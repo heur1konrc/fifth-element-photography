@@ -151,6 +151,7 @@ def scan_images():
     # Load saved data
     image_categories = load_image_categories()
     image_descriptions = load_image_descriptions()
+    image_titles = load_image_titles()
     background_images = load_background_images()
     featured_image_data = load_featured_image()
     
@@ -183,6 +184,15 @@ def scan_images():
             # Get description
             description = image_descriptions.get(filename, '')
             
+            # Get title (use saved title or generate from filename)
+            if filename in image_titles:
+                title = image_titles[filename]
+            else:
+                # Create clean title from filename
+                title = filename.replace('-', ' ').replace('_', ' ')
+                title = os.path.splitext(title)[0]
+                title = ' '.join(word.capitalize() for word in title.split())
+            
             # Check if image is marked for background use
             is_background = filename in background_images
             
@@ -191,11 +201,6 @@ def scan_images():
             
             # Get image info
             info = get_image_info(filepath)
-            
-            # Create clean title from filename
-            title = filename.replace('-', ' ').replace('_', ' ')
-            title = os.path.splitext(title)[0]
-            title = ' '.join(word.capitalize() for word in title.split())
             
             images.append({
                 'filename': filename,
