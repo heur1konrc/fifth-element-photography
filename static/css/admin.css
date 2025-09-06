@@ -91,7 +91,7 @@ body {
 }
 
 /* Upload Section */
-.upload-section {
+.upload-section, .category-section {
     background: #1a1a1a;
     padding: 30px;
     border-radius: 12px;
@@ -99,9 +99,77 @@ body {
     border: 1px solid #333;
 }
 
-.upload-section h2 {
+.upload-section h2, .category-section h2 {
     margin-bottom: 20px;
     color: #fff;
+}
+
+/* Category Management */
+.category-management {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.category-form {
+    background: #222;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.category-form h3 {
+    margin-bottom: 15px;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.add-category-form, .delete-category-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.add-category-form input, .delete-category-form select {
+    padding: 10px;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 4px;
+    color: #fff;
+}
+
+.current-categories {
+    background: #222;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #333;
+}
+
+.category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.category-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #333;
+    border-radius: 4px;
+}
+
+.category-name {
+    font-weight: bold;
+}
+
+.category-count {
+    background: #666;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
 }
 
 .upload-form {
@@ -205,13 +273,13 @@ body {
     line-height: 1.4;
 }
 
-.rename-form {
+.rename-form, .category-assign-form {
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
 }
 
-.rename-form input {
+.rename-form input, .category-assign-form select {
     flex: 1;
     padding: 8px 12px;
     background: #333;
@@ -221,7 +289,7 @@ body {
     font-size: 0.9rem;
 }
 
-.rename-form input:focus {
+.rename-form input:focus, .category-assign-form select:focus {
     outline: none;
     border-color: #4CAF50;
 }

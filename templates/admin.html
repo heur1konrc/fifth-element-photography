@@ -39,6 +39,56 @@
             </form>
         </section>
 
+        <!-- Category Management -->
+        <section class="category-section">
+            <h2>📁 Manage Categories</h2>
+            
+            <div class="category-management">
+                <!-- Add Category -->
+                <div class="category-form">
+                    <h3>Add New Category</h3>
+                    <form action="{{ url_for('manage_categories') }}" method="post" class="add-category-form">
+                        <input type="hidden" name="action" value="add">
+                        <input type="text" name="category_name" placeholder="Category name (e.g., Nature and Flora)" required>
+                        <button type="submit" class="btn btn-primary">Add Category</button>
+                    </form>
+                </div>
+
+                <!-- Delete Category -->
+                <div class="category-form">
+                    <h3>Delete Category</h3>
+                    <form action="{{ url_for('manage_categories') }}" method="post" class="delete-category-form">
+                        <input type="hidden" name="action" value="delete">
+                        <select name="category_to_delete" required>
+                            <option value="">Select category to delete</option>
+                            {% set categories = images|map(attribute='category')|unique|list %}
+                            {% for category in categories %}
+                                {% if category != 'other' %}
+                                    <option value="{{ category }}">{{ category.title() }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure? Images will be moved to Other category.')">Delete Category</button>
+                    </form>
+                </div>
+
+                <!-- Current Categories -->
+                <div class="current-categories">
+                    <h3>Current Categories</h3>
+                    <div class="category-list">
+                        {% set categories = images|map(attribute='category')|unique|list %}
+                        {% for category in categories %}
+                            {% set count = images|selectattr('category', 'equalto', category)|list|length %}
+                            <div class="category-item">
+                                <span class="category-name">{{ category.title() }}</span>
+                                <span class="category-count">{{ count }} images</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Image Management -->
         <section class="image-management">
             <h2>🖼️ Manage Images ({{ images|length }} total)</h2>
@@ -63,6 +113,25 @@
                                 <form action="{{ url_for('rename_image', filename=image.filename) }}" method="post" class="rename-form">
                                     <input type="text" name="new_name" placeholder="New filename" value="{{ image.filename.rsplit('.', 1)[0] }}">
                                     <button type="submit" class="btn btn-small btn-secondary">Rename</button>
+                                </form>
+                                
+                                <!-- Category Assignment -->
+                                <form action="{{ url_for('assign_category', filename=image.filename) }}" method="post" class="category-assign-form">
+                                    <select name="category" required>
+                                        <option value="">Change category</option>
+                                        {% set all_categories = images|map(attribute='category')|unique|list %}
+                                        {% for category in all_categories %}
+                                            <option value="{{ category }}" {% if category == image.category %}selected{% endif %}>{{ category.title() }}</option>
+                                        {% endfor %}
+                                        <option value="portrait">Portrait</option>
+                                        <option value="landscape">Landscape</option>
+                                        <option value="wildlife">Wildlife</option>
+                                        <option value="wedding">Wedding</option>
+                                        <option value="commercial">Commercial</option>
+                                        <option value="street">Street</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-small btn-secondary">Assign</button>
                                 </form>
                                 
                                 <!-- Delete Form -->

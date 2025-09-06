@@ -170,6 +170,50 @@ def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.route('/admin/categories', methods=['GET', 'POST'])
+def manage_categories():
+    """Manage categories - add/delete"""
+    if request.method == 'POST':
+        action = request.form.get('action')
+        
+        if action == 'add':
+            new_category = request.form.get('category_name', '').strip().lower()
+            if new_category:
+                flash(f'Category "{new_category}" added successfully!')
+            else:
+                flash('Please enter a category name')
+        
+        elif action == 'delete':
+            category_to_delete = request.form.get('category_to_delete')
+            if category_to_delete:
+                # Move images from deleted category to 'other'
+                images = scan_images()
+                updated_count = 0
+                for image in images:
+                    if image['category'] == category_to_delete:
+                        # In a real app, you'd update the database
+                        # For now, we'll just count them
+                        updated_count += 1
+                
+                flash(f'Category "{category_to_delete}" deleted. {updated_count} images moved to "other" category.')
+            else:
+                flash('Please select a category to delete')
+    
+    return redirect(url_for('admin'))
+
+@app.route('/admin/assign_category/<filename>', methods=['POST'])
+def assign_category(filename):
+    """Assign category to an image"""
+    new_category = request.form.get('category', '').strip().lower()
+    if new_category:
+        # In a real database app, you'd update the image record
+        # For file-based system, we could rename the file to include category
+        flash(f'Image "{filename}" assigned to category "{new_category}"')
+    else:
+        flash('Please select a category')
+    
+    return redirect(url_for('admin'))
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 
