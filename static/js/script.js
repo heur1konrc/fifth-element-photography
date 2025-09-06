@@ -62,6 +62,7 @@ function displayImages(images) {
             <div class="image-info">
                 <div class="image-title">${image.title}</div>
                 <div class="image-category">${image.category}</div>
+                <div class="image-dimensions">${image.width}×${image.height}</div>
             </div>
         </div>
     `).join('');
@@ -93,37 +94,46 @@ function updateImageCount(count) {
 
 // Setup event listeners
 function setupEventListeners() {
-    // Navigation links
+    // Navigation links for sections
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Update active state
+            const section = this.getAttribute('data-section');
+            
+            // Update active nav link
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             this.classList.add('active');
             
-            // Filter images
-            const category = this.getAttribute('data-category');
-            if (category) {
-                filterImages(category);
-            }
+            // Show corresponding section
+            showSection(section);
         });
     });
-
+    
     // Modal close events
-    closeModal.addEventListener('click', closeModalHandler);
-    modal.addEventListener('click', function(e) {
+    if (closeModal) {
+        closeModal.addEventListener('click', closeImageModal);
+    }
+    
+    window.addEventListener('click', function(e) {
         if (e.target === modal) {
-            closeModalHandler();
+            closeImageModal();
         }
     });
+}
 
-    // Keyboard events
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeModalHandler();
-        }
+// Show specific section
+function showSection(sectionName) {
+    // Hide all sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
     });
+    
+    // Show selected section
+    const targetSection = document.getElementById(`${sectionName}-section`);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
 }
 
 // Open image modal
@@ -136,15 +146,8 @@ function openModal(imageUrl, title, category) {
 }
 
 // Close modal
-function closeModalHandler() {
+function closeImageModal() {
     modal.style.display = 'none';
     document.body.style.overflow = 'auto';
-}
-
-// Smooth scrolling for navigation
-function smoothScroll(target) {
-    document.querySelector(target).scrollIntoView({
-        behavior: 'smooth'
-    });
 }
 

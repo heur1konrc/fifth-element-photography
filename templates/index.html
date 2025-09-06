@@ -17,52 +17,162 @@
             </div>
             
             <ul class="nav-menu">
-                <li><a href="#" class="nav-link active" data-category="all">HOME</a></li>
-                <li><a href="#" class="nav-link" data-category="all">ALL GALLERIES</a></li>
-                {% for category in categories|sort %}
-                    {% if category != 'other' %}
-                        <li><a href="#" class="nav-link" data-category="{{ category }}">
-                            {% if category == 'portrait' %}PORTRAITS
-                            {% elif category == 'landscape' %}LANDSCAPES  
-                            {% elif category == 'wildlife' %}WILDLIFE
-                            {% elif category == 'commercial' %}COMMERCIAL
-                            {% elif category == 'street' %}STREET
-                            {% elif category == 'flora' %}FLORA
-                            {% elif category == 'rickpersonal' %}PERSONAL
-                            {% else %}{{ category.upper() }}
-                            {% endif %}
-                            <span class="category-count">({{ category_counts.get(category, 0) }})</span>
-                        </a></li>
-                    {% endif %}
-                {% endfor %}
-                {% if category_counts.get('other', 0) > 0 %}
-                    <li><a href="#" class="nav-link" data-category="other">OTHER <span class="category-count">({{ category_counts.get('other', 0) }})</span></a></li>
-                {% endif %}
-                <li><a href="#" class="nav-link">CONTACT</a></li>
+                <li><a href="#" class="nav-link active" data-section="home">HOME</a></li>
+                <li><a href="#" class="nav-link" data-section="featured">FEATURED IMAGE</a></li>
+                <li><a href="#" class="nav-link" data-section="about">ABOUT</a></li>
+                <li><a href="#" class="nav-link" data-section="contact">CONTACT</a></li>
             </ul>
         </nav>
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <!-- Hero Section -->
-            <section class="hero">
-                <div class="hero-image" id="heroImage">
-                    <div class="hero-overlay">
-                        <h2 class="hero-title">Capturing the Quintessence</h2>
-                        <p class="hero-subtitle">Professional photography with artistic vision and technical excellence</p>
+            <!-- HOME Section -->
+            <section class="content-section active" id="home-section">
+                <div class="hero">
+                    <div class="hero-image" id="heroImage">
+                        <div class="hero-overlay">
+                            <h2 class="hero-title">Capturing the Quintessence</h2>
+                            <p class="hero-subtitle">Professional photography with artistic vision and technical excellence</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gallery">
+                    <div class="gallery-header">
+                        <h3 id="galleryTitle">Portfolio Gallery</h3>
+                        <div class="image-count" id="imageCount">Loading...</div>
+                    </div>
+                    
+                    <div class="masonry-grid" id="imageGrid">
+                        <div class="loading">Loading images...</div>
                     </div>
                 </div>
             </section>
 
-            <!-- Gallery Grid -->
-            <section class="gallery">
-                <div class="gallery-header">
-                    <h3 id="galleryTitle">All Galleries</h3>
-                    <div class="image-count" id="imageCount">Loading...</div>
+            <!-- FEATURED IMAGE Section -->
+            <section class="content-section" id="featured-section">
+                <div class="featured-container">
+                    <h2 class="section-title">Featured Image</h2>
+                    {% set featured_image = images|selectattr('is_featured')|first %}
+                    {% if featured_image %}
+                        <div class="featured-content">
+                            <div class="featured-image">
+                                <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
+                            </div>
+                            <div class="featured-info">
+                                <h3>{{ featured_image.title }}</h3>
+                                <div class="image-details">
+                                    <div class="detail-group">
+                                        <span class="detail-label">Camera:</span>
+                                        <span class="detail-value">Canon EOS R8</span>
+                                    </div>
+                                    <div class="detail-group">
+                                        <span class="detail-label">Lens:</span>
+                                        <span class="detail-value">EF24-105mm f/4L IS USM</span>
+                                    </div>
+                                    <div class="detail-group">
+                                        <span class="detail-label">Aperture:</span>
+                                        <span class="detail-value">f/4.0</span>
+                                    </div>
+                                    <div class="detail-group">
+                                        <span class="detail-label">Shutter Speed:</span>
+                                        <span class="detail-value">1/200</span>
+                                    </div>
+                                    <div class="detail-group">
+                                        <span class="detail-label">ISO:</span>
+                                        <span class="detail-value">800</span>
+                                    </div>
+                                    <div class="detail-group">
+                                        <span class="detail-label">Focal Length:</span>
+                                        <span class="detail-value">24.0mm</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="no-featured">
+                            <p>No featured image selected. Use the admin panel to set a featured image.</p>
+                        </div>
+                    {% endif %}
                 </div>
-                
-                <div class="masonry-grid" id="imageGrid">
-                    <div class="loading">Loading images...</div>
+            </section>
+
+            <!-- ABOUT Section -->
+            <section class="content-section" id="about-section">
+                <div class="about-container">
+                    <h2 class="section-title">About Fifth Element Photography</h2>
+                    <p class="section-subtitle">Where Moments Meet Imagination</p>
+                    
+                    <div class="about-content">
+                        <div class="about-image">
+                            {% set background_image = images|selectattr('is_background')|first %}
+                            {% if background_image %}
+                                <img src="{{ background_image.url }}" alt="About Fifth Element Photography">
+                            {% else %}
+                                <div class="placeholder-image">
+                                    <p>Set a background image in the admin panel</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="about-text">
+                            <p>Born and raised right here in Madison, Wisconsin, I'm a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths - as a musician/songwriter, a Teacher, a REALTOR®, and a Small Business Owner.</p>
+                            
+                            <p>Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography. At the heart of Fifth Element Photography: Capturing the Quintessence, resides my dedication to you.</p>
+                            
+                            <p>While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.</p>
+                            
+                            <p>For me, client satisfaction isn't just a goal - it's the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It's truly rewarding to see clients transform into lifelong friends, and that's the kind of connection I strive to build with everyone I work with.</p>
+                            
+                            <div class="signature">- Fifth Element Photography</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONTACT Section -->
+            <section class="content-section" id="contact-section">
+                <div class="contact-container">
+                    <h2 class="section-title">Contact</h2>
+                    <div class="contact-content">
+                        <div class="contact-info">
+                            <h3>Get In Touch</h3>
+                            <p>Ready to capture your special moments? Let's discuss your photography needs.</p>
+                            
+                            <div class="contact-details">
+                                <div class="contact-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>info@fifthelement.photography</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>(555) 123-4567</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Madison, Wisconsin</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-form">
+                            <h3>Send a Message</h3>
+                            <form>
+                                <div class="form-group">
+                                    <input type="text" placeholder="Your Name" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" placeholder="Your Email" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" placeholder="Subject">
+                                </div>
+                                <div class="form-group">
+                                    <textarea placeholder="Your Message" rows="5" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Send Message</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </section>
         </main>
