@@ -412,6 +412,8 @@ function uploadImages() {
     const fileInput = document.getElementById('fileInput');
     const files = fileInput.files;
     
+    console.log('Upload function called, files:', files.length);
+    
     if (files.length === 0) {
         alert('Please select files to upload.');
         return;
@@ -425,23 +427,31 @@ function uploadImages() {
     const formData = new FormData();
     for (let i = 0; i < files.length; i++) {
         formData.append('files', files[i]);
+        console.log('Added file:', files[i].name);
     }
+    
+    console.log('Sending upload request...');
     
     fetch('/upload_images', {
         method: 'POST',
         body: formData
-    }).then(response => response.json())
+    }).then(response => {
+        console.log('Upload response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('Upload response data:', data);
         if (data.success) {
             alert(data.message);
             closeUploadModal();
+            console.log('Reloading page...');
             location.reload(); // Refresh to show new images
         } else {
             alert('Upload failed: ' + data.message);
         }
     }).catch(error => {
-        console.error('Error:', error);
-        alert('Upload failed. Please try again.');
+        console.error('Upload error:', error);
+        alert('Upload failed. Please try again. Error: ' + error.message);
     }).finally(() => {
         uploadBtn.innerHTML = originalText;
         uploadBtn.disabled = false;
