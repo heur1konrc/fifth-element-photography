@@ -310,7 +310,8 @@ function initializeModals() {
     window.addEventListener('click', function(event) {
         const modals = document.querySelectorAll('.modal');
         modals.forEach(modal => {
-            if (event.target === modal) {
+            // Don't close if clicking inside modal content or drop zone
+            if (event.target === modal && !event.target.closest('.file-drop-zone')) {
                 modal.style.display = 'none';
             }
         });
@@ -332,29 +333,40 @@ function initializeFileUpload() {
     const dropZone = document.getElementById('fileDropZone');
     const fileInput = document.getElementById('fileInput');
     
-    if (!dropZone || !fileInput) return;
+    console.log('Initializing file upload, dropZone:', dropZone, 'fileInput:', fileInput);
+    
+    if (!dropZone || !fileInput) {
+        console.log('Drop zone or file input not found');
+        return;
+    }
     
     // Click to browse
-    dropZone.addEventListener('click', () => {
+    dropZone.addEventListener('click', (e) => {
+        e.stopPropagation(); // Prevent modal from closing
+        console.log('Drop zone clicked, triggering file input');
         fileInput.click();
     });
     
     // Drag and drop
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
+        e.stopPropagation();
         dropZone.classList.add('dragover');
     });
     
     dropZone.addEventListener('dragleave', (e) => {
         e.preventDefault();
+        e.stopPropagation();
         dropZone.classList.remove('dragover');
     });
     
     dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
+        e.stopPropagation();
         dropZone.classList.remove('dragover');
         
         const files = e.dataTransfer.files;
+        console.log('Files dropped:', files.length);
         if (files.length > 0) {
             fileInput.files = files;
             updateFileInputDisplay(files);
@@ -363,6 +375,7 @@ function initializeFileUpload() {
     
     // File input change
     fileInput.addEventListener('change', (e) => {
+        console.log('File input changed, files:', e.target.files.length);
         updateFileInputDisplay(e.target.files);
     });
 }
