@@ -6,6 +6,51 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSelectionCount();
 });
 
+// Alert function for user feedback
+function showAlert(message, type = 'info') {
+    // Create alert element
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+        z-index: 10000;
+        max-width: 400px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    `;
+    
+    // Set background color based on type
+    switch(type) {
+        case 'success':
+            alert.style.backgroundColor = '#28a745';
+            break;
+        case 'error':
+            alert.style.backgroundColor = '#dc3545';
+            break;
+        case 'warning':
+            alert.style.backgroundColor = '#ffc107';
+            alert.style.color = '#212529';
+            break;
+        default:
+            alert.style.backgroundColor = '#17a2b8';
+    }
+    
+    alert.textContent = message;
+    document.body.appendChild(alert);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (alert.parentNode) {
+            alert.parentNode.removeChild(alert);
+        }
+    }, 3000);
+}
+
 // Selection Management
 function selectAll() {
     const checkboxes = document.querySelectorAll('.image-select');

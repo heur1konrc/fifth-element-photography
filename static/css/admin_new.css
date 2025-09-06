@@ -1119,3 +1119,21 @@ select option {
     }
 }
 
+
+/* Set as Featured button styling */
+.btn-warning {
+    background: #fbbf24;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.btn-warning:hover {
+    background: #f59e0b;
+    color: #1f2937;
+    transform: translateY(-1px);
+}
+
+.btn-warning i {
+    color: #1f2937;
+}
+
