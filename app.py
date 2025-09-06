@@ -665,3 +665,125 @@ def toggle_featured(filename):
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 
+
+@app.route('/save_featured_story/<filename>', methods=['POST'])
+def save_featured_story(filename):
+    """Save story for featured image"""
+    try:
+        data = request.get_json()
+        story = data.get('story', '')
+        
+        # Load current featured stories
+        featured_stories = {}
+        if os.path.exists('/data/featured_stories.json'):
+            with open('/data/featured_stories.json', 'r') as f:
+                featured_stories = json.load(f)
+        
+        # Save story for this image
+        featured_stories[filename] = story
+        
+        # Save to file
+        with open('/data/featured_stories.json', 'w') as f:
+            json.dump(featured_stories, f)
+        
+        return jsonify({'success': True, 'message': 'Featured story saved successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/upload_about_image', methods=['POST'])
+def upload_about_image():
+    """Upload about page image with bio"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'message': 'No file provided'}), 400
+        
+        file = request.files['file']
+        bio = request.form.get('bio', '')
+        
+        if file.filename == '':
+            return jsonify({'success': False, 'message': 'No file selected'}), 400
+        
+        if file and allowed_file(file.filename):
+            # Create about images directory
+            about_dir = '/data/about'
+            if not os.path.exists(about_dir):
+                os.makedirs(about_dir)
+            
+            # Remove any existing about image
+            for existing_file in os.listdir(about_dir):
+                if existing_file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                    os.remove(os.path.join(about_dir, existing_file))
+            
+            # Save new about image
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(about_dir, filename)
+            file.save(filepath)
+            
+            # Save bio
+            bio_data = {
+                'filename': filename,
+                'bio': bio,
+                'upload_date': datetime.now().isoformat()
+            }
+            
+            with open('/data/about_data.json', 'w') as f:
+                json.dump(bio_data, f)
+            
+            return jsonify({
+                'success': True, 
+                'message': 'About image uploaded successfully',
+                'filename': filename
+            })
+        else:
+            return jsonify({'success': False, 'message': 'Invalid file type'}), 400
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/save_about_bio/<filename>', methods=['POST'])
+def save_about_bio(filename):
+    """Save bio for about image"""
+    try:
+        data = request.get_json()
+        bio = data.get('bio', '')
+        
+        # Load current about data
+        about_data = {}
+        if os.path.exists('/data/about_data.json'):
+            with open('/data/about_data.json', 'r') as f:
+                about_data = json.load(f)
+        
+        # Update bio
+        about_data['bio'] = bio
+        about_data['filename'] = filename
+        
+        # Save to file
+        with open('/data/about_data.json', 'w') as f:
+            json.dump(about_data, f)
+        
+        return jsonify({'success': True, 'message': 'About bio saved successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/remove_about_image/<filename>', methods=['POST'])
+def remove_about_image(filename):
+    """Remove about image"""
+    try:
+        about_dir = '/data/about'
+        filepath = os.path.join(about_dir, filename)
+        
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        
+        # Remove about data
+        if os.path.exists('/data/about_data.json'):
+            os.remove('/data/about_data.json')
+        
+        return jsonify({'success': True, 'message': 'About image removed successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/about/<filename>')
+def serve_about_image(filename):
+    """Serve about images"""
+    return send_file(os.path.join('/data/about', filename))
+

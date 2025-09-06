@@ -41,6 +41,104 @@
 
         <!-- Main Content -->
         <main class="dashboard-main">
+            <!-- Featured Image Story Management -->
+            <section class="featured-section">
+                <div class="section-header">
+                    <h2 class="section-title">Featured Image Story</h2>
+                    <p class="section-description">Use the "Set as Featured" toggle on portfolio images, then add your story here.</p>
+                </div>
+                
+                <div class="featured-content">
+                    {% set featured_image = images|selectattr('is_featured')|first %}
+                    {% if featured_image %}
+                        <div class="current-featured">
+                            <div class="featured-image-preview">
+                                <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
+                            </div>
+                            <div class="featured-info">
+                                <h3>{{ featured_image.title }}</h3>
+                                <p class="featured-description">{{ featured_image.description or 'No description' }}</p>
+                                <div class="featured-story">
+                                    <label for="featured-story">Featured Image Story:</label>
+                                    <textarea id="featured-story" placeholder="Tell the story behind this featured image..." rows="4">{{ featured_image.story or '' }}</textarea>
+                                    <button class="btn btn-small btn-success" onclick="saveFeaturedStory('{{ featured_image.filename }}')">
+                                        <i class="fas fa-save"></i>
+                                        Save Story
+                                    </button>
+                                </div>
+                                <div class="featured-meta">
+                                    <span class="dimensions">{{ featured_image.width }}×{{ featured_image.height }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="no-featured">
+                            <div class="no-featured-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h3>No Featured Image Selected</h3>
+                            <p>Use the "Set as Featured" toggle on any portfolio image below, then return here to add your story.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- About Page Management -->
+            <section class="about-section">
+                <div class="section-header">
+                    <h2 class="section-title">About Page Management</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" onclick="openAboutUploadModal()">
+                            <i class="fas fa-user"></i>
+                            Upload About Image
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="about-content">
+                    {% set about_image = images|selectattr('is_background')|first %}
+                    {% if about_image %}
+                        <div class="current-about">
+                            <div class="about-image-preview">
+                                <img src="{{ about_image.url }}" alt="About Image">
+                                <div class="about-overlay">
+                                    <button class="btn btn-danger" onclick="removeAboutImage('{{ about_image.filename }}')">
+                                        <i class="fas fa-trash"></i>
+                                        Remove About Image
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="about-info">
+                                <h3>About Page Image</h3>
+                                <div class="about-bio">
+                                    <label for="about-bio">About Page Bio:</label>
+                                    <textarea id="about-bio" placeholder="Write your personal bio for the About page..." rows="6">{{ about_image.bio or '' }}</textarea>
+                                    <button class="btn btn-small btn-success" onclick="saveAboutBio('{{ about_image.filename }}')">
+                                        <i class="fas fa-save"></i>
+                                        Save Bio
+                                    </button>
+                                </div>
+                                <div class="about-meta">
+                                    <span class="dimensions">{{ about_image.width }}×{{ about_image.height }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="no-about">
+                            <div class="no-about-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3>No About Image Set</h3>
+                            <p>Upload an image for your About page. This will be separate from your portfolio.</p>
+                            <button class="btn btn-primary" onclick="openAboutUploadModal()">
+                                <i class="fas fa-upload"></i>
+                                Upload About Image
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
             <!-- Portfolio Management Section -->
             <section class="portfolio-section">
                 <div class="section-header">
@@ -107,9 +205,6 @@
                                             </button>
                                             <button class="action-btn slideshow-btn" onclick="addToSlideshow('{{ image.filename }}')" title="Add to Slideshow">
                                                 <i class="fas fa-plus"></i>
-                                            </button>
-                                            <button class="action-btn about-btn" onclick="setAsAbout('{{ image.filename }}')" title="Set as About">
-                                                <i class="fas fa-user"></i>
                                             </button>
                                             <button class="action-btn delete-btn" onclick="deleteImage('{{ image.filename }}')" title="Delete">
                                                 <i class="fas fa-trash"></i>
@@ -323,6 +418,46 @@
             <div class="modal-body">
                 <div id="editModalContent">
                     <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Image Upload Modal -->
+    <div id="aboutUploadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Upload About Page Image</h3>
+                <button class="modal-close" onclick="closeAboutUploadModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-section">
+                    <div class="file-drop-zone" id="aboutFileDropZone">
+                        <div class="drop-zone-content">
+                            <i class="fas fa-user"></i>
+                            <h4>Upload About Page Image</h4>
+                            <p>Drag & drop your about page image here or click to browse</p>
+                            <p class="file-info">Supports: JPG, PNG, GIF</p>
+                        </div>
+                        <input type="file" id="aboutFileInput" accept="image/*" style="display: none;">
+                    </div>
+                    
+                    <div class="about-form" id="aboutForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="aboutBioText">About Page Bio:</label>
+                            <textarea id="aboutBioText" placeholder="Write your personal bio for the About page..." rows="6"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeAboutUploadModal()">Cancel</button>
+                    <button class="btn btn-primary" id="uploadAboutBtn" onclick="uploadAboutImage()">
+                        <i class="fas fa-upload"></i>
+                        Upload About Image
+                    </button>
                 </div>
             </div>
         </div>

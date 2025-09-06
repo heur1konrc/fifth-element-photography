@@ -851,3 +851,271 @@ select option {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
 }
 
+
+/* Featured Image Story Section */
+.featured-section {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.section-description {
+    color: #888;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.featured-content {
+    margin-top: 1.5rem;
+}
+
+.current-featured {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.featured-image-preview {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.featured-image-preview img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.featured-info h3 {
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+.featured-description {
+    color: #ccc;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.featured-story {
+    margin-bottom: 1rem;
+}
+
+.featured-story label {
+    display: block;
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.featured-story textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #fff;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    resize: vertical;
+    margin-bottom: 0.75rem;
+}
+
+.featured-story textarea::placeholder {
+    color: #888;
+}
+
+.featured-story textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.featured-meta {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.no-featured {
+    text-align: center;
+    padding: 3rem;
+    color: #888;
+}
+
+.no-featured-icon {
+    font-size: 3rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.no-featured h3 {
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+/* About Section */
+.about-section {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.about-content {
+    margin-top: 1.5rem;
+}
+
+.current-about {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.about-image-preview {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.about-image-preview img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.about-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.about-image-preview:hover .about-overlay {
+    opacity: 1;
+}
+
+.about-info h3 {
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.about-bio {
+    margin-bottom: 1rem;
+}
+
+.about-bio label {
+    display: block;
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.about-bio textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #fff;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    resize: vertical;
+    margin-bottom: 0.75rem;
+    min-height: 120px;
+}
+
+.about-bio textarea::placeholder {
+    color: #888;
+}
+
+.about-bio textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.about-meta {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.no-about {
+    text-align: center;
+    padding: 3rem;
+    color: #888;
+}
+
+.no-about-icon {
+    font-size: 3rem;
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.no-about h3 {
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+
+/* About Upload Modal Specific Styles */
+.about-form {
+    margin-top: 1rem;
+}
+
+.about-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.about-form label {
+    display: block;
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.about-form textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #fff;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.about-form textarea::placeholder {
+    color: #888;
+}
+
+.about-form textarea:focus {
+    outline: none;
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .current-featured,
+    .current-about {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .featured-image-preview img,
+    .about-image-preview img {
+        height: 150px;
+    }
+}
+

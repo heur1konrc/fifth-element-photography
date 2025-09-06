@@ -530,3 +530,215 @@ function saveImageChanges(filename) {
     });
 }
 
+
+// Featured Image Story Functions
+function saveFeaturedStory(filename) {
+    const story = document.getElementById('featured-story').value;
+    
+    fetch(`/save_featured_story/${filename}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ story: story })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('Featured image story saved successfully!', 'success');
+        } else {
+            showAlert('Error saving story: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('Error saving featured story', 'error');
+    });
+}
+
+// About Image Functions
+function openAboutUploadModal() {
+    document.getElementById('aboutUploadModal').style.display = 'block';
+    initializeAboutUpload();
+}
+
+function closeAboutUploadModal() {
+    document.getElementById('aboutUploadModal').style.display = 'none';
+    resetAboutUpload();
+}
+
+function initializeAboutUpload() {
+    const dropZone = document.getElementById('aboutFileDropZone');
+    const fileInput = document.getElementById('aboutFileInput');
+    const aboutForm = document.getElementById('aboutForm');
+    
+    // Click to browse
+    dropZone.addEventListener('click', (e) => {
+        e.stopPropagation();
+        fileInput.click();
+    });
+    
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            dropZone.innerHTML = `
+                <div class="drop-zone-content">
+                    <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                    <h4>File Selected</h4>
+                    <p>${file.name}</p>
+                    <p class="file-info">Ready to upload</p>
+                </div>
+            `;
+            aboutForm.style.display = 'block';
+        }
+    });
+    
+    // Drag and drop
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = '#2196F3';
+        dropZone.style.backgroundColor = 'rgba(33, 150, 243, 0.1)';
+    });
+    
+    dropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        dropZone.style.backgroundColor = 'transparent';
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        dropZone.style.backgroundColor = 'transparent';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            fileInput.dispatchEvent(new Event('change'));
+        }
+    });
+}
+
+function resetAboutUpload() {
+    const dropZone = document.getElementById('aboutFileDropZone');
+    const fileInput = document.getElementById('aboutFileInput');
+    const aboutForm = document.getElementById('aboutForm');
+    const bioText = document.getElementById('aboutBioText');
+    
+    fileInput.value = '';
+    bioText.value = '';
+    aboutForm.style.display = 'none';
+    
+    dropZone.innerHTML = `
+        <div class="drop-zone-content">
+            <i class="fas fa-user"></i>
+            <h4>Upload About Page Image</h4>
+            <p>Drag & drop your about page image here or click to browse</p>
+            <p class="file-info">Supports: JPG, PNG, GIF</p>
+        </div>
+    `;
+}
+
+function uploadAboutImage() {
+    const fileInput = document.getElementById('aboutFileInput');
+    const bioText = document.getElementById('aboutBioText').value;
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+        showAlert('Please select an image file', 'error');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+    formData.append('bio', bioText);
+    
+    // Update button state
+    const uploadBtn = document.getElementById('uploadAboutBtn');
+    const originalText = uploadBtn.innerHTML;
+    uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    uploadBtn.disabled = true;
+    
+    fetch('/upload_about_image', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('About image uploaded successfully!', 'success');
+            closeAboutUploadModal();
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showAlert('Error uploading image: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('Error uploading about image', 'error');
+    })
+    .finally(() => {
+        uploadBtn.innerHTML = originalText;
+        uploadBtn.disabled = false;
+    });
+}
+
+function saveAboutBio(filename) {
+    const bio = document.getElementById('about-bio').value;
+    
+    fetch(`/save_about_bio/${filename}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ bio: bio })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('About bio saved successfully!', 'success');
+        } else {
+            showAlert('Error saving bio: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('Error saving about bio', 'error');
+    });
+}
+
+function removeAboutImage(filename) {
+    if (!confirm('Are you sure you want to remove this about image?')) {
+        return;
+    }
+    
+    fetch(`/remove_about_image/${filename}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('About image removed successfully!', 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showAlert('Error removing image: ' + data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('Error removing about image', 'error');
+    });
+}
+
+// Close modals when clicking outside
+window.addEventListener('click', function(e) {
+    const aboutModal = document.getElementById('aboutUploadModal');
+    if (e.target === aboutModal) {
+        closeAboutUploadModal();
+    }
+});
+
