@@ -328,6 +328,9 @@ function initializeModals() {
     });
 }
 
+// Global variable to store selected files
+let selectedFiles = null;
+
 // File Upload Enhancement
 function initializeFileUpload() {
     const dropZone = document.getElementById('fileDropZone');
@@ -368,6 +371,7 @@ function initializeFileUpload() {
         const files = e.dataTransfer.files;
         console.log('Files dropped:', files.length);
         if (files.length > 0) {
+            selectedFiles = files; // Store files globally
             fileInput.files = files;
             updateFileInputDisplay(files);
         }
@@ -376,6 +380,7 @@ function initializeFileUpload() {
     // File input change
     fileInput.addEventListener('change', (e) => {
         console.log('File input changed, files:', e.target.files.length);
+        selectedFiles = e.target.files; // Store files globally
         updateFileInputDisplay(e.target.files);
     });
 }
@@ -422,20 +427,23 @@ function enableAutoRefresh(interval = 30000) {
 
 // Upload Images Function
 function uploadImages() {
-    const fileInput = document.getElementById('fileInput');
+    console.log('Upload function called, selectedFiles:', selectedFiles);
     
-    console.log('Upload function called, fileInput:', fileInput);
+    // Try to get files from global variable first, then from file input
+    let files = selectedFiles;
     
-    if (!fileInput) {
-        console.error('File input element not found!');
-        alert('Error: File input not found. Please try refreshing the page.');
-        return;
+    if (!files || files.length === 0) {
+        const fileInput = document.getElementById('fileInput');
+        console.log('No global files, trying fileInput:', fileInput);
+        
+        if (fileInput && fileInput.files) {
+            files = fileInput.files;
+        }
     }
     
-    const files = fileInput.files;
-    console.log('Files found:', files.length);
+    console.log('Final files to upload:', files ? files.length : 0);
     
-    if (files.length === 0) {
+    if (!files || files.length === 0) {
         alert('Please select files to upload.');
         return;
     }
@@ -470,6 +478,7 @@ function uploadImages() {
         console.log('Upload response data:', data);
         if (data.success) {
             alert(data.message);
+            selectedFiles = null; // Clear global files
             closeUploadModal();
             console.log('Reloading page...');
             location.reload(); // Refresh to show new images
