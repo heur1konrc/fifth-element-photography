@@ -423,9 +423,17 @@ function enableAutoRefresh(interval = 30000) {
 // Upload Images Function
 function uploadImages() {
     const fileInput = document.getElementById('fileInput');
-    const files = fileInput.files;
     
-    console.log('Upload function called, files:', files.length);
+    console.log('Upload function called, fileInput:', fileInput);
+    
+    if (!fileInput) {
+        console.error('File input element not found!');
+        alert('Error: File input not found. Please try refreshing the page.');
+        return;
+    }
+    
+    const files = fileInput.files;
+    console.log('Files found:', files.length);
     
     if (files.length === 0) {
         alert('Please select files to upload.');
@@ -433,6 +441,12 @@ function uploadImages() {
     }
     
     const uploadBtn = document.querySelector('#uploadModal .btn-primary');
+    if (!uploadBtn) {
+        console.error('Upload button not found!');
+        alert('Error: Upload button not found.');
+        return;
+    }
+    
     const originalText = uploadBtn.innerHTML;
     uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
     uploadBtn.disabled = true;
