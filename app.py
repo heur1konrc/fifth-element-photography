@@ -11,6 +11,47 @@ app.secret_key = 'fifth-element-admin-key-2024'
 # Configuration
 IMAGES_FOLDER = '/data'
 STATIC_FOLDER = 'static'
+CATEGORIES_FILE = '/data/categories.json'
+FEATURED_FILE = '/data/featured.json'
+ABOUT_FILE = '/data/about.json'
+
+def load_categories():
+    """Load categories from JSON file"""
+    try:
+        if os.path.exists(CATEGORIES_FILE):
+            with open(CATEGORIES_FILE, 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return ['portrait', 'landscape', 'wildlife', 'wedding', 'commercial', 'street', 'other']
+
+def save_categories(categories):
+    """Save categories to JSON file"""
+    try:
+        with open(CATEGORIES_FILE, 'w') as f:
+            json.dump(categories, f)
+        return True
+    except:
+        return False
+
+def load_image_categories():
+    """Load image category assignments"""
+    try:
+        if os.path.exists('/data/image_categories.json'):
+            with open('/data/image_categories.json', 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return {}
+
+def save_image_categories(assignments):
+    """Save image category assignments"""
+    try:
+        with open('/data/image_categories.json', 'w') as f:
+            json.dump(assignments, f)
+        return True
+    except:
+        return False
 
 def get_image_info(filepath):
     """Get image dimensions and basic info"""
@@ -31,8 +72,11 @@ def scan_images():
     if not os.path.exists(IMAGES_FOLDER):
         return images
     
-    # Categories mapping
-    categories = {
+    # Load saved category assignments
+    image_categories = load_image_categories()
+    
+    # Default categories mapping for auto-detection
+    default_categories = {
         'portrait': ['portrait', 'headshot', 'person', 'people', 'face'],
         'landscape': ['mountain', 'lake', 'sunset', 'landscape', 'nature', 'scenic'],
         'wildlife': ['bird', 'animal', 'turkey', 'duck', 'rabbit', 'crane', 'sparrow', 'woodpecker'],
@@ -45,13 +89,17 @@ def scan_images():
         if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
             filepath = os.path.join(IMAGES_FOLDER, filename)
             
-            # Determine category based on filename
-            category = 'other'
-            filename_lower = filename.lower()
-            for cat, keywords in categories.items():
-                if any(keyword in filename_lower for keyword in keywords):
-                    category = cat
-                    break
+            # Use saved category assignment or auto-detect
+            if filename in image_categories:
+                category = image_categories[filename]
+            else:
+                # Auto-detect category based on filename
+                category = 'other'
+                filename_lower = filename.lower()
+                for cat, keywords in default_categories.items():
+                    if any(keyword in filename_lower for keyword in keywords):
+                        category = cat
+                        break
             
             # Get image info
             info = get_image_info(filepath)
@@ -175,29 +223,40 @@ def manage_categories():
     """Manage categories - add/delete"""
     if request.method == 'POST':
         action = request.form.get('action')
+        categories = load_categories()
         
         if action == 'add':
             new_category = request.form.get('category_name', '').strip().lower()
-            if new_category:
-                flash(f'Category "{new_category}" added successfully!')
+            if new_category and new_category not in categories:
+                categories.append(new_category)
+                if save_categories(categories):
+                    flash(f'Category "{new_category}" added successfully!')
+                else:
+                    flash('Error saving category')
+            elif new_category in categories:
+                flash('Category already exists')
             else:
                 flash('Please enter a category name')
         
         elif action == 'delete':
             category_to_delete = request.form.get('category_to_delete')
-            if category_to_delete:
+            if category_to_delete and category_to_delete in categories:
+                # Remove from categories list
+                categories.remove(category_to_delete)
+                save_categories(categories)
+                
                 # Move images from deleted category to 'other'
-                images = scan_images()
+                image_categories = load_image_categories()
                 updated_count = 0
-                for image in images:
-                    if image['category'] == category_to_delete:
-                        # In a real app, you'd update the database
-                        # For now, we'll just count them
+                for filename, category in image_categories.items():
+                    if category == category_to_delete:
+                        image_categories[filename] = 'other'
                         updated_count += 1
                 
+                save_image_categories(image_categories)
                 flash(f'Category "{category_to_delete}" deleted. {updated_count} images moved to "other" category.')
             else:
-                flash('Please select a category to delete')
+                flash('Please select a valid category to delete')
     
     return redirect(url_for('admin'))
 
@@ -206,9 +265,12 @@ def assign_category(filename):
     """Assign category to an image"""
     new_category = request.form.get('category', '').strip().lower()
     if new_category:
-        # In a real database app, you'd update the image record
-        # For file-based system, we could rename the file to include category
-        flash(f'Image "{filename}" assigned to category "{new_category}"')
+        image_categories = load_image_categories()
+        image_categories[filename] = new_category
+        if save_image_categories(image_categories):
+            flash(f'Image "{filename}" assigned to category "{new_category}"')
+        else:
+            flash('Error saving category assignment')
     else:
         flash('Please select a category')
     
