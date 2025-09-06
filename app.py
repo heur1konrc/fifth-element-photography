@@ -199,6 +199,17 @@ def scan_images():
             # Check if image is the weekly featured image
             is_featured = featured_image_data and featured_image_data.get('filename') == filename
             
+            # Get featured story if this is the featured image
+            featured_story = ''
+            if is_featured:
+                try:
+                    if os.path.exists('/data/featured_stories.json'):
+                        with open('/data/featured_stories.json', 'r') as f:
+                            featured_stories = json.load(f)
+                            featured_story = featured_stories.get(filename, '')
+                except:
+                    pass
+            
             # Get image info
             info = get_image_info(filepath)
             
@@ -209,6 +220,7 @@ def scan_images():
                 'description': description,
                 'is_background': is_background,
                 'is_featured': is_featured,
+                'story': featured_story,
                 'url': f'/images/{filename}',
                 'width': info['width'],
                 'height': info['height']
@@ -645,18 +657,15 @@ def toggle_background(filename):
 def toggle_featured(filename):
     """Toggle featured image setting"""
     try:
-        # Load current featured settings
-        featured_settings = {}
-        if os.path.exists(FEATURED_FILE):
-            with open(FEATURED_FILE, 'r') as f:
-                featured_settings = json.load(f)
+        # Save featured image data in the format expected by scan_images
+        featured_data = {
+            'filename': filename,
+            'set_date': datetime.now().isoformat()
+        }
         
-        # Set this image as featured
-        featured_settings['featured_image'] = filename
-        
-        # Save settings
-        with open(FEATURED_FILE, 'w') as f:
-            json.dump(featured_settings, f)
+        # Save to the file that scan_images reads from
+        with open('/data/featured_image.json', 'w') as f:
+            json.dump(featured_data, f)
         
         return jsonify({'success': True, 'message': f'Set {filename} as featured image'})
     except Exception as e:
