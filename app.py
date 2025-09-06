@@ -66,14 +66,34 @@ def get_image_info(filepath):
     except:
         return {'width': 400, 'height': 300, 'format': 'JPEG'}
 
+def load_image_descriptions():
+    """Load image descriptions"""
+    try:
+        if os.path.exists('/data/image_descriptions.json'):
+            with open('/data/image_descriptions.json', 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return {}
+
+def save_image_descriptions(descriptions):
+    """Save image descriptions"""
+    try:
+        with open('/data/image_descriptions.json', 'w') as f:
+            json.dump(descriptions, f)
+        return True
+    except:
+        return False
+
 def scan_images():
     """Scan /data directory for images"""
     images = []
     if not os.path.exists(IMAGES_FOLDER):
         return images
     
-    # Load saved category assignments
+    # Load saved category assignments and descriptions
     image_categories = load_image_categories()
+    image_descriptions = load_image_descriptions()
     
     # Default categories mapping for auto-detection
     default_categories = {
@@ -101,6 +121,9 @@ def scan_images():
                         category = cat
                         break
             
+            # Get description
+            description = image_descriptions.get(filename, '')
+            
             # Get image info
             info = get_image_info(filepath)
             
@@ -113,6 +136,7 @@ def scan_images():
                 'filename': filename,
                 'title': title,
                 'category': category,
+                'description': description,
                 'url': f'/images/{filename}',
                 'width': info['width'],
                 'height': info['height']
@@ -274,6 +298,19 @@ def assign_category(filename):
             flash('Error saving category assignment')
     else:
         flash('Please select a category')
+    
+    return redirect(url_for('admin'))
+
+@app.route('/admin/update_description/<filename>', methods=['POST'])
+def update_description(filename):
+    """Update image description"""
+    new_description = request.form.get('description', '').strip()
+    image_descriptions = load_image_descriptions()
+    image_descriptions[filename] = new_description
+    if save_image_descriptions(image_descriptions):
+        flash(f'Description updated for "{filename}"')
+    else:
+        flash('Error saving description')
     
     return redirect(url_for('admin'))
 

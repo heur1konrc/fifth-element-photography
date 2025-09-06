@@ -104,13 +104,20 @@
                                 <p class="image-meta">
                                     <strong>File:</strong> {{ image.filename }}<br>
                                     <strong>Category:</strong> {{ image.category }}<br>
-                                    <strong>Size:</strong> {{ image.width }}x{{ image.height }}
+                                    <strong>Size:</strong> {{ image.width }}x{{ image.height }}<br>
+                                    <strong>Description:</strong> {{ image.description or 'No description' }}
                                 </p>
                                 
                                 <!-- Rename Form -->
                                 <form action="{{ url_for('rename_image', filename=image.filename) }}" method="post" class="rename-form">
                                     <input type="text" name="new_name" placeholder="New filename" value="{{ image.filename.rsplit('.', 1)[0] }}">
                                     <button type="submit" class="btn btn-small btn-secondary">Rename</button>
+                                </form>
+                                
+                                <!-- Description Form -->
+                                <form action="{{ url_for('update_description', filename=image.filename) }}" method="post" class="description-form">
+                                    <input type="text" name="description" placeholder="Image description" value="{{ image.description or '' }}">
+                                    <button type="submit" class="btn btn-small btn-secondary">Update Description</button>
                                 </form>
                                 
                                 <!-- Category Assignment -->
