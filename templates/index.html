@@ -61,6 +61,14 @@
                             </div>
                             <div class="featured-info">
                                 <h3>{{ featured_image.title }}</h3>
+                                
+                                {% if featured_image.story %}
+                                <div class="featured-story">
+                                    <h4>Story</h4>
+                                    <p>{{ featured_image.story }}</p>
+                                </div>
+                                {% endif %}
+                                
                                 <div class="image-details">
                                     <div class="detail-group">
                                         <span class="detail-label">Camera:</span>
