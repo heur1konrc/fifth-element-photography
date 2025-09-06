@@ -407,3 +407,44 @@ function enableAutoRefresh(interval = 30000) {
 // Initialize auto-refresh (uncomment if needed)
 // enableAutoRefresh();
 
+// Upload Images Function
+function uploadImages() {
+    const fileInput = document.getElementById('fileInput');
+    const files = fileInput.files;
+    
+    if (files.length === 0) {
+        alert('Please select files to upload.');
+        return;
+    }
+    
+    const uploadBtn = document.querySelector('#uploadModal .btn-primary');
+    const originalText = uploadBtn.innerHTML;
+    uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+    uploadBtn.disabled = true;
+    
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+    }
+    
+    fetch('/upload_images', {
+        method: 'POST',
+        body: formData
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            closeUploadModal();
+            location.reload(); // Refresh to show new images
+        } else {
+            alert('Upload failed: ' + data.message);
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Upload failed. Please try again.');
+    }).finally(() => {
+        uploadBtn.innerHTML = originalText;
+        uploadBtn.disabled = false;
+    });
+}
+

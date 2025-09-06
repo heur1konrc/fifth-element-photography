@@ -487,6 +487,126 @@ def backup_system():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+# New routes for admin interface functionality
+@app.route('/delete_image/<filename>', methods=['POST'])
+def delete_image_new(filename):
+    """Delete an image (new admin interface)"""
+    try:
+        filepath = os.path.join(IMAGES_FOLDER, filename)
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            # Also remove from category assignments
+            image_categories = load_image_categories()
+            if filename in image_categories:
+                del image_categories[filename]
+                save_image_categories(image_categories)
+            return jsonify({'success': True, 'message': f'Image {filename} deleted successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Image not found'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/assign_category/<filename>', methods=['POST'])
+def assign_category_new(filename):
+    """Assign category to an image (new admin interface)"""
+    try:
+        category = request.form.get('category', '').strip().lower()
+        if not category:
+            return jsonify({'success': False, 'message': 'Category is required'}), 400
+        
+        image_categories = load_image_categories()
+        image_categories[filename] = category
+        
+        if save_image_categories(image_categories):
+            return jsonify({'success': True, 'message': f'Image {filename} assigned to category {category}'})
+        else:
+            return jsonify({'success': False, 'message': 'Error saving category assignment'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/upload_images', methods=['POST'])
+def upload_images_new():
+    """Upload multiple images (new admin interface)"""
+    try:
+        uploaded_files = []
+        failed_files = []
+        
+        if 'files' not in request.files:
+            return jsonify({'success': False, 'message': 'No files provided'}), 400
+        
+        files = request.files.getlist('files')
+        
+        for file in files:
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                # Ensure unique filename
+                counter = 1
+                base_name, ext = os.path.splitext(filename)
+                while os.path.exists(os.path.join(IMAGES_FOLDER, filename)):
+                    filename = f"{base_name}_{counter}{ext}"
+                    counter += 1
+                
+                filepath = os.path.join(IMAGES_FOLDER, filename)
+                file.save(filepath)
+                uploaded_files.append(filename)
+            else:
+                failed_files.append(file.filename if file.filename else 'Unknown file')
+        
+        message = f'Successfully uploaded {len(uploaded_files)} file(s)'
+        if failed_files:
+            message += f'. Failed to upload {len(failed_files)} file(s): {", ".join(failed_files)}'
+        
+        return jsonify({
+            'success': True, 
+            'message': message,
+            'uploaded': uploaded_files,
+            'failed': failed_files
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/toggle_background/<filename>', methods=['POST'])
+def toggle_background(filename):
+    """Toggle background image setting"""
+    try:
+        # Load current about settings
+        about_settings = {}
+        if os.path.exists(ABOUT_FILE):
+            with open(ABOUT_FILE, 'r') as f:
+                about_settings = json.load(f)
+        
+        # Set this image as background
+        about_settings['background_image'] = filename
+        
+        # Save settings
+        with open(ABOUT_FILE, 'w') as f:
+            json.dump(about_settings, f)
+        
+        return jsonify({'success': True, 'message': f'Set {filename} as background image'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/toggle_featured/<filename>', methods=['POST'])
+def toggle_featured(filename):
+    """Toggle featured image setting"""
+    try:
+        # Load current featured settings
+        featured_settings = {}
+        if os.path.exists(FEATURED_FILE):
+            with open(FEATURED_FILE, 'r') as f:
+                featured_settings = json.load(f)
+        
+        # Set this image as featured
+        featured_settings['featured_image'] = filename
+        
+        # Save settings
+        with open(FEATURED_FILE, 'w') as f:
+            json.dump(featured_settings, f)
+        
+        return jsonify({'success': True, 'message': f'Set {filename} as featured image'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 
