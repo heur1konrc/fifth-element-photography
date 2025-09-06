@@ -105,7 +105,9 @@
                                     <strong>File:</strong> {{ image.filename }}<br>
                                     <strong>Category:</strong> {{ image.category }}<br>
                                     <strong>Size:</strong> {{ image.width }}x{{ image.height }}<br>
-                                    <strong>Description:</strong> {{ image.description or 'No description' }}
+                                    <strong>Description:</strong> {{ image.description or 'No description' }}<br>
+                                    <strong>Background:</strong> {{ 'Yes' if image.is_background else 'No' }}<br>
+                                    <strong>Featured:</strong> {{ 'Yes' if image.is_featured else 'No' }}
                                 </p>
                                 
                                 <!-- Rename Form -->
@@ -119,6 +121,23 @@
                                     <input type="text" name="description" placeholder="Image description" value="{{ image.description or '' }}">
                                     <button type="submit" class="btn btn-small btn-secondary">Update Description</button>
                                 </form>
+                                
+                                <!-- Background and Featured Controls -->
+                                <div class="image-controls">
+                                    <form action="{{ url_for('toggle_background', filename=image.filename) }}" method="post" class="control-form">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="is_background" {% if image.is_background %}checked{% endif %} onchange="this.form.submit()">
+                                            Use as Background Image
+                                        </label>
+                                    </form>
+                                    
+                                    <form action="{{ url_for('set_featured', filename=image.filename) }}" method="post" class="control-form">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" name="is_featured" {% if image.is_featured %}checked{% endif %} onchange="this.form.submit()">
+                                            Set as Weekly Featured Image
+                                        </label>
+                                    </form>
+                                </div>
                                 
                                 <!-- Category Assignment -->
                                 <form action="{{ url_for('assign_category', filename=image.filename) }}" method="post" class="category-assign-form">

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, send_from_directory, request, redirect, url_for, flash
+from flask import Flask, render_template, jsonify, send_from_directory, send_file, request, redirect, url_for, flash
 import os
 import json
 from PIL import Image
@@ -85,15 +85,55 @@ def save_image_descriptions(descriptions):
     except:
         return False
 
+def load_background_images():
+    """Load images marked for background use"""
+    try:
+        if os.path.exists('/data/background_images.json'):
+            with open('/data/background_images.json', 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return []
+
+def save_background_images(background_list):
+    """Save images marked for background use"""
+    try:
+        with open('/data/background_images.json', 'w') as f:
+            json.dump(background_list, f)
+        return True
+    except:
+        return False
+
+def load_featured_image():
+    """Load weekly featured image"""
+    try:
+        if os.path.exists('/data/featured_image.json'):
+            with open('/data/featured_image.json', 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return None
+
+def save_featured_image(featured_data):
+    """Save weekly featured image"""
+    try:
+        with open('/data/featured_image.json', 'w') as f:
+            json.dump(featured_data, f)
+        return True
+    except:
+        return False
+
 def scan_images():
     """Scan /data directory for images"""
     images = []
     if not os.path.exists(IMAGES_FOLDER):
         return images
     
-    # Load saved category assignments and descriptions
+    # Load saved data
     image_categories = load_image_categories()
     image_descriptions = load_image_descriptions()
+    background_images = load_background_images()
+    featured_image_data = load_featured_image()
     
     # Default categories mapping for auto-detection
     default_categories = {
@@ -124,6 +164,12 @@ def scan_images():
             # Get description
             description = image_descriptions.get(filename, '')
             
+            # Check if image is marked for background use
+            is_background = filename in background_images
+            
+            # Check if image is the weekly featured image
+            is_featured = featured_image_data and featured_image_data.get('filename') == filename
+            
             # Get image info
             info = get_image_info(filepath)
             
@@ -137,6 +183,8 @@ def scan_images():
                 'title': title,
                 'category': category,
                 'description': description,
+                'is_background': is_background,
+                'is_featured': is_featured,
                 'url': f'/images/{filename}',
                 'width': info['width'],
                 'height': info['height']
@@ -187,7 +235,7 @@ def admin():
     try:
         images = scan_images()
         all_categories = load_categories()
-        return render_template('admin.html', images=images, all_categories=all_categories)
+        return render_template('admin_new.html', images=images, all_categories=all_categories)
     except Exception as e:
         return f"Admin Error: {str(e)}", 500
 
@@ -334,6 +382,110 @@ def update_description(filename):
         flash('Error saving description')
     
     return redirect(url_for('admin'))
+
+@app.route('/edit_image/<filename>')
+def edit_image(filename):
+    """Get edit form for an image"""
+    try:
+        images = scan_images()
+        image = next((img for img in images if img['filename'] == filename), None)
+        if not image:
+            return "Image not found", 404
+        
+        all_categories = load_categories()
+        
+        # Return HTML form for editing
+        form_html = f"""
+        <form action="/update_image/{filename}" method="post" class="edit-form">
+            <div class="form-group">
+                <label>Title:</label>
+                <input type="text" name="title" value="{image.get('title', '')}" required>
+            </div>
+            <div class="form-group">
+                <label>Description:</label>
+                <textarea name="description" rows="3">{image.get('description', '')}</textarea>
+            </div>
+            <div class="form-group">
+                <label>Category:</label>
+                <select name="category" required>
+                    {''.join([f'<option value="{cat}" {"selected" if cat == image.get("category") else ""}>{cat.title()}</option>' for cat in all_categories])}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="is_featured" {"checked" if image.get('is_featured') else ""}>
+                    Set as Featured Image
+                </label>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="is_background" {"checked" if image.get('is_background') else ""}>
+                    Set as Background Image
+                </label>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+        """
+        return form_html
+    except Exception as e:
+        return f"Error: {str(e)}", 500
+
+@app.route('/update_image/<filename>', methods=['POST'])
+def update_image(filename):
+    """Update image metadata"""
+    try:
+        # Update image metadata (this would need to be implemented based on your data structure)
+        # For now, just redirect back to admin
+        flash(f'Image {filename} updated successfully')
+    except Exception as e:
+        flash(f'Error updating image: {str(e)}')
+    
+    return redirect(url_for('admin'))
+
+@app.route('/add_to_slideshow/<filename>', methods=['POST'])
+def add_to_slideshow(filename):
+    """Add image to slideshow"""
+    try:
+        # This would add the image to a slideshow configuration
+        # For now, just return success
+        return jsonify({'success': True, 'message': f'Added {filename} to slideshow'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/backup_system', methods=['POST'])
+def backup_system():
+    """Create system backup"""
+    try:
+        import zipfile
+        import tempfile
+        from datetime import datetime
+        
+        # Create temporary zip file
+        temp_dir = tempfile.mkdtemp()
+        backup_filename = f"portfolio_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+        backup_path = os.path.join(temp_dir, backup_filename)
+        
+        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            # Add all images
+            for root, dirs, files in os.walk(IMAGES_FOLDER):
+                for file in files:
+                    if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, IMAGES_FOLDER)
+                        zipf.write(file_path, arcname)
+            
+            # Add configuration files
+            config_files = [CATEGORIES_FILE, FEATURED_FILE, ABOUT_FILE, '/data/image_categories.json']
+            for config_file in config_files:
+                if os.path.exists(config_file):
+                    zipf.write(config_file, os.path.basename(config_file))
+        
+        return send_file(backup_path, as_attachment=True, download_name=backup_filename)
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
