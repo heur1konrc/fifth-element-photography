@@ -243,23 +243,21 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form action="{{ url_for('upload_image') }}" method="post" enctype="multipart/form-data" class="upload-form">
-                    <div class="file-drop-zone" id="fileDropZone">
-                        <div class="drop-zone-content">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <h4>Drag & Drop Images Here</h4>
-                            <p>or click to browse</p>
-                            <input type="file" id="fileInput" name="file" accept=".jpg,.jpeg,.png,.gif" multiple required>
-                        </div>
+                <div class="file-drop-zone" id="fileDropZone">
+                    <div class="drop-zone-content">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h4>Drag & Drop Images Here</h4>
+                        <p>or click to browse</p>
+                        <input type="file" id="fileInput" name="files" accept=".jpg,.jpeg,.png,.gif" multiple required style="display: none;">
                     </div>
-                    <div class="upload-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-upload"></i>
-                            Upload Images
-                        </button>
-                    </div>
-                </form>
+                </div>
+                <div class="upload-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="uploadImages()">
+                        <i class="fas fa-upload"></i>
+                        Upload Images
+                    </button>
+                </div>
             </div>
         </div>
     </div>
