@@ -742,3 +742,33 @@ window.addEventListener('click', function(e) {
     }
 });
 
+
+
+// Set as Featured functionality
+function setAsFeatured(filename) {
+    if (confirm(`Set ${filename} as the featured image?`)) {
+        fetch(`/toggle_featured/${filename}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert(data.message, 'success');
+                // Refresh the page to show the updated featured image
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showAlert(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error setting featured image:', error);
+            showAlert('Error setting featured image', 'error');
+        });
+    }
+}
+

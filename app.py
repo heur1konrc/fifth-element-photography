@@ -432,26 +432,20 @@ def edit_image(filename):
         
         # Return HTML form for editing
         form_html = f"""
-        <form class="edit-form" onsubmit="event.preventDefault(); saveImageChanges('{filename}');">
+        <form onsubmit="saveImageChanges(event, '{filename}')">
             <div class="form-group">
-                <label>Title:</label>
-                <input type="text" name="title" value="{image.get('title', '')}" required>
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" value="{image.get('title', '')}" required>
             </div>
             <div class="form-group">
-                <label>Description:</label>
-                <textarea name="description" rows="3">{image.get('description', '')}</textarea>
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="3">{image.get('description', '')}</textarea>
             </div>
             <div class="form-group">
-                <label>Category:</label>
-                <select name="category" required>
-                    {''.join([f'<option value="{cat}" {"selected" if cat == image.get("category") else ""}>{cat.title()}</option>' for cat in all_categories])}
+                <label for="category">Category:</label>
+                <select id="category" name="category">
+                    {category_options}
                 </select>
-            </div>
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="is_featured" {"checked" if image.get('is_featured') else ""}>
-                    Set as Featured Image
-                </label>
             </div>
             <div class="form-group">
                 <label>
