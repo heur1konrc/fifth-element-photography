@@ -141,7 +141,8 @@ def admin():
     """Admin panel for image management"""
     try:
         images = scan_images()
-        return render_template('admin.html', images=images)
+        all_categories = load_categories()
+        return render_template('admin.html', images=images, all_categories=all_categories)
     except Exception as e:
         return f"Admin Error: {str(e)}", 500
 

@@ -61,8 +61,7 @@
                         <input type="hidden" name="action" value="delete">
                         <select name="category_to_delete" required>
                             <option value="">Select category to delete</option>
-                            {% set categories = images|map(attribute='category')|unique|list %}
-                            {% for category in categories %}
+                            {% for category in all_categories %}
                                 {% if category != 'other' %}
                                     <option value="{{ category }}">{{ category.title() }}</option>
                                 {% endif %}
@@ -74,10 +73,9 @@
 
                 <!-- Current Categories -->
                 <div class="current-categories">
-                    <h3>Current Categories</h3>
+                    <h3>All Categories</h3>
                     <div class="category-list">
-                        {% set categories = images|map(attribute='category')|unique|list|sort %}
-                        {% for category in categories %}
+                        {% for category in all_categories|sort %}
                             {% set count = images|selectattr('category', 'equalto', category)|list|length %}
                             <div class="category-item">
                                 <span class="category-name">{{ category.title() }}</span>
@@ -119,8 +117,7 @@
                                 <form action="{{ url_for('assign_category', filename=image.filename) }}" method="post" class="category-assign-form">
                                     <select name="category" required>
                                         <option value="">Change category</option>
-                                        {% set all_categories = images|map(attribute='category')|unique|list|sort %}
-                                        {% for category in all_categories %}
+                                        {% for category in all_categories|sort %}
                                             <option value="{{ category }}" {% if category == image.category %}selected{% endif %}>{{ category.title() }}</option>
                                         {% endfor %}
                                     </select>
