@@ -18,12 +18,26 @@
             
             <ul class="nav-menu">
                 <li><a href="#" class="nav-link active" data-category="all">🏠 HOME</a></li>
-                <li><a href="#" class="nav-link" data-category="all">📸 GALLERIES</a></li>
-                <li><a href="#" class="nav-link" data-category="portrait">👤 PORTRAITS</a></li>
-                <li><a href="#" class="nav-link" data-category="landscape">🏔️ LANDSCAPES</a></li>
-                <li><a href="#" class="nav-link" data-category="wildlife">🦅 WILDLIFE</a></li>
-                <li><a href="#" class="nav-link" data-category="wedding">💒 WEDDINGS</a></li>
-                <li><a href="#" class="nav-link" data-category="commercial">🏢 COMMERCIAL</a></li>
+                <li><a href="#" class="nav-link" data-category="all">📸 ALL GALLERIES</a></li>
+                {% for category in categories|sort %}
+                    {% if category != 'other' %}
+                        <li><a href="#" class="nav-link" data-category="{{ category }}">
+                            {% if category == 'portrait' %}👤 PORTRAITS
+                            {% elif category == 'landscape' %}🏔️ LANDSCAPES  
+                            {% elif category == 'wildlife' %}🦅 WILDLIFE
+                            {% elif category == 'commercial' %}🏢 COMMERCIAL
+                            {% elif category == 'street' %}🏙️ STREET
+                            {% elif category == 'flora' %}🌸 FLORA
+                            {% elif category == 'rickpersonal' %}👨 PERSONAL
+                            {% else %}📁 {{ category.upper() }}
+                            {% endif %}
+                            <span class="category-count">({{ category_counts.get(category, 0) }})</span>
+                        </a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if category_counts.get('other', 0) > 0 %}
+                    <li><a href="#" class="nav-link" data-category="other">📂 OTHER <span class="category-count">({{ category_counts.get('other', 0) }})</span></a></li>
+                {% endif %}
                 <li><a href="#" class="nav-link">📞 CONTACT</a></li>
             </ul>
         </nav>

@@ -147,7 +147,28 @@ def scan_images():
 @app.route('/')
 def index():
     """Main portfolio page"""
-    return render_template('index.html')
+    images = scan_images()
+    categories = load_categories()
+    
+    # Get category counts
+    category_counts = {}
+    for category in categories:
+        category_counts[category] = len([img for img in images if img['category'] == category])
+    
+    # Get featured image (first landscape image for now)
+    featured_image = None
+    for image in images:
+        if image['category'] == 'landscape':
+            featured_image = image
+            break
+    if not featured_image and images:
+        featured_image = images[0]
+    
+    return render_template('index.html', 
+                         images=images, 
+                         categories=categories,
+                         category_counts=category_counts,
+                         featured_image=featured_image)
 
 @app.route('/api/images')
 def api_images():
