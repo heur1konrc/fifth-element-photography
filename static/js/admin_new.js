@@ -448,3 +448,39 @@ function uploadImages() {
     });
 }
 
+// Save Image Changes Function
+function saveImageChanges(filename) {
+    const form = document.querySelector('.edit-form');
+    if (!form) {
+        alert('Form not found');
+        return;
+    }
+    
+    const formData = new FormData(form);
+    
+    const saveBtn = document.querySelector('#editModal .btn-primary');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    saveBtn.disabled = true;
+    
+    fetch(`/update_image/${filename}`, {
+        method: 'POST',
+        body: formData
+    }).then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            closeEditModal();
+            location.reload(); // Refresh to show changes
+        } else {
+            alert('Save failed: ' + data.message);
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Save failed. Please try again.');
+    }).finally(() => {
+        saveBtn.innerHTML = originalText;
+        saveBtn.disabled = false;
+    });
+}
+

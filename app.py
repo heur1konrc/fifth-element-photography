@@ -85,6 +85,25 @@ def save_image_descriptions(descriptions):
     except:
         return False
 
+def load_image_titles():
+    """Load image titles"""
+    try:
+        if os.path.exists('/data/image_titles.json'):
+            with open('/data/image_titles.json', 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return {}
+
+def save_image_titles(titles):
+    """Save image titles"""
+    try:
+        with open('/data/image_titles.json', 'w') as f:
+            json.dump(titles, f)
+        return True
+    except:
+        return False
+
 def load_background_images():
     """Load images marked for background use"""
     try:
@@ -396,7 +415,7 @@ def edit_image(filename):
         
         # Return HTML form for editing
         form_html = f"""
-        <form action="/update_image/{filename}" method="post" class="edit-form">
+        <form class="edit-form" onsubmit="event.preventDefault(); saveImageChanges('{filename}');">
             <div class="form-group">
                 <label>Title:</label>
                 <input type="text" name="title" value="{image.get('title', '')}" required>
@@ -437,13 +456,44 @@ def edit_image(filename):
 def update_image(filename):
     """Update image metadata"""
     try:
-        # Update image metadata (this would need to be implemented based on your data structure)
-        # For now, just redirect back to admin
-        flash(f'Image {filename} updated successfully')
+        # Get form data
+        title = request.form.get('title', '').strip()
+        description = request.form.get('description', '').strip()
+        category = request.form.get('category', '').strip().lower()
+        is_featured = request.form.get('is_featured') == 'on'
+        is_background = request.form.get('is_background') == 'on'
+        
+        # Update category assignment
+        if category:
+            image_categories = load_image_categories()
+            image_categories[filename] = category
+            save_image_categories(image_categories)
+        
+        # Update image descriptions
+        image_descriptions = load_image_descriptions()
+        image_descriptions[filename] = description
+        save_image_descriptions(image_descriptions)
+        
+        # Update image titles
+        image_titles = load_image_titles()
+        image_titles[filename] = title
+        save_image_titles(image_titles)
+        
+        # Handle featured image
+        if is_featured:
+            featured_settings = {'featured_image': filename}
+            with open(FEATURED_FILE, 'w') as f:
+                json.dump(featured_settings, f)
+        
+        # Handle background image
+        if is_background:
+            about_settings = {'background_image': filename}
+            with open(ABOUT_FILE, 'w') as f:
+                json.dump(about_settings, f)
+        
+        return jsonify({'success': True, 'message': f'Image {filename} updated successfully'})
     except Exception as e:
-        flash(f'Error updating image: {str(e)}')
-    
-    return redirect(url_for('admin'))
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/add_to_slideshow/<filename>', methods=['POST'])
 def add_to_slideshow(filename):
