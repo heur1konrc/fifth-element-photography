@@ -91,8 +91,11 @@ def serve_image(filename):
 @app.route('/admin')
 def admin():
     """Admin panel for image management"""
-    images = scan_images()
-    return render_template('admin.html', images=images)
+    try:
+        images = scan_images()
+        return render_template('admin.html', images=images)
+    except Exception as e:
+        return f"Admin Error: {str(e)}", 500
 
 @app.route('/admin/upload', methods=['POST'])
 def upload_image():
