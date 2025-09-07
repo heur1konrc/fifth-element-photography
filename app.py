@@ -1,12 +1,31 @@
-from flask import Flask, render_template, request, jsonify, send_file, send_from_directory, redirect, url_for
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, url_for
 import os
 import json
-from PIL import Image
-import random
-from werkzeug.utils import secure_filename
 from datetime import datetime
+import shutil
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+# Template filter for exposure time conversion
+@app.template_filter('exposure_fraction')
+def exposure_fraction(value):
+    """Convert decimal exposure time to fraction format"""
+    try:
+        if isinstance(value, str):
+            val = float(value)
+        else:
+            val = float(value)
+        
+        if val >= 1:
+            return f"{val:.1f}s"
+        else:
+            # Convert to fraction
+            fraction = int(round(1 / val))
+            return f"1/{fraction}s"
+    except:
+        return str(value)
+
 app.secret_key = 'fifth-element-admin-key-2024'
 
 # Configuration

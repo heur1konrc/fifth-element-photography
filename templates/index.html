@@ -120,7 +120,7 @@
                                     </div>
                                     <div class="detail-group">
                                         <span class="detail-label">Shutter Speed:</span>
-                                        <span class="detail-value">{{ featured_exif.ExposureTime if featured_exif else 'Unavailable' }}</span>
+                                        <span class="detail-value">{{ featured_exif.ExposureTime|exposure_fraction if featured_exif else 'Unavailable' }}</span>
                                     </div>
                                     <div class="detail-group">
                                         <span class="detail-label">ISO:</span>
