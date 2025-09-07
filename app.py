@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_file, send_from_directory, redirect, url_for
 import os
 import json
 from PIL import Image
@@ -250,14 +250,24 @@ def index():
     for category in categories:
         category_counts[category] = len([img for img in images if img['category'] == category])
     
-    # Get featured image (first landscape image for now)
+    # Get featured image from featured_image.json
     featured_image = None
-    for image in images:
-        if image['category'] == 'landscape':
-            featured_image = image
-            break
-    if not featured_image and images:
-        featured_image = images[0]
+    featured_image_data = load_featured_image()
+    if featured_image_data and featured_image_data.get('filename'):
+        # Find the featured image in the images list
+        for image in images:
+            if image['filename'] == featured_image_data['filename']:
+                featured_image = image
+                break
+    
+    # If no featured image is set, fallback to first landscape image or first image
+    if not featured_image:
+        for image in images:
+            if image['category'] == 'landscape':
+                featured_image = image
+                break
+        if not featured_image and images:
+            featured_image = images[0]
     
     # Extract EXIF data for featured image
     featured_exif = None
@@ -291,16 +301,11 @@ def featured():
         # If no featured image is set, return to index
         return redirect(url_for('index'))
     
-    # Get EXIF data (mock for now - you can implement actual EXIF reading)
-    exif_data = {
-        'Camera': 'Canon EOS R5',
-        'Lens': '24-70mm f/2.8',
-        'Focal Length': '50mm',
-        'Aperture': 'f/4.0',
-        'Shutter Speed': '1/125s',
-        'ISO': '400',
-        'Date Taken': '2024-08-15'
-    }
+    # Extract EXIF data from the actual featured image
+    exif_data = None
+    if featured_image:
+        image_path = os.path.join(IMAGES_FOLDER, featured_image['filename'])
+        exif_data = extract_exif_data(image_path)
     
     return render_template('featured.html', 
                          featured_image=featured_image,
@@ -928,7 +933,7 @@ def get_camera_info(exif):
     model = exif.get('Model', '').strip()
     
     if make and model:
-        # Remove duplicate make from model if present
+        # Remove make from model if it's already included
         if make.lower() in model.lower():
             return model
         else:
@@ -938,67 +943,118 @@ def get_camera_info(exif):
     elif make:
         return make
     else:
-        return "Unavailable"
+        return 'Unavailable'
 
 def get_lens_info(exif):
     """Extract lens information from EXIF"""
-    lens_model = exif.get('LensModel', '')
-    lens_make = exif.get('LensMake', '')
+    # Try different lens fields
+    lens_fields = ['LensModel', 'Lens', 'LensInfo', 'LensMake']
     
-    if lens_model:
-        return lens_model.strip()
-    elif lens_make:
-        return lens_make.strip()
-    else:
-        return "Unavailable"
+    for field in lens_fields:
+        lens = exif.get(field)
+        if lens:
+            if isinstance(lens, str):
+                return lens.strip()
+            elif isinstance(lens, bytes):
+                try:
+                    return lens.decode('utf-8').strip()
+                except:
+                    continue
+    
+    return 'Unavailable'
 
 def get_aperture_info(exif):
     """Extract aperture information from EXIF"""
-    # Use FNumber directly as shown in debug
-    aperture = exif.get('FNumber', None)
-    if aperture:
-        return f"f/{float(aperture):.1f}"
-    return "Unavailable"
+    # Try FNumber first, then ApertureValue
+    f_number = exif.get('FNumber')
+    if f_number:
+        if isinstance(f_number, tuple) and len(f_number) == 2:
+            aperture = f_number[0] / f_number[1]
+            return f"f/{aperture:.1f}"
+        elif hasattr(f_number, '__float__'):  # Handle IFDRational and other numeric types
+            return f"f/{float(f_number):.1f}"
+        elif isinstance(f_number, (int, float)):
+            return f"f/{f_number:.1f}"
+    
+    aperture_value = exif.get('ApertureValue')
+    if aperture_value:
+        if isinstance(aperture_value, tuple) and len(aperture_value) == 2:
+            aperture = 2 ** (aperture_value[0] / aperture_value[1] / 2)
+            return f"f/{aperture:.1f}"
+        elif hasattr(aperture_value, '__float__'):
+            aperture = 2 ** (float(aperture_value) / 2)
+            return f"f/{aperture:.1f}"
+        elif isinstance(aperture_value, (int, float)):
+            aperture = 2 ** (aperture_value / 2)
+            return f"f/{aperture:.1f}"
+    
+    return 'Unavailable'
 
 def get_shutter_speed_info(exif):
     """Extract shutter speed information from EXIF"""
-    # Use ExposureTime directly as shown in debug
-    exposure_time = exif.get('ExposureTime', None)
+    exposure_time = exif.get('ExposureTime')
     if exposure_time:
-        exposure_float = float(exposure_time)
-        if exposure_float >= 1:
-            return f"{exposure_float:.1f}s"
-        else:
-            return f"1/{int(1/exposure_float)}"
-    return "Unavailable"
+        if isinstance(exposure_time, tuple) and len(exposure_time) == 2:
+            if exposure_time[0] == 1:
+                return f"1/{exposure_time[1]}s"
+            else:
+                speed = exposure_time[0] / exposure_time[1]
+                if speed >= 1:
+                    return f"{speed:.1f}s"
+                else:
+                    return f"1/{int(1/speed)}s"
+        elif hasattr(exposure_time, '__float__'):  # Handle IFDRational and other numeric types
+            speed = float(exposure_time)
+            if speed >= 1:
+                return f"{speed:.1f}s"
+            else:
+                return f"1/{int(1/speed)}s"
+        elif isinstance(exposure_time, (int, float)):
+            if exposure_time >= 1:
+                return f"{exposure_time:.1f}s"
+            else:
+                return f"1/{int(1/exposure_time)}s"
+    
+    return 'Unavailable'
 
 def get_iso_info(exif):
     """Extract ISO information from EXIF"""
-    # Use ISOSpeedRatings directly as shown in debug
-    iso = exif.get('ISOSpeedRatings', None)
-    if iso:
-        return f"ISO-{iso}"
-    return "Unavailable"
+    iso_fields = ['ISOSpeedRatings', 'ISO', 'PhotographicSensitivity']
+    
+    for field in iso_fields:
+        iso = exif.get(field)
+        if iso:
+            if isinstance(iso, (list, tuple)) and len(iso) > 0:
+                return f"ISO {iso[0]}"
+            elif isinstance(iso, (int, float)):
+                return f"ISO {int(iso)}"
+    
+    return 'Unavailable'
 
 def get_focal_length_info(exif):
     """Extract focal length information from EXIF"""
-    # Use FocalLength directly as shown in debug
-    focal_length = exif.get('FocalLength', None)
+    focal_length = exif.get('FocalLength')
     if focal_length:
-        return f"{float(focal_length):.0f} mm"
-    return "Unavailable"
+        if isinstance(focal_length, tuple) and len(focal_length) == 2:
+            fl = focal_length[0] / focal_length[1]
+            return f"{fl:.0f}mm"
+        elif hasattr(focal_length, '__float__'):  # Handle IFDRational and other numeric types
+            return f"{float(focal_length):.0f}mm"
+        elif isinstance(focal_length, (int, float)):
+            return f"{focal_length:.0f}mm"
+    
+    return 'Unavailable'
 
 def get_default_exif():
     """Return default EXIF data when extraction fails"""
     return {
         'camera': 'Unavailable',
-        'lens': 'Unavailable', 
+        'lens': 'Unavailable',
         'aperture': 'Unavailable',
         'shutter_speed': 'Unavailable',
         'iso': 'Unavailable',
         'focal_length': 'Unavailable'
     }
-
 
 @app.route('/debug_exif')
 def debug_exif():
@@ -1007,18 +1063,15 @@ def debug_exif():
         from PIL import Image
         from PIL.ExifTags import TAGS
         
-        # Get featured image
-        images = scan_images()
+        # Get featured image from the actual featured_image.json file
         featured_image = None
-        for image in images:
-            if image['category'] == 'landscape':
-                featured_image = image
-                break
-        if not featured_image and images:
-            featured_image = images[0]
+        if os.path.exists('/data/featured_image.json'):
+            with open('/data/featured_image.json', 'r') as f:
+                featured_data = json.load(f)
+                featured_image = featured_data
         
         if not featured_image:
-            return jsonify({'error': 'No featured image found'})
+            return jsonify({'error': 'No featured image set'})
         
         # Get image path
         image_path = os.path.join(IMAGES_FOLDER, featured_image['filename'])
