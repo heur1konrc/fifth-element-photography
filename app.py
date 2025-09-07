@@ -1203,7 +1203,7 @@ def set_hero_image():
             'title': title
         }
         
-        hero_file_path = os.path.join(DATA_FOLDER, 'hero_image.json')
+        hero_file_path = os.path.join('/data', 'hero_image.json')
         with open(hero_file_path, 'w') as f:
             json.dump(hero_data, f, indent=2)
         
@@ -1221,7 +1221,7 @@ def clear_hero_image():
             'title': None
         }
         
-        hero_file_path = os.path.join(DATA_FOLDER, 'hero_image.json')
+        hero_file_path = os.path.join('/data', 'hero_image.json')
         with open(hero_file_path, 'w') as f:
             json.dump(hero_data, f, indent=2)
         
