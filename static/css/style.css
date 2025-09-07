@@ -463,6 +463,13 @@ textarea {
     margin-bottom: 3rem;
 }
 
+.section-subtitle2 {
+    color: #ffffff;
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
 /* Featured Image Section */
 .featured-container {
     max-width: 1200px;
