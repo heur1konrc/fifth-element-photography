@@ -895,19 +895,19 @@ function formatText(textareaId, format) {
     
     switch (format) {
         case 'bold':
-            formattedText = `**${selectedText}**`;
+            formattedText = `<strong>${selectedText}</strong>`;
             break;
         case 'italic':
-            formattedText = `*${selectedText}*`;
+            formattedText = `<em>${selectedText}</em>`;
             break;
         case 'h1':
-            formattedText = `# ${selectedText}`;
+            formattedText = `<h1>${selectedText}</h1>`;
             break;
         case 'h2':
-            formattedText = `## ${selectedText}`;
+            formattedText = `<h2>${selectedText}</h2>`;
             break;
         case 'h3':
-            formattedText = `### ${selectedText}`;
+            formattedText = `<h3>${selectedText}</h3>`;
             break;
         default:
             formattedText = selectedText;

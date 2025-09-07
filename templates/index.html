@@ -130,7 +130,7 @@
                         {% if featured_image.story %}
                         <div class="featured-story-section">
                             <h4>The Story Behind this Image</h4>
-                            <p>{{ featured_image.story }}</p>
+                            <p>{{ featured_image.story|safe }}</p>
                         </div>
                         {% endif %}
                     {% else %}
@@ -159,7 +159,7 @@
                         </div>
                         <div class="about-text">
                             {% if about_data and about_data.bio %}
-                                <p>{{ about_data.bio }}</p>
+                                <p>{{ about_data.bio|safe }}</p>
                             {% else %}
                                 <p>Add your bio in the admin panel</p>
                             {% endif %}
