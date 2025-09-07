@@ -107,28 +107,32 @@
                                 
                                 <div class="image-details">
                                     <div class="detail-group">
-                                        <span class="detail-label">Camera:</span>
-                                        <span class="detail-value">{{ featured_exif.camera if featured_exif else 'Unavailable' }}</span>
+                                        <span class="detail-label">Make:</span>
+                                        <span class="detail-value">{{ featured_exif.Make if featured_exif else 'Unavailable' }}</span>
                                     </div>
                                     <div class="detail-group">
-                                        <span class="detail-label">Lens:</span>
-                                        <span class="detail-value">{{ featured_exif.lens if featured_exif else 'Unavailable' }}</span>
+                                        <span class="detail-label">Model:</span>
+                                        <span class="detail-value">{{ featured_exif.Model if featured_exif else 'Unavailable' }}</span>
                                     </div>
                                     <div class="detail-group">
-                                        <span class="detail-label">Aperture:</span>
-                                        <span class="detail-value">{{ featured_exif.aperture if featured_exif else 'Unavailable' }}</span>
+                                        <span class="detail-label">Lens Model:</span>
+                                        <span class="detail-value">{{ featured_exif.LensModel if featured_exif else 'Unavailable' }}</span>
                                     </div>
                                     <div class="detail-group">
-                                        <span class="detail-label">Shutter Speed:</span>
-                                        <span class="detail-value">{{ featured_exif.shutter_speed if featured_exif else 'Unavailable' }}</span>
+                                        <span class="detail-label">F Number:</span>
+                                        <span class="detail-value">{{ featured_exif.FNumber if featured_exif else 'Unavailable' }}</span>
                                     </div>
                                     <div class="detail-group">
-                                        <span class="detail-label">ISO:</span>
-                                        <span class="detail-value">{{ featured_exif.iso if featured_exif else 'Unavailable' }}</span>
+                                        <span class="detail-label">Exposure Time:</span>
+                                        <span class="detail-value">{{ featured_exif.ExposureTime if featured_exif else 'Unavailable' }}</span>
+                                    </div>
+                                    <div class="detail-group">
+                                        <span class="detail-label">ISO Speed:</span>
+                                        <span class="detail-value">{{ featured_exif.ISOSpeedRatings if featured_exif else 'Unavailable' }}</span>
                                     </div>
                                     <div class="detail-group">
                                         <span class="detail-label">Focal Length:</span>
-                                        <span class="detail-value">{{ featured_exif.focal_length if featured_exif else 'Unavailable' }}</span>
+                                        <span class="detail-value">{{ featured_exif.FocalLength if featured_exif else 'Unavailable' }}</span>
                                     </div>
                                 </div>
                                 

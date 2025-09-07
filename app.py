@@ -916,18 +916,8 @@ def extract_exif_data(image_path):
         
         print(f"Found EXIF data: {exif}")
         
-        # Extract specific EXIF fields we need
-        extracted_data = {
-            'camera': get_camera_info(exif),
-            'lens': get_lens_info(exif),
-            'aperture': get_aperture_info(exif),
-            'shutter_speed': get_shutter_speed_info(exif),
-            'iso': get_iso_info(exif),
-            'focal_length': get_focal_length_info(exif)
-        }
-        
-        print(f"Extracted data: {extracted_data}")
-        return extracted_data
+        # Return the raw EXIF data with the actual field names
+        return exif
         
     except Exception as e:
         print(f"Error extracting EXIF from {image_path}: {str(e)}")
