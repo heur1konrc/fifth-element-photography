@@ -175,32 +175,14 @@ function backupSystem() {
     backupBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Backup...';
     backupBtn.disabled = true;
     
-    // Create backup (this would need to be implemented on the backend)
-    fetch('/backup_system', {
-        method: 'POST'
-    }).then(response => {
-        if (response.ok) {
-            return response.blob();
-        } else {
-            throw new Error('Backup failed');
-        }
-    }).then(blob => {
-        // Download backup file
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `portfolio_backup_${new Date().toISOString().split('T')[0]}.zip`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-    }).catch(error => {
-        console.error('Error:', error);
-        alert('Error creating backup. Please try again.');
-    }).finally(() => {
+    // Create backup using new /backup route
+    window.location.href = '/backup';
+    
+    // Reset button after a short delay
+    setTimeout(() => {
         backupBtn.innerHTML = originalText;
         backupBtn.disabled = false;
-    });
+    }, 2000);
 }
 
 // Individual Image Actions
