@@ -604,6 +604,32 @@ body {
     font-size: 0.95rem;
 }
 
+/* New Featured Story Section - Full Width Below */
+.featured-story-section {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border-left: 3px solid #ffffff;
+}
+
+.featured-story-section h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.featured-story-section p {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    color: #e0e0e0;
+    font-size: 1rem;
+}
+
 /* Section titles with Poppins font */
 .section-title {
     font-family: 'Poppins', sans-serif;

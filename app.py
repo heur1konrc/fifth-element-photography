@@ -255,6 +255,37 @@ def index():
                          category_counts=category_counts,
                          featured_image=featured_image)
 
+@app.route('/featured')
+def featured():
+    """Featured Image of the Week page"""
+    images = scan_images()
+    
+    # Find the featured image
+    featured_image = None
+    for image in images:
+        if image['is_featured']:
+            featured_image = image
+            break
+    
+    if not featured_image:
+        # If no featured image is set, return to index
+        return redirect(url_for('index'))
+    
+    # Get EXIF data (mock for now - you can implement actual EXIF reading)
+    exif_data = {
+        'Camera': 'Canon EOS R5',
+        'Lens': '24-70mm f/2.8',
+        'Focal Length': '50mm',
+        'Aperture': 'f/4.0',
+        'Shutter Speed': '1/125s',
+        'ISO': '400',
+        'Date Taken': '2024-08-15'
+    }
+    
+    return render_template('featured.html', 
+                         featured_image=featured_image,
+                         exif_data=exif_data)
+
 @app.route('/api/images')
 def api_images():
     """API endpoint for images"""

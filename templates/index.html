@@ -52,7 +52,7 @@
             <!-- FEATURED IMAGE Section -->
             <section class="content-section" id="featured-section">
                 <div class="featured-container">
-                    <h2 class="section-title">Featured Image</h2>
+                    <h2 class="section-title">Featured Image of the Week</h2>
                     {% set featured_image = images|selectattr('is_featured')|first %}
                     {% if featured_image %}
                         <div class="featured-content">
@@ -61,13 +61,6 @@
                             </div>
                             <div class="featured-info">
                                 <h3>{{ featured_image.title }}</h3>
-                                
-                                {% if featured_image.story %}
-                                <div class="featured-story">
-                                    <h4>Story</h4>
-                                    <p>{{ featured_image.story }}</p>
-                                </div>
-                                {% endif %}
                                 
                                 <div class="image-details">
                                     <div class="detail-group">
@@ -97,6 +90,13 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        {% if featured_image.story %}
+                        <div class="featured-story-section">
+                            <h4>The Story Behind this Image</h4>
+                            <p>{{ featured_image.story }}</p>
+                        </div>
+                        {% endif %}
                     {% else %}
                         <div class="no-featured">
                             <p>No featured image selected. Use the admin panel to set a featured image.</p>
