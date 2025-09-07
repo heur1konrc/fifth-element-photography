@@ -90,13 +90,12 @@
                 </div>
                 
                 <div class="about-content">
-                    {% set about_image = images|selectattr('is_background')|first %}
-                    {% if about_image %}
+                    {% if about_data and about_data.filename %}
                         <div class="current-about">
                             <div class="about-image-preview">
-                                <img src="{{ about_image.url }}" alt="About Image">
+                                <img src="/about/{{ about_data.filename }}" alt="About Image">
                                 <div class="about-overlay">
-                                    <button class="btn btn-danger" onclick="removeAboutImage('{{ about_image.filename }}')">
+                                    <button class="btn btn-danger" onclick="removeAboutImage('{{ about_data.filename }}')">
                                         <i class="fas fa-trash"></i>
                                         Remove About Image
                                     </button>
@@ -106,14 +105,14 @@
                                 <h3>About Page Image</h3>
                                 <div class="about-bio">
                                     <label for="about-bio">About Page Bio:</label>
-                                    <textarea id="about-bio" placeholder="Write your personal bio for the About page..." rows="6">{{ about_image.bio or '' }}</textarea>
-                                    <button class="btn btn-small btn-success" onclick="saveAboutBio('{{ about_image.filename }}')">
+                                    <textarea id="about-bio" placeholder="Write your personal bio for the About page..." rows="6">{{ about_data.bio or '' }}</textarea>
+                                    <button class="btn btn-small btn-success" onclick="saveAboutBio('{{ about_data.filename }}')">
                                         <i class="fas fa-save"></i>
                                         Save Bio
                                     </button>
                                 </div>
                                 <div class="about-meta">
-                                    <span class="dimensions">{{ about_image.width }}×{{ about_image.height }}</span>
+                                    <span class="dimensions">About Image</span>
                                 </div>
                             </div>
                         </div>
