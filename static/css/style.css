@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
+html {
+    font-family: 'Poppins', sans-serif !important;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -7,10 +11,28 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: inherit;
     background: #0a0a0a;
     color: #ffffff;
     overflow-x: hidden;
+}
+
+/* Preserve logo text exactly as is */
+.logo h1,
+.logo p {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Keep default fonts for text inputs and textareas */
+input[type="text"],
+input[type="email"], 
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+textarea {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
 .container {
