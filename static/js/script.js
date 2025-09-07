@@ -44,8 +44,8 @@ async function loadImages() {
 // Set hero image (selected or random)
 async function setHeroImage() {
     try {
-        // First, try to get the selected hero image
-        const heroResponse = await fetch('/data/hero_image.json');
+        // First, try to get the selected hero image from API
+        const heroResponse = await fetch('/api/hero_image');
         const heroData = await heroResponse.json();
         
         if (heroData.filename) {

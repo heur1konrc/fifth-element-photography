@@ -1230,3 +1230,18 @@ def clear_hero_image():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/api/hero_image')
+def get_hero_image():
+    """API endpoint to get current hero image selection"""
+    try:
+        hero_file_path = os.path.join('/data', 'hero_image.json')
+        if os.path.exists(hero_file_path):
+            with open(hero_file_path, 'r') as f:
+                hero_data = json.load(f)
+                return jsonify(hero_data)
+        else:
+            # Return default if file doesn't exist
+            return jsonify({'filename': None, 'title': None})
+    except Exception as e:
+        return jsonify({'filename': None, 'title': None})
+
