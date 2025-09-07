@@ -303,7 +303,8 @@ def admin():
     try:
         images = scan_images()
         all_categories = load_categories()
-        return render_template('admin_new.html', images=images, all_categories=all_categories)
+        about_data = load_about_data()
+        return render_template('admin_new.html', images=images, all_categories=all_categories, about_data=about_data)
     except Exception as e:
         return f"Admin Error: {str(e)}", 500
 
