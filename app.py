@@ -973,11 +973,27 @@ def get_aperture_info(exif):
     # Try FNumber first, then ApertureValue
     f_number = exif.get('FNumber')
     if f_number:
-        if isinstance(f_number, tuple) and len(f_number) == 2:
-            aperture = f_number[0] / f_number[1]
+        try:
+            if isinstance(f_number, tuple) and len(f_number) == 2:
+                aperture = f_number[0] / f_number[1]
+                return f"f/{aperture:.1f}"
+            else:
+                # Handle direct float/string values
+                aperture = float(f_number)
+                return f"f/{aperture:.1f}"
+        except:
+            pass
+    
+    # Try ApertureValue as backup
+    aperture_value = exif.get('ApertureValue')
+    if aperture_value:
+        try:
+            aperture = float(aperture_value)
             return f"f/{aperture:.1f}"
-        elif hasattr(f_number, '__float__'):  # Handle IFDRational and other numeric types
-            return f"f/{float(f_number):.1f}"
+        except:
+            pass
+    
+    return 'Unavailable'
         elif isinstance(f_number, (int, float)):
             return f"f/{f_number:.1f}"
     
