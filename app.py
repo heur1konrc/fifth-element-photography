@@ -16,6 +16,16 @@ CATEGORIES_FILE = '/data/categories.json'
 FEATURED_FILE = '/data/featured.json'
 ABOUT_FILE = '/data/about.json'
 
+def load_about_data():
+    """Load about page data"""
+    try:
+        if os.path.exists(ABOUT_FILE):
+            with open(ABOUT_FILE, 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return {}
+
 def load_categories():
     """Load categories from JSON file"""
     try:
