@@ -259,6 +259,12 @@ def index():
     if not featured_image and images:
         featured_image = images[0]
     
+    # Extract EXIF data for featured image
+    featured_exif = None
+    if featured_image:
+        image_path = os.path.join(IMAGES_FOLDER, featured_image['filename'])
+        featured_exif = extract_exif_data(image_path)
+    
     about_data = load_about_data()
     
     return render_template('index.html', 
@@ -266,6 +272,7 @@ def index():
                          categories=categories,
                          category_counts=category_counts,
                          featured_image=featured_image,
+                         featured_exif=featured_exif,
                          about_data=about_data)
 
 @app.route('/featured')
@@ -878,4 +885,145 @@ def create_backup():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+def extract_exif_data(image_path):
+    """Extract EXIF data from image file"""
+    try:
+        from PIL import Image
+        from PIL.ExifTags import TAGS
+        
+        # Open image and get EXIF data
+        with Image.open(image_path) as img:
+            exif_data = img._getexif()
+            
+        if not exif_data:
+            return get_default_exif()
+            
+        # Convert EXIF data to readable format
+        exif = {}
+        for tag_id, value in exif_data.items():
+            tag = TAGS.get(tag_id, tag_id)
+            exif[tag] = value
+        
+        # Extract specific EXIF fields we need
+        extracted_data = {
+            'camera': get_camera_info(exif),
+            'lens': get_lens_info(exif),
+            'aperture': get_aperture_info(exif),
+            'shutter_speed': get_shutter_speed_info(exif),
+            'iso': get_iso_info(exif),
+            'focal_length': get_focal_length_info(exif)
+        }
+        
+        return extracted_data
+        
+    except Exception as e:
+        print(f"Error extracting EXIF from {image_path}: {str(e)}")
+        return get_default_exif()
+
+def get_camera_info(exif):
+    """Extract camera information from EXIF"""
+    make = exif.get('Make', '').strip()
+    model = exif.get('Model', '').strip()
+    
+    if make and model:
+        # Remove duplicate make from model if present
+        if make.lower() in model.lower():
+            return model
+        else:
+            return f"{make} {model}"
+    elif model:
+        return model
+    elif make:
+        return make
+    else:
+        return "Unavailable"
+
+def get_lens_info(exif):
+    """Extract lens information from EXIF"""
+    lens_model = exif.get('LensModel', '')
+    lens_make = exif.get('LensMake', '')
+    
+    if lens_model:
+        return lens_model.strip()
+    elif lens_make:
+        return lens_make.strip()
+    else:
+        return "Unavailable"
+
+def get_aperture_info(exif):
+    """Extract aperture information from EXIF"""
+    aperture = exif.get('FNumber', None)
+    if aperture:
+        if isinstance(aperture, tuple) and len(aperture) == 2:
+            f_value = aperture[0] / aperture[1]
+            return f"f/{f_value:.1f}"
+        elif isinstance(aperture, (int, float)):
+            return f"f/{aperture:.1f}"
+    
+    # Try alternative EXIF field
+    aperture_value = exif.get('ApertureValue', None)
+    if aperture_value:
+        if isinstance(aperture_value, tuple) and len(aperture_value) == 2:
+            f_value = 2 ** (aperture_value[0] / aperture_value[1] / 2)
+            return f"f/{f_value:.1f}"
+    
+    return "Unavailable"
+
+def get_shutter_speed_info(exif):
+    """Extract shutter speed information from EXIF"""
+    shutter_speed = exif.get('ExposureTime', None)
+    if shutter_speed:
+        if isinstance(shutter_speed, tuple) and len(shutter_speed) == 2:
+            if shutter_speed[1] == 1:
+                return f"{shutter_speed[0]}s"
+            else:
+                return f"1/{shutter_speed[1]}"
+        elif isinstance(shutter_speed, (int, float)):
+            if shutter_speed >= 1:
+                return f"{shutter_speed:.1f}s"
+            else:
+                return f"1/{int(1/shutter_speed)}"
+    
+    return "Unavailable"
+
+def get_iso_info(exif):
+    """Extract ISO information from EXIF"""
+    iso = exif.get('ISOSpeedRatings', None)
+    if iso:
+        if isinstance(iso, (list, tuple)):
+            return str(iso[0])
+        else:
+            return str(iso)
+    
+    # Try alternative EXIF field
+    iso_speed = exif.get('PhotographicSensitivity', None)
+    if iso_speed:
+        return str(iso_speed)
+    
+    return "Unavailable"
+
+def get_focal_length_info(exif):
+    """Extract focal length information from EXIF"""
+    focal_length = exif.get('FocalLength', None)
+    if focal_length:
+        if isinstance(focal_length, tuple) and len(focal_length) == 2:
+            fl_value = focal_length[0] / focal_length[1]
+            return f"{fl_value:.1f}mm"
+        elif isinstance(focal_length, (int, float)):
+            return f"{focal_length:.1f}mm"
+    
+    return "Unavailable"
+
+def get_default_exif():
+    """Return default EXIF data when extraction fails"""
+    return {
+        'camera': 'Unavailable',
+        'lens': 'Unavailable', 
+        'aperture': 'Unavailable',
+        'shutter_speed': 'Unavailable',
+        'iso': 'Unavailable',
+        'focal_length': 'Unavailable'
+    }
 
