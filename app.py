@@ -251,7 +251,7 @@ def scan_images():
                 'is_background': is_background,
                 'is_featured': is_featured,
                 'story': featured_story,
-                'url': f'/data/{filename}',
+                'url': f'/images/{filename}',
                 'width': info['width'],
                 'height': info['height']
             })
