@@ -124,10 +124,13 @@
                             </div>
                             <h3>No About Image Set</h3>
                             <p>Upload an image for your About page. This will be separate from your portfolio.</p>
-                            <button class="btn btn-primary" onclick="openAboutUploadModal()">
-                                <i class="fas fa-upload"></i>
-                                Upload About Image
-                            </button>
+                            <form action="/upload_about_image" method="post" enctype="multipart/form-data" style="margin-top: 20px;">
+                                <input type="file" name="file" accept="image/*" required style="margin-bottom: 10px;">
+                                <br>
+                                <textarea name="bio" placeholder="Write your bio here..." rows="4" style="width: 100%; margin-bottom: 10px;"></textarea>
+                                <br>
+                                <button type="submit" class="btn btn-primary">Upload About Image</button>
+                            </form>
                         </div>
                     {% endif %}
                 </div>
