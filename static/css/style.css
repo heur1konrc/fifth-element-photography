@@ -447,18 +447,26 @@ body {
 }
 
 .about-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 3rem;
     background: rgba(255, 255, 255, 0.05);
     padding: 3rem;
     border-radius: 12px;
+}
+
+.about-image {
+    float: left;
+    width: 400px;
+    margin: 0 2rem 1rem 0;
 }
 
 .about-image img {
     width: 100%;
     height: auto;
     border-radius: 8px;
+}
+
+.about-text {
+    text-align: justify;
+    line-height: 1.6;
 }
 
 .placeholder-image {
