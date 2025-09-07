@@ -189,17 +189,17 @@ textarea {
 /* Masonry Grid */
 .masonry-grid {
     columns: 4;
-    column-gap: 20px;
+    column-gap: 8px;
     margin: 0;
 }
 
 .image-item {
     display: inline-block;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
     break-inside: avoid;
     cursor: pointer;
-    border-radius: 12px;
+    border-radius: 0;
     overflow: hidden;
     transition: all 0.3s ease;
     background: #222;
@@ -216,12 +216,12 @@ textarea {
 
 .image-item.size-large {
     width: 100%;
-    margin-bottom: 30px;
+    margin-bottom: 8px;
 }
 
 .image-item.size-wide {
     width: 100%;
-    margin-bottom: 25px;
+    margin-bottom: 8px;
 }
 
 .image-item img {
@@ -440,7 +440,12 @@ textarea {
     
     .masonry-grid {
         columns: 2;
+        column-gap: 6px;
         padding: 1rem;
+    }
+    
+    .image-item {
+        margin-bottom: 6px;
     }
     
     .hero {
@@ -464,7 +469,12 @@ textarea {
 @media (max-width: 600px) {
     .masonry-grid {
         columns: 1;
+        column-gap: 4px;
         padding: 0.5rem;
+    }
+    
+    .image-item {
+        margin-bottom: 4px;
     }
     
     .hero {
