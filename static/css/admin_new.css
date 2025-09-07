@@ -1226,3 +1226,31 @@ select option {
     border-top: none;
 }
 
+
+/* Increase About page textarea width */
+#about-bio {
+    width: 100% !important;
+    min-width: 600px !important;
+    max-width: 800px !important;
+}
+
+.about-bio textarea {
+    width: 100% !important;
+    min-width: 600px !important;
+    max-width: 800px !important;
+}
+
+/* Ensure About section has enough space */
+.about-info {
+    width: 100%;
+    max-width: 800px;
+}
+
+.current-about {
+    display: block !important;
+}
+
+.about-content {
+    display: block !important;
+}
+
