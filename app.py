@@ -916,6 +916,25 @@ def extract_exif_data(image_path):
         
         print(f"Found EXIF data: {exif}")
         
+        # Convert exposure time to fraction format
+        if 'ExposureTime' in exif:
+            exposure_time = exif['ExposureTime']
+            try:
+                if isinstance(exposure_time, tuple) and len(exposure_time) == 2:
+                    if exposure_time[0] == 1:
+                        exif['ExposureTime'] = f"1/{exposure_time[1]}s"
+                    else:
+                        exif['ExposureTime'] = f"{exposure_time[0]}/{exposure_time[1]}s"
+                elif isinstance(exposure_time, float):
+                    if exposure_time >= 1:
+                        exif['ExposureTime'] = f"{exposure_time:.1f}s"
+                    else:
+                        # Convert decimal to fraction (e.g., 0.00133 -> 1/750)
+                        fraction = int(1 / exposure_time)
+                        exif['ExposureTime'] = f"1/{fraction}s"
+            except:
+                pass
+        
         # Return the raw EXIF data with the actual field names
         return exif
         
