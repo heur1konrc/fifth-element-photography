@@ -931,11 +931,26 @@ async function setAsHero(filename, title) {
     }
 }
 
+// Add event listeners for hero buttons
+function initializeHeroButtons() {
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('[data-action="set-hero"]')) {
+            e.preventDefault();
+            e.stopPropagation();
+            const button = e.target.closest('[data-action="set-hero"]');
+            const filename = button.getAttribute('data-filename');
+            const title = button.getAttribute('data-title');
+            setAsHero(filename, title);
+        }
+    });
+}
+
 // Update the DOMContentLoaded event listener to include text formatting initialization
 document.addEventListener('DOMContentLoaded', function() {
     initializeFileUpload();
     initializeModals();
     updateSelectionCount();
     initializeTextFormatting(); // Add this line
+    initializeHeroButtons(); // Add hero button event listeners
 });
 

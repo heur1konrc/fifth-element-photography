@@ -246,7 +246,7 @@
                                         <i class="fas fa-star"></i>
                                         Set as Featured
                                     </button>
-                                    <button class="btn btn-small btn-hero" onclick="setAsHero('{{ image.filename }}', '{{ image.title }}')">
+                                    <button class="btn btn-small btn-hero" data-action="set-hero" data-filename="{{ image.filename }}" data-title="{{ image.title }}">
                                         <i class="fas fa-home"></i>
                                         Set as Hero
                                     </button>
