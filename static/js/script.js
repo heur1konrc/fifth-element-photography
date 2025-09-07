@@ -56,11 +56,30 @@ function displayImages(images) {
         return;
     }
 
-    const imageHTML = images.map(image => `
-        <div class="image-item" onclick="openModal('${image.url}', '${image.title}', '${image.category}')">
-            <img src="${image.url}" alt="${image.title}" loading="lazy">
-        </div>
-    `).join('');
+    // Size classes for varied masonry layout
+    const sizeClasses = ['size-small', 'size-medium', 'size-large', 'size-wide'];
+    const sizeWeights = [0.3, 0.4, 0.2, 0.1]; // Probability weights for each size
+    
+    function getRandomSize() {
+        const random = Math.random();
+        let cumulative = 0;
+        for (let i = 0; i < sizeWeights.length; i++) {
+            cumulative += sizeWeights[i];
+            if (random < cumulative) {
+                return sizeClasses[i];
+            }
+        }
+        return sizeClasses[0]; // fallback
+    }
+
+    const imageHTML = images.map(image => {
+        const sizeClass = getRandomSize();
+        return `
+            <div class="image-item ${sizeClass}" onclick="openModal('${image.url}', '${image.title}', '${image.category}')">
+                <img src="${image.url}" alt="${image.title}" loading="lazy">
+            </div>
+        `;
+    }).join('');
 
     imageGrid.innerHTML = imageHTML;
 }

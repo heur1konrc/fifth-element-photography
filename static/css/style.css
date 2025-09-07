@@ -205,6 +205,53 @@ textarea {
     background: #222;
 }
 
+/* Varied image sizes for masonry layout */
+.image-item.size-small {
+    width: 100%;
+}
+
+.image-item.size-medium {
+    width: 100%;
+}
+
+.image-item.size-large {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.image-item.size-wide {
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.image-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+/* Different heights for varied layout */
+.image-item.size-small img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.image-item.size-medium img {
+    height: 280px;
+    object-fit: cover;
+}
+
+.image-item.size-large img {
+    height: 400px;
+    object-fit: cover;
+}
+
+.image-item.size-wide img {
+    height: 320px;
+    object-fit: cover;
+}
+
 .image-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
