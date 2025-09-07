@@ -898,11 +898,14 @@ def extract_exif_data(image_path):
         from PIL import Image
         from PIL.ExifTags import TAGS
         
+        print(f"Extracting EXIF from: {image_path}")
+        
         # Open image and get EXIF data
         with Image.open(image_path) as img:
             exif_data = img._getexif()
             
         if not exif_data:
+            print("No EXIF data found in image")
             return get_default_exif()
             
         # Convert EXIF data to readable format
@@ -910,6 +913,8 @@ def extract_exif_data(image_path):
         for tag_id, value in exif_data.items():
             tag = TAGS.get(tag_id, tag_id)
             exif[tag] = value
+        
+        print(f"Found EXIF data: {exif}")
         
         # Extract specific EXIF fields we need
         extracted_data = {
@@ -921,12 +926,12 @@ def extract_exif_data(image_path):
             'focal_length': get_focal_length_info(exif)
         }
         
+        print(f"Extracted data: {extracted_data}")
         return extracted_data
         
     except Exception as e:
         print(f"Error extracting EXIF from {image_path}: {str(e)}")
         return get_default_exif()
-
 def get_camera_info(exif):
     """Extract camera information from EXIF"""
     make = exif.get('Make', '').strip()
