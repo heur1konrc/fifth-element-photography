@@ -839,3 +839,94 @@ function setAsFeatured(filename) {
     }
 }
 
+
+
+// Text Formatting Functions
+function initializeTextFormatting() {
+    // Initialize formatting for featured story textarea
+    const featuredStoryTextarea = document.getElementById('featured-story');
+    if (featuredStoryTextarea) {
+        addFormattingToolbar(featuredStoryTextarea, 'featured-story-toolbar');
+    }
+    
+    // Initialize formatting for about bio textarea
+    const aboutBioTextarea = document.getElementById('about-bio');
+    if (aboutBioTextarea) {
+        addFormattingToolbar(aboutBioTextarea, 'about-bio-toolbar');
+    }
+}
+
+function addFormattingToolbar(textarea, toolbarId) {
+    // Create toolbar container
+    const toolbar = document.createElement('div');
+    toolbar.id = toolbarId;
+    toolbar.className = 'formatting-toolbar';
+    toolbar.innerHTML = `
+        <div class="toolbar-buttons">
+            <button type="button" class="format-btn" onclick="formatText('${textarea.id}', 'bold')" title="Bold">
+                <i class="fas fa-bold"></i>
+            </button>
+            <button type="button" class="format-btn" onclick="formatText('${textarea.id}', 'italic')" title="Italic">
+                <i class="fas fa-italic"></i>
+            </button>
+            <button type="button" class="format-btn" onclick="formatText('${textarea.id}', 'h1')" title="Heading 1">
+                H1
+            </button>
+            <button type="button" class="format-btn" onclick="formatText('${textarea.id}', 'h2')" title="Heading 2">
+                H2
+            </button>
+            <button type="button" class="format-btn" onclick="formatText('${textarea.id}', 'h3')" title="Heading 3">
+                H3
+            </button>
+        </div>
+    `;
+    
+    // Insert toolbar before textarea
+    textarea.parentNode.insertBefore(toolbar, textarea);
+}
+
+function formatText(textareaId, format) {
+    const textarea = document.getElementById(textareaId);
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    let formattedText = '';
+    
+    switch (format) {
+        case 'bold':
+            formattedText = `**${selectedText}**`;
+            break;
+        case 'italic':
+            formattedText = `*${selectedText}*`;
+            break;
+        case 'h1':
+            formattedText = `# ${selectedText}`;
+            break;
+        case 'h2':
+            formattedText = `## ${selectedText}`;
+            break;
+        case 'h3':
+            formattedText = `### ${selectedText}`;
+            break;
+        default:
+            formattedText = selectedText;
+    }
+    
+    // Replace selected text with formatted text
+    textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+    
+    // Set cursor position after formatted text
+    const newCursorPos = start + formattedText.length;
+    textarea.focus();
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+}
+
+// Update the DOMContentLoaded event listener to include text formatting initialization
+document.addEventListener('DOMContentLoaded', function() {
+    initializeFileUpload();
+    initializeModals();
+    updateSelectionCount();
+    initializeTextFormatting(); // Add this line
+});
+

@@ -1162,3 +1162,67 @@ select option {
     color: #1f2937;
 }
 
+
+/* Text Formatting Toolbar Styles */
+.formatting-toolbar {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toolbar-buttons {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.format-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 0.4rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+}
+
+.format-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.format-btn:active {
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.format-btn i {
+    font-size: 0.9rem;
+}
+
+/* Adjust textarea styling to work with toolbar */
+.featured-story textarea,
+.about-bio textarea {
+    margin-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+/* Ensure proper spacing for textareas with toolbars */
+#featured-story,
+#about-bio {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: none;
+}
+
