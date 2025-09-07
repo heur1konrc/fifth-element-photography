@@ -935,6 +935,32 @@ def extract_exif_data(image_path):
             except:
                 pass
         
+        # Format FNumber with f/ prefix
+        if 'FNumber' in exif:
+            try:
+                f_number = exif['FNumber']
+                if isinstance(f_number, tuple) and len(f_number) == 2:
+                    aperture = f_number[0] / f_number[1]
+                    exif['FNumber'] = f"f/{aperture:.1f}"
+                else:
+                    aperture = float(f_number)
+                    exif['FNumber'] = f"f/{aperture:.1f}"
+            except:
+                pass
+        
+        # Format FocalLength with mm and remove decimals
+        if 'FocalLength' in exif:
+            try:
+                focal_length = exif['FocalLength']
+                if isinstance(focal_length, tuple) and len(focal_length) == 2:
+                    focal = focal_length[0] / focal_length[1]
+                    exif['FocalLength'] = f"{int(focal)}mm"
+                else:
+                    focal = float(focal_length)
+                    exif['FocalLength'] = f"{int(focal)}mm"
+            except:
+                pass
+        
         # Return the raw EXIF data with the actual field names
         return exif
         
