@@ -904,35 +904,8 @@ function formatText(textareaId, format) {
     textarea.setSelectionRange(newCursorPos, newCursorPos);
 }
 
-// Hero Image Management Functions
-async function loadCurrentHeroImage() {
-    try {
-        const response = await fetch('/data/hero_image.json');
-        const heroData = await response.json();
-        const display = document.getElementById('currentHeroDisplay');
-        
-        if (heroData.filename) {
-            display.innerHTML = `
-                <div class="current-hero-image">
-                    <img src="/data/${heroData.filename}" alt="${heroData.title}" style="max-width: 300px; border-radius: 8px;">
-                    <p><strong>Selected:</strong> ${heroData.title}</p>
-                </div>
-            `;
-        } else {
-            display.innerHTML = `
-                <div class="no-hero-selected">
-                    <i class="fas fa-random" style="font-size: 2rem; color: #666; margin-bottom: 10px;"></i>
-                    <p>Using random hero image selection</p>
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error('Error loading current hero image:', error);
-        document.getElementById('currentHeroDisplay').innerHTML = '<p>Error loading current hero image</p>';
-    }
-}
-
-async function setHeroImage(filename, title) {
+// Simple Hero Image Management
+async function setAsHero(filename, title) {
     try {
         const response = await fetch('/set_hero_image', {
             method: 'POST',
@@ -949,7 +922,6 @@ async function setHeroImage(filename, title) {
         
         if (result.success) {
             showAlert(result.message, 'success');
-            loadCurrentHeroImage(); // Refresh the current hero display
         } else {
             showAlert(result.error, 'error');
         }
@@ -959,35 +931,11 @@ async function setHeroImage(filename, title) {
     }
 }
 
-async function clearHeroImage() {
-    try {
-        const response = await fetch('/clear_hero_image', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            showAlert(result.message, 'success');
-            loadCurrentHeroImage(); // Refresh the current hero display
-        } else {
-            showAlert(result.error, 'error');
-        }
-    } catch (error) {
-        console.error('Error clearing hero image:', error);
-        showAlert('Error clearing hero image', 'error');
-    }
-}
-
 // Update the DOMContentLoaded event listener to include text formatting initialization
 document.addEventListener('DOMContentLoaded', function() {
     initializeFileUpload();
     initializeModals();
     updateSelectionCount();
     initializeTextFormatting(); // Add this line
-    loadCurrentHeroImage(); // Load current hero image on page load
 });
 
