@@ -687,14 +687,21 @@ function resetAboutUpload() {
 
 function uploadAboutImage() {
     console.log('uploadAboutImage function called');
-    const fileInput = document.getElementById('aboutFileInput');
+    
+    // Try to find the file input - it might have a different ID
+    let fileInput = document.getElementById('aboutFileInput');
+    if (!fileInput) {
+        // Try alternative IDs
+        fileInput = document.querySelector('input[type="file"]');
+    }
+    
     const bioText = document.getElementById('aboutBioText').value;
     
     console.log('File input:', fileInput);
-    console.log('Files:', fileInput.files);
+    console.log('Files:', fileInput ? fileInput.files : 'no file input found');
     console.log('Bio text:', bioText);
     
-    if (!fileInput.files || fileInput.files.length === 0) {
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
         showAlert('Please select an image file', 'error');
         return;
     }
