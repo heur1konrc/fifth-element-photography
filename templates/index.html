@@ -159,7 +159,7 @@
                         </div>
                         <div class="about-text">
                             {% if about_data and about_data.bio %}
-                                {{ about_data.bio|nl2br|safe }}
+                                <p>{{ about_data.bio }}</p>
                             {% else %}
                                 <p>Add your bio in the admin panel</p>
                             {% endif %}
