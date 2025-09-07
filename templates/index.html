@@ -4,6 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fifth Element Photography - Capturing the Quintessence</title>
+    
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:title" content="Fifth Element Photography - Featured Image of the Week">
+    <meta property="og:description" content="Professional photography with artistic vision and technical excellence">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fifth-element-photography-production.up.railway.app/#featured">
+    {% set featured_image = images|selectattr('is_featured')|first %}
+    {% if featured_image %}
+    <meta property="og:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url }}">
+    <meta property="og:image:alt" content="{{ featured_image.title }}">
+    {% else %}
+    <meta property="og:image" content="https://fifth-element-photography-production.up.railway.app/static/images/default-og.jpg">
+    {% endif %}
+    <meta property="og:site_name" content="Fifth Element Photography">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Fifth Element Photography - Featured Image of the Week">
+    <meta name="twitter:description" content="Professional photography with artistic vision and technical excellence">
+    {% if featured_image %}
+    <meta name="twitter:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url }}">
+    {% endif %}
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -52,12 +75,23 @@
             <!-- FEATURED IMAGE Section -->
             <section class="content-section" id="featured-section">
                 <div class="featured-container">
-                    <h2 class="section-title">Featured Image of the Week</h2>
+                    <h2 class="section-title featured-title">FEATURED IMAGE OF THE WEEK</h2>
                     {% set featured_image = images|selectattr('is_featured')|first %}
                     {% if featured_image %}
                         <div class="featured-content">
                             <div class="featured-image">
                                 <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
+                                <div class="image-actions">
+                                    <button class="action-btn" onclick="viewFullscreen('{{ featured_image.url }}', '{{ featured_image.title }}')">
+                                        <span>🔍</span> View High Resolution
+                                    </button>
+                                    <button class="action-btn" onclick="downloadImage('{{ featured_image.url }}', '{{ featured_image.filename }}')">
+                                        <span>⬇️</span> Download Full Size
+                                    </button>
+                                    <button class="action-btn" onclick="shareOnSocial('{{ featured_image.title }}', '{{ featured_image.url }}')">
+                                        <span>📤</span> Share on Social Media
+                                    </button>
+                                </div>
                             </div>
                             <div class="featured-info">
                                 <h3>{{ featured_image.title }}</h3>
