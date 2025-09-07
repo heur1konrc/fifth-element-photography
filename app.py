@@ -919,6 +919,7 @@ def extract_exif_data(image_path):
         # Convert exposure time to fraction format
         if 'ExposureTime' in exif:
             exposure_time = exif['ExposureTime']
+            print(f"Original ExposureTime: {exposure_time}, type: {type(exposure_time)}")
             try:
                 if isinstance(exposure_time, tuple) and len(exposure_time) == 2:
                     if exposure_time[0] == 1:
@@ -930,9 +931,11 @@ def extract_exif_data(image_path):
                         exif['ExposureTime'] = f"{exposure_time:.1f}s"
                     else:
                         # Convert decimal to fraction (e.g., 0.00133 -> 1/750)
-                        fraction = int(1 / exposure_time)
+                        fraction = int(round(1 / exposure_time))
                         exif['ExposureTime'] = f"1/{fraction}s"
-            except:
+                        print(f"Converted ExposureTime to: {exif['ExposureTime']}")
+            except Exception as e:
+                print(f"Error converting ExposureTime: {e}")
                 pass
         
         # Format FNumber with f/ prefix
