@@ -1027,3 +1027,63 @@ def get_default_exif():
         'focal_length': 'Unavailable'
     }
 
+
+@app.route('/debug_exif')
+def debug_exif():
+    """Debug route to show all EXIF data from featured image"""
+    try:
+        from PIL import Image
+        from PIL.ExifTags import TAGS
+        
+        # Get featured image
+        images = scan_images()
+        featured_image = None
+        for image in images:
+            if image['category'] == 'landscape':
+                featured_image = image
+                break
+        if not featured_image and images:
+            featured_image = images[0]
+        
+        if not featured_image:
+            return jsonify({'error': 'No featured image found'})
+        
+        # Get image path
+        image_path = os.path.join(IMAGES_FOLDER, featured_image['filename'])
+        
+        # Extract ALL EXIF data
+        with Image.open(image_path) as img:
+            exif_data = img._getexif()
+        
+        if not exif_data:
+            return jsonify({
+                'filename': featured_image['filename'],
+                'message': 'No EXIF data found in this image',
+                'exif_data': {}
+            })
+        
+        # Convert all EXIF data to readable format
+        readable_exif = {}
+        for tag_id, value in exif_data.items():
+            tag_name = TAGS.get(tag_id, f"Unknown_{tag_id}")
+            
+            # Convert value to string for JSON serialization
+            if isinstance(value, bytes):
+                try:
+                    readable_exif[tag_name] = value.decode('utf-8', errors='ignore')
+                except:
+                    readable_exif[tag_name] = f"<bytes: {len(value)} bytes>"
+            elif isinstance(value, tuple):
+                readable_exif[tag_name] = f"{value[0]}/{value[1]}" if len(value) == 2 else str(value)
+            else:
+                readable_exif[tag_name] = str(value)
+        
+        return jsonify({
+            'filename': featured_image['filename'],
+            'total_exif_fields': len(readable_exif),
+            'exif_data': readable_exif
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
