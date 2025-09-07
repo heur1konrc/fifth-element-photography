@@ -259,11 +259,14 @@ def index():
     if not featured_image and images:
         featured_image = images[0]
     
+    about_data = load_about_data()
+    
     return render_template('index.html', 
                          images=images, 
                          categories=categories,
                          category_counts=category_counts,
-                         featured_image=featured_image)
+                         featured_image=featured_image,
+                         about_data=about_data)
 
 @app.route('/featured')
 def featured():

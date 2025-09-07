@@ -147,25 +147,20 @@
                     
                     <div class="about-content">
                         <div class="about-image">
-                            {% set background_image = images|selectattr('is_background')|first %}
-                            {% if background_image %}
-                                <img src="{{ background_image.url }}" alt="About Fifth Element Photography">
+                            {% if about_data and about_data.filename %}
+                                <img src="/about/{{ about_data.filename }}" alt="About Fifth Element Photography">
                             {% else %}
                                 <div class="placeholder-image">
-                                    <p>Set a background image in the admin panel</p>
+                                    <p>Upload an About image in the admin panel</p>
                                 </div>
                             {% endif %}
                         </div>
                         <div class="about-text">
-                            <p>Born and raised right here in Madison, Wisconsin, I'm a creative spirit with a passion for bringing visions to life. My journey has woven through various rewarding paths - as a musician/songwriter, a Teacher, a REALTOR®, and a Small Business Owner.</p>
-                            
-                            <p>Each of these roles has fueled my inspired, creative, and driven approach to everything I do, especially when it comes to photography. At the heart of Fifth Element Photography: Capturing the Quintessence, resides my dedication to you.</p>
-                            
-                            <p>While I cherish the fulfillment of capturing moments that spark my own imagination, my true passion lies in doing the same for my clients. Based in Madison, I frequently travel across the state, always on the lookout for that next inspiring scene.</p>
-                            
-                            <p>For me, client satisfaction isn't just a goal - it's the foundation of every interaction. I pour my energy into ensuring you not only love your photos but also enjoy the entire experience. It's truly rewarding to see clients transform into lifelong friends, and that's the kind of connection I strive to build with everyone I work with.</p>
-                            
-                            <div class="signature">- Fifth Element Photography</div>
+                            {% if about_data and about_data.bio %}
+                                {{ about_data.bio|nl2br|safe }}
+                            {% else %}
+                                <p>Add your bio in the admin panel</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
