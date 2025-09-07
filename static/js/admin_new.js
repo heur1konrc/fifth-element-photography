@@ -627,6 +627,7 @@ function initializeAboutUpload() {
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             const file = e.target.files[0];
+            selectedAboutFile = file; // Store the file globally
             dropZone.innerHTML = `
                 <div class="drop-zone-content">
                     <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
@@ -685,29 +686,24 @@ function resetAboutUpload() {
     `;
 }
 
+// Global variable to store selected About file
+let selectedAboutFile = null;
+
 function uploadAboutImage() {
     console.log('uploadAboutImage function called');
     
-    // Try to find the file input - it might have a different ID
-    let fileInput = document.getElementById('aboutFileInput');
-    if (!fileInput) {
-        // Try alternative IDs
-        fileInput = document.querySelector('input[type="file"]');
-    }
-    
     const bioText = document.getElementById('aboutBioText').value;
     
-    console.log('File input:', fileInput);
-    console.log('Files:', fileInput ? fileInput.files : 'no file input found');
+    console.log('Selected about file:', selectedAboutFile);
     console.log('Bio text:', bioText);
     
-    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+    if (!selectedAboutFile) {
         showAlert('Please select an image file', 'error');
         return;
     }
     
     const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
+    formData.append('file', selectedAboutFile);
     formData.append('bio', bioText);
     
     // Update button state
