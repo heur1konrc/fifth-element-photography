@@ -294,32 +294,6 @@
                     {% endif %}
                 </div>
             </section>
-
-            <!-- About Page Management -->
-            <section class="about-section">
-                <div class="section-header">
-                    <h2 class="section-title">About Page Management</h2>
-                </div>
-                <div class="about-content">
-                    {% set background_image = images|selectattr('is_background')|first %}
-                    {% if background_image %}
-                        <div class="current-background">
-                            <img src="{{ background_image.url }}" alt="{{ background_image.title }}">
-                            <div class="background-info">
-                                <h3>{{ background_image.title }}</h3>
-                                <p>Currently set as about page background</p>
-                                <button class="btn btn-secondary" onclick="removeBackground('{{ background_image.filename }}')">
-                                    Remove Background Status
-                                </button>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="no-background">
-                            <p>No background image selected. Choose an image from the portfolio above to set as about page background.</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </section>
         </main>
     </div>
 
