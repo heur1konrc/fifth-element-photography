@@ -1003,22 +1003,6 @@ def get_aperture_info(exif):
             pass
     
     return 'Unavailable'
-        elif isinstance(f_number, (int, float)):
-            return f"f/{f_number:.1f}"
-    
-    aperture_value = exif.get('ApertureValue')
-    if aperture_value:
-        if isinstance(aperture_value, tuple) and len(aperture_value) == 2:
-            aperture = 2 ** (aperture_value[0] / aperture_value[1] / 2)
-            return f"f/{aperture:.1f}"
-        elif hasattr(aperture_value, '__float__'):
-            aperture = 2 ** (float(aperture_value) / 2)
-            return f"f/{aperture:.1f}"
-        elif isinstance(aperture_value, (int, float)):
-            aperture = 2 ** (aperture_value / 2)
-            return f"f/{aperture:.1f}"
-    
-    return 'Unavailable'
 
 def get_shutter_speed_info(exif):
     """Extract shutter speed information from EXIF"""
