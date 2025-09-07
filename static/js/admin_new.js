@@ -810,6 +810,20 @@ function setAsFeatured(filename) {
         .then(data => {
             if (data.success) {
                 showAlert(data.message, 'success');
+                
+                // Update button colors immediately
+                document.querySelectorAll('.btn-featured').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Find and activate the button for this image
+                const buttons = document.querySelectorAll('.btn-featured');
+                buttons.forEach(btn => {
+                    if (btn.onclick.toString().includes(filename)) {
+                        btn.classList.add('active');
+                    }
+                });
+                
                 // Refresh the page to show the updated featured image
                 setTimeout(() => {
                     window.location.reload();

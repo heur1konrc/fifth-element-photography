@@ -390,6 +390,28 @@ body {
     gap: 0.25rem;
 }
 
+/* Featured button styles */
+.btn-featured {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-featured:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-featured.active {
+    background: #fbbf24;
+    color: #000000;
+    border: 1px solid #fbbf24;
+}
+
+.btn-featured.active:hover {
+    background: #f59e0b;
+}
+
 .image-details {
     display: flex;
     justify-content: space-between;
