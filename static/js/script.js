@@ -50,7 +50,7 @@ async function setHeroImage() {
         
         if (heroData.filename) {
             // Use the selected hero image
-            heroImage.style.backgroundImage = `url('/images/${heroData.filename}')`;
+            heroImage.style.backgroundImage = `url('/data/${heroData.filename}')`;
         } else {
             // Fallback to random hero image
             setRandomHeroImage();
