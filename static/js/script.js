@@ -59,11 +59,6 @@ function displayImages(images) {
     const imageHTML = images.map(image => `
         <div class="image-item" onclick="openModal('${image.url}', '${image.title}', '${image.category}')">
             <img src="${image.url}" alt="${image.title}" loading="lazy">
-            <div class="image-info">
-                <div class="image-title">${image.title}</div>
-                <div class="image-category">${image.category}</div>
-                <div class="image-dimensions">${image.width}×${image.height}</div>
-            </div>
         </div>
     `).join('');
 

@@ -921,12 +921,16 @@ def extract_exif_data(image_path):
             exposure_time = exif['ExposureTime']
             print(f"Original ExposureTime: {exposure_time}, type: {type(exposure_time)}")
             try:
+                # Handle different data types
+                if isinstance(exposure_time, str):
+                    exposure_time = float(exposure_time)
+                
                 if isinstance(exposure_time, tuple) and len(exposure_time) == 2:
                     if exposure_time[0] == 1:
                         exif['ExposureTime'] = f"1/{exposure_time[1]}s"
                     else:
                         exif['ExposureTime'] = f"{exposure_time[0]}/{exposure_time[1]}s"
-                elif isinstance(exposure_time, float):
+                elif isinstance(exposure_time, (float, int)):
                     if exposure_time >= 1:
                         exif['ExposureTime'] = f"{exposure_time:.1f}s"
                     else:
@@ -936,7 +940,15 @@ def extract_exif_data(image_path):
                         print(f"Converted ExposureTime to: {exif['ExposureTime']}")
             except Exception as e:
                 print(f"Error converting ExposureTime: {e}")
-                pass
+                # Fallback: try simple conversion
+                try:
+                    if isinstance(exposure_time, (str, float, int)):
+                        val = float(exposure_time)
+                        if val < 1:
+                            fraction = int(round(1 / val))
+                            exif['ExposureTime'] = f"1/{fraction}s"
+                except:
+                    pass
         
         # Format FNumber with f/ prefix
         if 'FNumber' in exif:
