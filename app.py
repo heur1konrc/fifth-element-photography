@@ -954,99 +954,38 @@ def get_lens_info(exif):
 
 def get_aperture_info(exif):
     """Extract aperture information from EXIF"""
-    # Try FNumber first (most common)
+    # Use FNumber directly as shown in debug
     aperture = exif.get('FNumber', None)
     if aperture:
-        if isinstance(aperture, tuple) and len(aperture) == 2:
-            f_value = aperture[0] / aperture[1]
-            return f"f/{f_value:.1f}"
-        elif isinstance(aperture, (int, float)):
-            return f"f/{aperture:.1f}"
-    
-    # Try MaxApertureValue
-    max_aperture = exif.get('MaxApertureValue', None)
-    if max_aperture:
-        if isinstance(max_aperture, tuple) and len(max_aperture) == 2:
-            f_value = 2 ** (max_aperture[0] / max_aperture[1] / 2)
-            return f"f/{f_value:.1f}"
-    
-    # Try ApertureValue
-    aperture_value = exif.get('ApertureValue', None)
-    if aperture_value:
-        if isinstance(aperture_value, tuple) and len(aperture_value) == 2:
-            f_value = 2 ** (aperture_value[0] / aperture_value[1] / 2)
-            return f"f/{f_value:.1f}"
-    
+        return f"f/{float(aperture):.1f}"
     return "Unavailable"
 
 def get_shutter_speed_info(exif):
     """Extract shutter speed information from EXIF"""
-    # Try ExposureTime first (most common)
-    shutter_speed = exif.get('ExposureTime', None)
-    if shutter_speed:
-        if isinstance(shutter_speed, tuple) and len(shutter_speed) == 2:
-            if shutter_speed[0] == 1:
-                return f"1/{shutter_speed[1]}"
-            elif shutter_speed[1] == 1:
-                return f"{shutter_speed[0]}s"
-            else:
-                decimal_value = shutter_speed[0] / shutter_speed[1]
-                if decimal_value >= 1:
-                    return f"{decimal_value:.1f}s"
-                else:
-                    return f"1/{int(1/decimal_value)}"
-        elif isinstance(shutter_speed, (int, float)):
-            if shutter_speed >= 1:
-                return f"{shutter_speed:.1f}s"
-            else:
-                return f"1/{int(1/shutter_speed)}"
-    
-    # Try ShutterSpeedValue
-    shutter_speed_value = exif.get('ShutterSpeedValue', None)
-    if shutter_speed_value:
-        if isinstance(shutter_speed_value, tuple) and len(shutter_speed_value) == 2:
-            speed = 2 ** (shutter_speed_value[0] / shutter_speed_value[1])
-            return f"1/{int(speed)}"
-    
+    # Use ExposureTime directly as shown in debug
+    exposure_time = exif.get('ExposureTime', None)
+    if exposure_time:
+        exposure_float = float(exposure_time)
+        if exposure_float >= 1:
+            return f"{exposure_float:.1f}s"
+        else:
+            return f"1/{int(1/exposure_float)}"
     return "Unavailable"
 
 def get_iso_info(exif):
     """Extract ISO information from EXIF"""
-    # Try ISOSpeedRatings first
+    # Use ISOSpeedRatings directly as shown in debug
     iso = exif.get('ISOSpeedRatings', None)
     if iso:
-        if isinstance(iso, (list, tuple)):
-            return f"ISO-{iso[0]}"
-        else:
-            return f"ISO-{iso}"
-    
-    # Try PhotographicSensitivity
-    iso_speed = exif.get('PhotographicSensitivity', None)
-    if iso_speed:
-        return f"ISO-{iso_speed}"
-    
-    # Try ISO
-    iso_direct = exif.get('ISO', None)
-    if iso_direct:
-        return f"ISO-{iso_direct}"
-    
+        return f"ISO-{iso}"
     return "Unavailable"
 
 def get_focal_length_info(exif):
     """Extract focal length information from EXIF"""
+    # Use FocalLength directly as shown in debug
     focal_length = exif.get('FocalLength', None)
     if focal_length:
-        if isinstance(focal_length, tuple) and len(focal_length) == 2:
-            fl_value = focal_length[0] / focal_length[1]
-            return f"{fl_value:.0f} mm"
-        elif isinstance(focal_length, (int, float)):
-            return f"{focal_length:.0f} mm"
-    
-    # Try FocalLengthIn35mmFilm
-    focal_35mm = exif.get('FocalLengthIn35mmFilm', None)
-    if focal_35mm:
-        return f"{focal_35mm} mm"
-    
+        return f"{float(focal_length):.0f} mm"
     return "Unavailable"
 
 def get_default_exif():
