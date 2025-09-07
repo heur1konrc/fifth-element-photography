@@ -19,8 +19,8 @@ ABOUT_FILE = '/data/about.json'
 def load_about_data():
     """Load about page data"""
     try:
-        if os.path.exists(ABOUT_FILE):
-            with open(ABOUT_FILE, 'r') as f:
+        if os.path.exists('/data/about_data.json'):
+            with open('/data/about_data.json', 'r') as f:
                 return json.load(f)
     except:
         pass
