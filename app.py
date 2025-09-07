@@ -1186,3 +1186,47 @@ def debug_exif():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/set_hero_image', methods=['POST'])
+def set_hero_image():
+    """Set a specific image as the hero image"""
+    try:
+        data = request.get_json()
+        filename = data.get('filename')
+        title = data.get('title')
+        
+        if not filename:
+            return jsonify({'success': False, 'error': 'No filename provided'})
+        
+        # Save hero image selection
+        hero_data = {
+            'filename': filename,
+            'title': title
+        }
+        
+        hero_file_path = os.path.join(DATA_FOLDER, 'hero_image.json')
+        with open(hero_file_path, 'w') as f:
+            json.dump(hero_data, f, indent=2)
+        
+        return jsonify({'success': True, 'message': f'Hero image set to "{title}"'})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/clear_hero_image', methods=['POST'])
+def clear_hero_image():
+    """Clear the hero image selection (return to random)"""
+    try:
+        hero_data = {
+            'filename': None,
+            'title': None
+        }
+        
+        hero_file_path = os.path.join(DATA_FOLDER, 'hero_image.json')
+        with open(hero_file_path, 'w') as f:
+            json.dump(hero_data, f, indent=2)
+        
+        return jsonify({'success': True, 'message': 'Hero image cleared - using random selection'})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+

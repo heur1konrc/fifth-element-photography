@@ -26,8 +26,8 @@ async function loadImages() {
         allImages = await response.json();
         
         if (allImages.length > 0) {
-            // Set random hero image
-            setRandomHeroImage();
+            // Set hero image (selected or random)
+            setHeroImage();
             
             // Display all images initially
             displayImages(allImages);
@@ -41,7 +41,28 @@ async function loadImages() {
     }
 }
 
-// Set random hero image
+// Set hero image (selected or random)
+async function setHeroImage() {
+    try {
+        // First, try to get the selected hero image
+        const heroResponse = await fetch('/data/hero_image.json');
+        const heroData = await heroResponse.json();
+        
+        if (heroData.filename) {
+            // Use the selected hero image
+            heroImage.style.backgroundImage = `url('/data/${heroData.filename}')`;
+        } else {
+            // Fallback to random hero image
+            setRandomHeroImage();
+        }
+    } catch (error) {
+        console.error('Error loading hero image selection:', error);
+        // Fallback to random hero image
+        setRandomHeroImage();
+    }
+}
+
+// Set random hero image (fallback)
 function setRandomHeroImage() {
     if (allImages.length > 0) {
         const randomImage = allImages[Math.floor(Math.random() * allImages.length)];

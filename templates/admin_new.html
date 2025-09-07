@@ -294,6 +294,45 @@
                     {% endif %}
                 </div>
             </section>
+
+            <!-- Hero Image Management -->
+            <section class="hero-section">
+                <div class="section-header">
+                    <h2 class="section-title">Hero Image Management</h2>
+                    <p class="section-description">Select a specific image for the homepage hero section, or leave unset for random selection.</p>
+                </div>
+                
+                <div class="hero-management">
+                    <div class="current-hero">
+                        <h3>Current Hero Image</h3>
+                        <div id="currentHeroDisplay" class="hero-preview">
+                            <p>Loading current hero image...</p>
+                        </div>
+                        <div class="hero-actions">
+                            <button id="clearHeroBtn" class="btn btn-secondary" onclick="clearHeroImage()">
+                                <i class="fas fa-random"></i>
+                                Use Random Selection
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="hero-selection">
+                        <h3>Select New Hero Image</h3>
+                        <p>Click on any image below to set it as the hero image:</p>
+                        <div class="hero-grid" id="heroImageGrid">
+                            {% for image in images %}
+                                <div class="hero-option" onclick="setHeroImage('{{ image.filename }}', '{{ image.title }}')">
+                                    <img src="/data/{{ image.filename }}" alt="{{ image.title }}" loading="lazy">
+                                    <div class="hero-option-info">
+                                        <div class="hero-option-title">{{ image.title }}</div>
+                                        <div class="hero-option-category">{{ image.category|upper }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
