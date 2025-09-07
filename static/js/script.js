@@ -290,3 +290,45 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
+// Category Filtering
+document.addEventListener('DOMContentLoaded', function() {
+    const categoryBadges = document.querySelectorAll('.category-badge');
+    
+    // Add click event listeners to category badges
+    categoryBadges.forEach(badge => {
+        badge.addEventListener('click', function() {
+            const category = this.getAttribute('data-category');
+            
+            // Update active badge
+            categoryBadges.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter images
+            filterImagesByCategory(category);
+        });
+    });
+});
+
+// Filter images by category
+function filterImagesByCategory(category) {
+    let filteredImages;
+    
+    if (category === 'all') {
+        filteredImages = allImages;
+        galleryTitle.textContent = 'Portfolio Gallery';
+    } else {
+        filteredImages = allImages.filter(image => 
+            image.category && image.category.toLowerCase() === category.toLowerCase()
+        );
+        galleryTitle.textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Gallery`;
+    }
+    
+    // Update current category
+    currentCategory = category;
+    
+    // Display filtered images
+    displayImages(filteredImages);
+    updateImageCount(filteredImages.length);
+}
+
