@@ -7,10 +7,30 @@
 }
 
 body {
-    font-family: 'Poppins', sans-serif;
+    
     background: #0a0a0a;
     color: #ffffff;
     overflow-x: hidden;
+}
+
+/* Keep original font for logo subtitle "PHOTOGRAPHY" */
+.logo p {
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: #888;
+    letter-spacing: 1px;
+}
+
+/* Keep default fonts for text inputs and textareas */
+input[type="text"],
+input[type="email"], 
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="number"],
+textarea {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .container {
@@ -47,7 +67,7 @@ body {
 }
 
 .logo h1 {
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 1.2rem;
     font-weight: 600;
     letter-spacing: 2px;
@@ -126,7 +146,7 @@ body {
 }
 
 .hero-title {
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 2.2rem;
     font-weight: 600;
     margin-bottom: 20px;
@@ -148,7 +168,7 @@ body {
 }
 
 .gallery-header h3 {
-    font-family: 'Poppins', sans-serif;
+    
     color: #888;
     font-size: 0.9rem;
     font-weight: 400;
@@ -427,7 +447,7 @@ body {
 
 .section-title {
     color: #ffffff;
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 2.5rem;
     font-weight: bold;
     text-align: center;
@@ -462,7 +482,7 @@ body {
 
 .featured-info h3 {
     color: #fff;
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
 }
@@ -571,7 +591,7 @@ body {
 .contact-info h3,
 .contact-form h3 {
     color: #ffffff;
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 1.5rem;
     margin-bottom: 1rem;
 }
@@ -671,7 +691,7 @@ body {
 }
 
 .featured-story h4 {
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 0.75rem;
@@ -681,7 +701,7 @@ body {
 }
 
 .featured-story p {
-    font-family: 'Poppins', sans-serif;
+    
     line-height: 1.6;
     color: #e0e0e0;
     font-size: 0.95rem;
@@ -697,7 +717,7 @@ body {
 }
 
 .featured-story-section h4 {
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 1rem;
@@ -707,7 +727,7 @@ body {
 }
 
 .featured-story-section p {
-    font-family: 'Poppins', sans-serif;
+    
     line-height: 1.6;
     color: #e0e0e0;
     font-size: 1rem;
@@ -715,7 +735,7 @@ body {
 
 /* Section titles with Poppins font */
 .section-title {
-    font-family: 'Poppins', sans-serif;
+    
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -738,7 +758,7 @@ body {
 }
 
 .featured-info h3 {
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 1.5rem;
@@ -750,7 +770,7 @@ body {
 /* Featured Image Improvements */
 .featured-title {
     color: #ffffff !important;
-    font-family: 'Poppins', sans-serif;
+    
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 2px;
@@ -792,7 +812,7 @@ body {
     color: #ffffff;
     padding: 0.75rem 1rem;
     border-radius: 6px;
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
@@ -822,7 +842,7 @@ body {
 
 .featured-story-section h4 {
     color: #ffffff;
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 1.3rem;
     font-weight: 600;
     margin-bottom: 1rem;
@@ -842,7 +862,7 @@ body {
 }
 
 .featured-info h3 {
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 1.3rem;
     font-weight: 600;
     margin-bottom: 1.2rem;
@@ -1126,7 +1146,7 @@ body {
     border: none;
     padding: 8px 16px;
     border-radius: 8px;
-    font-family: 'Poppins', sans-serif;
+    
     font-size: 0.8rem;
     font-weight: 500;
     text-transform: uppercase;
