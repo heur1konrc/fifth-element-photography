@@ -83,17 +83,6 @@
                         <div class="featured-content">
                             <div class="featured-image">
                                 <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
-                                <div class="image-actions">
-                                    <button class="action-btn" onclick="viewFullscreen('{{ featured_image.url }}', '{{ featured_image.title }}')">
-                                        <span>🔍</span> View High Resolution
-                                    </button>
-                                    <button class="action-btn" onclick="downloadImage('{{ featured_image.url }}', '{{ featured_image.filename }}')">
-                                        <span>⬇️</span> Download Full Size
-                                    </button>
-                                    <button class="action-btn" onclick="shareOnSocial('{{ featured_image.title }}', '{{ featured_image.url }}')">
-                                        <span>📤</span> Share on Social Media
-                                    </button>
-                                </div>
                             </div>
                             <div class="featured-info">
                                 <h3>{{ featured_image.title }}</h3>
@@ -123,6 +112,18 @@
                                         <span class="detail-label">Focal Length:</span>
                                         <span class="detail-value">24.0mm</span>
                                     </div>
+                                </div>
+                                
+                                <div class="image-actions">
+                                    <button class="action-btn" onclick="viewFullscreen('{{ featured_image.url }}', '{{ featured_image.title }}')">
+                                        <span>🔍</span> View High Resolution
+                                    </button>
+                                    <button class="action-btn" onclick="downloadImage('{{ featured_image.url }}', '{{ featured_image.filename }}')">
+                                        <span>⬇️</span> Download Full Size
+                                    </button>
+                                    <button class="action-btn" onclick="shareOnSocial('{{ featured_image.title }}', '{{ featured_image.url }}')">
+                                        <span>📤</span> Share on Social Media
+                                    </button>
                                 </div>
                             </div>
                         </div>
