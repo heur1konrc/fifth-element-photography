@@ -862,6 +862,17 @@ def remove_about_image(filename):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+@app.route('/debug_about')
+def debug_about():
+    """Debug about data"""
+    about_data = load_about_data()
+    return jsonify({
+        'about_data': about_data,
+        'about_data_exists': bool(about_data),
+        'about_file_exists': os.path.exists('/data/about_data.json'),
+        'about_dir_exists': os.path.exists('/data/about')
+    })
+
 @app.route('/about/<filename>')
 def serve_about_image(filename):
     """Serve about images"""
