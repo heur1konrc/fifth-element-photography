@@ -175,7 +175,7 @@ function showSection(sectionName) {
 function openModal(imageUrl, title, category) {
     modalImage.src = imageUrl;
     modalTitle.textContent = title;
-    modalCategory.textContent = category.toUpperCase();
+    modalCategory.innerHTML = '<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>';
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
 }
