@@ -585,12 +585,18 @@ function saveFeaturedStory(filename) {
 
 // About Image Functions
 function openAboutUploadModal() {
-    document.getElementById('aboutUploadModal').style.display = 'block';
-    initializeAboutUpload();
+    const modal = document.getElementById('aboutUploadModal');
+    if (modal) {
+        modal.style.display = 'block';
+        initializeAboutUpload();
+    }
 }
 
 function closeAboutUploadModal() {
-    document.getElementById('aboutUploadModal').style.display = 'none';
+    const modal = document.getElementById('aboutUploadModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
     resetAboutUpload();
 }
 
@@ -654,18 +660,21 @@ function resetAboutUpload() {
     const aboutForm = document.getElementById('aboutForm');
     const bioText = document.getElementById('aboutBioText');
     
-    fileInput.value = '';
-    bioText.value = '';
-    aboutForm.style.display = 'none';
+    // Only reset elements that exist
+    if (fileInput) fileInput.value = '';
+    if (bioText) bioText.value = '';
+    if (aboutForm) aboutForm.style.display = 'none';
     
-    dropZone.innerHTML = `
-        <div class="drop-zone-content">
-            <i class="fas fa-user"></i>
-            <h4>Upload About Page Image</h4>
-            <p>Drag & drop your about page image here or click to browse</p>
-            <p class="file-info">Supports: JPG, PNG, GIF</p>
-        </div>
-    `;
+    if (dropZone) {
+        dropZone.innerHTML = `
+            <div class="drop-zone-content">
+                <i class="fas fa-user"></i>
+                <h4>Upload About Page Image</h4>
+                <p>Drag & drop your about page image here or click to browse</p>
+                <p class="file-info">Supports: JPG, PNG, GIF</p>
+            </div>
+        `;
+    }
 }
 
 // Global variable to store selected About file
@@ -952,5 +961,32 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSelectionCount();
     initializeTextFormatting(); // Add this line
     initializeHeroButtons(); // Add hero button event listeners
+});
+
+
+
+// About image upload functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const aboutFileInput = document.getElementById('aboutFileInput');
+    const aboutSubmitBtn = document.getElementById('aboutSubmitBtn');
+    const aboutBioTextarea = document.getElementById('about-bio');
+    const hiddenBioInput = document.getElementById('hiddenBio');
+    
+    if (aboutFileInput) {
+        aboutFileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                // Update hidden bio field with current bio text
+                if (aboutBioTextarea && hiddenBioInput) {
+                    hiddenBioInput.value = aboutBioTextarea.value;
+                }
+                
+                // Show submit button and auto-submit
+                if (aboutSubmitBtn) {
+                    aboutSubmitBtn.style.display = 'inline-block';
+                    aboutSubmitBtn.click();
+                }
+            }
+        });
+    }
 });
 

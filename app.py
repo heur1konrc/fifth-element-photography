@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect, url_for, flash, send_file
 import os
 import json
 from datetime import datetime
@@ -26,6 +26,7 @@ def exposure_fraction(value):
     except:
         return str(value)
 
+# Force deployment - About upload button added - JS fixes applied
 app.secret_key = 'fifth-element-admin-key-2024'
 
 # Configuration
@@ -875,9 +876,14 @@ def debug_about():
 
 @app.route('/about/<filename>')
 def serve_about_image(filename):
-    """Serve about images"""
-    return send_file(os.path.join('/data/about', filename))
+    """Serve about images - Using send_from_directory"""
+    return send_from_directory('/data/about', filename)
 
+
+@app.route('/version')
+def version():
+    """Version endpoint - JS fixes applied"""
+    return jsonify({'version': '1.2', 'status': 'JS fixes applied'})
 
 @app.route('/backup')
 def create_backup():

@@ -107,6 +107,22 @@
                             </div>
                             <div class="about-info">
                                 <h3>About Page Image</h3>
+                                <div class="about-actions" style="margin-bottom: 15px;">
+                                    <!-- Simple upload button for about image -->
+                                    <form action="/upload_about_image" method="post" enctype="multipart/form-data" style="display: inline-block; margin-right: 10px;">
+                                        <input type="file" name="file" accept="image/*" required style="display: none;" id="aboutFileInput">
+                                        <button type="button" class="btn btn-primary" onclick="document.getElementById('aboutFileInput').click()">
+                                            <i class="fas fa-upload"></i>
+                                            Upload New About Image
+                                        </button>
+                                        <input type="hidden" name="bio" id="hiddenBio" value="{{ about_data.bio or '' }}">
+                                        <button type="submit" class="btn btn-success" style="display: none;" id="aboutSubmitBtn">Upload</button>
+                                    </form>
+                                    <button class="btn btn-danger" onclick="removeAboutImage('{{ about_data.filename }}')">
+                                        <i class="fas fa-trash"></i>
+                                        Remove Image
+                                    </button>
+                                </div>
                                 <div class="about-bio">
                                     <label for="about-bio">About Page Bio:</label>
                                     <textarea id="about-bio" placeholder="Write your personal bio for the About page..." rows="6">{{ about_data.bio or '' }}</textarea>
