@@ -515,34 +515,36 @@ def edit_image(filename):
             selected = 'selected' if category == current_category else ''
             category_options += f'<option value="{category}" {selected}>{category.title()}</option>'
         
-        # Return HTML form for editing with proper CSS classes
+        # Return HTML form for editing that matches modal styling
         form_html = f"""
-        <form class="edit-form" onsubmit="saveImageChanges(event, '{filename}')">
-            <div class="form-group">
-                <label for="title">Title:</label>
-                <input type="text" id="title" name="title" value="{image.get('title', '')}" required>
-            </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea id="description" name="description" rows="3">{image.get('description', '')}</textarea>
-            </div>
-            <div class="form-group">
-                <label for="category">Category:</label>
-                <select id="category" name="category">
-                    {category_options}
-                </select>
-            </div>
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="is_background" {"checked" if image.get('is_background') else ""}>
-                    Set as Background Image
-                </label>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-            </div>
-        </form>
+        <div class="edit-form">
+            <form onsubmit="saveImageChanges(event, '{filename}')">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" value="{image.get('title', '')}" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="3">{image.get('description', '')}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <select id="category" name="category">
+                        {category_options}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="is_background" {"checked" if image.get('is_background') else ""}>
+                        Set as Background Image
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
         """
         return form_html
     except Exception as e:
