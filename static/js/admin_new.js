@@ -522,8 +522,10 @@ function uploadImages() {
 }
 
 // Save Image Changes Function
-function saveImageChanges(filename) {
-    const form = document.querySelector('.edit-form');
+function saveImageChanges(event, filename) {
+    event.preventDefault(); // Prevent default form submission
+    
+    const form = document.querySelector('.edit-form form');
     if (!form) {
         alert('Form not found');
         return;
