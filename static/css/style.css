@@ -273,6 +273,17 @@ textarea {
     filter: grayscale(0%);
 }
 
+/* Mobile: Disable grayscale effect for smoother experience */
+@media (max-width: 768px) {
+    .image-item img {
+        filter: grayscale(0%) !important;
+    }
+    
+    .image-item:hover img {
+        filter: grayscale(0%) !important;
+    }
+}
+
 .image-info {
     padding: 15px;
     background: #1a1a1a;
