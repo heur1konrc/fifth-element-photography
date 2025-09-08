@@ -508,6 +508,13 @@ def edit_image(filename):
         
         all_categories = load_categories()
         
+        # Generate category options HTML
+        category_options = ""
+        current_category = image.get('category', 'other')
+        for category in sorted(all_categories):
+            selected = 'selected' if category == current_category else ''
+            category_options += f'<option value="{category}" {selected}>{category.title()}</option>'
+        
         # Return HTML form for editing
         form_html = f"""
         <form onsubmit="saveImageChanges(event, '{filename}')">
