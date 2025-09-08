@@ -515,9 +515,9 @@ def edit_image(filename):
             selected = 'selected' if category == current_category else ''
             category_options += f'<option value="{category}" {selected}>{category.title()}</option>'
         
-        # Return HTML form for editing
+        # Return HTML form for editing with proper CSS classes
         form_html = f"""
-        <form onsubmit="saveImageChanges(event, '{filename}')">
+        <form class="edit-form" onsubmit="saveImageChanges(event, '{filename}')">
             <div class="form-group">
                 <label for="title">Title:</label>
                 <input type="text" id="title" name="title" value="{image.get('title', '')}" required>
