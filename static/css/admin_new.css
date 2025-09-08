@@ -207,11 +207,23 @@ body {
 .btn-secondary {
     background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-secondary:hover {
     background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-accent {
+    background: rgba(103, 153, 194, 0.2);
+    color: #6799c2;
+    border: 1px solid #6799c2;
+}
+
+.btn-accent:hover {
+    background: #6799c2;
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
 .btn-success {

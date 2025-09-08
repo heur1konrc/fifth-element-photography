@@ -244,6 +244,17 @@ def scan_images():
             # Get image info
             info = get_image_info(filepath)
             
+            # Load display order from metadata if available
+            display_order = None
+            metadata_file = os.path.join(IMAGES_FOLDER, f"{filename}.json")
+            if os.path.exists(metadata_file):
+                try:
+                    with open(metadata_file, 'r') as f:
+                        metadata = json.load(f)
+                        display_order = metadata.get('display_order')
+                except:
+                    pass
+            
             images.append({
                 'filename': filename,
                 'title': title,
@@ -254,8 +265,18 @@ def scan_images():
                 'story': featured_story,
                 'url': f'/images/{filename}',
                 'width': info['width'],
-                'height': info['height']
+                'height': info['height'],
+                'display_order': display_order
             })
+    
+    # Sort images by display_order if available, otherwise by filename
+    def sort_key(img):
+        if img['display_order'] is not None:
+            return (0, img['display_order'])  # Randomized images first
+        else:
+            return (1, img['filename'])  # Non-randomized images second, sorted by filename
+    
+    images.sort(key=sort_key)
     
     return images
 
@@ -1270,4 +1291,77 @@ def get_hero_image():
             return jsonify({'filename': None, 'title': None})
     except Exception as e:
         return jsonify({'filename': None, 'title': None})
+
+
+@app.route('/admin/randomize_portfolio', methods=['POST'])
+def randomize_portfolio():
+    """Randomize the order of portfolio images"""
+    try:
+        import random
+        
+        # Get all images
+        images = []
+        for filename in os.listdir(IMAGES_FOLDER):
+            if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+                filepath = os.path.join(IMAGES_FOLDER, filename)
+                if os.path.isfile(filepath):
+                    # Get image metadata
+                    image_data = {
+                        'filename': filename,
+                        'size': os.path.getsize(filepath),
+                        'modified': os.path.getmtime(filepath)
+                    }
+                    
+                    # Load existing metadata if available
+                    metadata_file = os.path.join(IMAGES_FOLDER, f"{filename}.json")
+                    if os.path.exists(metadata_file):
+                        try:
+                            with open(metadata_file, 'r') as f:
+                                metadata = json.load(f)
+                                image_data.update(metadata)
+                        except:
+                            pass
+                    
+                    images.append(image_data)
+        
+        # Randomize the order
+        random.shuffle(images)
+        
+        # Save the new order by updating modification times
+        # We'll use a simple approach: update the metadata with a new 'display_order' field
+        for index, image in enumerate(images):
+            metadata_file = os.path.join(IMAGES_FOLDER, f"{image['filename']}.json")
+            
+            # Load existing metadata or create new
+            metadata = {}
+            if os.path.exists(metadata_file):
+                try:
+                    with open(metadata_file, 'r') as f:
+                        metadata = json.load(f)
+                except:
+                    pass
+            
+            # Add display order
+            metadata['display_order'] = index
+            metadata['randomized_at'] = datetime.now().isoformat()
+            
+            # Save metadata
+            try:
+                with open(metadata_file, 'w') as f:
+                    json.dump(metadata, f, indent=2)
+            except Exception as e:
+                print(f"Error saving metadata for {image['filename']}: {e}")
+        
+        return jsonify({
+            'success': True, 
+            'message': f'Successfully randomized {len(images)} images',
+            'count': len(images)
+        })
+        
+    except Exception as e:
+        print(f"Error randomizing portfolio: {e}")
+        return jsonify({'success': False, 'error': str(e)})
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
 

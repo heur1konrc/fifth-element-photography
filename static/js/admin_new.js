@@ -990,3 +990,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+
+// Randomize Portfolio Order
+function randomizePortfolio() {
+    if (!confirm('This will randomly shuffle the order of all portfolio images. Continue?')) {
+        return;
+    }
+    
+    const button = document.querySelector('button[onclick="randomizePortfolio()"]');
+    const originalText = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Randomizing...';
+    button.disabled = true;
+    
+    fetch('/admin/randomize_portfolio', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('Portfolio order randomized successfully!', 'success');
+            // Reload the page to show the new order
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showAlert('Error randomizing portfolio: ' + (data.error || 'Unknown error'), 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('Error randomizing portfolio. Please try again.', 'error');
+    })
+    .finally(() => {
+        // Restore button state
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
