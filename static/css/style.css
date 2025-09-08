@@ -180,11 +180,11 @@ textarea {
 }
 
 .image-count {
-    background: #333;
+    background: none;
     padding: 8px 16px;
-    border-radius: 20px;
     font-size: 0.9rem;
-    color: #ccc;
+    color: #6799c2;
+    border: none;
 }
 
 /* Masonry Grid */
