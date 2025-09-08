@@ -261,9 +261,8 @@ textarea {
     width: 100%;
     height: auto;
     display: block;
-    transition: transform 0.3s ease, filter 0.1s ease;
+    transition: transform 0.3s ease;
     filter: grayscale(100%);
-    will-change: filter, transform;
     backface-visibility: hidden;
     transform: translateZ(0);
 }
