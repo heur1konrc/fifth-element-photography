@@ -799,7 +799,7 @@ textarea {
 .featured-story {
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: transparent;
+    background: #b7172b;
     border-radius: 8px;
     border-left: 3px solid #6799c2;
 }
