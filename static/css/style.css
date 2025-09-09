@@ -982,11 +982,17 @@ textarea {
     color: #ffffff;
 }
 
-.image-details {
+/*.image-details {
     background: rgba(255, 255, 255, 0.05);
     padding: 1.2rem;
     border-radius: 8px;
-}
+}*/
+
+.image-details {
+    background: #000000;
+    padding: 1.2rem;
+    border-radius: 8px;
+}*/
 
 .detail-group {
     display: flex;
@@ -997,13 +1003,13 @@ textarea {
 }
 
 .detail-label {
-    color: #888;
+    color: #6799c2;
     font-weight: 500;
     font-size: 0.85rem;
 }
 
 .detail-value {
-    color: #fff;
+    color: #6799c2;
     font-weight: 600;
     font-size: 0.85rem;
 }
