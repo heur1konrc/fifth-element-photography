@@ -644,7 +644,7 @@ textarea {
 }
 
 .about-content {
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
     padding: 3rem;
     border-radius: 12px;
 }
@@ -798,7 +798,7 @@ textarea {
 .featured-story {
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
     border-radius: 8px;
     border-left: 3px solid #ffffff;
 }
@@ -824,7 +824,7 @@ textarea {
 .featured-story-section {
     margin-top: 3rem;
     padding: 2rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
     border-radius: 8px;
     border-left: 3px solid #ffffff;
 }
@@ -948,7 +948,7 @@ textarea {
 /* Featured story section - full width */
 .featured-story-section {
     margin-top: 3rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
     padding: 2rem;
     border-radius: 8px;
 }
