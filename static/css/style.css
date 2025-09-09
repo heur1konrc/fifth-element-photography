@@ -12,8 +12,7 @@ html {
 
 body {
     font-family: inherit;
-    /*background: #0a0a0a;*/
-    background: #000000;
+    background: #0a0a0a;
     color: #ffffff;
     overflow-x: hidden;
 }
@@ -645,7 +644,7 @@ textarea {
 }
 
 .about-content {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.05);
     padding: 3rem;
     border-radius: 12px;
 }
@@ -799,9 +798,9 @@ textarea {
 .featured-story {
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
-    border-left: 3px solid #6799c2;
+    border-left: 3px solid #ffffff;
 }
 
 .featured-story h4 {
@@ -817,7 +816,7 @@ textarea {
 .featured-story p {
     font-family: 'Poppins', sans-serif;
     line-height: 1.6;
-    color: #6799c2;
+    color: #e0e0e0;
     font-size: 0.95rem;
 }
 
@@ -825,9 +824,9 @@ textarea {
 .featured-story-section {
     margin-top: 3rem;
     padding: 2rem;
-    background: transparent;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 8px;
-    border-left: 3px solid #000000;
+    border-left: 3px solid #ffffff;
 }
 
 .featured-story-section h4 {
@@ -843,7 +842,7 @@ textarea {
 .featured-story-section p {
     font-family: 'Poppins', sans-serif;
     line-height: 1.6;
-    color: #ffffff;
+    color: #e0e0e0;
     font-size: 1rem;
 }
 
@@ -860,7 +859,7 @@ textarea {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
-    background: #000000;
+    background: rgba(255, 255, 255, 0.05);
     padding: 3rem;
     border-radius: 12px;
 }
@@ -937,8 +936,8 @@ textarea {
 }
 
 .action-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: #000000;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
     transform: translateY(-2px);
 }
 
@@ -949,7 +948,7 @@ textarea {
 /* Featured story section - full width */
 .featured-story-section {
     margin-top: 3rem;
-    background: #000000;
+    background: rgba(255, 255, 255, 0.05);
     padding: 2rem;
     border-radius: 8px;
 }
@@ -965,7 +964,7 @@ textarea {
 }
 
 .featured-story-section p {
-    color: #ffffff
+    color: #cccccc;
     line-height: 1.6;
     font-size: 1rem;
 }
@@ -980,21 +979,14 @@ textarea {
     font-size: 1.3rem;
     font-weight: 600;
     margin-bottom: 1.2rem;
-    /*color: #6799c2;*/
     color: #ffffff;
 }
 
-/*.image-details {
+.image-details {
     background: rgba(255, 255, 255, 0.05);
     padding: 1.2rem;
     border-radius: 8px;
-}*/
-
-.image-details {
-    background: #000000;
-    padding: 1.2rem;
-    border-radius: 8px;
-}*/
+}
 
 .detail-group {
     display: flex;
@@ -1005,13 +997,13 @@ textarea {
 }
 
 .detail-label {
-    color: #6799c2;
+    color: #888;
     font-weight: 500;
     font-size: 0.85rem;
 }
 
 .detail-value {
-    color: #6799c2;
+    color: #fff;
     font-weight: 600;
     font-size: 0.85rem;
 }
