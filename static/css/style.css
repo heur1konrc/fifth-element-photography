@@ -824,7 +824,7 @@ textarea {
 .featured-story-section {
     margin-top: 3rem;
     padding: 2rem;
-    background: #000000;
+    background: transparent;
     border-radius: 8px;
     border-left: 3px solid #000000;
 }
