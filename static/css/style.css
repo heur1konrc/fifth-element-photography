@@ -948,7 +948,7 @@ textarea {
 /* Featured story section - full width */
 .featured-story-section {
     margin-top: 3rem;
-    background: #6799c2;
+    background: #ffffff;
     padding: 2rem;
     border-radius: 8px;
 }
@@ -980,7 +980,7 @@ textarea {
     font-weight: 600;
     margin-bottom: 1.2rem;
     /*color: #6799c2;*/
-    color: #000000;
+    color: #ffffff;
 }
 
 /*.image-details {
