@@ -824,9 +824,9 @@ textarea {
 .featured-story-section {
     margin-top: 3rem;
     padding: 2rem;
-    background: transparent;
+    background: #000000;
     border-radius: 8px;
-    border-left: 3px solid #ffffff;
+    border-left: 3px solid #000000;
 }
 
 .featured-story-section h4 {
@@ -859,7 +859,7 @@ textarea {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: #000000;
     padding: 3rem;
     border-radius: 12px;
 }
@@ -895,7 +895,7 @@ textarea {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     gap: 2rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: #000000;
     padding: 3rem;
     border-radius: 12px;
 }
@@ -936,8 +936,8 @@ textarea {
 }
 
 .action-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: #000000;
+    border-color: #000000;
     transform: translateY(-2px);
 }
 
@@ -964,7 +964,7 @@ textarea {
 }
 
 .featured-story-section p {
-    color: #cccccc;
+    color: #000000;
     line-height: 1.6;
     font-size: 1rem;
 }
