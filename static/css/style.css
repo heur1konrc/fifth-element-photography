@@ -860,7 +860,7 @@ textarea {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: #000000;
     padding: 3rem;
     border-radius: 12px;
 }
