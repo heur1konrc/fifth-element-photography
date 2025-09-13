@@ -823,7 +823,8 @@ textarea {
 .featured-story p {
     font-family: 'Poppins', sans-serif;
     line-height: 1.6;
-    color: #e0e0e0;
+    /*color: #e0e0e0;*/
+    color: #000000;
     font-size: 0.95rem;
 }
 
@@ -831,7 +832,8 @@ textarea {
 .featured-story-section {
     margin-top: 3rem;
     padding: 2rem;
-    background: rgba(255, 255, 255, 0.05);
+    /*background: rgba(255, 255, 255, 0.05);*/
+    background: #ffffff;
     border-radius: 8px;
     border-left: 3px solid #ffffff;
 }
@@ -849,7 +851,8 @@ textarea {
 .featured-story-section p {
     font-family: 'Poppins', sans-serif;
     line-height: 1.6;
-    color: #e0e0e0;
+    /*color: #e0e0e0;*/
+    color: #ffffff;
     font-size: 1rem;
 }
 
@@ -866,7 +869,8 @@ textarea {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
-    background: rgba(255, 255, 255, 0.05);
+    /*background: rgba(255, 255, 255, 0.05);*/
+    background: #ffffff;
     padding: 3rem;
     border-radius: 12px;
 }
@@ -902,7 +906,8 @@ textarea {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     gap: 2rem;
-    background: rgba(255, 255, 255, 0.05);
+    /*background: rgba(255, 255, 255, 0.05);*/
+    background: #ffffff;
     padding: 3rem;
     border-radius: 12px;
 }
