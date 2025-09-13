@@ -843,7 +843,8 @@ textarea {
     font-size: 1.2rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: #000000;
+    /*color: #000000;*/
+    color: #ffffff;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
@@ -893,7 +894,7 @@ textarea {
 
 /* Featured Image Improvements */
 .featured-title {
-    color: #000000 !important;
+    color: #ffffff !important;
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
     text-transform: uppercase;
