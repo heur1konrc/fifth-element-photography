@@ -612,7 +612,8 @@ textarea {
     justify-content: space-between;
     margin-bottom: 0.75rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /*border-bottom: 1px solid rgba(255, 255, 255, 0.1);*/
+    border-bottom: 1px solid #ffffff;
 }
 
 .detail-group:last-child {
