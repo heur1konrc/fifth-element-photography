@@ -12,7 +12,8 @@ html {
 
 body {
     font-family: inherit;
-    background: #0a0a0a;
+    /*background: #0a0a0a;*/
+    background: #000000;
     color: #ffffff;
     overflow-x: hidden;
 }
