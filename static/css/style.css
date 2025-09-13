@@ -677,7 +677,8 @@ textarea {
 }
 
 .about-text p {
-    color: #ccc;
+    /*color: #ccc;*/
+    color: #6799c2;
     line-height: 1.6;
     margin-bottom: 1.5rem;
     font-size: 1rem;
