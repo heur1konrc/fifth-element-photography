@@ -644,7 +644,8 @@ textarea {
 }
 
 .about-content {
-    background: rgba(255, 255, 255, 0.05);
+    /*background: rgba(255, 255, 255, 0.05);*/
+    background: #FFFFFF
     padding: 3rem;
     border-radius: 12px;
 }
