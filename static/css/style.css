@@ -804,7 +804,8 @@ textarea {
 .featured-story {
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.05);
+    /*background: rgba(255, 255, 255, 0.05);*/
+    background: #ffffff;
     border-radius: 8px;
     border-left: 3px solid #ffffff;
 }
