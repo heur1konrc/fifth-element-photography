@@ -654,7 +654,8 @@ textarea {
 
 .about-image {
     float: left;
-    width: 600px;
+    /*width: 600px;*/
+    width: 800px;
     margin: 0 2rem 1rem 0;
 }
 
