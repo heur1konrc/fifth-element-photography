@@ -1288,13 +1288,13 @@ textarea {
     background: none;
     color: #6799c2;
     /*transform: translateY(-1px);*/
-    transform: translateY(-2px);
+    transform: translateY(-5px);
 }
 
 .category-badge.active {
     background: none;
     color: #6799c2;
-    font-weight: 750; /*from 600 to 750*/
+    font-weight: 900; /*from 600 to 900*/
 }
 
 /* Update gallery header layout for badges */
