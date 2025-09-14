@@ -744,8 +744,7 @@ textarea {
 }
 
 .form-group input,
-.form-group textarea,
-.form-group shoot-type {
+.form-group textarea {
     width: 100%;
     padding: 0.75rem;
     background: rgba(255, 255, 255, 0.1);
