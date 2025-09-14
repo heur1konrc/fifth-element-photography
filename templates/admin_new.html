@@ -41,33 +41,49 @@
 
         <!-- Main Content -->
         <main class="dashboard-main">
-
-             <!-- Featured Image Management -->
+   
+        <!-- Featured Image Story Management -->
             <section class="featured-section">
                 <div class="section-header">
-                    <h2 class="section-title">Featured Image Management</h2>
+                    <h2 class="section-title">Featured Image Story</h2>
+                    <p class="section-description">Use the "Set as Featured" toggle on portfolio images, then add your story here.</p>
                 </div>
+                
                 <div class="featured-content">
                     {% set featured_image = images|selectattr('is_featured')|first %}
                     {% if featured_image %}
                         <div class="current-featured">
-                            <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
+                            <div class="featured-image-preview">
+                                <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
+                            </div>
                             <div class="featured-info">
                                 <h3>{{ featured_image.title }}</h3>
-                                <p>Currently set as weekly featured image</p>
-                                <button class="btn btn-secondary" onclick="removeFeatured('{{ featured_image.filename }}')">
-                                    Remove Featured Status
-                                </button>
+                                <p class="featured-description">{{ featured_image.description or 'No description' }}</p>
+                                <div class="featured-story">
+                                    <label for="featured-story">Featured Image Story:</label>
+                                    <textarea id="featured-story" placeholder="Tell the story behind this featured image..." rows="4">{{ featured_image.story or '' }}</textarea>
+                                    <button class="btn btn-small btn-success" onclick="saveFeaturedStory('{{ featured_image.filename }}')">
+                                        <i class="fas fa-save"></i>
+                                        Save Story
+                                    </button>
+                                </div>
+                                <div class="featured-meta">
+                                    <span class="dimensions">{{ featured_image.width }}×{{ featured_image.height }}</span>
+                                </div>
                             </div>
                         </div>
                     {% else %}
                         <div class="no-featured">
-                            <p>No featured image selected. Choose an image from the portfolio above to set as featured.</p>
+                            <div class="no-featured-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <h3>No Featured Image Selected</h3>
+                            <p>Use the "Set as Featured" toggle on any portfolio image below, then return here to add your story.</p>
                         </div>
                     {% endif %}
                 </div>
             </section>
-                
+            
             <!-- Portfolio Management Section -->
             <section class="portfolio-section">
                 <div class="section-header">
@@ -210,7 +226,7 @@
                 {% endif %}
             </section>
 
-                   <!-- Featured Image Story Management -->
+                   <!-- Featured Image Story Management
             <section class="featured-section">
                 <div class="section-header">
                     <h2 class="section-title">Featured Image Story</h2>
@@ -250,7 +266,7 @@
                         </div>
                     {% endif %}
                 </div>
-            </section>
+            </section> -->
 
             <!-- About Page Management -->
             <section class="about-section">
