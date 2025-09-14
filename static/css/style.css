@@ -1292,7 +1292,7 @@ textarea {
 }
 
 .category-badge.active {
-    background: rgba(255,255,255,.02;) /*background: none*/
+    background: rgba(255,255,255,0.95;) /*background: none*/
     color: #6799c2;
     font-weight: 900; /*from 600 to 900*/
 }
