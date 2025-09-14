@@ -41,6 +41,32 @@
 
         <!-- Main Content -->
         <main class="dashboard-main">
+
+             <!-- Featured Image Management -->
+            <section class="featured-section">
+                <div class="section-header">
+                    <h2 class="section-title">Featured Image Management</h2>
+                </div>
+                <div class="featured-content">
+                    {% set featured_image = images|selectattr('is_featured')|first %}
+                    {% if featured_image %}
+                        <div class="current-featured">
+                            <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
+                            <div class="featured-info">
+                                <h3>{{ featured_image.title }}</h3>
+                                <p>Currently set as weekly featured image</p>
+                                <button class="btn btn-secondary" onclick="removeFeatured('{{ featured_image.filename }}')">
+                                    Remove Featured Status
+                                </button>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="no-featured">
+                            <p>No featured image selected. Choose an image from the portfolio above to set as featured.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
                 
             <!-- Portfolio Management Section -->
             <section class="portfolio-section">
