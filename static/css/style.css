@@ -1285,7 +1285,7 @@ textarea {
 }
 
 .category-badge:hover {
-    background: none;
+    background: #c8d4de;
     color: #6799c2;
     /*transform: translateY(-1px);*/
     transform: translateY(-5px);
