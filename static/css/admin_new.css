@@ -960,9 +960,10 @@ select option {
 }
 
 .featured-story textarea {
-    width: 600px !important;
-    min-width: 600px !important;
-    max-width: 600px !important;
+    width: 800px !important;
+    /*width: 600px !important;*/
+    /*min-width: 600px !important;*/
+    /*max-width: 600px !important;*/
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 6px;
