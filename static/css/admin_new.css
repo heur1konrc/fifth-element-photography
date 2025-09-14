@@ -164,7 +164,8 @@ body {
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 0.875rem;
+    /*font-size: 0.875rem;*/
+    font-size: 0.625rem;
 }
 
 .category-btn:hover,
