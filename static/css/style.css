@@ -1266,6 +1266,7 @@ textarea {
     gap: 0.5rem;
     align-items: center;
     flex-shrink: 0;
+    border-radius: 50%;
 }
 
 .category-badge {
