@@ -1287,13 +1287,14 @@ textarea {
 .category-badge:hover {
     background: none;
     color: #6799c2;
-    transform: translateY(-1px);
+    /*transform: translateY(-1px);*/
+    transform: translateY(-2px);
 }
 
 .category-badge.active {
     background: none;
     color: #6799c2;
-    font-weight: 600;
+    font-weight: 750; /*from 600 to 750*/
 }
 
 /* Update gallery header layout for badges */
