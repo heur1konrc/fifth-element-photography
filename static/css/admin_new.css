@@ -1256,8 +1256,8 @@ select option {
 /* Increase About page textarea width */
 #about-bio {
     width: 100% !important;
-    min-width: 600px !important;
-    max-width: 800px !important;
+    /*min-width: 600px !important;
+    max-width: 800px !important;*/
 }
 
 .about-bio textarea {
