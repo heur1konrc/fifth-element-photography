@@ -271,8 +271,9 @@ body {
 /* Image Grid */
 .image-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
+    /*grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));*/
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
 }
 
 .image-card {
@@ -305,7 +306,8 @@ body {
 
 .image-preview {
     position: relative;
-    aspect-ratio: 4/3;
+    /*aspect-ratio: 4/3;*/
+    aspect-ratio: 3/2;
     overflow: hidden;
 }
 
