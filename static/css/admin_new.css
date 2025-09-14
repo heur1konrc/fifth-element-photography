@@ -1262,14 +1262,14 @@ select option {
 
 .about-bio textarea {
     width: 100% !important;
-    min-width: 600px !important;
-    max-width: 800px !important;
+    /*min-width: 600px !important;
+    max-width: 800px !important;*/
 }
 
 /* Ensure About section has enough space */
 .about-info {
     width: 100%;
-    max-width: 800px;
+    /*max-width: 800px;*/
 }
 
 .current-about {
