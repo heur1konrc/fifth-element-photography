@@ -238,21 +238,25 @@ textarea {
 .image-item.size-small img {
     height: 200px;
     object-fit: cover;
+    aspect-ratio: 3/2;
 }
 
 .image-item.size-medium img {
     height: 280px;
     object-fit: cover;
+    aspect-ratio: 3/2;
 }
 
 .image-item.size-large img {
     height: 400px;
     object-fit: cover;
+    aspect-ratio: 3/2;
 }
 
 .image-item.size-wide img {
     height: 320px;
     object-fit: cover;
+    aspect-ratio: 3/2;
 }
 
 .image-item:hover {
