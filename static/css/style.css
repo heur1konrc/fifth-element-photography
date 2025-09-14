@@ -1286,14 +1286,14 @@ textarea {
 }
 
 .category-badge:hover {
-    background: #c8d4de;
+    background: none;
     color: #6799c2;
     /*transform: translateY(-1px);*/
     transform: translateY(-5px);
 }
 
 .category-badge.active {
-    background: rgba(200,212,222,0.50;) /*background: none*/
+    background: none;
     color: #6799c2;
     font-weight: 900; /*from 600 to 900*/
 }
