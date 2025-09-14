@@ -80,7 +80,8 @@ textarea {
 }
 
 .logo p {
-    font-size: 0.9rem;
+    /*font-size: 0.9rem;*/
+    font-size: 0.7rem;
     color: #888;
     letter-spacing: 1px;
 }
