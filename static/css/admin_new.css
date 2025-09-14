@@ -1033,8 +1033,10 @@ select option {
 }
 
 .about-image-preview img {
-    width: 100%;
-    height: 200px;
+    /*width: 100%;
+    height: 200px;*/
+    width: 25%;
+    height: 25%;
     object-fit: cover;
     border-radius: 8px;
 }
