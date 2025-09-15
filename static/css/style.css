@@ -64,8 +64,8 @@ textarea {
 }
 
 .logo-icon img {
-    width: 220px;/*was 140px originally with old logo*/
-    height: 220px;
+    width: 200px;/*was 140px originally with old logo*/
+    height: 200px;
     object-fit: contain;
 }
 
