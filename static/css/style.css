@@ -807,8 +807,10 @@ textarea {
 
 /* Featured Story Styling */
 .featured-story {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
+    /*margin-bottom: 2rem;*/
+    margin-bottom: 1rem;
+    /*padding: 1.5rem;*/
+    padding: 1rem;
     /*background: rgba(255, 255, 255, 0.05);*/
     background: #000000;
     border-radius: 8px;
@@ -1021,14 +1023,14 @@ textarea {
     color: #888;
     font-weight: 400;
     /*font-size: 0.85rem;*/
-    font-size: 0.685rem;
+    font-size: 0.500rem;
 }
 
 .detail-value {
     color: #fff;
-    font-weight: 500;
+    font-weight: 400;
     /*font-size: 0.85rem;*/
-    font-size: 0.685rem;
+    font-size: 0.500rem;
 }
 
 /* Fullscreen modal */
