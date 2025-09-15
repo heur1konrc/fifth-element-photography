@@ -996,7 +996,8 @@ textarea {
 
 .featured-info h3 {
     font-family: 'Poppins', sans-serif;
-    font-size: 1.3rem;
+    /*font-size: 1.3rem;*/
+    font-size: 0.875rem;
     font-weight: 600;
     margin-bottom: 1.2rem;
     color: #ffffff;
