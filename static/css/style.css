@@ -910,7 +910,8 @@ textarea {
 /* Increase featured image size by 25% */
 .featured-content {
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
+    /*grid-template-columns: 1.5fr 1fr;*/
+    grid-template-columns: 1.75fr .25fr;
     gap: 2rem;
     /*background: rgba(255, 255, 255, 0.05);*/
     background: #000000;
@@ -923,7 +924,7 @@ textarea {
 }
 
 .featured-image img {
-    width: 140%;
+    width: 100%;
     height: auto;
     border-radius: 8px;
     max-width: none;
