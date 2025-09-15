@@ -913,7 +913,7 @@ textarea {
 .featured-content {
     display: grid;
     /*grid-template-columns: 1.5fr 1fr;*/
-    grid-template-columns: 1.75fr .75fr;
+    grid-template-columns: 1.85fr .65fr;
     gap: 2rem;
     /*background: rgba(255, 255, 255, 0.05);*/
     background: #000000;
