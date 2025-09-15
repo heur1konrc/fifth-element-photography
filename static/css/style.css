@@ -898,8 +898,6 @@ textarea {
     color: #ffffff;
 }
 
-
-
 /* Featured Image Improvements */
 .featured-title {
     color: #ffffff !important;
@@ -1022,7 +1020,7 @@ textarea {
 
 .detail-label {
     color: #888;
-    font-weight: 400;
+    font-weight: 450;
     /*font-size: 0.85rem;*/
     font-size: 0.60rem;
 }
