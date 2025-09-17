@@ -113,8 +113,10 @@
                 <div class="bulk-actions-bar">
                     <div class="selection-controls">
                         <button class="btn btn-small btn-success" onclick="selectAll()">Select All</button>
-                        <button class="btn btn-small btn-secondary" onclick="selectNone()">Select None</button>
                         <span class="selection-count">Selected: <span id="selectedCount">0</span></span>
+                        <button class="btn btn-small btn-secondary" onclick="selectNone()">Select None</button>
+                        <button class="btn btn-danger" onclick="deleteSelected()"><i class="fas fa-trash"></i>Delete Selected</button>
+                        <!--<span class="selection-count">Selected: <span id="selectedCount">0</span></span>-->
                     </div>
                     
                     <div class="category-assignment">
@@ -130,10 +132,10 @@
                     </div>
 
                     <div class="bulk-actions">
-                        <button class="btn btn-danger" onclick="deleteSelected()">
+                        <!--<button class="btn btn-danger" onclick="deleteSelected()">
                             <i class="fas fa-trash"></i>
                             Delete Selected
-                        </button>
+                        </button>-->
                         <!--<button class="btn btn-success" onclick="backupSystem()">
                             <i class="fas fa-download"></i>
                             Backup System
