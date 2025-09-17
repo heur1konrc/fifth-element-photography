@@ -968,7 +968,7 @@ select option {
 }
 
 .featured-story textarea {
-    width: 100% !important;
+    /*width: 100% !important;*/
     /*width: 600px !important;*/
     /*min-width: 600px !important;*/
     /*max-width: 600px !important;*/
