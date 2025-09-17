@@ -270,7 +270,7 @@ textarea {
     display: block;
     transition: transform 0.3s ease;
     /*filter: grayscale(100%);*/
-    filter: grayscale(50%);
+    filter: grayscale(25%);
     backface-visibility: hidden;
     transform: translateZ(0);
 }
