@@ -269,7 +269,8 @@ textarea {
     height: auto;
     display: block;
     transition: transform 0.3s ease;
-    filter: grayscale(100%);
+    /*filter: grayscale(100%);*/
+    filter: grayscale(50%);
     backface-visibility: hidden;
     transform: translateZ(0);
 }
