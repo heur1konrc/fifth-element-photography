@@ -160,7 +160,8 @@ textarea {
 
 /* Gallery Section */
 .gallery {
-    padding: 40px;
+    /*padding: 40px;*/
+    padding: 10px;
 }
 
 .gallery-header {
