@@ -55,7 +55,8 @@ textarea {
 .logo {
     text-align: center;
     margin-bottom: 40px;
-    padding-bottom: 30px;
+    padding-bottom: 30px; /*This was added to push logo down a bit */
+    padding-top: 30px;
     border-bottom: 1px solid #333;
 }
 
