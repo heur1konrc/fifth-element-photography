@@ -45,7 +45,8 @@ textarea {
 .sidebar {
     width: 250px;
     background: #000000;
-    padding: 30px 20px;
+    /*padding: 30px 20px;*/
+    padding: 5px 5px;
     position: fixed;
     height: 100vh;
     overflow-y: auto;
@@ -55,8 +56,8 @@ textarea {
 .logo {
     text-align: center;
     margin-bottom: 40px;
-    padding-bottom: 30px; /*This was added to push logo down a bit */
-    padding-top: 30px;
+    /*padding-bottom: 30px; removed to test height of logo clearance*/
+    /*padding-top: 30px;*/
     border-bottom: 1px solid #333;
 }
 
@@ -65,8 +66,8 @@ textarea {
 }
 
 .logo-icon img {
-    width: 300px;/*was 200px originally with old logo*/
-    height: 300px;
+    width: 200px;/*was 200px originally with old logo*/
+    height: 200px;
     object-fit: contain;
 }
 
