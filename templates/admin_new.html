@@ -153,7 +153,7 @@
                                 </div>
                                 
                                 <div class="image-preview">
-                                    <img src="{{ image.url }}" alt="{{ image.title }}" loading="lazy">
+                                    <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title }}" loading="lazy" decoding="async" style="background: #1a1a1a;">
                                     <div class="image-overlay">
                                         <div class="overlay-actions">
                                             <button class="action-btn edit-btn" onclick="editImage('{{ image.filename }}')" title="Edit">

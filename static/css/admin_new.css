@@ -321,6 +321,12 @@ body {
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
+    /* Performance optimizations for admin grid */
+    max-width: 400px;
+    max-height: 300px;
+    image-rendering: optimizeSpeed;
+    loading: lazy;
+    decoding: async;
 }
 
 .image-card:hover .image-preview img {
