@@ -137,25 +137,41 @@ function initMobileHero() {
     setMobileHeroImage();
 }
 
-function setMobileHeroImage() {
+async function setMobileHeroImage() {
+    const hero = document.getElementById('mobileHero');
+    if (!hero) return;
+    
+    try {
+        // First, try to get the selected hero image from API (same as desktop)
+        const heroResponse = await fetch('/api/hero_image');
+        const heroData = await heroResponse.json();
+        
+        if (heroData.filename) {
+            // Use the selected hero image (same as desktop)
+            hero.style.backgroundImage = `url('/images/${heroData.filename}')`;
+            hero.style.backgroundSize = 'cover';
+            hero.style.backgroundPosition = 'center';
+            hero.style.backgroundRepeat = 'no-repeat';
+        } else {
+            // Fallback to random hero image
+            setRandomMobileHeroImage();
+        }
+    } catch (error) {
+        console.error('Error loading hero image selection:', error);
+        // Fallback to random hero image
+        setRandomMobileHeroImage();
+    }
+}
+
+// Fallback function for random hero image
+function setRandomMobileHeroImage() {
     const hero = document.getElementById('mobileHero');
     if (!hero || allImages.length === 0) return;
     
-    // First, try to find the featured image (same as desktop)
-    let heroImage = allImages.find(img => img.is_featured);
-    
-    // If no featured image, fallback to first landscape image
-    if (!heroImage) {
-        heroImage = allImages.find(img => img.category === 'landscape');
-    }
-    
-    // Final fallback to any image
-    if (!heroImage && allImages.length > 0) {
-        heroImage = allImages[0];
-    }
-    
-    if (heroImage) {
-        hero.style.backgroundImage = `url('${heroImage.url}')`;
+    // Use random image as fallback
+    const randomImage = allImages[Math.floor(Math.random() * allImages.length)];
+    if (randomImage) {
+        hero.style.backgroundImage = `url('${randomImage.url}')`;
         hero.style.backgroundSize = 'cover';
         hero.style.backgroundPosition = 'center';
         hero.style.backgroundRepeat = 'no-repeat';
