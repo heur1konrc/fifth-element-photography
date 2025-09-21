@@ -7,6 +7,15 @@ from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
+def is_mobile_device():
+    """Detect if the request is from a mobile device"""
+    user_agent = request.headers.get('User-Agent', '').lower()
+    mobile_keywords = [
+        'mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 
+        'windows phone', 'opera mini', 'iemobile', 'webos', 'palm'
+    ]
+    return any(keyword in user_agent for keyword in mobile_keywords)
+
 # Template filter for exposure time conversion
 @app.template_filter('exposure_fraction')
 def exposure_fraction(value):
@@ -318,13 +327,24 @@ def index():
     
     about_data = load_about_data()
     
-    return render_template('index.html', 
-                         images=images, 
-                         categories=categories,
-                         category_counts=category_counts,
-                         featured_image=featured_image,
-                         featured_exif=featured_exif,
-                         about_data=about_data)
+    # Mobile detection - serve different template based on device
+    if is_mobile_device():
+        return render_template('index_mobile.html', 
+                             images=images, 
+                             categories=categories,
+                             category_counts=category_counts,
+                             featured_image=featured_image,
+                             featured_exif=featured_exif,
+                             about_data=about_data)
+    else:
+        # Desktop users get the original template (unchanged)
+        return render_template('index.html', 
+                             images=images, 
+                             categories=categories,
+                             category_counts=category_counts,
+                             featured_image=featured_image,
+                             featured_exif=featured_exif,
+                             about_data=about_data)
 
 @app.route('/featured')
 def featured():
