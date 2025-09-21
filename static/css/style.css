@@ -303,11 +303,6 @@ textarea {
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
     padding: 15px 10px 10px;
     color: #ffffff;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.image-item:hover .image-overlay {
     opacity: 1;
 }
 
