@@ -1,14 +1,13 @@
 // Mobile-Optimized JavaScript for Fifth Element Photography
 
+// Initialize mobile functionality
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Mobile script loaded');
-    
-    // Initialize mobile functionality
     initMobileNavigation();
     initMobileGallery();
-    initMobileFilters();
     initMobileHero();
     initMobileContactForm();
+    initStickyNavigation();
 });
 
 // Mobile Navigation
@@ -456,10 +455,55 @@ async function handleMobileContactSubmit(e) {
             alert(result.error || 'Failed to send message. Please try again.');
         }
     } catch (error) {
-        console.error('Error sending message:', error);
-        alert('An error occurred. Please try again later.');
-    } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
+        console.error('Error sending mobile contact form:', error);
+        alert('Error sending message. Please try again.');
     }
+}
+
+// Sticky Navigation
+function initStickyNavigation() {
+    const header = document.querySelector('.mobile-header');
+    const nav = document.querySelector('.mobile-nav');
+    const main = document.querySelector('.mobile-main');
+    
+    if (!header || !nav || !main) return;
+    
+    let headerHeight = header.offsetHeight;
+    let navHeight = nav.offsetHeight;
+    let isSticky = false;
+    
+    function handleScroll() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // When scrolled past the header height, make nav sticky
+        if (scrollTop >= headerHeight && !isSticky) {
+            nav.classList.add('sticky');
+            main.classList.add('nav-sticky');
+            isSticky = true;
+        } 
+        // When scrolled back to top, remove sticky
+        else if (scrollTop < headerHeight && isSticky) {
+            nav.classList.remove('sticky');
+            main.classList.remove('nav-sticky');
+            isSticky = false;
+        }
+    }
+    
+    // Throttle scroll events for better performance
+    let ticking = false;
+    function requestTick() {
+        if (!ticking) {
+            requestAnimationFrame(handleScroll);
+            ticking = true;
+            setTimeout(() => { ticking = false; }, 16); // ~60fps
+        }
+    }
+    
+    window.addEventListener('scroll', requestTick);
+    
+    // Handle window resize to recalculate heights
+    window.addEventListener('resize', function() {
+        headerHeight = header.offsetHeight;
+        navHeight = nav.offsetHeight;
+    });
 }
