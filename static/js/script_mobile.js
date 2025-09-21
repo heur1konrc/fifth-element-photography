@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Mobile script loaded');
     initMobileNavigation();
     initMobileGallery();
+    initMobileFilters();
     initMobileHero();
     initMobileContactForm();
     initStickyNavigation();
@@ -464,28 +465,50 @@ async function handleMobileContactSubmit(e) {
 function initStickyNavigation() {
     const header = document.querySelector('.mobile-header');
     const nav = document.querySelector('.mobile-nav');
+    const filters = document.querySelector('.mobile-filters');
     const main = document.querySelector('.mobile-main');
     
-    if (!header || !nav || !main) return;
+    if (!header || !nav || !filters || !main) return;
     
     let headerHeight = header.offsetHeight;
     let navHeight = nav.offsetHeight;
-    let isSticky = false;
+    let filtersHeight = filters.offsetHeight;
+    let isNavSticky = false;
+    let isFiltersSticky = false;
     
     function handleScroll() {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         
         // When scrolled past the header height, make nav sticky
-        if (scrollTop >= headerHeight && !isSticky) {
+        if (scrollTop >= headerHeight && !isNavSticky) {
             nav.classList.add('sticky');
             main.classList.add('nav-sticky');
-            isSticky = true;
+            isNavSticky = true;
         } 
-        // When scrolled back to top, remove sticky
-        else if (scrollTop < headerHeight && isSticky) {
+        // When scrolled back to top, remove nav sticky
+        else if (scrollTop < headerHeight && isNavSticky) {
             nav.classList.remove('sticky');
             main.classList.remove('nav-sticky');
-            isSticky = false;
+            main.classList.remove('filters-sticky');
+            filters.classList.remove('sticky');
+            isNavSticky = false;
+            isFiltersSticky = false;
+        }
+        
+        // When scrolled past nav + filters, make filters sticky too
+        const navFiltersHeight = headerHeight + navHeight + filtersHeight;
+        if (scrollTop >= navFiltersHeight && isNavSticky && !isFiltersSticky) {
+            filters.classList.add('sticky');
+            main.classList.remove('nav-sticky');
+            main.classList.add('filters-sticky');
+            isFiltersSticky = true;
+        }
+        // When scrolled back above filters threshold, remove filters sticky
+        else if (scrollTop < navFiltersHeight && isFiltersSticky) {
+            filters.classList.remove('sticky');
+            main.classList.remove('filters-sticky');
+            main.classList.add('nav-sticky');
+            isFiltersSticky = false;
         }
     }
     
@@ -505,5 +528,6 @@ function initStickyNavigation() {
     window.addEventListener('resize', function() {
         headerHeight = header.offsetHeight;
         navHeight = nav.offsetHeight;
+        filtersHeight = filters.offsetHeight;
     });
 }
