@@ -97,7 +97,7 @@ textarea {
 
 .nav-link {
     display: block;
-    padding: 15px 20px;
+    padding: 10px 15px; /*was 15 and 20*/
     color: #6799c2;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -957,7 +957,7 @@ textarea {
 
 /* New Featured Story Section - Full Width Below */
 .featured-story-section {
-    margin-top: 1rem;
+    margin-top: 0;
     padding: 2rem;
     /*background: rgba(255, 255, 255, 0.05);*/
     background: #000000;
@@ -1141,7 +1141,7 @@ textarea {
 
 /* Featured story section - full width */
 .featured-story-section {
-    margin-top: 1rem;
+    margin-top: 0;
     /*background: rgba(255, 255, 255, 0.05);*/
     background: #000000;
     padding: 2rem;
@@ -1297,7 +1297,7 @@ textarea {
     }
     
     .featured-story-section {
-        margin-top: 0.5rem;
+        margin-top: 0;
         padding: 1.5rem;
     }
     
