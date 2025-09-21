@@ -43,8 +43,8 @@ body {
 }
 
 .logo-icon img {
-    width: 120px;
-    height: 120px;
+    width: 180px;
+    height: 180px;
     object-fit: contain;
 }
 
@@ -158,22 +158,25 @@ body {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
+.hero-tagline-image {
+    max-width: 320px;
+    width: 90%;
+    height: auto;
+    opacity: 0.95;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.7));
+}
+
 /* Mobile Filters */
 .mobile-filters {
     padding: 0 15px;
     margin-bottom: 15px;
 }
 
-.filter-scroll {
-    display: flex;
-    overflow-x: auto;
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 10px;
     padding: 10px 0;
-    -webkit-overflow-scrolling: touch;
-}
-
-.filter-scroll::-webkit-scrollbar {
-    display: none;
 }
 
 .filter-btn {
@@ -189,8 +192,7 @@ body {
     letter-spacing: 1px;
     cursor: pointer;
     transition: all 0.3s ease;
-    white-space: nowrap;
-    flex-shrink: 0;
+    text-align: center;
 }
 
 .filter-btn.active,
@@ -531,6 +533,10 @@ body {
     text-align: center;
 }
 
+.mobile-contact-item span:not(.contact-icon) {
+    color: #ffffff;
+}
+
 .mobile-contact-form h3 {
     font-size: 1.2rem;
     font-weight: 600;
@@ -670,8 +676,8 @@ body {
 /* Responsive adjustments for smaller screens */
 @media (max-width: 375px) {
     .logo-icon img {
-        width: 100px;
-        height: 100px;
+        width: 150px;
+        height: 150px;
     }
     
     .logo-text h1 {
@@ -703,8 +709,8 @@ body {
     }
     
     .logo-icon img {
-        width: 80px;
-        height: 80px;
+        width: 120px;
+        height: 120px;
     }
     
     .mobile-header {
