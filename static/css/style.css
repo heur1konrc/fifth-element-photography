@@ -1082,13 +1082,13 @@ textarea {
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 0.25rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .exif-value {
     color: #ffffff;
     /*font-size: 0.9rem;*/
-    font-size: 0.5rem;
+    font-size: 0.8rem;
     font-weight: 500;
 }
 
