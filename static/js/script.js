@@ -314,64 +314,8 @@ function closeImageModal() {
 
 // Featured Image Action Functions
 function viewFullscreen(imageUrl, imageTitle) {
-    // Create fullscreen container
-    const fullscreenContainer = document.createElement('div');
-    fullscreenContainer.className = 'fullscreen-container';
-    fullscreenContainer.innerHTML = `
-        <span class="fullscreen-close">&times;</span>
-        <img src="${imageUrl}" alt="${imageTitle}" class="fullscreen-image">
-    `;
-    
-    document.body.appendChild(fullscreenContainer);
-    
-    // Request fullscreen
-    if (fullscreenContainer.requestFullscreen) {
-        fullscreenContainer.requestFullscreen();
-    } else if (fullscreenContainer.webkitRequestFullscreen) {
-        fullscreenContainer.webkitRequestFullscreen();
-    } else if (fullscreenContainer.msRequestFullscreen) {
-        fullscreenContainer.msRequestFullscreen();
-    }
-    
-    // Close handlers
-    const closeBtn = fullscreenContainer.querySelector('.fullscreen-close');
-    
-    function closeFullscreen() {
-        if (document.exitFullscreen) {
-            document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
-        if (fullscreenContainer.parentNode) {
-            document.body.removeChild(fullscreenContainer);
-        }
-    }
-    
-    // Close on button click
-    closeBtn.addEventListener('click', closeFullscreen);
-    
-    // Close on background click
-    fullscreenContainer.addEventListener('click', function(e) {
-        if (e.target === fullscreenContainer) {
-            closeFullscreen();
-        }
-    });
-    
-    // Close on escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            closeFullscreen();
-        }
-    });
-    
-    // Clean up when fullscreen exits
-    document.addEventListener('fullscreenchange', function() {
-        if (!document.fullscreenElement && fullscreenContainer.parentNode) {
-            document.body.removeChild(fullscreenContainer);
-        }
-    });
+    // Open image in new window/tab - original behavior
+    window.open(imageUrl, '_blank');
 }
 
 function downloadImage(imageUrl, filename) {
