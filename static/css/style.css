@@ -1060,7 +1060,7 @@ textarea {
     justify-content: left;
     gap: 2rem;
     background: rgba(255, 255, 255, 0.05);
-    padding: 1.5rem;
+    padding: 0.8rem;/*was 1.5*/
     border-radius: 8px;
     margin: 2rem 0;
 }
