@@ -29,8 +29,11 @@ async function loadImages() {
             // Set hero image (selected or random)
             setHeroImage();
             
-            // Display all images initially
-            displayImages(allImages);
+            // Initialize pagination
+            initPagination();
+            
+            // Display all images initially with pagination
+            displayImagesWithPagination(allImages);
             updateImageCount(allImages.length);
         } else {
             imageGrid.innerHTML = '<div class="loading">No images found in /data directory</div>';
@@ -70,7 +73,13 @@ function setRandomHeroImage() {
     }
 }
 
-// Display images in masonry grid
+// Pagination variables
+let currentPage = 1;
+let imagesPerPage = 18;
+let totalPages = 1;
+let currentImages = [];
+
+// Display images in masonry grid (for current page)
 function displayImages(images) {
     if (images.length === 0) {
         imageGrid.innerHTML = '<div class="loading">No images found for this category</div>';
@@ -98,6 +107,10 @@ function displayImages(images) {
         return `
             <div class="image-item ${sizeClass}" onclick="openModal('${image.url}', '${image.title}', '${image.category}')">
                 <img src="${image.url}" alt="${image.title}" loading="lazy">
+                <div class="image-overlay">
+                    <h4>${image.title}</h4>
+                    <p>${image.category.toUpperCase()}</p>
+                </div>
             </div>
         `;
     }).join('');
@@ -105,13 +118,113 @@ function displayImages(images) {
     imageGrid.innerHTML = imageHTML;
 }
 
-// Filter images by category
-function filterImages(category) {
-    currentCategory = category;
+// Display images with pagination
+function displayImagesWithPagination(images) {
+    currentImages = images;
+    totalPages = Math.ceil(images.length / imagesPerPage);
+    currentPage = 1;
     
-    let filteredImages;
-    if (category === 'all') {
-        filteredImages = allImages;
+    if (totalPages <= 1) {
+        document.getElementById('paginationContainer').style.display = 'none';
+    } else {
+        document.getElementById('paginationContainer').style.display = 'block';
+    }
+    
+    displayCurrentPage();
+    updatePaginationControls();
+}
+
+// Display current page of images
+function displayCurrentPage() {
+    const startIndex = (currentPage - 1) * imagesPerPage;
+    const endIndex = startIndex + imagesPerPage;
+    const pageImages = currentImages.slice(startIndex, endIndex);
+    
+    displayImages(pageImages);
+}
+
+// Change page with slide animation
+function changePage(newPage) {
+    if (newPage < 1 || newPage > totalPages || newPage === currentPage) {
+        return;
+    }
+    
+    const grid = document.getElementById('imageGrid');
+    
+    // Add slide-out animation
+    grid.classList.add('sliding-out');
+    
+    setTimeout(() => {
+        currentPage = newPage;
+        displayCurrentPage();
+        updatePaginationControls();
+        
+        // Add slide-in animation
+        grid.classList.remove('sliding-out');
+        grid.classList.add('sliding-in');
+        
+        setTimeout(() => {
+            grid.classList.remove('sliding-in');
+        }, 50);
+    }, 300);
+}
+
+// Update pagination controls
+function updatePaginationControls() {
+    const paginationInfo = document.getElementById('paginationInfo');
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+    const pageNumbers = document.getElementById('pageNumbers');
+    
+    // Update info
+    if (paginationInfo) {
+        paginationInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
+    
+    // Update buttons
+    if (prevBtn) {
+        prevBtn.disabled = currentPage === 1;
+    }
+    
+    if (nextBtn) {
+        nextBtn.disabled = currentPage === totalPages;
+    }
+    
+    // Update page numbers
+    if (pageNumbers) {
+        pageNumbers.innerHTML = '';
+        
+        // Show max 5 page numbers
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
+        
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+            const pageBtn = document.createElement('button');
+            pageBtn.className = `page-number ${i === currentPage ? 'active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.addEventListener('click', () => changePage(i));
+            pageNumbers.appendChild(pageBtn);
+        }
+    }
+}
+
+// Initialize pagination
+function initPagination() {
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => changePage(currentPage - 1));
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => changePage(currentPage + 1));
+    }
+}edImages = allImages;
         galleryTitle.textContent = 'All Galleries';
     } else {
         filteredImages = allImages.filter(image => image.category === category);
@@ -362,8 +475,8 @@ function filterImagesByCategory(category) {
     // Update current category
     currentCategory = category;
     
-    // Display filtered images
-    displayImages(filteredImages);
+    // Display filtered images with pagination
+    displayImagesWithPagination(filteredImages);
     updateImageCount(filteredImages.length);
 }
 
