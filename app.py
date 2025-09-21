@@ -3,6 +3,9 @@ import os
 import json
 from datetime import datetime
 import shutil
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -44,6 +47,13 @@ STATIC_FOLDER = 'static'
 CATEGORIES_FILE = '/data/categories.json'
 FEATURED_FILE = '/data/featured.json'
 ABOUT_FILE = '/data/about.json'
+
+# SMTP Configuration
+SMTP_SERVER = 'smtp.gmail.com'
+SMTP_PORT = 587
+SMTP_USERNAME = 'rick@fifthelement.photos'
+SMTP_PASSWORD = 'ahrc paio vwsm scro'
+CONTACT_EMAIL = 'info@fifthelement.photos'
 
 def load_about_data():
     """Load about page data"""
@@ -1381,6 +1391,76 @@ def randomize_portfolio():
     except Exception as e:
         print(f"Error randomizing portfolio: {e}")
         return jsonify({'success': False, 'error': str(e)})
+
+def send_contact_email(name, email, phone, shoot_type, budget, how_heard, message):
+    """Send contact form email"""
+    try:
+        # Create message
+        msg = MIMEMultipart()
+        msg['From'] = SMTP_USERNAME
+        msg['To'] = CONTACT_EMAIL
+        msg['Subject'] = f'New Contact Form Submission from {name}'
+        
+        # Create email body
+        body = f"""
+New contact form submission from Fifth Element Photography website:
+
+Name: {name}
+Email: {email}
+Phone: {phone if phone else 'Not provided'}
+Shoot Type: {shoot_type if shoot_type else 'Not specified'}
+Budget: {budget if budget else 'Not specified'}
+How they heard about us: {how_heard if how_heard else 'Not specified'}
+
+Message:
+{message}
+
+---
+This email was sent automatically from the Fifth Element Photography contact form.
+        """
+        
+        msg.attach(MIMEText(body, 'plain'))
+        
+        # Connect to server and send email
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        text = msg.as_string()
+        server.sendmail(SMTP_USERNAME, CONTACT_EMAIL, text)
+        server.quit()
+        
+        return True
+    except Exception as e:
+        print(f"Error sending email: {e}")
+        return False
+
+@app.route('/contact', methods=['POST'])
+def contact():
+    """Handle contact form submission"""
+    try:
+        data = request.get_json()
+        
+        name = data.get('name', '').strip()
+        email = data.get('email', '').strip()
+        phone = data.get('phone', '').strip()
+        shoot_type = data.get('shoot_type', '').strip()
+        budget = data.get('budget', '').strip()
+        how_heard = data.get('how_heard', '').strip()
+        message = data.get('message', '').strip()
+        
+        # Validate required fields
+        if not name or not email or not message:
+            return jsonify({'success': False, 'error': 'Name, email, and message are required'}), 400
+        
+        # Send email
+        if send_contact_email(name, email, phone, shoot_type, budget, how_heard, message):
+            return jsonify({'success': True, 'message': 'Thank you for your message! We will get back to you soon.'})
+        else:
+            return jsonify({'success': False, 'error': 'Failed to send message. Please try again later.'}), 500
+            
+    except Exception as e:
+        print(f"Error processing contact form: {e}")
+        return jsonify({'success': False, 'error': 'An error occurred. Please try again later.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

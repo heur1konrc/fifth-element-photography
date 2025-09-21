@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initMobileGallery();
     initMobileFilters();
     initMobileHero();
+    initMobileContactForm();
 });
 
 // Mobile Navigation
@@ -377,3 +378,65 @@ function observeImages() {
 
 // Initialize lazy loading after images are loaded
 setTimeout(observeImages, 1000);
+
+// Mobile Contact Form
+function initMobileContactForm() {
+    const mobileContactForm = document.querySelector('#contact-section form');
+    if (mobileContactForm) {
+        mobileContactForm.addEventListener('submit', handleMobileContactSubmit);
+    }
+}
+
+async function handleMobileContactSubmit(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('.mobile-submit-btn');
+    const originalText = submitBtn.textContent;
+    
+    // Get form data
+    const formData = {
+        name: form.querySelector('input[placeholder="Your Name"]').value,
+        email: form.querySelector('input[placeholder="Your Email"]').value,
+        phone: form.querySelector('input[placeholder="Your Phone Number"]').value,
+        shoot_type: form.querySelector('#mobile-shoot-type').value,
+        budget: form.querySelector('#mobile-budget').value,
+        how_heard: form.querySelector('#mobile-how-heard').value,
+        message: form.querySelector('textarea').value
+    };
+    
+    // Validate required fields
+    if (!formData.name || !formData.email || !formData.message) {
+        alert('Please fill in all required fields (Name, Email, and Message).');
+        return;
+    }
+    
+    // Show loading state
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/contact', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(result.message);
+            form.reset();
+        } else {
+            alert(result.error || 'Failed to send message. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+        alert('An error occurred. Please try again later.');
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}

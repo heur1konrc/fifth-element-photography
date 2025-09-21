@@ -367,3 +367,70 @@ function filterImagesByCategory(category) {
     updateImageCount(filteredImages.length);
 }
 
+// Desktop Contact Form
+function initDesktopContactForm() {
+    const desktopContactForm = document.querySelector('#contact-section form');
+    if (desktopContactForm) {
+        desktopContactForm.addEventListener('submit', handleDesktopContactSubmit);
+    }
+}
+
+async function handleDesktopContactSubmit(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('.btn-primary');
+    const originalText = submitBtn.textContent;
+    
+    // Get form data
+    const formData = {
+        name: form.querySelector('input[placeholder="Your Name"]').value,
+        email: form.querySelector('input[placeholder="Your Email"]').value,
+        phone: form.querySelector('input[placeholder="Your Phone Number"]').value,
+        shoot_type: form.querySelector('#shoot-type').value,
+        budget: form.querySelector('#budget').value,
+        how_heard: form.querySelector('#how-heard').value,
+        message: form.querySelector('textarea').value
+    };
+    
+    // Validate required fields
+    if (!formData.name || !formData.email || !formData.message) {
+        alert('Please fill in all required fields (Name, Email, and Message).');
+        return;
+    }
+    
+    // Show loading state
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/contact', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(result.message);
+            form.reset();
+        } else {
+            alert(result.error || 'Failed to send message. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+        alert('An error occurred. Please try again later.');
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+// Initialize contact form when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initDesktopContactForm();
+});
+
