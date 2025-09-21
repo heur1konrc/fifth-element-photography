@@ -329,11 +329,30 @@ def index():
         if not featured_image and images:
             featured_image = images[0]
     
-    # Extract EXIF data for featured image
+    # Extract EXIF data for featured image and handle story/description sync
     featured_exif = None
     if featured_image:
         image_path = os.path.join(IMAGES_FOLDER, featured_image['filename'])
         featured_exif = extract_exif_data(image_path)
+        
+        # Load featured stories
+        featured_stories = {}
+        if os.path.exists('/data/featured_stories.json'):
+            with open('/data/featured_stories.json', 'r') as f:
+                featured_stories = json.load(f)
+        
+        # Auto-populate story from description if story doesn't exist
+        story_key = featured_image['filename']
+        if story_key not in featured_stories or not featured_stories[story_key]:
+            # Use image description as story
+            if featured_image.get('description'):
+                featured_stories[story_key] = featured_image['description']
+                # Save the auto-populated story
+                with open('/data/featured_stories.json', 'w') as f:
+                    json.dump(featured_stories, f)
+        
+        # Add story to featured image data
+        featured_image['story'] = featured_stories.get(story_key, '')
     
     about_data = load_about_data()
     
@@ -809,7 +828,7 @@ if __name__ == '__main__':
 
 @app.route('/save_featured_story/<filename>', methods=['POST'])
 def save_featured_story(filename):
-    """Save story for featured image"""
+    """Save story for featured image and sync with image description"""
     try:
         data = request.get_json()
         story = data.get('story', '')
@@ -827,7 +846,20 @@ def save_featured_story(filename):
         with open('/data/featured_stories.json', 'w') as f:
             json.dump(featured_stories, f)
         
-        return jsonify({'success': True, 'message': 'Featured story saved successfully'})
+        # SYNC: Also update the image description in image_data.json
+        if os.path.exists('/data/image_data.json'):
+            with open('/data/image_data.json', 'r') as f:
+                image_data = json.load(f)
+            
+            # Find and update the image description
+            if filename in image_data:
+                image_data[filename]['description'] = story
+                
+                # Save updated image data
+                with open('/data/image_data.json', 'w') as f:
+                    json.dump(image_data, f)
+        
+        return jsonify({'success': True, 'message': 'Featured story and image description saved successfully'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
