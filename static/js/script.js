@@ -464,8 +464,8 @@ document.addEventListener('DOMContentLoaded', function() {
             categoryBadges.forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             
-            // Filter images
-            filterImagesByCategory(category);
+            // Filter images using the correct function
+            filterImages(category);
         });
     });
 });
