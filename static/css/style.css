@@ -202,6 +202,7 @@ textarea {
 .image-item {
     display: inline-block;
     width: 100%;
+    position: relative;
     margin-bottom: 8px;
     break-inside: avoid;
     cursor: pointer;
@@ -294,22 +295,34 @@ textarea {
     }
 }
 
-.image-info {
-    padding: 15px;
-    background: #1a1a1a;
+.image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    padding: 15px 10px 10px;
+    color: #ffffff;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-item:hover .image-overlay {
+    opacity: 1;
 }
 
 .image-title {
-    font-weight: bold;
-    margin-bottom: 5px;
     font-size: 0.9rem;
+    font-weight: normal;
+    margin-bottom: 3px;
+    line-height: 1.2;
 }
 
 .image-category {
-    color: #888;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    color: #6799c2;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    font-weight: normal;
 }
 
 .image-dimensions {

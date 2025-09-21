@@ -108,8 +108,8 @@ function displayImages(images) {
             <div class="image-item ${sizeClass}" onclick="openModal('${image.url}', '${image.title}', '${image.category}')">
                 <img src="${image.url}" alt="${image.title}" loading="lazy">
                 <div class="image-overlay">
-                    <h4>${image.title}</h4>
-                    <p>${image.category.toUpperCase()}</p>
+                    <div class="image-title">${image.title}</div>
+                    <div class="image-category">${image.category.toUpperCase()}</div>
                 </div>
             </div>
         `;
