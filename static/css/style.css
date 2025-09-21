@@ -1031,7 +1031,7 @@ textarea {
 .featured-content {
     display: block;
     background: #000000;
-    padding: 3rem;
+    padding: 3rem 3rem 1rem 3rem;
     border-radius: 12px;
 }
 
@@ -1297,7 +1297,7 @@ textarea {
     }
     
     .featured-story-section {
-        margin-top: 2rem;
+        margin-top: 0.5rem;
         padding: 1.5rem;
     }
     
