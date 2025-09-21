@@ -537,6 +537,20 @@ body {
     color: #6799c2;
 }
 
+.mobile-phone-link {
+    color: #6799c2 !important;
+    text-decoration: none;
+}
+
+.mobile-phone-link:visited {
+    color: #6799c2 !important;
+}
+
+.mobile-phone-link:hover {
+    color: #8bb3d3 !important;
+    text-decoration: underline;
+}
+
 .mobile-contact-form h3 {
     font-size: 1.2rem;
     font-weight: 600;
