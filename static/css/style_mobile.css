@@ -87,25 +87,20 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    text-align: center;
 }
 
-.header-contact-btn {
-    background: #6799c2;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+.contact-link {
+    color: #6799c2;
+    text-decoration: underline;
     font-size: 0.9rem;
-    font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    display: block;
+    margin-top: 5px;
 }
 
-.header-contact-btn:hover {
-    background: #5a8bb0;
+.contact-link:hover {
+    color: #8bb3d3;
 }
 
 /* Mobile Navigation */
@@ -141,18 +136,10 @@ body {
 }
 
 .coffee-nav-btn {
-    background: #ff6b35 !important;
-    color: white !important;
-    border-color: #ff6b35 !important;
     text-decoration: none;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.coffee-nav-btn:hover {
-    background: #e55a2b !important;
-    color: white !important;
 }
 
 /* Mobile Main Content */

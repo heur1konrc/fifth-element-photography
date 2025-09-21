@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Mobile Navigation
 function initMobileNavigation() {
     const navBtns = document.querySelectorAll('.nav-btn');
-    const headerContactBtn = document.querySelector('.header-contact-btn');
+    const contactLink = document.querySelector('.contact-link');
     const sections = document.querySelectorAll('.content-section');
     
     navBtns.forEach(btn => {
@@ -38,9 +38,10 @@ function initMobileNavigation() {
         });
     });
     
-    // Handle header contact button
-    if (headerContactBtn) {
-        headerContactBtn.addEventListener('click', function() {
+    // Handle contact link
+    if (contactLink) {
+        contactLink.addEventListener('click', function(e) {
+            e.preventDefault();
             const targetSection = this.getAttribute('data-section');
             
             // Remove active from nav buttons
