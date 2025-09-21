@@ -224,14 +224,26 @@ function initPagination() {
     if (nextBtn) {
         nextBtn.addEventListener('click', () => changePage(currentPage + 1));
     }
-}edImages = allImages;
-        galleryTitle.textContent = 'All Galleries';
+}
+
+// Filter images by category
+function filterImages(category) {
+    const galleryTitle = document.getElementById('galleryTitle');
+    let filteredImages;
+    
+    if (category === 'all') {
+        filteredImages = allImages;
+        galleryTitle.textContent = 'Portfolio Gallery';
     } else {
         filteredImages = allImages.filter(image => image.category === category);
-        galleryTitle.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+        galleryTitle.textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Gallery`;
     }
     
-    displayImages(filteredImages);
+    // Update current category
+    currentCategory = category;
+    
+    // Display filtered images with pagination
+    displayImagesWithPagination(filteredImages);
     updateImageCount(filteredImages.length);
 }
 
@@ -458,27 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Filter images by category
-function filterImagesByCategory(category) {
-    let filteredImages;
-    
-    if (category === 'all') {
-        filteredImages = allImages;
-        galleryTitle.textContent = 'Portfolio Gallery';
-    } else {
-        filteredImages = allImages.filter(image => 
-            image.category && image.category.toLowerCase() === category.toLowerCase()
-        );
-        galleryTitle.textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Gallery`;
-    }
-    
-    // Update current category
-    currentCategory = category;
-    
-    // Display filtered images with pagination
-    displayImagesWithPagination(filteredImages);
-    updateImageCount(filteredImages.length);
-}
+
 
 // Desktop Contact Form
 function initDesktopContactForm() {
