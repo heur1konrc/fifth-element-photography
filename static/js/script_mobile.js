@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Mobile Navigation
 function initMobileNavigation() {
     const navBtns = document.querySelectorAll('.nav-btn');
+    const headerContactBtn = document.querySelector('.header-contact-btn');
     const sections = document.querySelectorAll('.content-section');
     
     navBtns.forEach(btn => {
@@ -33,9 +34,30 @@ function initMobileNavigation() {
             });
             
             // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo(0, 0);
         });
     });
+    
+    // Handle header contact button
+    if (headerContactBtn) {
+        headerContactBtn.addEventListener('click', function() {
+            const targetSection = this.getAttribute('data-section');
+            
+            // Remove active from nav buttons
+            navBtns.forEach(b => b.classList.remove('active'));
+            
+            // Show contact section
+            sections.forEach(section => {
+                section.classList.remove('active');
+                if (section.id === targetSection + '-section') {
+                    section.classList.add('active');
+                }
+            });
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        });
+    }
 }
 
 // Mobile Gallery
