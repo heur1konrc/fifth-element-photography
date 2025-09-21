@@ -595,7 +595,8 @@ textarea {
 /* Featured Image Section */
 .featured-container {
     /*max-width: 1200px;*/
-    max-width: 1350px;
+    /*max-width: 1350px;*/
+    max-width: 1500px;
     margin: 0 auto;
 }
 
@@ -1026,16 +1027,69 @@ textarea {
     margin-bottom: 2rem;
 }
 
-/* Increase featured image size by 25% */
+/* Featured content - single column layout for larger image */
 .featured-content {
-    display: grid;
-    /*grid-template-columns: 1.5fr 1fr;*/
-    grid-template-columns: 1.85fr .65fr;
-    gap: 2rem;
-    /*background: rgba(255, 255, 255, 0.05);*/
+    display: block;
     background: #000000;
     padding: 3rem;
     border-radius: 12px;
+}
+
+.featured-image-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.featured-image-container h3 {
+    color: #ffffff;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.featured-image {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+/* Horizontal EXIF layout */
+.featured-exif-horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    gap: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.5rem;/*was 1.5*/
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+
+.exif-item {
+    display: flex;
+    flex-direction: column;
+    /*align-items: center;*/
+    align-items: left;
+    /*text-align: center;*/
+    text-align: left;
+    /*min-width: 120px;*/
+}
+
+.exif-label {
+    color: #6799c2;
+    /*font-size: 0.8rem;*/
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.exif-value {
+    color: #ffffff;
+    /*font-size: 0.9rem;*/
+    font-size: 0.8rem;
+    font-weight: 500;
 }
 
 .featured-image {

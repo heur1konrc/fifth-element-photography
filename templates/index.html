@@ -118,50 +118,52 @@
                     {% set featured_image = images|selectattr('is_featured')|first %}
                     {% if featured_image %}
                         <div class="featured-content">
-                            <div class="featured-image">
-                                <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
-                            </div>
-                            <div class="featured-info">
+                            <div class="featured-image-container">
                                 <h3>{{ featured_image.title }}</h3>
-                                
-                                <div class="image-details">
-                                    <div class="detail-group">
-                                        <span class="detail-label">Model:</span>
-                                        <span class="detail-value">{{ featured_exif.Model if featured_exif else 'Unavailable' }}</span>
-                                    </div>
-                                    <div class="detail-group">
-                                        <span class="detail-label">Lens:</span>
-                                        <span class="detail-value">{{ featured_exif.LensModel if featured_exif else 'Unavailable' }}</span>
-                                    </div>
-                                    <div class="detail-group">
-                                        <span class="detail-label">Aperture:</span>
-                                        <span class="detail-value">{{ featured_exif.FNumber if featured_exif else 'Unavailable' }}</span>
-                                    </div>
-                                    <div class="detail-group">
-                                        <span class="detail-label">Shutter Speed:</span>
-                                        <span class="detail-value">{{ featured_exif.ExposureTime|exposure_fraction if featured_exif else 'Unavailable' }}</span>
-                                    </div>
-                                    <div class="detail-group">
-                                        <span class="detail-label">ISO:</span>
-                                        <span class="detail-value">{{ featured_exif.ISOSpeedRatings if featured_exif else 'Unavailable' }}</span>
-                                    </div>
-                                    <div class="detail-group">
-                                        <span class="detail-label">Focal Length:</span>
-                                        <span class="detail-value">{{ featured_exif.FocalLength if featured_exif else 'Unavailable' }}</span>
-                                    </div>
+                                <div class="featured-image">
+                                    <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
                                 </div>
-                                
-                                <div class="image-actions">
-                                    <button class="action-btn" onclick="viewFullscreen('{{ featured_image.url }}', '{{ featured_image.title }}')">
-                                        <span></span> View High Resolution
-                                    </button>
-                                    <button class="action-btn" onclick="downloadImage('{{ featured_image.url }}', '{{ featured_image.filename }}')">
-                                        <span></span> Download Full Size
-                                    </button>
-                                    <button class="action-btn" onclick="shareOnSocial('{{ featured_image.title }}', '{{ featured_image.url }}')">
-                                        <span></span> Share on Social Media
-                                    </button>
+                            </div>
+                            
+                            <!-- EXIF Data - Horizontal Layout Below Image -->
+                            <div class="featured-exif-horizontal">
+                                <div class="exif-item">
+                                    <span class="exif-label">Model:</span>
+                                    <span class="exif-value">{{ featured_exif.Model if featured_exif else 'Unavailable' }}</span>
                                 </div>
+                                <div class="exif-item">
+                                    <span class="exif-label">Lens:</span>
+                                    <span class="exif-value">{{ featured_exif.LensModel if featured_exif else 'Unavailable' }}</span>
+                                </div>
+                                <div class="exif-item">
+                                    <span class="exif-label">Aperture:</span>
+                                    <span class="exif-value">{{ featured_exif.FNumber if featured_exif else 'Unavailable' }}</span>
+                                </div>
+                                <div class="exif-item">
+                                    <span class="exif-label">Shutter Speed:</span>
+                                    <span class="exif-value">{{ featured_exif.ExposureTime|exposure_fraction if featured_exif else 'Unavailable' }}</span>
+                                </div>
+                                <div class="exif-item">
+                                    <span class="exif-label">ISO:</span>
+                                    <span class="exif-value">{{ featured_exif.ISOSpeedRatings if featured_exif else 'Unavailable' }}</span>
+                                </div>
+                                <div class="exif-item">
+                                    <span class="exif-label">Focal Length:</span>
+                                    <span class="exif-value">{{ featured_exif.FocalLength if featured_exif else 'Unavailable' }}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="image-actions">
+                                <button class="action-btn" onclick="viewFullscreen('{{ featured_image.url }}', '{{ featured_image.title }}')">
+                                    <span></span> View High Resolution
+                                </button>
+                                <button class="action-btn" onclick="downloadImage('{{ featured_image.url }}', '{{ featured_image.filename }}')">
+                                    <span></span> Download Full Size
+                                </button>
+                                <button class="action-btn" onclick="shareOnSocial('{{ featured_image.title }}', '{{ featured_image.url }}')">
+                                    <span></span> Share on Social Media
+                                </button>
                             </div>
                         </div>
                         
