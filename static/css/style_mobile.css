@@ -25,7 +25,8 @@ body {
 
 /* Mobile Header */
 .mobile-header {
-    padding: 20px 15px;
+    /*padding: 20px 15px;*/
+    padding: 2px 1.5px;
     text-align: center;
     border-bottom: 1px solid #333;
     background: #000000;
