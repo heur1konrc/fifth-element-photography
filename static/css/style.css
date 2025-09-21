@@ -957,7 +957,7 @@ textarea {
 
 /* New Featured Story Section - Full Width Below */
 .featured-story-section {
-    margin-top: 3rem;
+    margin-top: 1rem;
     padding: 2rem;
     /*background: rgba(255, 255, 255, 0.05);*/
     background: #000000;
@@ -1142,7 +1142,7 @@ textarea {
 
 /* Featured story section - full width */
 .featured-story-section {
-    margin-top: 3rem;
+    margin-top: 1rem;
     /*background: rgba(255, 255, 255, 0.05);*/
     background: #000000;
     padding: 2rem;
