@@ -141,10 +141,17 @@ function setMobileHeroImage() {
     const hero = document.getElementById('mobileHero');
     if (!hero || allImages.length === 0) return;
     
-    // Get a random landscape image or fallback to any image
-    let heroImage = allImages.find(img => img.category === 'landscape');
+    // First, try to find the featured image (same as desktop)
+    let heroImage = allImages.find(img => img.is_featured);
+    
+    // If no featured image, fallback to first landscape image
+    if (!heroImage) {
+        heroImage = allImages.find(img => img.category === 'landscape');
+    }
+    
+    // Final fallback to any image
     if (!heroImage && allImages.length > 0) {
-        heroImage = allImages[Math.floor(Math.random() * allImages.length)];
+        heroImage = allImages[0];
     }
     
     if (heroImage) {
