@@ -249,16 +249,9 @@ def scan_images():
             # Check if image is the weekly featured image
             is_featured = featured_image_data and featured_image_data.get('filename') == filename
             
-            # Get featured story if this is the featured image
-            featured_story = ''
-            if is_featured:
-                try:
-                    if os.path.exists('/data/featured_stories.json'):
-                        with open('/data/featured_stories.json', 'r') as f:
-                            featured_stories = json.load(f)
-                            featured_story = featured_stories.get(filename, '')
-                except:
-                    pass
+            # SINGLE SOURCE: Use description as the story (no separate featured_story)
+            # Description and story are now the same field
+            featured_story = description
             
             # Get image info
             info = get_image_info(filepath)
@@ -329,30 +322,14 @@ def index():
         if not featured_image and images:
             featured_image = images[0]
     
-    # Extract EXIF data for featured image and handle story/description sync
+    # Extract EXIF data for featured image - SINGLE SOURCE APPROACH
     featured_exif = None
     if featured_image:
         image_path = os.path.join(IMAGES_FOLDER, featured_image['filename'])
         featured_exif = extract_exif_data(image_path)
         
-        # Load featured stories
-        featured_stories = {}
-        if os.path.exists('/data/featured_stories.json'):
-            with open('/data/featured_stories.json', 'r') as f:
-                featured_stories = json.load(f)
-        
-        # Auto-populate story from description if story doesn't exist
-        story_key = featured_image['filename']
-        if story_key not in featured_stories or not featured_stories[story_key]:
-            # Use image description as story
-            if featured_image.get('description'):
-                featured_stories[story_key] = featured_image['description']
-                # Save the auto-populated story
-                with open('/data/featured_stories.json', 'w') as f:
-                    json.dump(featured_stories, f)
-        
-        # Add story to featured image data
-        featured_image['story'] = featured_stories.get(story_key, '')
+        # SINGLE SOURCE: Story is always the same as description
+        featured_image['story'] = featured_image.get('description', '')
     
     about_data = load_about_data()
     
@@ -662,7 +639,7 @@ def edit_image(filename):
 
 @app.route('/update_image/<filename>', methods=['POST'])
 def update_image(filename):
-    """Update image metadata"""
+    """Update image metadata and sync description with featured story"""
     try:
         # Get form data
         title = request.form.get('title', '').strip()
@@ -681,6 +658,22 @@ def update_image(filename):
         image_descriptions = load_image_descriptions()
         image_descriptions[filename] = description
         save_image_descriptions(image_descriptions)
+        
+        # SYNC: Also update featured story if this image is featured
+        try:
+            featured_stories = {}
+            if os.path.exists('/data/featured_stories.json'):
+                with open('/data/featured_stories.json', 'r') as f:
+                    featured_stories = json.load(f)
+            
+            # Update the story to match the description
+            featured_stories[filename] = description
+            
+            # Save updated featured stories
+            with open('/data/featured_stories.json', 'w') as f:
+                json.dump(featured_stories, f)
+        except Exception as sync_error:
+            print(f"Warning: Could not sync featured story: {sync_error}")
         
         # Update image titles
         image_titles = load_image_titles()
@@ -868,38 +861,28 @@ if __name__ == '__main__':
 
 @app.route('/save_featured_story/<filename>', methods=['POST'])
 def save_featured_story(filename):
-    """Save story for featured image and sync with image description"""
+    """Save story for featured image and sync with image description - SINGLE SOURCE OF TRUTH"""
     try:
         data = request.get_json()
         story = data.get('story', '')
         
-        # Load current featured stories
+        # SINGLE SOURCE: Update image description (primary storage)
+        image_descriptions = load_image_descriptions()
+        image_descriptions[filename] = story
+        save_image_descriptions(image_descriptions)
+        
+        # SYNC: Also update featured stories for backwards compatibility
         featured_stories = {}
         if os.path.exists('/data/featured_stories.json'):
             with open('/data/featured_stories.json', 'r') as f:
                 featured_stories = json.load(f)
         
-        # Save story for this image
         featured_stories[filename] = story
         
-        # Save to file
         with open('/data/featured_stories.json', 'w') as f:
             json.dump(featured_stories, f)
         
-        # SYNC: Also update the image description in image_data.json
-        if os.path.exists('/data/image_data.json'):
-            with open('/data/image_data.json', 'r') as f:
-                image_data = json.load(f)
-            
-            # Find and update the image description
-            if filename in image_data:
-                image_data[filename]['description'] = story
-                
-                # Save updated image data
-                with open('/data/image_data.json', 'w') as f:
-                    json.dump(image_data, f)
-        
-        return jsonify({'success': True, 'message': 'Featured story and image description saved successfully'})
+        return jsonify({'success': True, 'message': 'Story and description synchronized successfully'})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
