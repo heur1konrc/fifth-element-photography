@@ -1078,7 +1078,7 @@ textarea {
 .exif-label {
     color: #6799c2;
     /*font-size: 0.8rem;*/
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 0.25rem;
@@ -1088,8 +1088,8 @@ textarea {
 .exif-value {
     color: #ffffff;
     /*font-size: 0.9rem;*/
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 0.7rem;
+    font-weight: 400;
 }
 
 .featured-image {
