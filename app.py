@@ -543,8 +543,8 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Lumaprints Thumbnail Management Routes
-PRODUCT_THUMBNAILS_FOLDER = '/data/portfolio/gallery/product-thumbnails'
-THUMBNAIL_ASSIGNMENTS_FILE = '/data/thumbnail-assignments.json'
+PRODUCT_THUMBNAILS_FOLDER = os.path.join(os.path.dirname(__file__), 'static', 'product-thumbnails')
+THUMBNAIL_ASSIGNMENTS_FILE = os.path.join(os.path.dirname(__file__), 'thumbnail-assignments.json')
 
 def ensure_product_thumbnails_folder():
     """Ensure product thumbnails folder exists"""
@@ -641,12 +641,9 @@ def get_product_thumbnails():
 def serve_product_thumbnail(filename):
     """Serve product thumbnail files"""
     try:
-        thumbnail_path = os.path.join(PRODUCT_THUMBNAILS_FOLDER, filename)
-        if os.path.exists(thumbnail_path):
-            return send_file(thumbnail_path)
-        return "Thumbnail not found", 404
+        return send_from_directory(PRODUCT_THUMBNAILS_FOLDER, filename)
     except Exception as e:
-        return str(e), 500
+        return "Thumbnail not found", 404
 
 @app.route('/admin/assign-thumbnail', methods=['POST'])
 def assign_thumbnail():
@@ -788,8 +785,12 @@ def manage_categories():
                 flash(f'Category "{category_to_delete}" deleted. {updated_count} images moved to "other" category.')
             else:
                 flash('Please select a valid category to delete')
+        
+        return redirect(url_for('manage_categories'))
     
-    return redirect(url_for('admin'))
+    # GET request - show categories management page
+    categories = load_categories()
+    return render_template('admin_categories.html', categories=categories)
 
 @app.route('/admin/assign_category/<filename>', methods=['POST'])
 def assign_category(filename):
