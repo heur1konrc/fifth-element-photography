@@ -36,7 +36,7 @@
 }
 
 .modal-content {
-    background: white;
+    background: transparent; /* Transparent for image view */
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     max-width: 90vw;
@@ -44,6 +44,63 @@
     overflow-y: auto;
     position: relative;
     animation: modalSlideIn 0.3s ease;
+}
+
+/* White background only for print ordering sections */
+.modal-print-order,
+.modal-order-form {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+/* Main image view styling */
+.modal-main-view {
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-height: 90vh;
+    padding: 20px;
+    margin: 0;
+    gap: 15px;
+}
+
+.modal-main-view .modal-image {
+    background: transparent;
+    box-shadow: none;
+    max-height: 70vh;
+    flex-shrink: 0;
+}
+
+.modal-main-view .modal-info {
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    text-align: center;
+    flex-shrink: 0;
+    min-height: auto;
+}
+
+.modal-main-view .modal-info h4 {
+    color: white;
+    margin: 0 0 8px 0;
+    font-size: 18px;
+}
+
+.modal-main-view .modal-info p {
+    color: #ccc;
+    margin: 0;
+    font-size: 14px;
+}
+
+.modal-main-view .modal-actions {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 15px 25px;
+    border-radius: 8px;
+    flex-shrink: 0;
 }
 
 @keyframes modalSlideIn {
