@@ -35,16 +35,18 @@
     box-sizing: border-box;
 }
 
+/* Restore original modal content styling */
 .modal-content {
-    background: transparent; /* Transparent for image view */
-    border-radius: 0; /* No border radius for full image display */
-    box-shadow: none; /* No shadow for clean image display */
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden; /* NO SCROLLING EVER */
-    position: fixed;
-    top: 0;
-    left: 0;
+    position: relative;
+    margin: auto;
+    padding: 10px;
+    width: 95%;
+    max-width: 1400px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    background: transparent;
+    border-radius: 8px;
     animation: modalSlideIn 0.3s ease;
 }
 
@@ -99,69 +101,42 @@
     font-weight: bold !important;
 }
 
-/* FULL SCREEN IMAGE MODAL - Professional Photography Display */
+/* Restore original modal main view styling */
 .modal-main-view {
     background: transparent;
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    margin: 0;
-    overflow: hidden;
+    text-align: center;
 }
 
 .modal-main-view .modal-image {
-    width: 100vw;
-    height: 100vh;
-    object-fit: contain;
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 8px;
     background: transparent;
-    border-radius: 0;
-    box-shadow: none;
+    object-fit: contain;
 }
 
 .modal-main-view .modal-info {
-    position: fixed;
-    bottom: 120px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.85);
+    margin-top: 10px;
     color: white;
-    padding: 25px 40px;
-    border-radius: 12px;
-    text-align: center;
-    backdrop-filter: blur(15px);
-    z-index: 10001;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .modal-main-view .modal-info h4 {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    font-weight: normal;
+    font-family: 'Poppins', sans-serif;
     color: white;
-    margin: 0 0 10px 0;
-    font-size: 24px;
-    font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .modal-main-view .modal-info p {
-    color: #f0f0f0;
-    margin: 0;
-    font-size: 16px;
-    letter-spacing: 2px;
-    font-weight: 300;
-    text-transform: uppercase;
+    color: #ccc;
+    font-size: 0.85rem;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.1;
 }
 
 .modal-main-view .modal-actions {
-    position: fixed;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10001;
+    margin-top: 20px;
 }
 
 @keyframes modalSlideIn {
