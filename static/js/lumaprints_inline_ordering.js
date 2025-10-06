@@ -83,25 +83,59 @@ class LumaprintsInlineOrdering {
     }
 
     showPrintOrderView() {
-        // Get current image from modal
+        // Try to get current image from modal first
         const modalImage = document.getElementById('modalImage');
         const modalTitle = document.getElementById('modalTitle');
         
-        if (modalImage && modalImage.src) {
-            this.currentImage = modalImage.src;
+        let imageSource = null;
+        let imageTitle = 'Selected Image';
+        
+        // Check if we're in a modal context with a valid image
+        if (modalImage && modalImage.src && modalImage.src !== window.location.href) {
+            imageSource = modalImage.src;
+            imageTitle = modalTitle ? modalTitle.textContent : 'Selected Image';
+        } else {
+            // Try to find the featured image or any visible image
+            const featuredImg = document.querySelector('.hero-image img, .featured-image img, img[alt*="featured"], img[src*="IMG_5555"]');
+            if (featuredImg && featuredImg.src) {
+                imageSource = featuredImg.src;
+                imageTitle = featuredImg.alt || 'Featured Image';
+            } else {
+                // Fallback: try to find any image on the page
+                const anyImg = document.querySelector('img[src*="/static/"], img[src*="/images/"]');
+                if (anyImg && anyImg.src) {
+                    imageSource = anyImg.src;
+                    imageTitle = anyImg.alt || 'Selected Image';
+                }
+            }
+        }
+        
+        if (imageSource) {
+            this.currentImage = imageSource;
             
             // Update preview image and title
             const orderPreviewImage = document.getElementById('orderPreviewImage');
             const orderImageTitle = document.getElementById('orderImageTitle');
             
             if (orderPreviewImage) orderPreviewImage.src = this.currentImage;
-            if (orderImageTitle) orderImageTitle.textContent = modalTitle ? modalTitle.textContent : 'Selected Image';
+            if (orderImageTitle) orderImageTitle.textContent = imageTitle;
+            
+            // Ensure modal is visible and show print order view
+            const modal = document.getElementById('imageModal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
             
             // Show print order view
             this.showView('modalPrintOrder');
             
             // Reset selections
             this.resetSelections();
+            
+            console.log('Print order view shown for image:', this.currentImage);
+        } else {
+            console.error('No valid image found to order');
+            alert('No image available for ordering. Please select an image first.');
         }
     }
 
