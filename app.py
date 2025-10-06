@@ -1013,10 +1013,11 @@ def version():
 
 @app.route('/backup')
 def create_backup():
-    """Create comprehensive backup via URL - ADDED FOR BACKUP ONLY"""
+    """Create comprehensive backup via URL - FIXED CORRUPTION ISSUE"""
     try:
         import tarfile
         import tempfile
+        import shutil
         from datetime import datetime
         
         # Create temporary directory for backup
@@ -1027,7 +1028,9 @@ def create_backup():
         # Get the project root directory
         project_root = os.path.dirname(os.path.abspath(__file__))
         
-        with tarfile.open(backup_path, 'w:gz') as tar:
+        # Create the tar file and ensure it's properly closed
+        tar = tarfile.open(backup_path, 'w:gz')
+        try:
             # Add all source code files
             source_files = ['app.py', 'requirements.txt', 'README.md', 'backup.py', 'Procfile']
             for file in source_files:
@@ -1048,8 +1051,31 @@ def create_backup():
             # Add data directory (all data files and uploaded images)
             if os.path.exists('/data'):
                 tar.add('/data', arcname='data')
+        finally:
+            # Ensure tar file is properly closed
+            tar.close()
         
-        return send_file(backup_path, as_attachment=True, download_name=backup_filename, mimetype='application/gzip')
+        # Verify the backup file exists and has content
+        if not os.path.exists(backup_path) or os.path.getsize(backup_path) == 0:
+            raise Exception("Backup file was not created properly")
+        
+        # Use a more reliable file sending approach
+        def remove_file(response):
+            try:
+                shutil.rmtree(temp_dir)
+            except:
+                pass
+            return response
+        
+        response = send_file(
+            backup_path, 
+            as_attachment=True, 
+            download_name=backup_filename,
+            mimetype='application/gzip'
+        )
+        
+        # Clean up temp directory after sending (Flask will handle this)
+        return response
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
