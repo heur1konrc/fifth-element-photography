@@ -524,3 +524,4 @@ let lumaprintsOrdering = null;
 // Initialize Lumaprints when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     // Order Print functionality is now handled by lumaprints_inline_ordering.js
+});
