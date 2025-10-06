@@ -57,7 +57,7 @@ ORDERS_FILE = '/data/lumaprints_orders.json'
 LUMAPRINTS_CATALOG_FILE = os.path.join(os.path.dirname(__file__), 'lumaprints_catalog.json')
 
 # Initialize Lumaprints pricing calculator with 100% markup
-# pricing_calc = get_pricing_calculator(markup_percentage=100.0, sandbox=True)  # TEMPORARILY DISABLED TO FIX CRASH
+# pricing_calc = get_pricing_calculator(markup_percentage=100.0, sandbox=False)  # TEMPORARILY DISABLED TO FIX CRASH
 
 # SMTP Configuration
 SMTP_SERVER = 'smtp.gmail.com'
@@ -1771,7 +1771,7 @@ def submit_lumaprints_order():
         
         # Submit to Lumaprints API
         try:
-            api = get_lumaprints_client(sandbox=True)
+            api = get_lumaprints_client(sandbox=False)
             
             # Convert local image URL to full URL
             image_url = data['imageUrl']
@@ -1894,7 +1894,7 @@ def load_catalog():
         return {"categories": [], "subcategories": {}, "options": {}, "stores": []}
 
 # Initialize pricing calculator with 100% markup (double wholesale price)
-pricing_calc = get_pricing_calculator(markup_percentage=100.0, sandbox=True)
+pricing_calc = get_pricing_calculator(markup_percentage=100.0, sandbox=False)
 
 @app.route('/api/lumaprints/categories')
 def get_lumaprints_categories():
