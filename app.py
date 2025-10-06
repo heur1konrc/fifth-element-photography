@@ -2114,3 +2114,31 @@ def export_lumaprints_mapping():
             'success': False,
             'error': str(e)
         }), 500
+
+# ============================================================================
+# ADMIN IMAGE DOWNLOAD ROUTE
+# ============================================================================
+
+@app.route('/admin/download-image/<filename>')
+def download_image(filename):
+    """Download original image file for admin use (e.g., uploading to Lumaprints)"""
+    try:
+        # Security check - ensure filename is safe
+        if not filename or '..' in filename or '/' in filename:
+            return "Invalid filename", 400
+        
+        # Check if file exists
+        file_path = os.path.join(IMAGES_FOLDER, filename)
+        if not os.path.exists(file_path):
+            return "File not found", 404
+        
+        # Send file with proper headers for download
+        return send_from_directory(
+            IMAGES_FOLDER, 
+            filename, 
+            as_attachment=True,
+            download_name=filename
+        )
+        
+    except Exception as e:
+        return f"Error downloading file: {str(e)}", 500

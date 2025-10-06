@@ -347,13 +347,25 @@
                         <strong>Library Name:</strong> {{ image.library_name or 'N/A' }}<br>
                         <strong>Mapped:</strong> {{ image.mapped_at[:10] if image.mapped_at else 'Unknown' }}
                         <br><br>
-                        <button class="btn btn-small" style="background: #dc3545; color: #fff;" onclick="removeMapping('{{ image.filename }}')">
-                            <i class="fas fa-unlink"></i>
-                            Remove Mapping
-                        </button>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <a href="/admin/download-image/{{ image.filename }}" class="btn btn-small" style="background: #28a745; color: #fff;" download>
+                                <i class="fas fa-download"></i>
+                                Download
+                            </a>
+                            <button class="btn btn-small" style="background: #dc3545; color: #fff;" onclick="removeMapping('{{ image.filename }}')">
+                                <i class="fas fa-unlink"></i>
+                                Remove Mapping
+                            </button>
+                        </div>
                     </div>
                     {% else %}
                     <div class="mapping-form">
+                        <div style="margin-bottom: 15px;">
+                            <a href="/admin/download-image/{{ image.filename }}" class="btn btn-small" style="background: #28a745; color: #fff; width: 100%; text-align: center;" download>
+                                <i class="fas fa-download"></i>
+                                Download for Lumaprints Upload
+                            </a>
+                        </div>
                         <div class="form-group">
                             <label for="libraryId_{{ loop.index }}">Lumaprints Library ID:</label>
                             <input type="text" id="libraryId_{{ loop.index }}" placeholder="e.g., IMG_8653_1">
