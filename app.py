@@ -1013,69 +1013,66 @@ def version():
 
 @app.route('/backup')
 def create_backup():
-    """Create comprehensive backup via URL - FIXED CORRUPTION ISSUE"""
+    """Create comprehensive backup via URL - USING ZIP FOR RELIABILITY"""
     try:
-        import tarfile
+        import zipfile
         import tempfile
-        import shutil
+        import os
         from datetime import datetime
         
         # Create temporary directory for backup
         temp_dir = tempfile.mkdtemp()
-        backup_filename = f"portfolio_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.tar.gz"
+        backup_filename = f"portfolio_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
         backup_path = os.path.join(temp_dir, backup_filename)
         
         # Get the project root directory
         project_root = os.path.dirname(os.path.abspath(__file__))
         
-        # Create the tar file and ensure it's properly closed
-        tar = tarfile.open(backup_path, 'w:gz')
-        try:
+        # Create ZIP file (more reliable than TAR.GZ for web downloads)
+        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
             # Add all source code files
             source_files = ['app.py', 'requirements.txt', 'README.md', 'backup.py', 'Procfile']
             for file in source_files:
                 file_path = os.path.join(project_root, file)
                 if os.path.exists(file_path):
-                    tar.add(file_path, arcname=file)
+                    zipf.write(file_path, file)
             
             # Add templates directory
             templates_dir = os.path.join(project_root, 'templates')
             if os.path.exists(templates_dir):
-                tar.add(templates_dir, arcname='templates')
+                for root, dirs, files in os.walk(templates_dir):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, project_root)
+                        zipf.write(file_path, arcname)
             
-            # Add static directory (CSS, JS, images)
+            # Add static directory
             static_dir = os.path.join(project_root, 'static')
             if os.path.exists(static_dir):
-                tar.add(static_dir, arcname='static')
+                for root, dirs, files in os.walk(static_dir):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, project_root)
+                        zipf.write(file_path, arcname)
             
             # Add data directory (all data files and uploaded images)
             if os.path.exists('/data'):
-                tar.add('/data', arcname='data')
-        finally:
-            # Ensure tar file is properly closed
-            tar.close()
+                for root, dirs, files in os.walk('/data'):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, '/')
+                        zipf.write(file_path, arcname)
         
         # Verify the backup file exists and has content
         if not os.path.exists(backup_path) or os.path.getsize(backup_path) == 0:
             raise Exception("Backup file was not created properly")
         
-        # Use a more reliable file sending approach
-        def remove_file(response):
-            try:
-                shutil.rmtree(temp_dir)
-            except:
-                pass
-            return response
-        
-        response = send_file(
+        return send_file(
             backup_path, 
             as_attachment=True, 
             download_name=backup_filename,
-            mimetype='application/gzip'
+            mimetype='application/zip'
         )
-        
-        # Clean up temp directory after sending (Flask will handle this)
-        return response
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
