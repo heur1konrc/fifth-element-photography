@@ -342,24 +342,318 @@ body {
     position: relative;
 }
 
-.canvas-preview {
+/* Canvas Previews */
+.canvas-preview-075 {
     background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
     border: 1px solid #ddd;
+    position: relative;
 }
 
-.framed-canvas-preview {
+.canvas-preview-075::after {
+    content: "0.75\"";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.7rem;
+    color: #666;
+}
+
+.canvas-preview-125 {
+    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+    border: 2px solid #ddd;
+    position: relative;
+}
+
+.canvas-preview-125::after {
+    content: "1.25\"";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.7rem;
+    color: #666;
+}
+
+.canvas-preview-150 {
+    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+    border: 3px solid #ddd;
+    position: relative;
+}
+
+.canvas-preview-150::after {
+    content: "1.50\"";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.7rem;
+    color: #666;
+}
+
+.canvas-preview-rolled {
+    background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    position: relative;
+}
+
+.canvas-preview-rolled::after {
+    content: "ROLLED";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #666;
+}
+
+/* Frame Previews */
+.frame-preview-maple {
+    background: linear-gradient(135deg, #deb887 0%, #cd853f 100%);
+    border: 4px solid #cd853f;
+}
+
+.frame-preview-espresso {
+    background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
+    border: 4px solid #654321;
+}
+
+.frame-preview-natural {
+    background: linear-gradient(135deg, #f5deb3 0%, #daa520 100%);
+    border: 4px solid #daa520;
+}
+
+.frame-preview-oak {
+    background: linear-gradient(135deg, #d2b48c 0%, #bc9a6a 100%);
+    border: 4px solid #bc9a6a;
+}
+
+.frame-preview-gold {
+    background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+    border: 4px solid #b8860b;
+}
+
+.frame-preview-silver {
+    background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%);
+    border: 4px solid #808080;
+}
+
+.frame-preview-white {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    border: 4px solid #e0e0e0;
+}
+
+.frame-preview-black {
+    background: linear-gradient(135deg, #333333 0%, #000000 100%);
+    border: 4px solid #000000;
+}
+
+/* 1.25" Frame Previews */
+.frame-125-preview-maple {
+    background: linear-gradient(135deg, #deb887 0%, #cd853f 100%);
+    border: 3px solid #cd853f;
+}
+
+.frame-125-preview-espresso {
     background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
     border: 3px solid #654321;
 }
 
-.paper-preview {
-    background: linear-gradient(135deg, #fffef7 0%, #f5f5dc 100%);
-    border: 1px solid #e0e0e0;
+.frame-125-preview-natural {
+    background: linear-gradient(135deg, #f5deb3 0%, #daa520 100%);
+    border: 3px solid #daa520;
 }
 
-.metal-preview {
+.frame-125-preview-black {
+    background: linear-gradient(135deg, #333333 0%, #000000 100%);
+    border: 3px solid #000000;
+}
+
+/* Paper Previews */
+.paper-preview-archival {
+    background: linear-gradient(135deg, #fffef7 0%, #f5f5dc 100%);
+    border: 1px solid #e0e0e0;
+    position: relative;
+}
+
+.paper-preview-archival::after {
+    content: "MATTE";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #666;
+}
+
+.paper-preview-hot-press {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+    border: 1px solid #ddd;
+    position: relative;
+}
+
+.paper-preview-hot-press::after {
+    content: "HOT PRESS";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #666;
+}
+
+.paper-preview-cold-press {
+    background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+    border: 1px solid #ccc;
+    position: relative;
+}
+
+.paper-preview-cold-press::after {
+    content: "COLD PRESS";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #666;
+}
+
+.paper-preview-semi-glossy {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+    border: 1px solid #ddd;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.paper-preview-semi-glossy::after {
+    content: "SEMI-GLOSSY";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #666;
+}
+
+.paper-preview-metallic {
+    background: linear-gradient(135deg, #e6e6fa 0%, #d3d3d3 100%);
+    border: 1px solid #b0b0b0;
+    box-shadow: inset 0 0 15px rgba(192,192,192,0.5);
+    position: relative;
+}
+
+.paper-preview-metallic::after {
+    content: "METALLIC";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #666;
+}
+
+.paper-preview-glossy {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    border: 1px solid #ccc;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.paper-preview-glossy::after {
+    content: "GLOSSY";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #666;
+}
+
+.paper-preview-somerset {
+    background: linear-gradient(135deg, #f5f5dc 0%, #e6e6fa 100%);
+    border: 1px solid #d0d0d0;
+    position: relative;
+}
+
+.paper-preview-somerset::after {
+    content: "VELVET";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #666;
+}
+
+/* Foam Preview */
+.foam-preview {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    border: 3px solid #e0e0e0;
+    position: relative;
+}
+
+.foam-preview::after {
+    content: "FOAM";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #666;
+}
+
+/* Framed Fine Art Previews */
+.framed-fine-art-preview-black {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+    border: 4px solid #000000;
+}
+
+.framed-fine-art-preview-white {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+    border: 4px solid #ffffff;
+    box-shadow: 0 0 0 1px #e0e0e0;
+}
+
+.framed-fine-art-preview-natural {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+    border: 4px solid #daa520;
+}
+
+/* Metal Previews */
+.metal-preview-glossy {
     background: linear-gradient(135deg, #c0c0c0 0%, #808080 100%);
     border: 1px solid #666;
+    box-shadow: inset 0 0 20px rgba(255,255,255,0.3);
+    position: relative;
+}
+
+.metal-preview-glossy::after {
+    content: "GLOSSY";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #333;
+}
+
+.metal-preview-matte {
+    background: linear-gradient(135deg, #b0b0b0 0%, #707070 100%);
+    border: 1px solid #555;
+    position: relative;
+}
+
+.metal-preview-matte::after {
+    content: "MATTE";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #333;
+}
+
+/* Peel and Stick Preview */
+.peel-stick-preview {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    border: 1px solid #ddd;
+    position: relative;
+}
+
+.peel-stick-preview::after {
+    content: "PEEL & STICK";
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    font-size: 0.6rem;
+    color: #666;
 }
 
 .product-info {

@@ -363,17 +363,51 @@ class OrderPrintController {
 
     getProductName(productId) {
         const productNames = {
-            '101001': 'Canvas Print (0.75")',
-            '101002': 'Canvas Print (1.25")',
-            '101003': 'Canvas Print (1.50")',
-            '101004': 'Rolled Canvas',
-            '102001': '1.50" Maple Wood Floating Frame',
-            '102002': '1.50" Espresso Floating Frame',
-            '102003': '1.50" Natural Wood Floating Frame',
-            '102008': '1.50" Black Floating Frame',
-            '103001': 'Fine Art Paper',
-            '106001': 'Metal Print - Glossy',
-            '106002': 'Metal Print - Matte'
+            // Canvas Products
+            'canvas-075': '0.75in Stretched Canvas',
+            'canvas-125': '1.25in Stretched Canvas',
+            'canvas-150': '1.50in Stretched Canvas',
+            'canvas-rolled': 'Rolled Canvas',
+            
+            // Framed Canvas Products - 1.50"
+            'frame-maple': '1.50in Maple Wood Floating Frame',
+            'frame-espresso': '1.50in Espresso Floating Frame',
+            'frame-natural': '1.50in Natural Wood Floating Frame',
+            'frame-oak': '1.50in Oak Floating Frame',
+            'frame-gold': '1.50in Gold Floating Frame',
+            'frame-silver': '1.50in Silver Floating Frame',
+            'frame-white': '1.50in White Floating Frame',
+            'frame-black': '1.50in Black Floating Frame',
+            
+            // Framed Canvas Products - 1.25"
+            'frame-125-maple': '1.25in Maple Wood Floating Frame',
+            'frame-125-espresso': '1.25in Espresso Floating Frame',
+            'frame-125-natural': '1.25in Natural Wood Floating Frame',
+            'frame-125-black': '1.25in Black Floating Frame',
+            
+            // Fine Art Paper Products
+            'paper-archival-matte': 'Archival Matte Fine Art Paper',
+            'paper-hot-press': 'Hot Press Fine Art Paper',
+            'paper-cold-press': 'Cold Press Fine Art Paper',
+            'paper-semi-glossy': 'Semi-Glossy Fine Art Paper',
+            'paper-metallic': 'Metallic Fine Art Paper',
+            'paper-glossy': 'Glossy Fine Art Paper',
+            'paper-somerset-velvet': 'Somerset Velvet Fine Art Paper',
+            
+            // Foam Mounted Print
+            'foam-mounted-print': 'Foam Mounted Print',
+            
+            // Framed Fine Art Paper
+            'framed-fine-art-black': 'Black Framed Fine Art Paper',
+            'framed-fine-art-white': 'White Framed Fine Art Paper',
+            'framed-fine-art-natural': 'Natural Wood Framed Fine Art Paper',
+            
+            // Metal Products
+            'metal-glossy': 'Metal Print - Glossy',
+            'metal-matte': 'Metal Print - Matte',
+            
+            // Peel and Stick
+            'peel-and-stick': 'Peel and Stick'
         };
         return productNames[productId] || 'Unknown Product';
     }
