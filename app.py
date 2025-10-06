@@ -1690,8 +1690,15 @@ def order_print_form():
                     size_name = subcat['name']
                     break
         
-        # Construct image URL
-        image_url = f"/static/assets/{image_filename}"
+        # Check if image is mapped to Lumaprints library
+        from lumaprints_mapping import LumaprintsMapping
+        mapping_manager = LumaprintsMapping()
+        
+        if not mapping_manager.is_mapped(image_filename):
+            return f"Error: Image '{image_filename}' is not mapped to Lumaprints library. Please contact admin to add this image to the print catalog.", 400
+        
+        # Construct image URL for display
+        image_url = f"/images/{image_filename}"
         
         # Render order form
         return render_template('lumaprints_order_form.html',
@@ -1977,55 +1984,57 @@ if __name__ == '__main__':
 # 
 
 # ============================================================================
-# LUMAPRINTS LIBRARY SYNC ROUTES
+# LUMAPRINTS LIBRARY MAPPING ROUTES
 # ============================================================================
 
-@app.route('/admin/lumaprints-sync')
-def admin_lumaprints_sync():
-    """Admin interface for managing Lumaprints library sync"""
+@app.route('/admin/lumaprints-mapping')
+def admin_lumaprints_mapping():
+    """Admin interface for managing Lumaprints library mapping"""
     try:
-        from lumaprints_library import LumaprintsLibrary
-        library_manager = LumaprintsLibrary()
+        from lumaprints_mapping import LumaprintsMapping
+        mapping_manager = LumaprintsMapping()
         
-        gallery_images = library_manager.get_gallery_images()
-        sync_status = library_manager.get_sync_status_for_all_images()
+        gallery_images = mapping_manager.get_gallery_images()
+        mapping_status = mapping_manager.get_mapping_status_for_all_images()
         
-        return render_template('admin_lumaprints_sync.html',
+        return render_template('admin_lumaprints_mapping.html',
                              gallery_images=gallery_images,
-                             sync_status=sync_status)
+                             mapping_status=mapping_status)
     except Exception as e:
-        return f"Error loading Lumaprints sync page: {str(e)}", 500
+        return f"Error loading Lumaprints mapping page: {str(e)}", 500
 
-@app.route('/api/lumaprints/sync-image', methods=['POST'])
-def sync_image_to_lumaprints():
-    """Sync a single image to Lumaprints library"""
+@app.route('/api/lumaprints/add-mapping', methods=['POST'])
+def add_lumaprints_mapping():
+    """Add mapping between gallery image and Lumaprints library ID"""
     try:
-        from lumaprints_library import LumaprintsLibrary
-        library_manager = LumaprintsLibrary()
+        from lumaprints_mapping import LumaprintsMapping
+        mapping_manager = LumaprintsMapping()
         
         data = request.get_json()
         filename = data.get('filename')
+        library_id = data.get('library_id')
+        library_name = data.get('library_name')
         
-        if not filename:
-            return jsonify({'success': False, 'error': 'Filename required'}), 400
+        if not filename or not library_id:
+            return jsonify({'success': False, 'error': 'Filename and Library ID required'}), 400
         
-        image_path = os.path.join('/data', filename)
-        if not os.path.exists(image_path):
-            return jsonify({'success': False, 'error': 'Image file not found'}), 404
+        # Validate the mapping
+        valid, message = mapping_manager.validate_mapping(filename, library_id)
+        if not valid:
+            return jsonify({'success': False, 'error': message}), 400
         
-        success, result = library_manager.upload_image_to_lumaprints(image_path, filename)
+        success, result = mapping_manager.add_mapping(filename, library_id, library_name)
         
         if success:
             return jsonify({
                 'success': True,
-                'library_id': result,
-                'message': f'Successfully uploaded {filename} to Lumaprints library'
+                'message': result
             })
         else:
             return jsonify({
                 'success': False,
                 'error': result
-            }), 500
+            }), 400
             
     except Exception as e:
         return jsonify({
@@ -2033,24 +2042,52 @@ def sync_image_to_lumaprints():
             'error': str(e)
         }), 500
 
-@app.route('/api/lumaprints/sync-all', methods=['POST'])
-def sync_all_images_to_lumaprints():
-    """Sync all missing images to Lumaprints library"""
+@app.route('/api/lumaprints/remove-mapping', methods=['POST'])
+def remove_lumaprints_mapping():
+    """Remove mapping for a gallery image"""
     try:
-        from lumaprints_library import LumaprintsLibrary
-        library_manager = LumaprintsLibrary()
+        from lumaprints_mapping import LumaprintsMapping
+        mapping_manager = LumaprintsMapping()
         
-        results = library_manager.bulk_upload_missing_images()
+        data = request.get_json()
+        filename = data.get('filename')
         
-        successful_uploads = [r for r in results if r['success']]
-        failed_uploads = [r for r in results if not r['success']]
+        if not filename:
+            return jsonify({'success': False, 'error': 'Filename required'}), 400
+        
+        success, result = mapping_manager.remove_mapping(filename)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': result
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': result
+            }), 400
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/lumaprints/mapping-status')
+def get_lumaprints_mapping_status():
+    """Get mapping status for all gallery images"""
+    try:
+        from lumaprints_mapping import LumaprintsMapping
+        mapping_manager = LumaprintsMapping()
+        
+        mapping_status = mapping_manager.get_mapping_status_for_all_images()
+        stats = mapping_manager.get_mapping_stats()
         
         return jsonify({
             'success': True,
-            'synced_count': len(successful_uploads),
-            'failed_count': len(failed_uploads),
-            'results': results,
-            'message': f'Synced {len(successful_uploads)} images successfully'
+            'mapping_status': mapping_status,
+            'stats': stats
         })
         
     except Exception as e:
@@ -2059,19 +2096,18 @@ def sync_all_images_to_lumaprints():
             'error': str(e)
         }), 500
 
-@app.route('/api/lumaprints/sync-status')
-def get_lumaprints_sync_status():
-    """Get sync status for all gallery images"""
+@app.route('/api/lumaprints/export-mapping')
+def export_lumaprints_mapping():
+    """Export mapping data as JSON file"""
     try:
-        from lumaprints_library import LumaprintsLibrary
-        library_manager = LumaprintsLibrary()
+        from lumaprints_mapping import LumaprintsMapping
+        mapping_manager = LumaprintsMapping()
         
-        sync_status = library_manager.get_sync_status_for_all_images()
+        export_data = mapping_manager.export_mapping_data()
         
-        return jsonify({
-            'success': True,
-            'sync_status': sync_status
-        })
+        response = jsonify(export_data)
+        response.headers['Content-Disposition'] = 'attachment; filename=lumaprints_mapping.json'
+        return response
         
     except Exception as e:
         return jsonify({
