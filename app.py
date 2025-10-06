@@ -1013,69 +1013,100 @@ def version():
 
 @app.route('/backup')
 def create_backup():
-    """Create comprehensive backup via URL - USING ZIP FOR RELIABILITY"""
-    try:
-        import zipfile
-        import tempfile
-        import os
-        from datetime import datetime
-        
-        # Create temporary directory for backup
-        temp_dir = tempfile.mkdtemp()
-        backup_filename = f"portfolio_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
-        backup_path = os.path.join(temp_dir, backup_filename)
-        
-        # Get the project root directory
-        project_root = os.path.dirname(os.path.abspath(__file__))
-        
-        # Create ZIP file (more reliable than TAR.GZ for web downloads)
-        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            # Add all source code files
-            source_files = ['app.py', 'requirements.txt', 'README.md', 'backup.py', 'Procfile']
-            for file in source_files:
-                file_path = os.path.join(project_root, file)
-                if os.path.exists(file_path):
-                    zipf.write(file_path, file)
-            
-            # Add templates directory
-            templates_dir = os.path.join(project_root, 'templates')
-            if os.path.exists(templates_dir):
-                for root, dirs, files in os.walk(templates_dir):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        arcname = os.path.relpath(file_path, project_root)
-                        zipf.write(file_path, arcname)
-            
-            # Add static directory
-            static_dir = os.path.join(project_root, 'static')
-            if os.path.exists(static_dir):
-                for root, dirs, files in os.walk(static_dir):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        arcname = os.path.relpath(file_path, project_root)
-                        zipf.write(file_path, arcname)
-            
-            # Add data directory (all data files and uploaded images)
-            if os.path.exists('/data'):
-                for root, dirs, files in os.walk('/data'):
-                    for file in files:
-                        file_path = os.path.join(root, file)
-                        arcname = os.path.relpath(file_path, '/')
-                        zipf.write(file_path, arcname)
-        
-        # Verify the backup file exists and has content
-        if not os.path.exists(backup_path) or os.path.getsize(backup_path) == 0:
-            raise Exception("Backup file was not created properly")
-        
-        return send_file(
-            backup_path, 
-            as_attachment=True, 
-            download_name=backup_filename,
-            mimetype='application/zip'
-        )
+    """COMPLETELY REWRITTEN BACKUP SYSTEM"""
+    import subprocess
+    import tempfile
+    import os
+    from datetime import datetime
+    from flask import Response
     
+    try:
+        # Create timestamp for filename
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_filename = f"portfolio_backup_{timestamp}.tar.gz"
+        
+        # Create temporary file
+        temp_fd, temp_path = tempfile.mkstemp(suffix='.tar.gz')
+        os.close(temp_fd)
+        
+        # Use system tar command for reliable compression
+        cmd = [
+            'tar', 
+            '--create',
+            '--gzip', 
+            '--file', temp_path,
+            '--directory', '/',
+            'app/app.py',
+            'app/requirements.txt', 
+            'app/templates',
+            'app/static',
+            'data'
+        ]
+        
+        # Execute tar command
+        result = subprocess.run(cmd, capture_output=True, text=True, cwd='/')
+        
+        if result.returncode != 0:
+            # Fallback to Python implementation
+            import tarfile
+            
+            with tarfile.open(temp_path, 'w:gz') as tar:
+                # Add project files
+                project_root = os.path.dirname(os.path.abspath(__file__))
+                
+                # Add main files
+                for filename in ['app.py', 'requirements.txt']:
+                    filepath = os.path.join(project_root, filename)
+                    if os.path.exists(filepath):
+                        tar.add(filepath, arcname=filename)
+                
+                # Add directories
+                for dirname in ['templates', 'static']:
+                    dirpath = os.path.join(project_root, dirname)
+                    if os.path.exists(dirpath):
+                        tar.add(dirpath, arcname=dirname)
+                
+                # Add data directory
+                if os.path.exists('/data'):
+                    tar.add('/data', arcname='data')
+        
+        # Check if file was created successfully
+        if not os.path.exists(temp_path) or os.path.getsize(temp_path) < 1000:
+            raise Exception("Backup file creation failed")
+        
+        # Read file and create response
+        def generate():
+            with open(temp_path, 'rb') as f:
+                while True:
+                    chunk = f.read(8192)
+                    if not chunk:
+                        break
+                    yield chunk
+            # Clean up temp file
+            try:
+                os.unlink(temp_path)
+            except:
+                pass
+        
+        response = Response(
+            generate(),
+            mimetype='application/gzip',
+            headers={
+                'Content-Disposition': f'attachment; filename="{backup_filename}"',
+                'Content-Type': 'application/gzip'
+            }
+        )
+        
+        return response
+        
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        # Clean up on error
+        try:
+            if 'temp_path' in locals():
+                os.unlink(temp_path)
+        except:
+            pass
+        return f"Backup failed: {str(e)}", 500
 
 
 def extract_exif_data(image_path):
