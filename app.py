@@ -1023,24 +1023,25 @@ def create_backup():
     try:
         # Create timestamp for filename
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        backup_filename = f"portfolio_backup_{timestamp}.tar.gz"
+        backup_filename = f"portfolio_backup_{timestamp}.tar"
         
         # Create temporary file
-        temp_fd, temp_path = tempfile.mkstemp(suffix='.tar.gz')
+        temp_fd, temp_path = tempfile.mkstemp(suffix='.tar')
         os.close(temp_fd)
         
-        # Use system tar command for reliable compression
+        # Get the actual project directory
+        project_root = os.path.dirname(os.path.abspath(__file__))
+        
+        # Use system tar command WITHOUT compression and correct paths
         cmd = [
             'tar', 
             '--create',
-            '--gzip', 
             '--file', temp_path,
-            '--directory', '/',
-            'app/app.py',
-            'app/requirements.txt', 
-            'app/templates',
-            'app/static',
-            'data'
+            '--directory', project_root,
+            'app.py',
+            'requirements.txt', 
+            'templates',
+            'static'
         ]
         
         # Execute tar command
@@ -1050,7 +1051,7 @@ def create_backup():
             # Fallback to Python implementation
             import tarfile
             
-            with tarfile.open(temp_path, 'w:gz') as tar:
+            with tarfile.open(temp_path, 'w') as tar:
                 # Add project files
                 project_root = os.path.dirname(os.path.abspath(__file__))
                 
@@ -1065,10 +1066,6 @@ def create_backup():
                     dirpath = os.path.join(project_root, dirname)
                     if os.path.exists(dirpath):
                         tar.add(dirpath, arcname=dirname)
-                
-                # Add data directory
-                if os.path.exists('/data'):
-                    tar.add('/data', arcname='data')
         
         # Check if file was created successfully
         if not os.path.exists(temp_path) or os.path.getsize(temp_path) < 1000:
@@ -1090,10 +1087,10 @@ def create_backup():
         
         response = Response(
             generate(),
-            mimetype='application/gzip',
+            mimetype='application/x-tar',
             headers={
                 'Content-Disposition': f'attachment; filename="{backup_filename}"',
-                'Content-Type': 'application/gzip'
+                'Content-Type': 'application/x-tar'
             }
         )
         
