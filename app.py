@@ -2496,7 +2496,7 @@ def upload_product_thumbnail():
         }), 500
 
 @app.route('/api/delete-product-thumbnail/<path:product_path>', methods=['DELETE'])
-def delete_product_thumbnail(product_path):
+def delete_product_thumbnail_by_path(product_path):
     """Delete a product thumbnail"""
     try:
         # Convert path to filename
