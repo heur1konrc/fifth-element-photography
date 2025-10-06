@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Thumbnail Management - Fifth Element Photography</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_new.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_products.css') }}">
+    <link rel="stylesheet" href="/static/css/admin_new.css">
+    <link rel="stylesheet" href="/static/css/admin_products.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -18,11 +18,11 @@
                     Product Thumbnail Management
                 </h1>
                 <div class="header-actions">
-                    <a href="{{ url_for('admin_new') }}" class="btn btn-outline">
+                    <a href="/admin" class="btn btn-outline">
                         <i class="fas fa-arrow-left"></i>
                         Back to Admin
                     </a>
-                    <a href="{{ url_for('index') }}" class="btn btn-outline">
+                    <a href="/" class="btn btn-outline">
                         <i class="fas fa-external-link-alt"></i>
                         View Website
                     </a>
@@ -198,6 +198,6 @@
         };
     </script>
 
-    <script src="{{ url_for('static', filename='js/admin_products.js') }}"></script>
+    <script src="/static/js/admin_products.js"></script>
 </body>
 </html>
