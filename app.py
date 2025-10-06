@@ -395,6 +395,24 @@ def api_images():
     images = scan_images()
     return jsonify(images)
 
+@app.route('/order-print/<image_id>')
+def order_print(image_id):
+    """Dedicated Lumaprints order page"""
+    images = scan_images()
+    
+    # Find the specific image
+    selected_image = None
+    for image in images:
+        if image['filename'] == image_id or str(image.get('id', '')) == image_id:
+            selected_image = image
+            break
+    
+    if not selected_image:
+        # If image not found, redirect to main page
+        return redirect(url_for('index'))
+    
+    return render_template('order_print.html', image=selected_image)
+
 @app.route('/images/<filename>')
 def serve_image(filename):
     """Serve images from /data directory"""

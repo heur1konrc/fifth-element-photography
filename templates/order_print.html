@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Print - {{ image.title or image.filename }} | Fifth Element Photography</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Order professional prints of {{ image.title or image.filename }} from Fifth Element Photography">
+    <meta name="keywords" content="photography prints, canvas prints, fine art prints, professional photography">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Order Print - {{ image.title or image.filename }}">
+    <meta property="og:description" content="Order professional prints from Fifth Element Photography">
+    <meta property="og:image" content="{{ url_for('serve_image', filename=image.filename) }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/order_print.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="order-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <a href="{{ url_for('index') }}" class="back-link">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to Gallery
+                </a>
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Fifth Element Photography" class="logo-img">
+                </div>
+            </div>
+            <h1 class="page-title">Order Print</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="order-main">
+        <!-- Lumaprints-Style Interface Container -->
+        <div class="lumaprints-container">
+            
+            <!-- Left Sidebar - Categories & Steps -->
+            <aside class="lumaprints-sidebar">
+                <!-- Image Preview -->
+                <div class="image-preview-section">
+                    <div class="preview-image">
+                        <img src="{{ url_for('serve_image', filename=image.filename) }}" 
+                             alt="{{ image.title or image.filename }}" 
+                             class="preview-img">
+                    </div>
+                    <div class="image-info">
+                        <h3 class="image-title">{{ image.title or image.filename }}</h3>
+                        <p class="image-category">{{ image.category|title }}</p>
+                    </div>
+                </div>
+
+                <!-- Steps Navigation -->
+                <div class="steps-navigation">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Select Product</div>
+                            <div class="step-description">Choose your print type</div>
+                        </div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Select Size</div>
+                            <div class="step-description">Choose dimensions</div>
+                        </div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Select Options</div>
+                            <div class="step-description">Quantity & details</div>
+                        </div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Order Details</div>
+                            <div class="step-description">Review & checkout</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Categories -->
+                <div class="product-categories">
+                    <h4 class="categories-title">Product Categories</h4>
+                    <div class="category-list">
+                        <div class="category-item active" data-category="canvas">
+                            <div class="category-icon">🖼️</div>
+                            <span class="category-name">Canvas</span>
+                        </div>
+                        <div class="category-item" data-category="framed-canvas">
+                            <div class="category-icon">🖼️</div>
+                            <span class="category-name">Framed Canvas</span>
+                        </div>
+                        <div class="category-item" data-category="fine-art-paper">
+                            <div class="category-icon">📄</div>
+                            <span class="category-name">Fine Art Paper</span>
+                        </div>
+                        <div class="category-item" data-category="foam-mounted">
+                            <div class="category-icon">📋</div>
+                            <span class="category-name">Foam Mounted Print</span>
+                        </div>
+                        <div class="category-item" data-category="framed-fine-art">
+                            <div class="category-icon">🖼️</div>
+                            <span class="category-name">Framed Fine Art Paper</span>
+                        </div>
+                        <div class="category-item" data-category="metal">
+                            <div class="category-icon">⚡</div>
+                            <span class="category-name">Metal</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Panel - Product Selection -->
+            <section class="lumaprints-main-panel">
+                
+                <!-- Step 1: Product Selection -->
+                <div class="step-content-panel active" data-step="1">
+                    <div class="panel-header">
+                        <h2>Select Product Type</h2>
+                        <p>Choose from our premium print options</p>
+                    </div>
+
+                    <!-- Canvas Products -->
+                    <div class="product-category-section active" data-category="canvas">
+                        <h3 class="category-section-title">Canvas Products</h3>
+                        <div class="products-grid">
+                            <div class="product-option" data-product="101001">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview canvas-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>Canvas Print (0.75")</h4>
+                                    <p>Gallery wrapped canvas with 0.75" depth</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Museum quality</span>
+                                        <span class="feature">• Ready to hang</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                            <div class="product-option" data-product="101002">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview canvas-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>Canvas Print (1.25")</h4>
+                                    <p>Gallery wrapped canvas with 1.25" depth</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Premium thickness</span>
+                                        <span class="feature">• Professional finish</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                            <div class="product-option" data-product="101003">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview canvas-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>Canvas Print (1.50")</h4>
+                                    <p>Gallery wrapped canvas with 1.50" depth</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Maximum depth</span>
+                                        <span class="feature">• Gallery quality</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                            <div class="product-option" data-product="101004">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview canvas-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>Rolled Canvas</h4>
+                                    <p>Canvas print rolled for shipping</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Cost effective</span>
+                                        <span class="feature">• Custom framing</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Framed Canvas Products -->
+                    <div class="product-category-section" data-category="framed-canvas">
+                        <h3 class="category-section-title">Framed Canvas Products</h3>
+                        <div class="products-grid">
+                            <div class="product-option" data-product="102001">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview framed-canvas-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>1.50" Maple Wood Floating Frame</h4>
+                                    <p>Natural maple wood floating frame</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Natural wood finish</span>
+                                        <span class="feature">• Floating effect</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                            <div class="product-option" data-product="102002">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview framed-canvas-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>1.50" Espresso Floating Frame</h4>
+                                    <p>Rich espresso wood floating frame</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Dark wood finish</span>
+                                        <span class="feature">• Elegant appearance</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                            <div class="product-option" data-product="102003">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview framed-canvas-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>1.50" Natural Wood Floating Frame</h4>
+                                    <p>Natural wood floating frame</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Natural finish</span>
+                                        <span class="feature">• Versatile style</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                            <div class="product-option" data-product="102008">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview framed-canvas-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>1.50" Black Floating Frame</h4>
+                                    <p>Sleek black floating frame</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Modern black finish</span>
+                                        <span class="feature">• Contemporary style</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fine Art Paper Products -->
+                    <div class="product-category-section" data-category="fine-art-paper">
+                        <h3 class="category-section-title">Fine Art Paper Products</h3>
+                        <div class="products-grid">
+                            <div class="product-option" data-product="103001">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview paper-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>Fine Art Paper</h4>
+                                    <p>Premium archival fine art paper</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Archival quality</span>
+                                        <span class="feature">• Museum grade</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metal Products -->
+                    <div class="product-category-section" data-category="metal">
+                        <h3 class="category-section-title">Metal Products</h3>
+                        <div class="products-grid">
+                            <div class="product-option" data-product="106001">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview metal-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>Metal Print - Glossy</h4>
+                                    <p>Vibrant metal print with glossy finish</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Vibrant colors</span>
+                                        <span class="feature">• Durable finish</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                            <div class="product-option" data-product="106002">
+                                <div class="product-thumbnail">
+                                    <div class="product-preview metal-preview"></div>
+                                </div>
+                                <div class="product-info">
+                                    <h4>Metal Print - Matte</h4>
+                                    <p>Elegant metal print with matte finish</p>
+                                    <div class="product-features">
+                                        <span class="feature">• Subtle finish</span>
+                                        <span class="feature">• No glare</span>
+                                    </div>
+                                </div>
+                                <button class="btn-select-product">Select Product</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Size Selection -->
+                <div class="step-content-panel" data-step="2">
+                    <div class="panel-header">
+                        <h2>Select Size</h2>
+                        <p>Choose the perfect size for your space</p>
+                    </div>
+                    <div class="sizes-grid" id="sizesGrid">
+                        <!-- Sizes will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Step 3: Options -->
+                <div class="step-content-panel" data-step="3">
+                    <div class="panel-header">
+                        <h2>Select Options</h2>
+                        <p>Customize your order</p>
+                    </div>
+                    <div class="options-section">
+                        <div class="quantity-section">
+                            <label for="quantity">Quantity:</label>
+                            <div class="quantity-controls">
+                                <button type="button" class="qty-btn" id="qtyMinus">-</button>
+                                <input type="number" id="quantity" value="1" min="1" max="10">
+                                <button type="button" class="qty-btn" id="qtyPlus">+</button>
+                            </div>
+                        </div>
+                        <div class="price-display" id="priceDisplay">
+                            <div class="price-info">
+                                <span>Select product and size to see pricing</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Order Summary -->
+                <div class="step-content-panel" data-step="4">
+                    <div class="panel-header">
+                        <h2>Order Summary</h2>
+                        <p>Review your order details</p>
+                    </div>
+                    <div class="order-summary" id="orderSummary">
+                        <!-- Order summary will be populated by JavaScript -->
+                    </div>
+                    <div class="order-actions">
+                        <button class="btn-continue" id="continueOrderBtn" disabled>
+                            Select Product & Size
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/lumaprints_pricing.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/order_print.js') }}"></script>
+</body>
+</html>

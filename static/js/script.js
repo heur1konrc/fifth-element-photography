@@ -523,5 +523,23 @@ let lumaprintsOrdering = null;
 
 // Initialize Lumaprints when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Order Print functionality is now handled by lumaprints_inline_ordering.js
+    // Handle Order Print button clicks - redirect to dedicated page
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#orderPrintBtn')) {
+            e.preventDefault();
+            
+            // Get current image filename from modal
+            const modalImage = document.getElementById('modalImage');
+            if (modalImage && modalImage.src) {
+                // Extract filename from the image src
+                const imageSrc = modalImage.src;
+                const filename = imageSrc.split('/').pop();
+                
+                // Redirect to order print page
+                window.location.href = `/order-print/${filename}`;
+            } else {
+                alert('Please select an image first.');
+            }
+        }
+    });
 });
