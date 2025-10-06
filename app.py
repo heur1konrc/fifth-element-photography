@@ -7,6 +7,10 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from werkzeug.utils import secure_filename
+import uuid
+
+# Lumaprints integration imports
+from lumaprints_api import get_lumaprints_client, get_pricing_calculator
 
 app = Flask(__name__)
 
@@ -47,6 +51,13 @@ STATIC_FOLDER = 'static'
 CATEGORIES_FILE = '/data/categories.json'
 FEATURED_FILE = '/data/featured.json'
 ABOUT_FILE = '/data/about.json'
+
+# Lumaprints configuration
+ORDERS_FILE = '/data/lumaprints_orders.json'
+LUMAPRINTS_CATALOG_FILE = os.path.join(os.path.dirname(__file__), 'lumaprints_catalog.json')
+
+# Initialize Lumaprints pricing calculator with 100% markup
+pricing_calc = get_pricing_calculator(markup_percentage=100.0, sandbox=True)
 
 # SMTP Configuration
 SMTP_SERVER = 'smtp.gmail.com'
@@ -708,35 +719,72 @@ def add_to_slideshow(filename):
 
 @app.route('/backup_system', methods=['POST'])
 def backup_system():
-    """Create system backup"""
+    """Create comprehensive system backup - FIXED VERSION"""
     try:
-        import zipfile
+        import tarfile
         import tempfile
         from datetime import datetime
         
-        # Create temporary zip file
+        # Create temporary directory for backup
         temp_dir = tempfile.mkdtemp()
-        backup_filename = f"portfolio_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+        backup_filename = f"portfolio_complete_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.tar.gz"
         backup_path = os.path.join(temp_dir, backup_filename)
         
-        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            # Add all images
-            for root, dirs, files in os.walk(IMAGES_FOLDER):
-                for file in files:
-                    if file.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')):
-                        file_path = os.path.join(root, file)
-                        arcname = os.path.relpath(file_path, IMAGES_FOLDER)
-                        zipf.write(file_path, arcname)
-            
-            # Add configuration files
-            config_files = [CATEGORIES_FILE, FEATURED_FILE, ABOUT_FILE, '/data/image_categories.json']
-            for config_file in config_files:
-                if os.path.exists(config_file):
-                    zipf.write(config_file, os.path.basename(config_file))
+        # Get the project root directory
+        project_root = os.path.dirname(os.path.abspath(__file__))
         
-        return send_file(backup_path, as_attachment=True, download_name=backup_filename)
+        with tarfile.open(backup_path, 'w:gz') as tar:
+            # Add ALL source code files
+            source_files = ['app.py', 'requirements.txt', 'README.md', 'backup.py', 'Procfile']
+            for file in source_files:
+                file_path = os.path.join(project_root, file)
+                if os.path.exists(file_path):
+                    print(f"Adding source file: {file}")
+                    tar.add(file_path, arcname=file)
+            
+            # Add templates directory (ALL templates)
+            templates_dir = os.path.join(project_root, 'templates')
+            if os.path.exists(templates_dir):
+                print(f"Adding templates directory: {templates_dir}")
+                tar.add(templates_dir, arcname='templates')
+            
+            # Add static directory (CSS, JS, images, etc.)
+            static_dir = os.path.join(project_root, 'static')
+            if os.path.exists(static_dir):
+                print(f"Adding static directory: {static_dir}")
+                tar.add(static_dir, arcname='static')
+            
+            # Add data directory (ALL data files and uploaded images)
+            if os.path.exists('/data'):
+                print(f"Adding data directory: /data")
+                tar.add('/data', arcname='data')
+                
+            # Add any additional Python files in root
+            for file in os.listdir(project_root):
+                if file.endswith('.py') and file not in ['app.py', 'backup.py']:
+                    file_path = os.path.join(project_root, file)
+                    if os.path.isfile(file_path):
+                        print(f"Adding Python file: {file}")
+                        tar.add(file_path, arcname=file)
+            
+            # Add any JSON configuration files
+            for file in os.listdir(project_root):
+                if file.endswith('.json'):
+                    file_path = os.path.join(project_root, file)
+                    if os.path.isfile(file_path):
+                        print(f"Adding JSON file: {file}")
+                        tar.add(file_path, arcname=file)
+        
+        # Verify the backup was created successfully
+        if os.path.exists(backup_path) and os.path.getsize(backup_path) > 0:
+            print(f"Backup created successfully: {backup_path} ({os.path.getsize(backup_path)} bytes)")
+            return send_file(backup_path, as_attachment=True, download_name=backup_filename, mimetype='application/gzip')
+        else:
+            raise Exception("Backup file was not created or is empty")
+    
     except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+        print(f"Backup error: {str(e)}")
+        return jsonify({'success': False, 'message': f'Backup failed: {str(e)}'}), 500
 
 # New routes for admin interface functionality
 @app.route('/delete_image/<filename>', methods=['POST'])
@@ -1000,47 +1048,7 @@ def version():
     """Version endpoint - JS fixes applied"""
     return jsonify({'version': '1.2', 'status': 'JS fixes applied'})
 
-@app.route('/backup')
-def create_backup():
-    """Create comprehensive backup via URL - ADDED FOR BACKUP ONLY"""
-    try:
-        import tarfile
-        import tempfile
-        
-        # Create temporary directory for backup
-        temp_dir = tempfile.mkdtemp()
-        backup_filename = f"portfolio_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.tar.gz"
-        backup_path = os.path.join(temp_dir, backup_filename)
-        
-        # Get the project root directory
-        project_root = os.path.dirname(os.path.abspath(__file__))
-        
-        with tarfile.open(backup_path, 'w:gz') as tar:
-            # Add all source code files
-            source_files = ['app.py', 'requirements.txt', 'README.md', 'backup.py', 'Procfile']
-            for file in source_files:
-                file_path = os.path.join(project_root, file)
-                if os.path.exists(file_path):
-                    tar.add(file_path, arcname=file)
-            
-            # Add templates directory
-            templates_dir = os.path.join(project_root, 'templates')
-            if os.path.exists(templates_dir):
-                tar.add(templates_dir, arcname='templates')
-            
-            # Add static directory (CSS, JS, images)
-            static_dir = os.path.join(project_root, 'static')
-            if os.path.exists(static_dir):
-                tar.add(static_dir, arcname='static')
-            
-            # Add data directory (all data files and uploaded images)
-            if os.path.exists('/data'):
-                tar.add('/data', arcname='data')
-        
-        return send_file(backup_path, as_attachment=True, download_name=backup_filename, mimetype='application/gzip')
-    
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# REMOVED CONFLICTING BACKUP ROUTE - Now using single comprehensive backup_system route
 
 
 def extract_exif_data(image_path):
@@ -1516,6 +1524,371 @@ def contact():
     except Exception as e:
         print(f"Error processing contact form: {e}")
         return jsonify({'success': False, 'error': 'An error occurred. Please try again later.'}), 500
+
+# ============================================================================
+# LUMAPRINTS PRINT ORDERING ROUTES
+# ============================================================================
+
+def load_lumaprints_catalog():
+    """Load the Lumaprints product catalog"""
+    try:
+        with open(LUMAPRINTS_CATALOG_FILE, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"categories": [], "subcategories": {}, "options": {}, "stores": []}
+
+def load_orders():
+    """Load orders from JSON file"""
+    try:
+        with open(ORDERS_FILE, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+def save_orders(orders):
+    """Save orders to JSON file"""
+    with open(ORDERS_FILE, 'w') as f:
+        json.dump(orders, f, indent=2)
+
+@app.route('/api/lumaprints/catalog')
+def get_lumaprints_catalog():
+    """Get the complete Lumaprints product catalog"""
+    try:
+        catalog = load_lumaprints_catalog()
+        return jsonify({
+            'success': True,
+            'catalog': catalog
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/lumaprints/categories')
+def get_lumaprints_categories():
+    """Get available product categories"""
+    try:
+        catalog = load_lumaprints_catalog()
+        return jsonify({
+            'success': True,
+            'categories': catalog.get('categories', [])
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/lumaprints/subcategories/<int:category_id>')
+def get_lumaprints_subcategories(category_id):
+    """Get subcategories for a specific category"""
+    try:
+        catalog = load_lumaprints_catalog()
+        subcategories = catalog.get('subcategories', {}).get(str(category_id), [])
+        return jsonify({
+            'success': True,
+            'subcategories': subcategories
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/lumaprints/pricing', methods=['POST'])
+def get_lumaprints_pricing():
+    """Calculate pricing for a specific product configuration"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['subcategoryId', 'width', 'height']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }), 400
+        
+        subcategory_id = data['subcategoryId']
+        width = float(data['width'])
+        height = float(data['height'])
+        quantity = int(data.get('quantity', 1))
+        options = data.get('options', [])
+        
+        # Calculate pricing
+        pricing_result = pricing_calc.calculate_retail_price(
+            subcategory_id=subcategory_id,
+            width=width,
+            height=height,
+            quantity=quantity,
+            options=options if options else None
+        )
+        
+        if 'error' in pricing_result:
+            return jsonify({
+                'success': False,
+                'error': pricing_result['error']
+            }), 500
+        
+        # Format response
+        response = {
+            'success': True,
+            'pricing': {
+                'subcategoryId': subcategory_id,
+                'width': width,
+                'height': height,
+                'quantity': quantity,
+                'options': options,
+                'wholesale_price': pricing_result['wholesale_price'],
+                'markup_percentage': pricing_result['markup_percentage'],
+                'markup_amount': pricing_result['markup_amount'],
+                'retail_price': pricing_result['retail_price'],
+                'price_per_item': pricing_result['price_per_item'],
+                'formatted_price': f"${pricing_result['retail_price']:.2f}",
+                'formatted_price_per_item': f"${pricing_result['price_per_item']:.2f}"
+            }
+        }
+        
+        return jsonify(response)
+        
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'error': f'Invalid data format: {str(e)}'
+        }), 400
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/order-print')
+def order_print_form():
+    """Display the order form for a specific product configuration"""
+    try:
+        # Get parameters from query string
+        image_filename = request.args.get('image', '')
+        image_title = request.args.get('title', 'Untitled')
+        subcategory_id = int(request.args.get('subcategory_id', 0))
+        width = float(request.args.get('width', 0))
+        height = float(request.args.get('height', 0))
+        quantity = int(request.args.get('quantity', 1))
+        price = float(request.args.get('price', 0))
+        options = request.args.get('options', '[]')
+        
+        # Parse options
+        try:
+            options = json.loads(options)
+        except:
+            options = []
+        
+        # Validate required parameters
+        if not all([image_filename, subcategory_id, width, height, price]):
+            return "Missing required parameters", 400
+        
+        # Load catalog to get product names
+        catalog = load_lumaprints_catalog()
+        
+        # Find product and subcategory names
+        product_name = "Unknown Product"
+        size_name = "Custom Size"
+        
+        for category in catalog['categories']:
+            subcategories = catalog['subcategories'].get(str(category['id']), [])
+            for subcat in subcategories:
+                if subcat['subcategoryId'] == subcategory_id:
+                    product_name = category['name']
+                    size_name = subcat['name']
+                    break
+        
+        # Construct image URL
+        image_url = f"/static/assets/{image_filename}"
+        
+        # Render order form
+        return render_template('lumaprints_order_form.html',
+            image_url=image_url,
+            image_title=image_title,
+            product_name=product_name,
+            size_name=size_name,
+            width=width,
+            height=height,
+            quantity=quantity,
+            formatted_price=f"${price:.2f}",
+            subcategory_id=subcategory_id,
+            options=options,
+            price=price
+        )
+        
+    except Exception as e:
+        return f"Error loading order form: {str(e)}", 500
+
+@app.route('/api/lumaprints/submit-order', methods=['POST'])
+def submit_lumaprints_order():
+    """Submit an order to Lumaprints and store locally"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['subcategoryId', 'width', 'height', 'quantity', 'imageUrl', 'price', 'shipping', 'payment']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }), 400
+        
+        # Generate order ID
+        order_id = str(uuid.uuid4())[:8].upper()
+        
+        # Create order record
+        order_record = {
+            'orderId': order_id,
+            'timestamp': datetime.now().isoformat(),
+            'status': 'pending',
+            'product': {
+                'subcategoryId': data['subcategoryId'],
+                'width': data['width'],
+                'height': data['height'],
+                'quantity': data['quantity'],
+                'options': data.get('options', [])
+            },
+            'image': {
+                'url': data['imageUrl'],
+                'filename': os.path.basename(data['imageUrl'])
+            },
+            'pricing': {
+                'total': data['price']
+            },
+            'shipping': data['shipping'],
+            'payment': data['payment'],
+            'lumaprints': {
+                'orderId': None,
+                'status': None,
+                'submitted': False
+            }
+        }
+        
+        # Store order locally
+        orders = load_orders()
+        orders[order_id] = order_record
+        save_orders(orders)
+        
+        # Submit to Lumaprints API
+        try:
+            api = get_lumaprints_client(sandbox=True)
+            
+            # Convert local image URL to full URL
+            image_url = data['imageUrl']
+            if image_url.startswith('/static/'):
+                # Convert to full URL
+                image_url = f"https://fifth-element-photography-production.up.railway.app{image_url}"
+            
+            # Prepare Lumaprints order payload
+            lumaprints_payload = {
+                "externalId": order_id,
+                "storeId": "20027",  # Your store ID from catalog
+                "shippingMethod": "default",
+                "productionTime": "regular",
+                "recipient": {
+                    "firstName": data['shipping']['firstName'],
+                    "lastName": data['shipping']['lastName'],
+                    "addressLine1": data['shipping']['addressLine1'],
+                    "addressLine2": data['shipping'].get('addressLine2', ''),
+                    "city": data['shipping']['city'],
+                    "state": data['shipping']['state'],
+                    "zipCode": data['shipping']['zipCode'],
+                    "country": data['shipping']['country'],
+                    "phone": data['shipping'].get('phone', ''),
+                    "company": ""
+                },
+                "orderItems": [{
+                    "externalItemId": f"{order_id}-1",
+                    "subcategoryId": data['subcategoryId'],
+                    "quantity": data['quantity'],
+                    "width": data['width'],
+                    "height": data['height'],
+                    "file": {
+                        "imageUrl": image_url
+                    },
+                    "orderItemOptions": data.get('options', []),
+                    "solidColorHexCode": None
+                }]
+            }
+            
+            # Submit order to Lumaprints
+            lumaprints_response = api.submit_order(lumaprints_payload)
+            
+            # Update order record with Lumaprints response
+            order_record['lumaprints'] = {
+                'orderId': lumaprints_response.get('orderId'),
+                'status': lumaprints_response.get('status'),
+                'submitted': True,
+                'response': lumaprints_response
+            }
+            order_record['status'] = 'submitted'
+            
+            # Save updated order
+            orders[order_id] = order_record
+            save_orders(orders)
+            
+        except Exception as lumaprints_error:
+            # Log the error but don't fail the order
+            print(f"Lumaprints submission error: {lumaprints_error}")
+            order_record['lumaprints']['error'] = str(lumaprints_error)
+            order_record['status'] = 'payment_received'
+            
+            # Save order with error
+            orders[order_id] = order_record
+            save_orders(orders)
+        
+        return jsonify({
+            'success': True,
+            'orderId': order_id,
+            'message': 'Order submitted successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/order-confirmation/<order_id>')
+def order_confirmation(order_id):
+    """Display order confirmation page"""
+    try:
+        orders = load_orders()
+        order = orders.get(order_id)
+        
+        if not order:
+            return "Order not found", 404
+        
+        return render_template('order_confirmation.html', order=order)
+        
+    except Exception as e:
+        return f"Error loading order confirmation: {str(e)}", 500
+
+@app.route('/admin/orders')
+def admin_orders():
+    """Admin page to view all orders"""
+    try:
+        orders = load_orders()
+        
+        # Sort orders by timestamp (newest first)
+        sorted_orders = sorted(orders.items(), 
+                             key=lambda x: x[1]['timestamp'], 
+                             reverse=True)
+        
+        return render_template('admin_orders.html', orders=sorted_orders)
+        
+    except Exception as e:
+        return f"Error loading orders: {str(e)}", 500
+
+# ============================================================================
+# END LUMAPRINTS ROUTES
+# ============================================================================
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
