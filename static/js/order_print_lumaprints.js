@@ -108,12 +108,39 @@ class LumaprintsOrderInterface {
             105: {
                 name: 'Framed Fine Art Paper',
                 subcategories: [
+                    // 0.875in Frame Options - All Colors
                     { id: 105001, name: '0.875in Black Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
                     { id: 105002, name: '0.875in White Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
                     { id: 105003, name: '0.875in Oak Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105004, name: '0.875in Walnut Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105008, name: '0.875in Espresso Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105009, name: '0.875in Silver Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105010, name: '0.875in Gold Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105011, name: '0.875in Natural Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105012, name: '0.875in Maple Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105013, name: '0.875in Cherry Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    
+                    // 1.25in Frame Options - All Colors  
                     { id: 105005, name: '1.25in Black Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
                     { id: 105006, name: '1.25in White Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105007, name: '1.25in Oak Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 }
+                    { id: 105007, name: '1.25in Oak Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105014, name: '1.25in Walnut Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105015, name: '1.25in Espresso Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105016, name: '1.25in Silver Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105017, name: '1.25in Gold Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105018, name: '1.25in Natural Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105019, name: '1.25in Maple Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105020, name: '1.25in Cherry Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    
+                    // 1.75in Frame Options - All Colors
+                    { id: 105021, name: '1.75in Black Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105022, name: '1.75in White Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105023, name: '1.75in Oak Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105024, name: '1.75in Walnut Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105025, name: '1.75in Espresso Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105026, name: '1.75in Silver Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105027, name: '1.75in Gold Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105028, name: '1.75in Natural Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 }
                 ]
             },
             // Metal Category (ID: 106)
