@@ -1,0 +1,38 @@
+{
+  "categories": [
+    {
+      "id": 101,
+      "name": "Canvas"
+    },
+    {
+      "id": 102,
+      "name": "Framed Canvas"
+    },
+    {
+      "id": 103,
+      "name": "Fine Art Paper"
+    },
+    {
+      "id": 105,
+      "name": "Framed Fine Art Paper"
+    },
+    {
+      "id": 106,
+      "name": "Metal"
+    },
+    {
+      "id": 107,
+      "name": "Peel and Stick"
+    },
+    {
+      "id": 108,
+      "name": "Foam-mounted Fine Art Paper"
+    }
+  ],
+  "stores": [
+    {
+      "storeId": 20027,
+      "storeName": "Fifth Element Photography"
+    }
+  ]
+}

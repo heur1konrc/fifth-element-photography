@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Order</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .order-form-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .order-summary {
+            margin-bottom: 30px;
+        }
+        .order-summary h4 {
+            font-weight: bold;
+        }
+        .payment-options {
+            margin-top: 30px;
+        }
+        #paypal-button-container {
+            margin-top: 20px;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="order-form-container">
+        <div class="order-summary">
+            <h4>Order Summary</h4>
+            <div class="row">
+                <div class="col-md-3">
+                    <img src="{{ image_url }}" class="img-fluid rounded" alt="{{ image_title }}">
+                </div>
+                <div class="col-md-6">
+                    <h5>{{ image_title }}</h5>
+                    <p>
+                        <strong>Product:</strong> {{ product_name }}<br>
+                        <strong>Size:</strong> {{ size_name }} ({{ width }}" × {{ height }}")<br>
+                        <strong>Quantity:</strong> {{ quantity }}
+                    </p>
+                </div>
+                <div class="col-md-3 text-right">
+                    <h4>{{ formatted_price }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <form id="order-form">
+            <h4>Shipping Information</h4>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="firstName">First Name</label>
+                    <input type="text" class="form-control" id="firstName" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" class="form-control" id="lastName" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="address1">Address</label>
+                <input type="text" class="form-control" id="address1" placeholder="1234 Main St" required>
+            </div>
+            <div class="form-group">
+                <label for="address2">Address 2 (Optional)</label>
+                <input type="text" class="form-control" id="address2" placeholder="Apartment, studio, or floor">
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="city">City</label>
+                    <input type="text" class="form-control" id="city" required>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="state">State</label>
+                    <input type="text" class="form-control" id="state" required>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="zip">Zip</label>
+                    <input type="text" class="form-control" id="zip" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" class="form-control" id="country" value="US" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone (Optional)</label>
+                <input type="tel" class="form-control" id="phone">
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" required>
+            </div>
+        </form>
+
+        <div class="payment-options">
+            <h4>Payment</h4>
+            <p>Complete your purchase using PayPal. You can use your PayPal balance or any major credit card.</p>
+            <div id="paypal-button-container"></div>
+        </div>
+    </div>
+
+    <div class="loading-overlay" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Processing...</span>
+        </div>
+    </div>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const orderData = {
+                subcategoryId: {{ subcategory_id }},
+                width: {{ width }},
+                height: {{ height }},
+                quantity: {{ quantity }},
+                options: {{ options | tojson }},
+                imageUrl: "{{ image_url }}",
+                price: {{ price }}
+            };
+
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: orderData.price.toFixed(2)
+                            }
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        // Show loading overlay
+                        document.querySelector(".loading-overlay").style.display = "flex";
+
+                        // Get form data
+                        const shippingInfo = {
+                            firstName: document.getElementById("firstName").value,
+                            lastName: document.getElementById("lastName").value,
+                            addressLine1: document.getElementById("address1").value,
+                            addressLine2: document.getElementById("address2").value,
+                            city: document.getElementById("city").value,
+                            state: document.getElementById("state").value,
+                            zipCode: document.getElementById("zip").value,
+                            country: document.getElementById("country").value,
+                            phone: document.getElementById("phone").value,
+                            email: document.getElementById("email").value
+                        };
+
+                        // Combine order data
+                        const finalOrder = {
+                            ...orderData,
+                            shipping: shippingInfo,
+                            payment: {
+                                method: "PayPal",
+                                transactionId: details.id,
+                                status: details.status
+                            }
+                        };
+
+                        // Submit order to backend
+                        fetch("/api/lumaprints/submit-order", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(finalOrder)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                window.location.href = `/order-confirmation/${data.orderId}`;
+                            } else {
+                                alert("Order submission failed: " + data.error);
+                                document.querySelector(".loading-overlay").style.display = "none";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error submitting order:", error);
+                            alert("An error occurred while submitting your order. Please try again.");
+                            document.querySelector(".loading-overlay").style.display = "none";
+                        });
+                    });
+                },
+                onError: function(err) {
+                    console.error("PayPal Error:", err);
+                    alert("An error occurred with the PayPal payment. Please try again.");
+                }
+            }).render("#paypal-button-container");
+        });
+    </script>
+
+</body>
+</html>
