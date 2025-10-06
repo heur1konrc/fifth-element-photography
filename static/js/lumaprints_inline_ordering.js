@@ -37,10 +37,21 @@ class LumaprintsInlineOrdering {
             backToPrintOrderBtn.addEventListener('click', () => this.showPrintOrderView());
         }
 
+        // Category selection in sidebar
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.category-item')) {
+                this.selectCategory(e.target.closest('.category-item'));
+            }
+        });
+
         // Product selection
         document.addEventListener('click', (e) => {
             if (e.target.closest('.product-category')) {
                 this.selectProduct(e.target.closest('.product-category'));
+            }
+            if (e.target.closest('.btn-select-product')) {
+                e.preventDefault();
+                this.selectProduct(e.target.closest('.product-option'));
             }
         });
 
@@ -189,9 +200,41 @@ class LumaprintsInlineOrdering {
         `).join('');
     }
 
+    selectCategory(categoryElement) {
+        // Update sidebar active state
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        categoryElement.classList.add('active');
+
+        // Get category from data attribute
+        const category = categoryElement.dataset.category;
+        
+        // Show corresponding product section
+        this.showCategory(category);
+    }
+
+    showCategory(category) {
+        // Hide all product category sections
+        document.querySelectorAll('.product-category-section').forEach(section => {
+            section.classList.remove('active');
+        });
+
+        // Show selected category section
+        const categorySection = document.querySelector(`[data-category="${category}"]`);
+        if (categorySection) {
+            categorySection.classList.add('active');
+        }
+
+        // Reset selections when changing category
+        this.selectedProduct = null;
+        this.selectedSize = null;
+        this.updatePricing();
+    }
+
     selectProduct(productElement) {
-        // Remove previous selection
-        document.querySelectorAll('.product-category').forEach(el => {
+        // Remove previous selection from both old and new structures
+        document.querySelectorAll('.product-category, .product-option').forEach(el => {
             el.classList.remove('selected');
         });
         
@@ -201,8 +244,57 @@ class LumaprintsInlineOrdering {
         // Store selected product
         this.selectedProduct = productElement.dataset.product;
         
+        // Show size selection if using new interface
+        if (productElement.classList.contains('product-option')) {
+            this.showSizeSelection(this.selectedProduct);
+        }
+        
         // Update pricing
         this.updatePricing();
+    }
+
+    showSizeSelection(productId) {
+        const sizeSection = document.getElementById('sizeSelectionSection');
+        const sizesGrid = document.getElementById('sizesGrid');
+        
+        if (!sizeSection || !sizesGrid) return;
+
+        // Get sizes for this product
+        const sizes = this.getSizesForProduct(productId);
+        
+        // Clear existing sizes
+        sizesGrid.innerHTML = '';
+
+        // Add size options
+        sizes.forEach(size => {
+            const sizeElement = document.createElement('div');
+            sizeElement.className = 'size-option';
+            sizeElement.dataset.width = size.width;
+            sizeElement.dataset.height = size.height;
+            sizeElement.innerHTML = `
+                <div class="size-display">${size.name}</div>
+                <div class="size-price">$${size.price}</div>
+            `;
+            sizesGrid.appendChild(sizeElement);
+        });
+
+        // Show size selection section
+        sizeSection.style.display = 'block';
+        
+        // Scroll to size selection
+        sizeSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    getSizesForProduct(productId) {
+        // Default sizes for all products
+        return [
+            { width: 8, height: 10, name: '8" × 10"', price: 29.99 },
+            { width: 11, height: 14, name: '11" × 14"', price: 39.99 },
+            { width: 16, height: 20, name: '16" × 20"', price: 59.99 },
+            { width: 18, height: 24, name: '18" × 24"', price: 79.99 },
+            { width: 20, height: 30, name: '20" × 30"', price: 99.99 },
+            { width: 24, height: 36, name: '24" × 36"', price: 129.99 }
+        ];
     }
 
     selectSize(sizeElement) {
@@ -218,7 +310,7 @@ class LumaprintsInlineOrdering {
         this.selectedSize = {
             width: parseInt(sizeElement.dataset.width),
             height: parseInt(sizeElement.dataset.height),
-            name: sizeElement.querySelector('.size-name').textContent
+            name: sizeElement.querySelector('.size-display, .size-name')?.textContent || 'Unknown Size'
         };
         
         // Update pricing
