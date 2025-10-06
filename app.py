@@ -542,6 +542,144 @@ def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Lumaprints Thumbnail Management Routes
+THUMBNAILS_FOLDER = '/data/thumbnails'
+
+def ensure_thumbnails_folder():
+    """Ensure thumbnails folder structure exists"""
+    categories = ['canvas', 'framed-canvas', 'fine-art-paper', 'framed-fine-art', 'metal', 'foam-mounted', 'peel-stick']
+    
+    if not os.path.exists(THUMBNAILS_FOLDER):
+        os.makedirs(THUMBNAILS_FOLDER)
+    
+    for category in categories:
+        category_path = os.path.join(THUMBNAILS_FOLDER, category)
+        if not os.path.exists(category_path):
+            os.makedirs(category_path)
+
+@app.route('/admin/upload-thumbnails', methods=['POST'])
+def upload_thumbnails():
+    """Upload thumbnails for Lumaprints products"""
+    try:
+        ensure_thumbnails_folder()
+        
+        category = request.form.get('category', 'canvas')
+        files = request.files.getlist('thumbnails')
+        
+        if not files or files[0].filename == '':
+            return jsonify({'success': False, 'error': 'No files selected'})
+        
+        uploaded_count = 0
+        category_path = os.path.join(THUMBNAILS_FOLDER, category)
+        
+        for file in files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                # Ensure unique filename
+                counter = 1
+                base_name, ext = os.path.splitext(filename)
+                while os.path.exists(os.path.join(category_path, filename)):
+                    filename = f"{base_name}_{counter}{ext}"
+                    counter += 1
+                
+                filepath = os.path.join(category_path, filename)
+                file.save(filepath)
+                uploaded_count += 1
+        
+        return jsonify({'success': True, 'uploaded': uploaded_count})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/thumbnails/<category>')
+def get_thumbnails(category):
+    """Get thumbnails for a specific category"""
+    try:
+        ensure_thumbnails_folder()
+        category_path = os.path.join(THUMBNAILS_FOLDER, category)
+        
+        if not os.path.exists(category_path):
+            return jsonify([])
+        
+        thumbnails = []
+        for filename in os.listdir(category_path):
+            if allowed_file(filename):
+                thumbnails.append({
+                    'id': f"{category}_{filename}",
+                    'name': filename,
+                    'url': f"/thumbnails/{category}/{filename}",
+                    'category': category
+                })
+        
+        return jsonify(thumbnails)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/thumbnails/<category>/<filename>')
+def serve_thumbnail(category, filename):
+    """Serve thumbnail files"""
+    try:
+        thumbnail_path = os.path.join(THUMBNAILS_FOLDER, category, filename)
+        if os.path.exists(thumbnail_path):
+            return send_file(thumbnail_path)
+        return "Thumbnail not found", 404
+    except Exception as e:
+        return str(e), 500
+
+@app.route('/admin/thumbnails/<thumbnail_id>', methods=['DELETE'])
+def delete_thumbnail(thumbnail_id):
+    """Delete a thumbnail"""
+    try:
+        # Parse thumbnail_id (format: category_filename)
+        parts = thumbnail_id.split('_', 1)
+        if len(parts) != 2:
+            return jsonify({'success': False, 'error': 'Invalid thumbnail ID'})
+        
+        category, filename = parts
+        thumbnail_path = os.path.join(THUMBNAILS_FOLDER, category, filename)
+        
+        if os.path.exists(thumbnail_path):
+            os.remove(thumbnail_path)
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Thumbnail not found'})
+            
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/thumbnails/<thumbnail_id>/replace', methods=['POST'])
+def replace_thumbnail(thumbnail_id):
+    """Replace a thumbnail"""
+    try:
+        # Parse thumbnail_id (format: category_filename)
+        parts = thumbnail_id.split('_', 1)
+        if len(parts) != 2:
+            return jsonify({'success': False, 'error': 'Invalid thumbnail ID'})
+        
+        category, old_filename = parts
+        file = request.files.get('thumbnail')
+        
+        if not file or file.filename == '':
+            return jsonify({'success': False, 'error': 'No file provided'})
+        
+        if not allowed_file(file.filename):
+            return jsonify({'success': False, 'error': 'Invalid file type'})
+        
+        # Remove old file
+        old_path = os.path.join(THUMBNAILS_FOLDER, category, old_filename)
+        if os.path.exists(old_path):
+            os.remove(old_path)
+        
+        # Save new file with same name
+        new_path = os.path.join(THUMBNAILS_FOLDER, category, old_filename)
+        file.save(new_path)
+        
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/admin/categories', methods=['GET', 'POST'])
 def manage_categories():
     """Manage categories - add/delete"""
