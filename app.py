@@ -1893,9 +1893,9 @@ def load_catalog():
     except FileNotFoundError:
         return {"categories": [], "subcategories": {}, "options": {}, "stores": []}
 
-# Initialize static pricing calculator with 100% markup (double wholesale price)
-from static_pricing_calculator import get_static_pricing_calculator
-pricing_calc = get_static_pricing_calculator(markup_percentage=100.0)
+# Initialize realistic pricing calculator with 3x markup based on actual Lumaprints costs
+from realistic_pricing_calculator import get_realistic_pricing_calculator
+pricing_calc = get_realistic_pricing_calculator(markup_multiplier=3.0)
 
 @app.route('/api/lumaprints/categories')
 def get_lumaprints_categories():
