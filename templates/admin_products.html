@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Thumbnail Management - Fifth Element Photography</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_new.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_products.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-images"></i>
+                    Product Thumbnail Management
+                </h1>
+                <div class="header-actions">
+                    <a href="{{ url_for('admin_new') }}" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Admin
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline">
+                        <i class="fas fa-external-link-alt"></i>
+                        View Website
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message">
+                            <i class="fas fa-check-circle"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Product Management Section -->
+            <section class="products-section">
+                <div class="section-header">
+                    <h2 class="section-title">Lumaprints Product Thumbnails</h2>
+                    <p class="section-description">Upload and manage thumbnails for each product type and size combination</p>
+                </div>
+
+                <!-- Product Type Selection -->
+                <div class="product-selector">
+                    <div class="selector-row">
+                        <div class="form-group">
+                            <label for="productType">Product Type:</label>
+                            <select id="productType" onchange="loadProductSizes()">
+                                <option value="">Select Product Type</option>
+                                <option value="canvas">Canvas</option>
+                                <option value="framed-canvas">Framed Canvas</option>
+                                <option value="fine-art-paper">Fine Art Paper</option>
+                                <option value="framed-fine-art">Framed Fine Art Paper</option>
+                                <option value="metal">Metal</option>
+                                <option value="peel-stick">Peel and Stick</option>
+                                <option value="foam-mounted">Foam-mounted Fine Art Paper</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productSize">Size:</label>
+                            <select id="productSize" onchange="loadProductOptions()" disabled>
+                                <option value="">Select Size First</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productOption">Option:</label>
+                            <select id="productOption" onchange="showThumbnailUpload()" disabled>
+                                <option value="">Select Option</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Thumbnail Display -->
+                <div class="current-thumbnail" id="currentThumbnail" style="display: none;">
+                    <h3>Current Thumbnail</h3>
+                    <div class="thumbnail-display">
+                        <img id="thumbnailPreview" src="" alt="Current thumbnail">
+                        <div class="thumbnail-info">
+                            <p id="thumbnailPath"></p>
+                            <button class="btn btn-danger btn-small" onclick="deleteThumbnail()">
+                                <i class="fas fa-trash"></i>
+                                Delete Thumbnail
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thumbnail Upload Section -->
+                <div class="upload-section" id="uploadSection" style="display: none;">
+                    <h3>Upload New Thumbnail</h3>
+                    <div class="upload-area">
+                        <div class="file-drop-zone" id="thumbnailDropZone">
+                            <div class="drop-zone-content">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h4>Upload Product Thumbnail</h4>
+                                <p>Drag & drop your thumbnail image here or click to browse</p>
+                                <p class="file-info">Recommended: 300x300px, JPG/PNG format</p>
+                            </div>
+                            <input type="file" id="thumbnailFileInput" accept="image/*" style="display: none;">
+                        </div>
+                        
+                        <div class="upload-actions">
+                            <button class="btn btn-primary" id="uploadThumbnailBtn" onclick="uploadThumbnail()" disabled>
+                                <i class="fas fa-upload"></i>
+                                Upload Thumbnail
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Existing Thumbnails Grid -->
+                <div class="thumbnails-grid">
+                    <h3>All Product Thumbnails</h3>
+                    <div class="grid-container" id="thumbnailsGrid">
+                        <!-- Thumbnails will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Product Data (Hidden) -->
+    <script>
+        const PRODUCT_DATA = {
+            'canvas': {
+                'sizes': {
+                    '8x10': ['Standard Canvas', 'Gallery Wrap'],
+                    '11x14': ['Standard Canvas', 'Gallery Wrap'],
+                    '16x20': ['Standard Canvas', 'Gallery Wrap'],
+                    '18x24': ['Standard Canvas', 'Gallery Wrap'],
+                    '24x36': ['Standard Canvas', 'Gallery Wrap']
+                }
+            },
+            'framed-canvas': {
+                'sizes': {
+                    '8x10': ['Black Frame', 'White Frame', 'Natural Wood', 'Dark Wood'],
+                    '11x14': ['Black Frame', 'White Frame', 'Natural Wood', 'Dark Wood'],
+                    '16x20': ['Black Frame', 'White Frame', 'Natural Wood', 'Dark Wood'],
+                    '18x24': ['Black Frame', 'White Frame', 'Natural Wood', 'Dark Wood']
+                }
+            },
+            'fine-art-paper': {
+                'sizes': {
+                    '5x7': ['Matte Finish', 'Glossy Finish', 'Pearl Finish'],
+                    '8x10': ['Matte Finish', 'Glossy Finish', 'Pearl Finish'],
+                    '11x14': ['Matte Finish', 'Glossy Finish', 'Pearl Finish'],
+                    '16x20': ['Matte Finish', 'Glossy Finish', 'Pearl Finish'],
+                    '18x24': ['Matte Finish', 'Glossy Finish', 'Pearl Finish']
+                }
+            },
+            'framed-fine-art': {
+                'sizes': {
+                    '8x10': ['Black Frame + Matte', 'White Frame + Matte', 'Natural Wood + Matte'],
+                    '11x14': ['Black Frame + Matte', 'White Frame + Matte', 'Natural Wood + Matte'],
+                    '16x20': ['Black Frame + Matte', 'White Frame + Matte', 'Natural Wood + Matte']
+                }
+            },
+            'metal': {
+                'sizes': {
+                    '8x10': ['Brushed Aluminum', 'White Aluminum', 'Glossy Finish'],
+                    '11x14': ['Brushed Aluminum', 'White Aluminum', 'Glossy Finish'],
+                    '16x20': ['Brushed Aluminum', 'White Aluminum', 'Glossy Finish'],
+                    '18x24': ['Brushed Aluminum', 'White Aluminum', 'Glossy Finish'],
+                    '24x36': ['Brushed Aluminum', 'White Aluminum', 'Glossy Finish']
+                }
+            },
+            'peel-stick': {
+                'sizes': {
+                    '8x10': ['Matte Vinyl', 'Glossy Vinyl'],
+                    '11x14': ['Matte Vinyl', 'Glossy Vinyl'],
+                    '16x20': ['Matte Vinyl', 'Glossy Vinyl']
+                }
+            },
+            'foam-mounted': {
+                'sizes': {
+                    '8x10': ['3/16" Foam Core', '1/2" Foam Core'],
+                    '11x14': ['3/16" Foam Core', '1/2" Foam Core'],
+                    '16x20': ['3/16" Foam Core', '1/2" Foam Core'],
+                    '18x24': ['3/16" Foam Core', '1/2" Foam Core']
+                }
+            }
+        };
+    </script>
+
+    <script src="{{ url_for('static', filename='js/admin_products.js') }}"></script>
+</body>
+</html>

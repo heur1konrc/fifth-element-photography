@@ -1,0 +1,315 @@
+/* Product Management Specific Styles */
+
+.products-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.product-selector {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.selector-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    align-items: end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    color: #fff;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.form-group select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #fff;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.form-group select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.form-group select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.form-group select option {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+/* Current Thumbnail Display */
+.current-thumbnail {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.current-thumbnail h3 {
+    color: #fff;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.thumbnail-display {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.thumbnail-display img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.thumbnail-info {
+    flex: 1;
+}
+
+.thumbnail-info p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+/* Upload Section */
+.upload-section {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.upload-section h3 {
+    color: #fff;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.upload-area {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.file-drop-zone {
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.file-drop-zone:hover {
+    border-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.file-drop-zone.dragover {
+    border-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.2);
+}
+
+.drop-zone-content {
+    pointer-events: none;
+}
+
+.drop-zone-content i {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1rem;
+}
+
+.drop-zone-content h4 {
+    color: #fff;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.drop-zone-content p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.25rem;
+}
+
+.drop-zone-content .file-info {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
+.upload-actions {
+    display: flex;
+    justify-content: center;
+}
+
+/* Thumbnails Grid */
+.thumbnails-grid {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.thumbnails-grid h3 {
+    color: #fff;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.thumbnail-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.thumbnail-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.thumbnail-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 0.75rem;
+}
+
+.thumbnail-card-info {
+    color: #fff;
+}
+
+.thumbnail-card-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.thumbnail-card-details {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+}
+
+.thumbnail-card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.thumbnail-card-actions .btn {
+    flex: 1;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+}
+
+/* File Selected State */
+.file-selected .drop-zone-content {
+    color: #4CAF50;
+}
+
+.file-selected .drop-zone-content i {
+    color: #4CAF50;
+}
+
+.file-selected {
+    border-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .selector-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .thumbnail-display {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Empty State */
+.empty-thumbnails {
+    text-align: center;
+    padding: 3rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-thumbnails i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-thumbnails h4 {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 0.5rem;
+}
+
+.empty-thumbnails p {
+    font-size: 0.9rem;
+}

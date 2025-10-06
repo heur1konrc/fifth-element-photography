@@ -2403,3 +2403,158 @@ def get_image_storage_info():
             'success': False,
             'error': str(e)
         }), 500
+
+
+# Product Thumbnail Management Routes
+@app.route('/admin/products')
+def admin_products():
+    """Product thumbnail management page"""
+    return render_template('admin_products.html')
+
+@app.route('/api/product-thumbnail/<path:product_path>')
+def get_product_thumbnail(product_path):
+    """Check if a product thumbnail exists"""
+    try:
+        # Create thumbnails directory if it doesn't exist
+        thumbnails_dir = os.path.join('static', 'product-thumbnails')
+        os.makedirs(thumbnails_dir, exist_ok=True)
+        
+        # Convert path to filename
+        filename = product_path.replace('/', '_') + '.jpg'
+        thumbnail_path = os.path.join(thumbnails_dir, filename)
+        
+        if os.path.exists(thumbnail_path):
+            return jsonify({
+                'exists': True,
+                'url': f'/static/product-thumbnails/{filename}',
+                'path': product_path
+            })
+        else:
+            return jsonify({
+                'exists': False,
+                'path': product_path
+            })
+    except Exception as e:
+        return jsonify({
+            'exists': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/upload-product-thumbnail', methods=['POST'])
+def upload_product_thumbnail():
+    """Upload a product thumbnail"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'message': 'No file provided'}), 400
+        
+        file = request.files['file']
+        product_path = request.form.get('productPath')
+        
+        if not file or not product_path:
+            return jsonify({'success': False, 'message': 'File and product path required'}), 400
+        
+        # Create thumbnails directory
+        thumbnails_dir = os.path.join('static', 'product-thumbnails')
+        os.makedirs(thumbnails_dir, exist_ok=True)
+        
+        # Convert path to filename
+        filename = product_path.replace('/', '_') + '.jpg'
+        
+        # Process and save image
+        from PIL import Image
+        import io
+        
+        # Open and process image
+        image = Image.open(file.stream)
+        
+        # Convert to RGB if necessary
+        if image.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', image.size, (255, 255, 255))
+            if image.mode == 'P':
+                image = image.convert('RGBA')
+            background.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+            image = background
+        
+        # Resize to standard thumbnail size
+        image.thumbnail((300, 300), Image.Resampling.LANCZOS)
+        
+        # Save as JPEG
+        thumbnail_path = os.path.join(thumbnails_dir, filename)
+        image.save(thumbnail_path, 'JPEG', quality=85, optimize=True)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Thumbnail uploaded successfully',
+            'url': f'/static/product-thumbnails/{filename}',
+            'path': product_path
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error uploading thumbnail: {str(e)}'
+        }), 500
+
+@app.route('/api/delete-product-thumbnail/<path:product_path>', methods=['DELETE'])
+def delete_product_thumbnail(product_path):
+    """Delete a product thumbnail"""
+    try:
+        # Convert path to filename
+        filename = product_path.replace('/', '_') + '.jpg'
+        thumbnail_path = os.path.join('static', 'product-thumbnails', filename)
+        
+        if os.path.exists(thumbnail_path):
+            os.remove(thumbnail_path)
+            return jsonify({
+                'success': True,
+                'message': 'Thumbnail deleted successfully'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Thumbnail not found'
+            }), 404
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error deleting thumbnail: {str(e)}'
+        }), 500
+
+@app.route('/api/product-thumbnails')
+def get_all_product_thumbnails():
+    """Get all existing product thumbnails"""
+    try:
+        thumbnails_dir = os.path.join('static', 'product-thumbnails')
+        thumbnails = []
+        
+        if os.path.exists(thumbnails_dir):
+            for filename in os.listdir(thumbnails_dir):
+                if filename.endswith('.jpg'):
+                    # Convert filename back to path
+                    product_path = filename[:-4].replace('_', '/')
+                    
+                    # Create display name
+                    parts = product_path.split('/')
+                    display_name = f"{parts[0].replace('-', ' ').title()} - {parts[1]} - {parts[2].replace('-', ' ').title()}"
+                    
+                    thumbnails.append({
+                        'name': filename,
+                        'path': product_path,
+                        'displayName': display_name,
+                        'url': f'/static/product-thumbnails/{filename}'
+                    })
+        
+        # Sort by display name
+        thumbnails.sort(key=lambda x: x['displayName'])
+        
+        return jsonify({
+            'success': True,
+            'thumbnails': thumbnails
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

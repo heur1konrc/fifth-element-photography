@@ -24,7 +24,7 @@
             <aside class="order-sidebar">
                 <!-- Image Preview -->
                 <div class="image-preview">
-                    <img src="{{ url_for('get_image', filename=image.filename) }}" alt="{{ image.title }}" class="preview-img">
+                    <img src="{{ url_for('serve_image', filename=image.filename) }}" alt="{{ image.title }}" class="preview-img">
                     <div class="image-info">
                         <h3 class="image-title">{{ image.title }}</h3>
                         <p class="image-category">{{ image.category }}</p>
