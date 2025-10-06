@@ -138,7 +138,7 @@ class RealisticPricingCalculator:
                     'dimensions': f'{width}" × {height}"',
                     'closest_size': f'{closest_size[0]}" × {closest_size[1]}"' if closest_size else None,
                     'markup_multiplier': self.markup_multiplier,
-                    'markup_percentage': (self.markup_multiplier - 1) * 100
+                    'markup_percentage': round((self.markup_multiplier - 1) * 100, 1)
                 }
             }
             
