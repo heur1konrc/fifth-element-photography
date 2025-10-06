@@ -99,64 +99,69 @@
     font-weight: bold !important;
 }
 
-/* Main image view styling - restore original beautiful appearance */
+/* FULL SCREEN IMAGE MODAL - Professional Photography Display */
 .modal-main-view {
     background: transparent;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
     padding: 0;
     margin: 0;
-    position: relative;
+    overflow: hidden;
 }
 
 .modal-main-view .modal-image {
-    background: transparent;
-    box-shadow: none;
-    max-width: 100%;
-    max-height: 85vh;
+    width: 100vw;
+    height: 100vh;
     object-fit: contain;
+    background: transparent;
     border-radius: 0;
+    box-shadow: none;
 }
 
 .modal-main-view .modal-info {
-    position: absolute;
-    bottom: 80px;
+    position: fixed;
+    bottom: 120px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.85);
     color: white;
-    padding: 20px 30px;
-    border-radius: 8px;
+    padding: 25px 40px;
+    border-radius: 12px;
     text-align: center;
-    backdrop-filter: blur(10px);
-    min-width: 300px;
+    backdrop-filter: blur(15px);
+    z-index: 10001;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .modal-main-view .modal-info h4 {
     color: white;
-    margin: 0 0 8px 0;
-    font-size: 20px;
+    margin: 0 0 10px 0;
+    font-size: 24px;
     font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .modal-main-view .modal-info p {
-    color: #e0e0e0;
+    color: #f0f0f0;
     margin: 0;
-    font-size: 14px;
-    letter-spacing: 1px;
+    font-size: 16px;
+    letter-spacing: 2px;
+    font-weight: 300;
+    text-transform: uppercase;
 }
 
 .modal-main-view .modal-actions {
-    position: absolute;
-    bottom: 20px;
+    position: fixed;
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    background: transparent;
-    padding: 0;
+    z-index: 10001;
 }
 
 @keyframes modalSlideIn {
