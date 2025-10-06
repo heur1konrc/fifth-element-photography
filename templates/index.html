@@ -332,69 +332,7 @@
         </div>
     </div>
 
-    <!-- Print Order Modal -->
-    <div class="modal" id="printOrderModal">
-        <div class="modal-content print-order-content">
-            <span class="close" id="printOrderClose">&times;</span>
-            <div class="print-order-header">
-                <h3>Order Print</h3>
-                <div class="order-image-preview">
-                    <img id="orderImagePreview" src="" alt="Order Preview">
-                    <div class="order-image-info">
-                        <h4 id="orderImageTitle"></h4>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="print-order-form">
-                <div class="product-selection">
-                    <h4>Select Product</h4>
-                    <div class="product-categories" id="productCategories">
-                        <div class="loading">Loading products...</div>
-                    </div>
-                </div>
-                
-                <div class="size-selection" id="sizeSelection" style="display: none;">
-                    <h4>Select Size</h4>
-                    <div class="size-options" id="sizeOptions">
-                        <!-- Size options will be populated by JavaScript -->
-                    </div>
-                </div>
-                
-                <div class="quantity-selection" id="quantitySelection" style="display: none;">
-                    <h4>Quantity</h4>
-                    <div class="quantity-controls">
-                        <button type="button" class="qty-btn" id="qtyMinus">-</button>
-                        <input type="number" id="quantity" value="1" min="1" max="10">
-                        <button type="button" class="qty-btn" id="qtyPlus">+</button>
-                    </div>
-                </div>
-                
-                <div class="price-display" id="priceDisplay" style="display: none;">
-                    <div class="price-breakdown">
-                        <div class="price-line">
-                            <span>Price per item:</span>
-                            <span id="pricePerItem">$0.00</span>
-                        </div>
-                        <div class="price-line">
-                            <span>Quantity:</span>
-                            <span id="displayQuantity">1</span>
-                        </div>
-                        <div class="price-line total">
-                            <span>Total:</span>
-                            <span id="totalPrice">$0.00</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="order-actions" id="orderActions" style="display: none;">
-                    <button class="btn-continue-order" id="continueOrderBtn">
-                        Continue to Checkout
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Print Order Modal will be dynamically created by lumaprints_ordering.js -->
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lumaprints_pricing.js') }}"></script>
