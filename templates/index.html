@@ -29,6 +29,7 @@
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/lumaprints_styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lumaprints_interface.css') }}">
 </head>
 <body>
     <!-- Mobile Menu Button -->
@@ -352,60 +353,220 @@
                         </div>
                     </div>
                     
-                    <div class="print-order-layout">
-                        <div class="print-order-left">
-                            <div class="product-selection">
-                                <h4>Product Type</h4>
-                                <div class="product-categories">
-                                    <div class="product-category" data-product="101001">
-                                        <h5>Canvas Print (0.75")</h5>
-                                        <p>Gallery wrapped canvas</p>
+                    <!-- Lumaprints-Style Interface: Left Sidebar + Right Panel -->
+                    <div class="lumaprints-interface">
+                        <!-- Left Sidebar - Categories (Lumaprints Style) -->
+                        <div class="lumaprints-sidebar">
+                            <div class="lumaprints-categories">
+                                <h4>Product Categories</h4>
+                                <div class="category-list">
+                                    <div class="category-item active" data-category="canvas">
+                                        <div class="category-icon">🖼️</div>
+                                        <span class="category-name">Canvas</span>
                                     </div>
-                                    <div class="product-category" data-product="101002">
-                                        <h5>Canvas Print (1.25")</h5>
-                                        <p>Thick gallery wrapped canvas</p>
+                                    <div class="category-item" data-category="framed-canvas">
+                                        <div class="category-icon">🖼️</div>
+                                        <span class="category-name">Framed Canvas</span>
                                     </div>
-                                    <div class="product-category" data-product="103001">
-                                        <h5>Fine Art Paper</h5>
-                                        <p>Premium matte paper</p>
+                                    <div class="category-item" data-category="fine-art-paper">
+                                        <div class="category-icon">📄</div>
+                                        <span class="category-name">Fine Art Paper</span>
                                     </div>
-                                    <div class="product-category" data-product="106001">
-                                        <h5>Metal Print</h5>
-                                        <p>Vibrant aluminum print</p>
+                                    <div class="category-item" data-category="foam-mounted-print">
+                                        <div class="category-icon">📋</div>
+                                        <span class="category-name">Foam Mounted Print</span>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <div class="size-selection">
-                                <h4>Size</h4>
-                                <div class="size-options" id="sizeOptions">
-                                    <!-- Size options will be populated dynamically -->
+                                    <div class="category-item" data-category="framed-fine-art-paper">
+                                        <div class="category-icon">🖼️</div>
+                                        <span class="category-name">Framed Fine Art Paper</span>
+                                    </div>
+                                    <div class="category-item" data-category="metal">
+                                        <div class="category-icon">⚡</div>
+                                        <span class="category-name">Metal</span>
+                                    </div>
+                                    <div class="category-item" data-category="peel-and-stick">
+                                        <div class="category-icon">📌</div>
+                                        <span class="category-name">Peel and Stick</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <div class="print-order-right">
-                            <div class="quantity-selection">
-                                <h4>Quantity</h4>
-                                <div class="quantity-controls">
-                                    <button class="qty-btn" id="qtyMinus">-</button>
-                                    <input type="number" id="quantity" value="1" min="1" max="10">
-                                    <button class="qty-btn" id="qtyPlus">+</button>
+                        <!-- Right Panel - Product Options (Lumaprints Style) -->
+                        <div class="lumaprints-main-panel">
+                            <!-- Product Selection Grid -->
+                            <div class="products-section">
+                                <!-- Canvas Products -->
+                                <div class="product-category-section active" data-category="canvas">
+                                    <h4>Canvas Products</h4>
+                                    <div class="products-grid">
+                                        <div class="product-option" data-product="101001">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview canvas-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Canvas Print (0.75")</h5>
+                                                <p>Gallery wrapped canvas</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="101002">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview canvas-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Canvas Print (1.25")</h5>
+                                                <p>Thick gallery wrapped canvas</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="101003">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview canvas-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Canvas Print (1.50")</h5>
+                                                <p>Extra thick gallery wrapped canvas</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="101004">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview canvas-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Rolled Canvas</h5>
+                                                <p>Canvas print without frame</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Framed Canvas Products -->
+                                <div class="product-category-section" data-category="framed-canvas">
+                                    <h4>Framed Canvas Products</h4>
+                                    <div class="products-grid">
+                                        <div class="product-option" data-product="102001">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview framed-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>1.50in Maple Wood Floating Frame</h5>
+                                                <p>Canvas with maple wood frame</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="102002">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview framed-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>1.50in Espresso Floating Frame</h5>
+                                                <p>Canvas with espresso wood frame</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="102003">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview framed-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>1.50in Natural Wood Floating Frame</h5>
+                                                <p>Canvas with natural wood frame</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="102008">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview framed-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>1.50in Black Floating Frame</h5>
+                                                <p>Canvas with black frame</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Fine Art Paper Products -->
+                                <div class="product-category-section" data-category="fine-art-paper">
+                                    <h4>Fine Art Paper Products</h4>
+                                    <div class="products-grid">
+                                        <div class="product-option" data-product="103001">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview paper-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Fine Art Paper</h5>
+                                                <p>Premium matte paper</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Metal Products -->
+                                <div class="product-category-section" data-category="metal">
+                                    <h4>Metal Products</h4>
+                                    <div class="products-grid">
+                                        <div class="product-option" data-product="106001">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview metal-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Metal Print - Glossy</h5>
+                                                <p>Vibrant glossy aluminum print</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="106002">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview metal-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Metal Print - Matte</h5>
+                                                <p>Elegant matte aluminum print</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Other categories would follow the same pattern -->
+                            </div>
+                            
+                            <!-- Size Selection -->
+                            <div class="size-selection-section" id="sizeSelectionSection" style="display: none;">
+                                <h4>Select Size</h4>
+                                <div class="sizes-grid" id="sizesGrid">
+                                    <!-- Sizes will be populated dynamically -->
                                 </div>
                             </div>
                             
-                            <div class="price-display" id="priceDisplay">
-                                <div class="price-breakdown">
-                                    <div class="price-line">
+                            <!-- Order Summary Panel -->
+                            <div class="order-summary-panel">
+                                <div class="quantity-section">
+                                    <h4>Quantity</h4>
+                                    <div class="quantity-controls">
+                                        <button class="qty-btn" id="qtyMinus">-</button>
+                                        <input type="number" id="quantity" value="1" min="1" max="10">
+                                        <button class="qty-btn" id="qtyPlus">+</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="price-display" id="priceDisplay">
+                                    <div class="price-info">
                                         <span>Select product and size to see pricing</span>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <div class="order-actions">
-                                <button class="btn-continue-order" id="continueOrderBtn" disabled>
-                                    Proceed to Order
-                                </button>
+                                
+                                <div class="order-actions">
+                                    <button class="btn-proceed-order" id="continueOrderBtn" disabled>
+                                        Proceed to Order
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -494,6 +655,7 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lumaprints_pricing.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lumaprints_inline_ordering.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lumaprints_interface.js') }}"></script>
 </body>
 </html>
 
