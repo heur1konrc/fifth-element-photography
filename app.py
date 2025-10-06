@@ -1013,97 +1013,48 @@ def version():
 
 @app.route('/backup')
 def create_backup():
-    """COMPLETELY REWRITTEN BACKUP SYSTEM"""
-    import subprocess
-    import tempfile
-    import os
-    from datetime import datetime
-    from flask import Response
-    
+    """Simple working backup system"""
     try:
-        # Create timestamp for filename
+        import tarfile
+        import tempfile
+        from datetime import datetime
+        
+        # Create backup filename
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        backup_filename = f"portfolio_backup_{timestamp}.tar"
+        backup_filename = f"portfolio_backup_{timestamp}.tar.gz"
         
         # Create temporary file
-        temp_fd, temp_path = tempfile.mkstemp(suffix='.tar')
+        temp_fd, temp_path = tempfile.mkstemp(suffix='.tar.gz')
         os.close(temp_fd)
         
-        # Get the actual project directory
-        project_root = os.path.dirname(os.path.abspath(__file__))
+        # Get current directory (where app.py is)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
         
-        # Use system tar command WITHOUT compression and correct paths
-        cmd = [
-            'tar', 
-            '--create',
-            '--file', temp_path,
-            '--directory', project_root,
-            'app.py',
-            'requirements.txt', 
-            'templates',
-            'static'
-        ]
-        
-        # Execute tar command
-        result = subprocess.run(cmd, capture_output=True, text=True, cwd='/')
-        
-        if result.returncode != 0:
-            # Fallback to Python implementation
-            import tarfile
+        # Create tar file
+        with tarfile.open(temp_path, 'w:gz') as tar:
+            # Add app.py
+            if os.path.exists(os.path.join(current_dir, 'app.py')):
+                tar.add(os.path.join(current_dir, 'app.py'), arcname='app.py')
             
-            with tarfile.open(temp_path, 'w') as tar:
-                # Add project files
-                project_root = os.path.dirname(os.path.abspath(__file__))
-                
-                # Add main files
-                for filename in ['app.py', 'requirements.txt']:
-                    filepath = os.path.join(project_root, filename)
-                    if os.path.exists(filepath):
-                        tar.add(filepath, arcname=filename)
-                
-                # Add directories
-                for dirname in ['templates', 'static']:
-                    dirpath = os.path.join(project_root, dirname)
-                    if os.path.exists(dirpath):
-                        tar.add(dirpath, arcname=dirname)
+            # Add requirements.txt
+            if os.path.exists(os.path.join(current_dir, 'requirements.txt')):
+                tar.add(os.path.join(current_dir, 'requirements.txt'), arcname='requirements.txt')
+            
+            # Add templates directory
+            templates_dir = os.path.join(current_dir, 'templates')
+            if os.path.exists(templates_dir):
+                tar.add(templates_dir, arcname='templates')
+            
+            # Add static directory
+            static_dir = os.path.join(current_dir, 'static')
+            if os.path.exists(static_dir):
+                tar.add(static_dir, arcname='static')
         
-        # Check if file was created successfully
-        if not os.path.exists(temp_path) or os.path.getsize(temp_path) < 1000:
-            raise Exception("Backup file creation failed")
-        
-        # Read file and create response
-        def generate():
-            with open(temp_path, 'rb') as f:
-                while True:
-                    chunk = f.read(8192)
-                    if not chunk:
-                        break
-                    yield chunk
-            # Clean up temp file
-            try:
-                os.unlink(temp_path)
-            except:
-                pass
-        
-        response = Response(
-            generate(),
-            mimetype='application/x-tar',
-            headers={
-                'Content-Disposition': f'attachment; filename="{backup_filename}"',
-                'Content-Type': 'application/x-tar'
-            }
-        )
-        
-        return response
+        # Send file
+        return send_file(temp_path, as_attachment=True, download_name=backup_filename)
         
     except Exception as e:
-        # Clean up on error
-        try:
-            if 'temp_path' in locals():
-                os.unlink(temp_path)
-        except:
-            pass
-        return f"Backup failed: {str(e)}", 500
+        return f"Backup error: {str(e)}", 500
 
 
 def extract_exif_data(image_path):
