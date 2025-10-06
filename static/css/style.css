@@ -194,7 +194,8 @@ textarea {
 
 /* Masonry Grid */
 .masonry-grid {
-    columns: 4;
+    /*columns: 4;*/
+    columns: 3;
     column-gap: 8px;
     margin: 0;
 }
@@ -246,7 +247,7 @@ textarea {
 }
 
 .image-item.size-medium img {
-    height: 280px;
+    height: 300px;
     object-fit: cover;
     aspect-ratio: 3/2;
 }
@@ -274,7 +275,8 @@ textarea {
     display: block;
     transition: transform 0.3s ease;
     /*filter: grayscale(100%);*/
-    filter: grayscale(25%);
+    /*filter: grayscale(25%);*/
+    filter: grayscale(0%);
     backface-visibility: hidden;
     transform: translateZ(0);
 }
@@ -1088,8 +1090,8 @@ textarea {
 .exif-value {
     color: #ffffff;
     /*font-size: 0.9rem;*/
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 0.7rem;
+    font-weight: 300;
 }
 
 .featured-image {
@@ -1115,7 +1117,7 @@ textarea {
 .action-btn {
     background: #6799c2;
     border: 1px solid #6799c2;
-    color: #ffffff;
+    color: #000000;
     padding: 0.4rem 0.6rem;
     border-radius: 4px;
     font-family: 'Poppins', sans-serif;
