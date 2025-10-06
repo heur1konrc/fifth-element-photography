@@ -80,16 +80,19 @@ class StaticPricingCalculator:
             
             return {
                 'success': True,
-                'subcategory_id': subcategory_id,
-                'product_name': self.product_names.get(subcategory_id, f'Product {subcategory_id}'),
-                'dimensions': f'{width}" × {height}"',
-                'square_inches': square_inches,
-                'quantity': quantity,
-                'price_per_item': round(price_per_item, 2),
-                'total_price': round(total_price, 2),
-                'base_cost': round(base_cost, 2),
-                'markup_percentage': self.markup_percentage,
-                'size_adjustment': size_adjustment
+                'pricing': {
+                    'retail_price': round(price_per_item, 2),
+                    'formatted_price': f'${round(price_per_item, 2):.2f}',
+                    'wholesale_price': round(base_cost, 2),
+                    'total_price': round(total_price, 2),
+                    'quantity': quantity,
+                    'subcategory_id': subcategory_id,
+                    'product_name': self.product_names.get(subcategory_id, f'Product {subcategory_id}'),
+                    'dimensions': f'{width}" × {height}"',
+                    'square_inches': square_inches,
+                    'markup_percentage': self.markup_percentage,
+                    'size_adjustment': size_adjustment
+                }
             }
             
         except Exception as e:
