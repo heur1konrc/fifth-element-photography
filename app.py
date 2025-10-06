@@ -719,72 +719,35 @@ def add_to_slideshow(filename):
 
 @app.route('/backup_system', methods=['POST'])
 def backup_system():
-    """Create comprehensive system backup - FIXED VERSION"""
+    """Create system backup"""
     try:
-        import tarfile
+        import zipfile
         import tempfile
         from datetime import datetime
         
-        # Create temporary directory for backup
+        # Create temporary zip file
         temp_dir = tempfile.mkdtemp()
-        backup_filename = f"portfolio_complete_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.tar.gz"
+        backup_filename = f"portfolio_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
         backup_path = os.path.join(temp_dir, backup_filename)
         
-        # Get the project root directory
-        project_root = os.path.dirname(os.path.abspath(__file__))
-        
-        with tarfile.open(backup_path, 'w:gz') as tar:
-            # Add ALL source code files
-            source_files = ['app.py', 'requirements.txt', 'README.md', 'backup.py', 'Procfile']
-            for file in source_files:
-                file_path = os.path.join(project_root, file)
-                if os.path.exists(file_path):
-                    print(f"Adding source file: {file}")
-                    tar.add(file_path, arcname=file)
-            
-            # Add templates directory (ALL templates)
-            templates_dir = os.path.join(project_root, 'templates')
-            if os.path.exists(templates_dir):
-                print(f"Adding templates directory: {templates_dir}")
-                tar.add(templates_dir, arcname='templates')
-            
-            # Add static directory (CSS, JS, images, etc.)
-            static_dir = os.path.join(project_root, 'static')
-            if os.path.exists(static_dir):
-                print(f"Adding static directory: {static_dir}")
-                tar.add(static_dir, arcname='static')
-            
-            # Add data directory (ALL data files and uploaded images)
+        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            # Add all images from /data directory
             if os.path.exists('/data'):
-                print(f"Adding data directory: /data")
-                tar.add('/data', arcname='data')
-                
-            # Add any additional Python files in root
-            for file in os.listdir(project_root):
-                if file.endswith('.py') and file not in ['app.py', 'backup.py']:
-                    file_path = os.path.join(project_root, file)
-                    if os.path.isfile(file_path):
-                        print(f"Adding Python file: {file}")
-                        tar.add(file_path, arcname=file)
+                for root, dirs, files in os.walk('/data'):
+                    for file in files:
+                        file_path = os.path.join(root, file)
+                        arcname = os.path.relpath(file_path, '/data')
+                        zipf.write(file_path, f"data/{arcname}")
             
-            # Add any JSON configuration files
-            for file in os.listdir(project_root):
-                if file.endswith('.json'):
-                    file_path = os.path.join(project_root, file)
-                    if os.path.isfile(file_path):
-                        print(f"Adding JSON file: {file}")
-                        tar.add(file_path, arcname=file)
+            # Add configuration files
+            config_files = [CATEGORIES_FILE, FEATURED_FILE, ABOUT_FILE]
+            for config_file in config_files:
+                if os.path.exists(config_file):
+                    zipf.write(config_file, os.path.basename(config_file))
         
-        # Verify the backup was created successfully
-        if os.path.exists(backup_path) and os.path.getsize(backup_path) > 0:
-            print(f"Backup created successfully: {backup_path} ({os.path.getsize(backup_path)} bytes)")
-            return send_file(backup_path, as_attachment=True, download_name=backup_filename, mimetype='application/gzip')
-        else:
-            raise Exception("Backup file was not created or is empty")
-    
+        return send_file(backup_path, as_attachment=True, download_name=backup_filename)
     except Exception as e:
-        print(f"Backup error: {str(e)}")
-        return jsonify({'success': False, 'message': f'Backup failed: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 # New routes for admin interface functionality
 @app.route('/delete_image/<filename>', methods=['POST'])
