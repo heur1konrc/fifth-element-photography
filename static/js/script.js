@@ -301,13 +301,13 @@ function openModal(imageUrl, title, category) {
     modalImage.src = imageUrl;
     modalTitle.textContent = title;
     modalCategory.innerHTML = '<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>';
-    modal.style.display = 'block';
+    modal.classList.add('show');
     document.body.style.overflow = 'hidden';
 }
 
 // Close modal
 function closeImageModal() {
-    modal.style.display = 'none';
+    modal.classList.remove('show');
     document.body.style.overflow = 'auto';
 }
 

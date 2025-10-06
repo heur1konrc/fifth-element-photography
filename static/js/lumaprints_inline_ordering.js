@@ -123,7 +123,7 @@ class LumaprintsInlineOrdering {
             // Ensure modal is visible and show print order view
             const modal = document.getElementById('imageModal');
             if (modal) {
-                modal.style.display = 'flex';
+                modal.classList.add('show');
             }
             
             // Show print order view
