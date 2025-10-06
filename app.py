@@ -2142,3 +2142,51 @@ def download_image(filename):
         
     except Exception as e:
         return f"Error downloading file: {str(e)}", 500
+
+@app.route('/admin/download-highres/<filename>')
+def download_highres_image(filename):
+    """Download high-resolution version of image for Lumaprints upload"""
+    try:
+        from image_storage_manager import ImageStorageManager
+        storage_manager = ImageStorageManager()
+        
+        # Security check - ensure filename is safe
+        if not filename or '..' in filename or '/' in filename:
+            return "Invalid filename", 400
+        
+        # Get high-res path
+        highres_path = storage_manager.get_highres_path(filename)
+        
+        if not highres_path:
+            return "High-resolution version not found", 404
+        
+        # Send file with proper headers for download
+        return send_from_directory(
+            os.path.dirname(highres_path), 
+            os.path.basename(highres_path), 
+            as_attachment=True,
+            download_name=f"highres_{filename}"
+        )
+        
+    except Exception as e:
+        return f"Error downloading high-res file: {str(e)}", 500
+
+@app.route('/api/image-storage-info')
+def get_image_storage_info():
+    """Get storage information for all images"""
+    try:
+        from image_storage_manager import ImageStorageManager
+        storage_manager = ImageStorageManager()
+        
+        all_info = storage_manager.get_all_images_info()
+        
+        return jsonify({
+            'success': True,
+            'images': all_info
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

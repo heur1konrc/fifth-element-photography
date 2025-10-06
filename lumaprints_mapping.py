@@ -100,12 +100,24 @@ class LumaprintsMapping:
         status_list = []
         for filename in gallery_images:
             image_data = mapping.get(filename, {})
+            
+            # Get file size from /data (these ARE the original files)
+            file_path = os.path.join('/data', filename)
+            file_size_bytes = 0
+            file_size_mb = 0
+            
+            if os.path.exists(file_path):
+                file_size_bytes = os.path.getsize(file_path)
+                file_size_mb = round(file_size_bytes / (1024 * 1024), 2)
+            
             status_list.append({
                 'filename': filename,
                 'mapped': image_data.get('status') == 'mapped',
                 'library_id': image_data.get('library_id'),
                 'library_name': image_data.get('library_name'),
-                'mapped_at': image_data.get('mapped_at')
+                'mapped_at': image_data.get('mapped_at'),
+                'file_size_bytes': file_size_bytes,
+                'file_size_mb': file_size_mb
             })
         
         return status_list
