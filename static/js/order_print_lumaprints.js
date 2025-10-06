@@ -27,23 +27,40 @@ class LumaprintsOrderInterface {
             102: {
                 name: 'Framed Canvas',
                 subcategories: [
-                    // 0.75in Framed Canvas with different frame colors
-                    { id: 102001, name: '0.75in Black Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102001, name: '0.75in White Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102001, name: '0.75in Silver Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102001, name: '0.75in Gold Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    
-                    // 1.25in Framed Canvas with different frame colors
-                    { id: 102002, name: '1.25in Black Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102002, name: '1.25in Oak Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102002, name: '1.25in Walnut Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    
-                    // 1.50in Framed Canvas with different frame colors
-                    { id: 102003, name: '1.50in Black Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102003, name: '1.50in White Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102003, name: '1.50in Silver Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102003, name: '1.50in Gold Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102003, name: '1.50in Oak Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 }
+                    // Frame depth options - user selects depth first
+                    { 
+                        id: 102001, 
+                        name: '0.75" Framed Canvas', 
+                        minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200,
+                        frameColors: [
+                            { name: 'Black Floating Frame', optionId: 12 },
+                            { name: 'White Floating Frame', optionId: 13 },
+                            { name: 'Silver Floating Frame', optionId: 14 },
+                            { name: 'Gold Floating Frame', optionId: 15 }
+                        ]
+                    },
+                    { 
+                        id: 102002, 
+                        name: '1.25" Framed Canvas', 
+                        minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200,
+                        frameColors: [
+                            { name: 'Black Floating Frame', optionId: 27 },
+                            { name: 'Oak Floating Frame', optionId: 91 },
+                            { name: 'Walnut Floating Frame', optionId: 120 }
+                        ]
+                    },
+                    { 
+                        id: 102003, 
+                        name: '1.50" Framed Canvas', 
+                        minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200,
+                        frameColors: [
+                            { name: 'Black Floating Frame', optionId: 23 },
+                            { name: 'White Floating Frame', optionId: 24 },
+                            { name: 'Silver Floating Frame', optionId: 25 },
+                            { name: 'Gold Floating Frame', optionId: 26 },
+                            { name: 'Oak Floating Frame', optionId: 92 }
+                        ]
+                    }
                 ]
             },
             // Fine Art Paper Category (ID: 103)
@@ -227,8 +244,68 @@ class LumaprintsOrderInterface {
         // Update product title
         document.getElementById('productTitle').textContent = product.name;
         
+        // Check if this product has frame color options (for Framed Canvas)
+        if (product.frameColors && product.frameColors.length > 0) {
+            this.showFrameColorSelection(product);
+        } else {
+            // Load sizes directly for products without color options
+            this.loadSizes(product);
+            this.showView('sizes');
+        }
+    }
+
+    showFrameColorSelection(product) {
+        // Update the products grid to show frame color options
+        const grid = document.getElementById('productsGrid');
+        grid.innerHTML = '';
+        
+        // Update category title to show we're selecting frame colors
+        document.getElementById('categoryTitle').textContent = product.name + ' - Choose Frame Color';
+        
+        product.frameColors.forEach(color => {
+            const colorCard = document.createElement('div');
+            colorCard.className = 'product-card';
+            colorCard.dataset.colorId = color.optionId;
+            
+            colorCard.innerHTML = `
+                <div class="product-thumbnail">
+                    <span>Product Preview</span>
+                </div>
+                <div class="product-name">${color.name}</div>
+                <div class="product-description">
+                    Size range: ${product.minWidth}"×${product.minHeight}" to ${product.maxWidth}"×${product.maxHeight}"<br>
+                    Required DPI: ${product.dpi}
+                </div>
+            `;
+            
+            colorCard.addEventListener('click', () => {
+                this.selectFrameColor(product, color);
+            });
+            
+            grid.appendChild(colorCard);
+        });
+    }
+
+    selectFrameColor(product, color) {
+        // Create a new product object with the selected color
+        this.currentProduct = {
+            ...product,
+            name: product.name + ' - ' + color.name,
+            optionId: color.optionId,
+            selectedColor: color
+        };
+        
+        // Update UI
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        document.querySelector(`[data-color-id="${color.optionId}"]`).classList.add('selected');
+        
+        // Update product title
+        document.getElementById('productTitle').textContent = this.currentProduct.name;
+        
         // Load sizes
-        this.loadSizes(product);
+        this.loadSizes(this.currentProduct);
         this.showView('sizes');
     }
     
