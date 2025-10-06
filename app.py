@@ -1048,7 +1048,10 @@ def version():
     """Version endpoint - JS fixes applied"""
     return jsonify({'version': '1.2', 'status': 'JS fixes applied'})
 
-# REMOVED CONFLICTING BACKUP ROUTE - Now using single comprehensive backup_system route
+@app.route('/backup')
+def backup_redirect():
+    """Simple backup route that calls the backup_system function"""
+    return backup_system()
 
 
 def extract_exif_data(image_path):
