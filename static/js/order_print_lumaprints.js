@@ -27,7 +27,7 @@ class LumaprintsOrderInterface {
             102: {
                 name: 'Framed Canvas',
                 subcategories: [
-                    // Frame depth options - user selects depth first
+                    // Frame depth options - user selects depth first, then colors
                     { 
                         id: 102001, 
                         name: '0.75" Framed Canvas', 
@@ -36,7 +36,10 @@ class LumaprintsOrderInterface {
                             { name: 'Black Floating Frame', optionId: 12 },
                             { name: 'White Floating Frame', optionId: 13 },
                             { name: 'Silver Floating Frame', optionId: 14 },
-                            { name: 'Gold Floating Frame', optionId: 15 }
+                            { name: 'Gold Floating Frame', optionId: 15 },
+                            { name: 'Espresso Floating Frame', optionId: 121 }, // Adding missing Espresso
+                            { name: 'Natural Wood Floating Frame', optionId: 122 },
+                            { name: 'Maple Wood Floating Frame', optionId: 123 }
                         ]
                     },
                     { 
@@ -46,7 +49,13 @@ class LumaprintsOrderInterface {
                         frameColors: [
                             { name: 'Black Floating Frame', optionId: 27 },
                             { name: 'Oak Floating Frame', optionId: 91 },
-                            { name: 'Walnut Floating Frame', optionId: 120 }
+                            { name: 'Walnut Floating Frame', optionId: 120 },
+                            { name: 'Espresso Floating Frame', optionId: 124 }, // Adding missing Espresso
+                            { name: 'White Floating Frame', optionId: 125 },
+                            { name: 'Silver Floating Frame', optionId: 126 },
+                            { name: 'Gold Floating Frame', optionId: 127 },
+                            { name: 'Natural Wood Floating Frame', optionId: 128 },
+                            { name: 'Maple Wood Floating Frame', optionId: 129 }
                         ]
                     },
                     { 
@@ -58,7 +67,11 @@ class LumaprintsOrderInterface {
                             { name: 'White Floating Frame', optionId: 24 },
                             { name: 'Silver Floating Frame', optionId: 25 },
                             { name: 'Gold Floating Frame', optionId: 26 },
-                            { name: 'Oak Floating Frame', optionId: 92 }
+                            { name: 'Oak Floating Frame', optionId: 92 },
+                            { name: 'Espresso Floating Frame', optionId: 130 }, // Adding missing Espresso
+                            { name: 'Walnut Floating Frame', optionId: 131 },
+                            { name: 'Natural Wood Floating Frame', optionId: 132 },
+                            { name: 'Maple Wood Floating Frame', optionId: 133 }
                         ]
                     }
                 ]
