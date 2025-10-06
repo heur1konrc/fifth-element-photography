@@ -1948,22 +1948,8 @@ def get_lumaprints_pricing():
                 'error': pricing_result['error']
             }), 500
         
-        # Format response
-        response = {
-            'success': True,
-            'pricing': {
-                'subcategoryId': subcategory_id,
-                'width': width,
-                'height': height,
-                'quantity': quantity,
-                'wholesale_price': pricing_result['wholesale_price'],
-                'markup_percentage': pricing_result['markup_percentage'],
-                'retail_price': pricing_result['retail_price'],
-                'formatted_price': f"${pricing_result['retail_price']:.2f}"
-            }
-        }
-        
-        return jsonify(response)
+        # Return the pricing result directly (it's already in the correct format)
+        return jsonify(pricing_result)
         
     except ValueError as e:
         return jsonify({
