@@ -27,9 +27,23 @@ class LumaprintsOrderInterface {
             102: {
                 name: 'Framed Canvas',
                 subcategories: [
-                    { id: 102001, name: '0.75in Framed Canvas', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102002, name: '1.25in Framed Canvas', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
-                    { id: 102003, name: '1.50in Framed Canvas', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 }
+                    // 0.75in Framed Canvas with different frame colors
+                    { id: 102001, name: '0.75in Black Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    { id: 102001, name: '0.75in White Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    { id: 102001, name: '0.75in Silver Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    { id: 102001, name: '0.75in Gold Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    
+                    // 1.25in Framed Canvas with different frame colors
+                    { id: 102002, name: '1.25in Black Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    { id: 102002, name: '1.25in Oak Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    { id: 102002, name: '1.25in Walnut Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    
+                    // 1.50in Framed Canvas with different frame colors
+                    { id: 102003, name: '1.50in Black Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    { id: 102003, name: '1.50in White Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    { id: 102003, name: '1.50in Silver Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    { id: 102003, name: '1.50in Gold Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 },
+                    { id: 102003, name: '1.50in Oak Floating Frame', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 }
                 ]
             },
             // Fine Art Paper Category (ID: 103)
@@ -44,6 +58,20 @@ class LumaprintsOrderInterface {
                     { id: 103007, name: 'Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
                     { id: 103008, name: 'Semi-Matte Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
                     { id: 103009, name: 'Somerset Velvet Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 }
+                ]
+            },
+            // Foam-mounted Print Category (ID: 104) - Based on Fine Art Paper products
+            104: {
+                name: 'Foam-mounted Print',
+                subcategories: [
+                    { id: 104001, name: 'Foam-mounted Archival Matte Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
+                    { id: 104002, name: 'Foam-mounted Hot Press Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
+                    { id: 104003, name: 'Foam-mounted Cold Press Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
+                    { id: 104005, name: 'Foam-mounted Semi-Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
+                    { id: 104006, name: 'Foam-mounted Metallic Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
+                    { id: 104007, name: 'Foam-mounted Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
+                    { id: 104009, name: 'Foam-mounted Somerset Velvet Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
+                    { id: 104010, name: 'Foam-mounted Canvas', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 }
                 ]
             },
             // Framed Fine Art Paper Category (ID: 105)
@@ -62,7 +90,16 @@ class LumaprintsOrderInterface {
             106: {
                 name: 'Metal',
                 subcategories: [
-                    { id: 106001, name: 'Metal Print', minWidth: 5, maxWidth: 48, minHeight: 5, maxHeight: 96, dpi: 300 }
+                    { id: 106001, name: 'Glossy White Metal Print', minWidth: 5, maxWidth: 48, minHeight: 5, maxHeight: 96, dpi: 300 },
+                    { id: 106001, name: 'Glossy Silver Metal Print', minWidth: 5, maxWidth: 48, minHeight: 5, maxHeight: 96, dpi: 300 }
+                ]
+            },
+            // Peel and Stick Category (ID: 107)
+            107: {
+                name: 'Peel and Stick',
+                subcategories: [
+                    { id: 107001, name: 'Peel and Stick Vinyl', minWidth: 5, maxWidth: 48, minHeight: 5, maxHeight: 96, dpi: 300 },
+                    { id: 107002, name: 'Peel and Stick Fabric', minWidth: 5, maxWidth: 48, minHeight: 5, maxHeight: 96, dpi: 300 }
                 ]
             }
         };
