@@ -85,50 +85,25 @@
                 </div>
             </section> -->
             
-            <!-- Lumaprints Thumbnail Management Section -->
-            <section class="thumbnail-section">
+            <!-- Admin Tools Section -->
+            <section class="admin-tools-section">
                 <div class="section-header">
-                    <h2 class="section-title">Lumaprints Product Thumbnails</h2>
-                    <p class="section-description">Upload and manage product thumbnails for the Lumaprints ordering interface. Images should be 1:1 aspect ratio (square).</p>
+                    <h2 class="section-title">Admin Tools</h2>
+                    <p class="section-description">Manage various aspects of your photography website</p>
                 </div>
                 
-                <div class="thumbnail-management">
-                    <div class="thumbnail-categories">
-                        <div class="category-tabs">
-                            <button class="tab-btn active" data-category="canvas">Canvas</button>
-                            <button class="tab-btn" data-category="framed-canvas">Framed Canvas</button>
-                            <button class="tab-btn" data-category="fine-art-paper">Fine Art Paper</button>
-                            <button class="tab-btn" data-category="framed-fine-art">Framed Fine Art</button>
-                            <button class="tab-btn" data-category="metal">Metal</button>
-                            <button class="tab-btn" data-category="foam-mounted">Foam Mounted</button>
-                            <button class="tab-btn" data-category="peel-stick">Peel & Stick</button>
-                        </div>
-                        
-                        <div class="thumbnail-grid" id="thumbnailGrid">
-                            <!-- Thumbnails will be loaded here via JavaScript -->
-                        </div>
-                        
-                        <div class="upload-section">
-                            <div class="upload-dropzone" id="thumbnailDropzone">
-                                <div class="dropzone-content">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <h3>Drop thumbnail images here</h3>
-                                    <p>or click to browse (1:1 aspect ratio recommended)</p>
-                                    <input type="file" id="thumbnailInput" multiple accept="image/*" style="display: none;">
-                                </div>
-                            </div>
-                            <div class="upload-actions">
-                                <button class="btn btn-primary" onclick="document.getElementById('thumbnailInput').click()">
-                                    <i class="fas fa-plus"></i>
-                                    Select Files
-                                </button>
-                                <button class="btn btn-success" onclick="uploadThumbnails()">
-                                    <i class="fas fa-upload"></i>
-                                    Upload Selected
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="admin-tools-grid">
+                    <a href="/admin/categories" class="admin-tool-card">
+                        <i class="fas fa-tags"></i>
+                        <h3>Categories</h3>
+                        <p>Manage image categories and organization</p>
+                    </a>
+                    
+                    <a href="/admin/thumbnails" class="admin-tool-card">
+                        <i class="fas fa-images"></i>
+                        <h3>Lumaprints Thumbnails</h3>
+                        <p>Manage product thumbnails for print ordering</p>
+                    </a>
                 </div>
             </section>
 

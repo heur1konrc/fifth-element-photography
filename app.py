@@ -543,34 +543,52 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Lumaprints Thumbnail Management Routes
-THUMBNAILS_FOLDER = '/data/thumbnails'
+PRODUCT_THUMBNAILS_FOLDER = '/data/portfolio/gallery/product-thumbnails'
+THUMBNAIL_ASSIGNMENTS_FILE = '/data/thumbnail-assignments.json'
 
-def ensure_thumbnails_folder():
-    """Ensure thumbnails folder structure exists"""
-    categories = ['canvas', 'framed-canvas', 'fine-art-paper', 'framed-fine-art', 'metal', 'foam-mounted', 'peel-stick']
-    
-    if not os.path.exists(THUMBNAILS_FOLDER):
-        os.makedirs(THUMBNAILS_FOLDER)
-    
-    for category in categories:
-        category_path = os.path.join(THUMBNAILS_FOLDER, category)
-        if not os.path.exists(category_path):
-            os.makedirs(category_path)
+def ensure_product_thumbnails_folder():
+    """Ensure product thumbnails folder exists"""
+    if not os.path.exists(PRODUCT_THUMBNAILS_FOLDER):
+        os.makedirs(PRODUCT_THUMBNAILS_FOLDER)
 
-@app.route('/admin/upload-thumbnails', methods=['POST'])
-def upload_thumbnails():
-    """Upload thumbnails for Lumaprints products"""
+def load_thumbnail_assignments():
+    """Load thumbnail assignments from JSON file"""
     try:
-        ensure_thumbnails_folder()
+        if os.path.exists(THUMBNAIL_ASSIGNMENTS_FILE):
+            with open(THUMBNAIL_ASSIGNMENTS_FILE, 'r') as f:
+                return json.load(f)
+        return {}
+    except Exception as e:
+        print(f"Error loading thumbnail assignments: {e}")
+        return {}
+
+def save_thumbnail_assignments(assignments):
+    """Save thumbnail assignments to JSON file"""
+    try:
+        with open(THUMBNAIL_ASSIGNMENTS_FILE, 'w') as f:
+            json.dump(assignments, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving thumbnail assignments: {e}")
+        return False
+
+@app.route('/admin/thumbnails')
+def admin_thumbnails():
+    """Admin page for managing product thumbnails"""
+    return render_template('admin_thumbnails.html')
+
+@app.route('/admin/upload-product-thumbnails', methods=['POST'])
+def upload_product_thumbnails():
+    """Upload product thumbnails to the product-thumbnails directory"""
+    try:
+        ensure_product_thumbnails_folder()
         
-        category = request.form.get('category', 'canvas')
         files = request.files.getlist('thumbnails')
         
         if not files or files[0].filename == '':
             return jsonify({'success': False, 'error': 'No files selected'})
         
         uploaded_count = 0
-        category_path = os.path.join(THUMBNAILS_FOLDER, category)
         
         for file in files:
             if file and allowed_file(file.filename):
@@ -578,11 +596,11 @@ def upload_thumbnails():
                 # Ensure unique filename
                 counter = 1
                 base_name, ext = os.path.splitext(filename)
-                while os.path.exists(os.path.join(category_path, filename)):
+                while os.path.exists(os.path.join(PRODUCT_THUMBNAILS_FOLDER, filename)):
                     filename = f"{base_name}_{counter}{ext}"
                     counter += 1
                 
-                filepath = os.path.join(category_path, filename)
+                filepath = os.path.join(PRODUCT_THUMBNAILS_FOLDER, filename)
                 file.save(filepath)
                 uploaded_count += 1
         
@@ -591,24 +609,27 @@ def upload_thumbnails():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/admin/thumbnails/<category>')
-def get_thumbnails(category):
-    """Get thumbnails for a specific category"""
+@app.route('/admin/product-thumbnails')
+def get_product_thumbnails():
+    """Get all product thumbnails with their assignments"""
     try:
-        ensure_thumbnails_folder()
-        category_path = os.path.join(THUMBNAILS_FOLDER, category)
-        
-        if not os.path.exists(category_path):
-            return jsonify([])
+        ensure_product_thumbnails_folder()
+        assignments = load_thumbnail_assignments()
         
         thumbnails = []
-        for filename in os.listdir(category_path):
+        for filename in os.listdir(PRODUCT_THUMBNAILS_FOLDER):
             if allowed_file(filename):
+                thumbnail_id = filename
+                assignment = assignments.get(thumbnail_id, '')
+                
+                # Get human-readable assignment name
+                assignment_name = get_product_name(assignment) if assignment else ''
+                
                 thumbnails.append({
-                    'id': f"{category}_{filename}",
+                    'id': thumbnail_id,
                     'name': filename,
-                    'url': f"/thumbnails/{category}/{filename}",
-                    'category': category
+                    'url': f"/product-thumbnails/{filename}",
+                    'assignment': assignment_name
                 })
         
         return jsonify(thumbnails)
@@ -616,31 +637,58 @@ def get_thumbnails(category):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/thumbnails/<category>/<filename>')
-def serve_thumbnail(category, filename):
-    """Serve thumbnail files"""
+@app.route('/product-thumbnails/<filename>')
+def serve_product_thumbnail(filename):
+    """Serve product thumbnail files"""
     try:
-        thumbnail_path = os.path.join(THUMBNAILS_FOLDER, category, filename)
+        thumbnail_path = os.path.join(PRODUCT_THUMBNAILS_FOLDER, filename)
         if os.path.exists(thumbnail_path):
             return send_file(thumbnail_path)
         return "Thumbnail not found", 404
     except Exception as e:
         return str(e), 500
 
-@app.route('/admin/thumbnails/<thumbnail_id>', methods=['DELETE'])
-def delete_thumbnail(thumbnail_id):
-    """Delete a thumbnail"""
+@app.route('/admin/assign-thumbnail', methods=['POST'])
+def assign_thumbnail():
+    """Assign a thumbnail to a specific product"""
     try:
-        # Parse thumbnail_id (format: category_filename)
-        parts = thumbnail_id.split('_', 1)
-        if len(parts) != 2:
-            return jsonify({'success': False, 'error': 'Invalid thumbnail ID'})
+        data = request.get_json()
+        thumbnail_id = data.get('thumbnail_id')
+        product_id = data.get('product_id')
         
-        category, filename = parts
-        thumbnail_path = os.path.join(THUMBNAILS_FOLDER, category, filename)
+        if not thumbnail_id or not product_id:
+            return jsonify({'success': False, 'error': 'Missing thumbnail_id or product_id'})
+        
+        # Load current assignments
+        assignments = load_thumbnail_assignments()
+        
+        # Update assignment
+        assignments[thumbnail_id] = product_id
+        
+        # Save assignments
+        if save_thumbnail_assignments(assignments):
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Failed to save assignment'})
+            
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/admin/delete-product-thumbnail/<thumbnail_id>', methods=['DELETE'])
+def delete_product_thumbnail(thumbnail_id):
+    """Delete a product thumbnail"""
+    try:
+        thumbnail_path = os.path.join(PRODUCT_THUMBNAILS_FOLDER, thumbnail_id)
         
         if os.path.exists(thumbnail_path):
             os.remove(thumbnail_path)
+            
+            # Also remove from assignments
+            assignments = load_thumbnail_assignments()
+            if thumbnail_id in assignments:
+                del assignments[thumbnail_id]
+                save_thumbnail_assignments(assignments)
+            
             return jsonify({'success': True})
         else:
             return jsonify({'success': False, 'error': 'Thumbnail not found'})
@@ -648,37 +696,58 @@ def delete_thumbnail(thumbnail_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
-@app.route('/admin/thumbnails/<thumbnail_id>/replace', methods=['POST'])
-def replace_thumbnail(thumbnail_id):
-    """Replace a thumbnail"""
-    try:
-        # Parse thumbnail_id (format: category_filename)
-        parts = thumbnail_id.split('_', 1)
-        if len(parts) != 2:
-            return jsonify({'success': False, 'error': 'Invalid thumbnail ID'})
-        
-        category, old_filename = parts
-        file = request.files.get('thumbnail')
-        
-        if not file or file.filename == '':
-            return jsonify({'success': False, 'error': 'No file provided'})
-        
-        if not allowed_file(file.filename):
-            return jsonify({'success': False, 'error': 'Invalid file type'})
-        
-        # Remove old file
-        old_path = os.path.join(THUMBNAILS_FOLDER, category, old_filename)
-        if os.path.exists(old_path):
-            os.remove(old_path)
-        
-        # Save new file with same name
-        new_path = os.path.join(THUMBNAILS_FOLDER, category, old_filename)
-        file.save(new_path)
-        
-        return jsonify({'success': True})
-        
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+def get_product_name(product_id):
+    """Convert product ID to human-readable name"""
+    product_names = {
+        'canvas-075-stretched': 'Canvas - 0.75" Stretched',
+        'canvas-125-stretched': 'Canvas - 1.25" Stretched',
+        'canvas-150-stretched': 'Canvas - 1.50" Stretched',
+        'canvas-rolled': 'Canvas - Rolled',
+        'framed-canvas-075-black': 'Framed Canvas - 0.75" Black',
+        'framed-canvas-075-white': 'Framed Canvas - 0.75" White',
+        'framed-canvas-075-silver': 'Framed Canvas - 0.75" Silver',
+        'framed-canvas-075-gold': 'Framed Canvas - 0.75" Gold',
+        'framed-canvas-075-espresso': 'Framed Canvas - 0.75" Espresso',
+        'framed-canvas-125-black': 'Framed Canvas - 1.25" Black',
+        'framed-canvas-125-white': 'Framed Canvas - 1.25" White',
+        'framed-canvas-125-oak': 'Framed Canvas - 1.25" Oak',
+        'framed-canvas-125-walnut': 'Framed Canvas - 1.25" Walnut',
+        'framed-canvas-125-espresso': 'Framed Canvas - 1.25" Espresso',
+        'framed-canvas-150-black': 'Framed Canvas - 1.50" Black',
+        'framed-canvas-150-white': 'Framed Canvas - 1.50" White',
+        'framed-canvas-150-silver': 'Framed Canvas - 1.50" Silver',
+        'framed-canvas-150-gold': 'Framed Canvas - 1.50" Gold',
+        'framed-canvas-150-oak': 'Framed Canvas - 1.50" Oak',
+        'framed-canvas-150-espresso': 'Framed Canvas - 1.50" Espresso',
+        'fine-art-archival-matte': 'Fine Art Paper - Archival Matte',
+        'fine-art-hot-press': 'Fine Art Paper - Hot Press',
+        'fine-art-cold-press': 'Fine Art Paper - Cold Press',
+        'fine-art-semi-glossy': 'Fine Art Paper - Semi-Glossy',
+        'fine-art-metallic': 'Fine Art Paper - Metallic',
+        'fine-art-glossy': 'Fine Art Paper - Glossy',
+        'fine-art-somerset-velvet': 'Fine Art Paper - Somerset Velvet',
+        'framed-fine-art-0875-black': 'Framed Fine Art - 0.875" Black',
+        'framed-fine-art-0875-white': 'Framed Fine Art - 0.875" White',
+        'framed-fine-art-0875-oak': 'Framed Fine Art - 0.875" Oak',
+        'framed-fine-art-0875-walnut': 'Framed Fine Art - 0.875" Walnut',
+        'framed-fine-art-0875-espresso': 'Framed Fine Art - 0.875" Espresso',
+        'framed-fine-art-125-black': 'Framed Fine Art - 1.25" Black',
+        'framed-fine-art-125-white': 'Framed Fine Art - 1.25" White',
+        'framed-fine-art-125-oak': 'Framed Fine Art - 1.25" Oak',
+        'framed-fine-art-125-walnut': 'Framed Fine Art - 1.25" Walnut',
+        'framed-fine-art-125-espresso': 'Framed Fine Art - 1.25" Espresso',
+        'metal-glossy': 'Metal - Glossy',
+        'metal-matte': 'Metal - Matte',
+        'foam-mounted-archival-matte': 'Foam Mounted - Archival Matte',
+        'foam-mounted-hot-press': 'Foam Mounted - Hot Press',
+        'foam-mounted-cold-press': 'Foam Mounted - Cold Press',
+        'foam-mounted-semi-glossy': 'Foam Mounted - Semi-Glossy',
+        'foam-mounted-metallic': 'Foam Mounted - Metallic',
+        'foam-mounted-glossy': 'Foam Mounted - Glossy',
+        'peel-stick-vinyl': 'Peel and Stick - Vinyl',
+        'peel-stick-fabric': 'Peel and Stick - Fabric'
+    }
+    return product_names.get(product_id, product_id)
 
 @app.route('/admin/categories', methods=['GET', 'POST'])
 def manage_categories():
