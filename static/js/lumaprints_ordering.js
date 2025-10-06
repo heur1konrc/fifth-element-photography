@@ -217,7 +217,9 @@ class LumaprintsPrintOrdering {
 
     // Show order form
     showOrderForm(orderDetails) {
+        console.log('showOrderForm called with:', orderDetails);
         const totalPrice = orderDetails.pricing.retail_price * orderDetails.quantity;
+        console.log('Total price calculated:', totalPrice);
         
         const orderFormHTML = `
             <div id="orderFormModal" class="modal-overlay" onclick="lumaprintsPrintOrdering.closeOrderForm(event)">
@@ -303,11 +305,22 @@ class LumaprintsPrintOrdering {
             </div>
         `;
         
+        console.log('Adding order form HTML to body...');
         document.body.insertAdjacentHTML('beforeend', orderFormHTML);
-        document.getElementById('orderFormModal').style.display = 'flex';
+        
+        const modal = document.getElementById('orderFormModal');
+        console.log('Order form modal element:', modal);
+        
+        if (modal) {
+            modal.style.display = 'flex';
+            console.log('Modal display set to flex');
+        } else {
+            console.error('Order form modal not found after creation!');
+        }
         
         // Store order details for payment processing
         this.currentOrderDetails = orderDetails;
+        console.log('Order form should now be visible');
     }
 
     // Close order form
