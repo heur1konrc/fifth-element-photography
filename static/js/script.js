@@ -523,32 +523,4 @@ let lumaprintsOrdering = null;
 
 // Initialize Lumaprints when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Lumaprints classes if they exist
-    if (typeof LumaprintsPricing !== 'undefined') {
-        lumaprintsPricing = new LumaprintsPricing();
-    }
-    
-    if (typeof LumaprintsPrintOrdering !== 'undefined') {
-        lumaprintsOrdering = new LumaprintsPrintOrdering();
-    }
-    
-    // Setup Order Print button event listener
-    const orderPrintBtn = document.getElementById('orderPrintBtn');
-    if (orderPrintBtn) {
-        orderPrintBtn.addEventListener('click', function() {
-            const currentImageSrc = modalImage.src;
-            const currentImageTitle = modalTitle.textContent;
-            
-            if (currentImageSrc && lumaprintsOrdering) {
-                // Extract filename from image URL
-                const filename = currentImageSrc.split('/').pop();
-                
-                // Open print order modal with current image
-                lumaprintsOrdering.showPrintModal(currentImageSrc);
-                
-                // Close the main image modal
-                closeImageModal();
-            }
-        });
-    }
-});
+    // Order Print functionality is now handled by lumaprints_inline_ordering.js

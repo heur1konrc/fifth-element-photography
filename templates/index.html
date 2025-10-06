@@ -318,15 +318,166 @@
     <div class="modal" id="imageModal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <img class="modal-image" id="modalImage">
-            <div class="modal-info">
-                <h4 id="modalTitle"></h4>
-                <p id="modalCategory"></p>
-                <div class="modal-actions">
-                    <button class="btn-order-print" id="orderPrintBtn">
-                        <span class="btn-icon">🖼️</span>
-                        Order Print
+            
+            <!-- Main Image View -->
+            <div class="modal-main-view" id="modalMainView">
+                <img class="modal-image" id="modalImage">
+                <div class="modal-info">
+                    <h4 id="modalTitle"></h4>
+                    <p id="modalCategory"></p>
+                    <div class="modal-actions">
+                        <button class="btn-order-print" id="orderPrintBtn">
+                            <span class="btn-icon">🖼️</span>
+                            Order Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Print Ordering Interface (initially hidden) -->
+            <div class="modal-print-order" id="modalPrintOrder" style="display: none;">
+                <div class="print-order-header">
+                    <button class="btn-back" id="backToImageBtn">
+                        <span class="btn-icon">←</span>
+                        Back to Image
                     </button>
+                    <h3>Order Print</h3>
+                </div>
+                
+                <div class="print-order-content">
+                    <div class="order-image-preview">
+                        <img id="orderPreviewImage" class="order-preview-img" alt="Print Preview">
+                        <div class="order-image-info">
+                            <h4 id="orderImageTitle"></h4>
+                        </div>
+                    </div>
+                    
+                    <div class="product-selection">
+                        <h4>Product Type</h4>
+                        <div class="product-categories">
+                            <div class="product-category" data-product="101001">
+                                <h5>Canvas Print (0.75")</h5>
+                                <p>Gallery wrapped canvas</p>
+                            </div>
+                            <div class="product-category" data-product="101002">
+                                <h5>Canvas Print (1.25")</h5>
+                                <p>Thick gallery wrapped canvas</p>
+                            </div>
+                            <div class="product-category" data-product="103001">
+                                <h5>Fine Art Paper</h5>
+                                <p>Premium matte paper</p>
+                            </div>
+                            <div class="product-category" data-product="106001">
+                                <h5>Metal Print</h5>
+                                <p>Vibrant aluminum print</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="size-selection">
+                        <h4>Size</h4>
+                        <div class="size-options" id="sizeOptions">
+                            <!-- Size options will be populated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="quantity-selection">
+                        <h4>Quantity</h4>
+                        <div class="quantity-controls">
+                            <button class="qty-btn" id="qtyMinus">-</button>
+                            <input type="number" id="quantity" value="1" min="1" max="10">
+                            <button class="qty-btn" id="qtyPlus">+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="price-display" id="priceDisplay">
+                        <div class="price-breakdown">
+                            <div class="price-line">
+                                <span>Select product and size to see pricing</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="order-actions">
+                        <button class="btn-continue-order" id="continueOrderBtn" disabled>
+                            Proceed to Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Form Interface (initially hidden) -->
+            <div class="modal-order-form" id="modalOrderForm" style="display: none;">
+                <div class="order-form-header">
+                    <button class="btn-back" id="backToPrintOrderBtn">
+                        <span class="btn-icon">←</span>
+                        Back to Options
+                    </button>
+                    <h3>Complete Your Order</h3>
+                </div>
+                
+                <div class="order-form-content">
+                    <div class="order-summary" id="orderSummary">
+                        <!-- Order summary will be populated dynamically -->
+                    </div>
+                    
+                    <form id="orderForm" class="customer-form">
+                        <h4>Shipping Information</h4>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name *</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name *</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Address *</label>
+                            <input type="text" id="address" name="address" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City *</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State *</label>
+                                <input type="text" id="state" name="state" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="zipCode">ZIP Code *</label>
+                                <input type="text" id="zipCode" name="zipCode" required>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-section">
+                            <h4>Payment</h4>
+                            <div class="payment-total" id="paymentTotal">
+                                <!-- Total will be populated dynamically -->
+                            </div>
+                            
+                            <div class="payment-options">
+                                <button type="button" class="btn-paypal" id="paypalBtn">
+                                    Pay with PayPal
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -336,7 +487,7 @@
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lumaprints_pricing.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lumaprints_ordering.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lumaprints_inline_ordering.js') }}"></script>
 </body>
 </html>
 
