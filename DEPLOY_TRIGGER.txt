@@ -1,0 +1,4 @@
+Deployment trigger - Force Railway redeploy
+Timestamp: 2025-10-06 04:21:00
+Changes: Lumaprints API credentials updated, modal fixes applied
+Status: Forcing new deployment due to Railway deployment delay
