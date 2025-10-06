@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Print - {{ image_title }} | Fifth Element Photography</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/order_print_simple.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="order-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <a href="/" class="back-link">
+                    <span>←</span> Back to Gallery
+                </a>
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Fifth Element Photography" class="logo-img">
+            </div>
+            <h1 class="page-title">Order Print</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="order-main">
+        <div class="order-container">
+            
+            <!-- Left Sidebar -->
+            <aside class="order-sidebar">
+                <!-- Image Preview -->
+                <div class="image-preview-section">
+                    <div class="preview-image">
+                        <img src="/api/image/{{ image_filename }}" alt="{{ image_title }}" class="preview-img">
+                    </div>
+                    <div class="image-info">
+                        <h3 class="image-title">{{ image_title }}</h3>
+                        <p class="image-category">{{ image_category }}</p>
+                    </div>
+                </div>
+
+                <!-- Product Categories -->
+                <div class="product-categories">
+                    <h2 class="categories-title">Select product</h2>
+                    <div class="category-list">
+                        <div class="category-item active" data-category="canvas">
+                            <img src="{{ url_for('static', filename='images/icons/canvas.png') }}" alt="Canvas" class="category-icon">
+                            <span class="category-name">Canvas</span>
+                        </div>
+                        <div class="category-item" data-category="framed-canvas">
+                            <img src="{{ url_for('static', filename='images/icons/framed-canvas.png') }}" alt="Framed Canvas" class="category-icon">
+                            <span class="category-name">Framed Canvas</span>
+                        </div>
+                        <div class="category-item" data-category="fine-art-paper">
+                            <img src="{{ url_for('static', filename='images/icons/fine-art-paper.png') }}" alt="Fine Art Paper" class="category-icon">
+                            <span class="category-name">Fine Art Paper</span>
+                        </div>
+                        <div class="category-item" data-category="foam-mounted">
+                            <img src="{{ url_for('static', filename='images/icons/foam-mounted.png') }}" alt="Foam-mounted Print" class="category-icon">
+                            <span class="category-name">Foam-mounted Print</span>
+                        </div>
+                        <div class="category-item" data-category="framed-fine-art">
+                            <img src="{{ url_for('static', filename='images/icons/framed-fine-art.png') }}" alt="Framed Fine Art Paper" class="category-icon">
+                            <span class="category-name">Framed Fine Art Paper</span>
+                        </div>
+                        <div class="category-item" data-category="metal">
+                            <img src="{{ url_for('static', filename='images/icons/metal.png') }}" alt="Metal" class="category-icon">
+                            <span class="category-name">Metal</span>
+                        </div>
+                        <div class="category-item" data-category="peel-and-stick">
+                            <img src="{{ url_for('static', filename='images/icons/peel-and-stick.png') }}" alt="Peel and Stick" class="category-icon">
+                            <span class="category-name">Peel and Stick</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="shopping-cart">
+                    <h3 class="cart-title">Order Summary</h3>
+                    <div class="cart-items" id="cartItems">
+                        <p class="cart-empty">No items in cart</p>
+                    </div>
+                    <div class="cart-total" id="cartTotal" style="display: none;">
+                        <div class="total-line">
+                            <span>Total: </span>
+                            <span class="total-amount">$0.00</span>
+                        </div>
+                    </div>
+                    <button class="btn-checkout" id="checkoutBtn" style="display: none;">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Panel -->
+            <section class="order-main-panel">
+                
+                <!-- Product Selection View -->
+                <div class="view-panel active" id="productView">
+                    <div class="panel-header">
+                        <h2 id="categoryTitle">Canvas</h2>
+                    </div>
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Size Selection View -->
+                <div class="view-panel" id="sizeView">
+                    <div class="panel-header">
+                        <h2 id="productTitle">Select Size</h2>
+                        <button class="btn-back" id="backToProducts">← Back to Products</button>
+                    </div>
+                    <div class="sizes-grid" id="sizesGrid">
+                        <!-- Sizes will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Quantity & Add to Cart View -->
+                <div class="view-panel" id="quantityView">
+                    <div class="panel-header">
+                        <h2 id="sizeTitle">Select Quantity</h2>
+                        <button class="btn-back" id="backToSizes">← Back to Sizes</button>
+                    </div>
+                    <div class="quantity-section">
+                        <div class="selected-item-info" id="selectedItemInfo">
+                            <!-- Selected item details will be shown here -->
+                        </div>
+                        <div class="quantity-controls">
+                            <label for="quantity">Quantity:</label>
+                            <div class="qty-input-group">
+                                <button type="button" class="qty-btn" id="qtyMinus">-</button>
+                                <input type="number" id="quantity" value="1" min="1" max="99">
+                                <button type="button" class="qty-btn" id="qtyPlus">+</button>
+                            </div>
+                        </div>
+                        <div class="price-display" id="priceDisplay">
+                            <div class="price-breakdown">
+                                <div class="unit-price">Unit Price: <span id="unitPrice">$0.00</span></div>
+                                <div class="total-price">Total: <span id="itemTotal">$0.00</span></div>
+                            </div>
+                        </div>
+                        <div class="add-to-cart-actions">
+                            <button class="btn-add-to-cart" id="addToCartBtn">
+                                Add to Order
+                            </button>
+                            <button class="btn-continue-shopping" id="continueShoppingBtn">
+                                Continue Shopping
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/order_print_simple.js') }}"></script>
+</body>
+</html>

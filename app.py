@@ -411,7 +411,7 @@ def order_print(image_id):
         # If image not found, redirect to main page
         return redirect(url_for('index'))
     
-    return render_template('order_print.html', image=selected_image)
+    return render_template('order_print_lumaprints.html', image=selected_image)
 
 @app.route('/images/<filename>')
 def serve_image(filename):
