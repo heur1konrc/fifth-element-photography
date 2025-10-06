@@ -838,3 +838,82 @@
     background: #6c757d !important;
     color: white !important;
 }
+
+/* Two-column layout for print ordering interface */
+.print-order-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 30px;
+    align-items: start;
+    margin-top: 20px;
+}
+
+.print-order-left {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.print-order-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: #f8f9fa !important;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    position: sticky;
+    top: 20px;
+}
+
+.print-order-right h4 {
+    color: #333 !important;
+    margin: 0 0 15px 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.print-order-right .quantity-controls {
+    justify-content: flex-start;
+}
+
+.print-order-right .price-display {
+    background: white !important;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.print-order-right .btn-continue-order {
+    width: 100%;
+    padding: 15px;
+    background: #28a745 !important;
+    color: white !important;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.print-order-right .btn-continue-order:hover {
+    background: #218838 !important;
+}
+
+.print-order-right .btn-continue-order:disabled {
+    background: #6c757d !important;
+    cursor: not-allowed;
+}
+
+/* Responsive: stack on mobile */
+@media (max-width: 768px) {
+    .print-order-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .print-order-right {
+        position: static;
+    }
+}
