@@ -49,9 +49,46 @@
 /* White background only for print ordering sections */
 .modal-print-order,
 .modal-order-form {
-    background: white;
+    background: white !important;
     border-radius: 12px;
     padding: 20px;
+    color: #333 !important;
+}
+
+/* Ensure all text in ordering sections is readable */
+.modal-print-order *,
+.modal-order-form * {
+    color: #333 !important;
+}
+
+.modal-print-order h3,
+.modal-print-order h4,
+.modal-order-form h3,
+.modal-order-form h4 {
+    color: #222 !important;
+}
+
+/* Fix order summary styling */
+.order-summary {
+    background: #f8f9fa !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+}
+
+.order-summary h4 {
+    color: #333 !important;
+    margin-bottom: 15px !important;
+}
+
+.order-summary .summary-item {
+    color: #555 !important;
+}
+
+.order-summary .total-price {
+    color: #28a745 !important;
+    font-weight: bold !important;
 }
 
 /* Main image view styling */
@@ -751,4 +788,53 @@
     .order-form-header h3 {
         font-size: 20px;
     }
+}
+
+
+/* Comprehensive text color fixes for ordering interface */
+.modal-print-order label,
+.modal-order-form label {
+    color: #333 !important;
+}
+
+.modal-print-order input,
+.modal-order-form input,
+.modal-print-order select,
+.modal-order-form select {
+    color: #333 !important;
+    background: white !important;
+}
+
+.modal-print-order .product-category,
+.modal-print-order .size-option {
+    color: #333 !important;
+    background: #f8f9fa !important;
+}
+
+.modal-print-order .product-category.selected,
+.modal-print-order .size-option.selected {
+    background: #007bff !important;
+    color: white !important;
+}
+
+.modal-print-order .pricing-info,
+.modal-order-form .pricing-info {
+    color: #28a745 !important;
+}
+
+.modal-print-order .form-group label,
+.modal-order-form .form-group label {
+    color: #555 !important;
+    font-weight: 500 !important;
+}
+
+.modal-print-order button,
+.modal-order-form button {
+    color: white !important;
+}
+
+.modal-print-order .btn-back,
+.modal-order-form .btn-back {
+    background: #6c757d !important;
+    color: white !important;
 }
