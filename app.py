@@ -1032,23 +1032,19 @@ def create_backup():
         
         # Create tar file
         with tarfile.open(temp_path, 'w:gz') as tar:
-            # Add app.py
-            if os.path.exists(os.path.join(current_dir, 'app.py')):
-                tar.add(os.path.join(current_dir, 'app.py'), arcname='app.py')
+            # Add main files
+            main_files = ['app.py', 'requirements.txt', 'Procfile', 'app_backup.py', 'backup.py', '.gitignore']
+            for filename in main_files:
+                filepath = os.path.join(current_dir, filename)
+                if os.path.exists(filepath):
+                    tar.add(filepath, arcname=filename)
             
-            # Add requirements.txt
-            if os.path.exists(os.path.join(current_dir, 'requirements.txt')):
-                tar.add(os.path.join(current_dir, 'requirements.txt'), arcname='requirements.txt')
-            
-            # Add templates directory
-            templates_dir = os.path.join(current_dir, 'templates')
-            if os.path.exists(templates_dir):
-                tar.add(templates_dir, arcname='templates')
-            
-            # Add static directory
-            static_dir = os.path.join(current_dir, 'static')
-            if os.path.exists(static_dir):
-                tar.add(static_dir, arcname='static')
+            # Add directories
+            directories = ['templates', 'static', 'data']
+            for dirname in directories:
+                dirpath = os.path.join(current_dir, dirname)
+                if os.path.exists(dirpath):
+                    tar.add(dirpath, arcname=dirname)
         
         # Send file
         return send_file(temp_path, as_attachment=True, download_name=backup_filename)
