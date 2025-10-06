@@ -1975,3 +1975,106 @@ def get_lumaprints_pricing():
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 # 
+
+# ============================================================================
+# LUMAPRINTS LIBRARY SYNC ROUTES
+# ============================================================================
+
+@app.route('/admin/lumaprints-sync')
+def admin_lumaprints_sync():
+    """Admin interface for managing Lumaprints library sync"""
+    try:
+        from lumaprints_library import LumaprintsLibrary
+        library_manager = LumaprintsLibrary()
+        
+        gallery_images = library_manager.get_gallery_images()
+        sync_status = library_manager.get_sync_status_for_all_images()
+        
+        return render_template('admin_lumaprints_sync.html',
+                             gallery_images=gallery_images,
+                             sync_status=sync_status)
+    except Exception as e:
+        return f"Error loading Lumaprints sync page: {str(e)}", 500
+
+@app.route('/api/lumaprints/sync-image', methods=['POST'])
+def sync_image_to_lumaprints():
+    """Sync a single image to Lumaprints library"""
+    try:
+        from lumaprints_library import LumaprintsLibrary
+        library_manager = LumaprintsLibrary()
+        
+        data = request.get_json()
+        filename = data.get('filename')
+        
+        if not filename:
+            return jsonify({'success': False, 'error': 'Filename required'}), 400
+        
+        image_path = os.path.join('/data', filename)
+        if not os.path.exists(image_path):
+            return jsonify({'success': False, 'error': 'Image file not found'}), 404
+        
+        success, result = library_manager.upload_image_to_lumaprints(image_path, filename)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'library_id': result,
+                'message': f'Successfully uploaded {filename} to Lumaprints library'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': result
+            }), 500
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/lumaprints/sync-all', methods=['POST'])
+def sync_all_images_to_lumaprints():
+    """Sync all missing images to Lumaprints library"""
+    try:
+        from lumaprints_library import LumaprintsLibrary
+        library_manager = LumaprintsLibrary()
+        
+        results = library_manager.bulk_upload_missing_images()
+        
+        successful_uploads = [r for r in results if r['success']]
+        failed_uploads = [r for r in results if not r['success']]
+        
+        return jsonify({
+            'success': True,
+            'synced_count': len(successful_uploads),
+            'failed_count': len(failed_uploads),
+            'results': results,
+            'message': f'Synced {len(successful_uploads)} images successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/lumaprints/sync-status')
+def get_lumaprints_sync_status():
+    """Get sync status for all gallery images"""
+    try:
+        from lumaprints_library import LumaprintsLibrary
+        library_manager = LumaprintsLibrary()
+        
+        sync_status = library_manager.get_sync_status_for_all_images()
+        
+        return jsonify({
+            'success': True,
+            'sync_status': sync_status
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

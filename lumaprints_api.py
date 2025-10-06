@@ -360,3 +360,41 @@ def test_api_connection():
 if __name__ == "__main__":
     # Run test when script is executed directly
     test_api_connection()
+
+    
+    def upload_to_library(self, upload_data: Dict) -> Dict:
+        """
+        Upload an image to Lumaprints library
+        
+        Args:
+            upload_data: Dictionary containing:
+                - fileName: Name of the file
+                - fileData: Base64 encoded image data
+                - description: Optional description
+                - tags: Optional list of tags
+                
+        Returns:
+            Upload result dictionary with libraryId if successful
+        """
+        return self._make_request("POST", "/library/upload", upload_data)
+    
+    def get_library_images(self) -> List[Dict]:
+        """
+        Get all images from Lumaprints library
+        
+        Returns:
+            List of library image dictionaries
+        """
+        return self._make_request("GET", "/library/images")
+    
+    def delete_from_library(self, library_id: str) -> Dict:
+        """
+        Delete an image from Lumaprints library
+        
+        Args:
+            library_id: ID of the library image to delete
+            
+        Returns:
+            Deletion result dictionary
+        """
+        return self._make_request("DELETE", f"/library/images/{library_id}")
