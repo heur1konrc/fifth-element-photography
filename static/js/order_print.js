@@ -17,6 +17,8 @@ class OrderPrintController {
         this.setupEventListeners();
         this.showCategory('canvas');
         this.updateStepDisplay();
+        // Ensure the first step panel is active and shows products
+        this.goToStep(1);
     }
 
     setupEventListeners() {
@@ -103,9 +105,18 @@ class OrderPrintController {
         });
 
         // Show selected category section
-        const categorySection = document.querySelector(`[data-category="${category}"]`);
+        const categorySection = document.querySelector(`.product-category-section[data-category="${category}"]`);
         if (categorySection) {
             categorySection.classList.add('active');
+            console.log(`Showing category: ${category}`);
+        } else {
+            console.log(`Category section not found: ${category}`);
+        }
+        
+        // Ensure step 1 panel is visible
+        const step1Panel = document.querySelector('[data-step="1"]');
+        if (step1Panel) {
+            step1Panel.classList.add('active');
         }
     }
 
