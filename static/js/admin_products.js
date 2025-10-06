@@ -167,6 +167,10 @@ function checkExistingThumbnail(productPath) {
 }
 
 function uploadThumbnail() {
+    console.log('uploadThumbnail called');
+    console.log('selectedFile:', selectedFile);
+    console.log('currentProductPath:', currentProductPath);
+    
     if (!selectedFile || !currentProductPath) {
         showAlert('Please select a file and product configuration', 'error');
         return;
@@ -175,6 +179,8 @@ function uploadThumbnail() {
     const formData = new FormData();
     formData.append('file', selectedFile);
     formData.append('productPath', currentProductPath);
+    
+    console.log('FormData created with file:', selectedFile.name, 'and path:', currentProductPath);
     
     // Update button state
     const uploadBtn = document.getElementById('uploadThumbnailBtn');
@@ -186,8 +192,12 @@ function uploadThumbnail() {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Response status:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('Response data:', data);
         if (data.success) {
             showAlert('Thumbnail uploaded successfully!', 'success');
             
@@ -204,8 +214,8 @@ function uploadThumbnail() {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        showAlert('Error uploading thumbnail', 'error');
+        console.error('Upload error:', error);
+        showAlert('Error uploading thumbnail: ' + error.message, 'error');
     })
     .finally(() => {
         uploadBtn.innerHTML = originalText;

@@ -2444,13 +2444,21 @@ def get_product_thumbnail(product_path):
 def upload_product_thumbnail():
     """Upload a product thumbnail"""
     try:
+        print(f"Upload request received. Files: {list(request.files.keys())}")
+        print(f"Form data: {dict(request.form)}")
+        
         if 'file' not in request.files:
+            print("No file in request")
             return jsonify({'success': False, 'message': 'No file provided'}), 400
         
         file = request.files['file']
         product_path = request.form.get('productPath')
         
-        if not file or not product_path:
+        print(f"File: {file}, filename: {file.filename if file else 'None'}")
+        print(f"Product path: {product_path}")
+        
+        if not file or file.filename == '' or not product_path:
+            print("Invalid file or product path")
             return jsonify({'success': False, 'message': 'File and product path required'}), 400
         
         # Create thumbnails directory
