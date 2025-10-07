@@ -1,0 +1,162 @@
+[
+  {
+    "category": "Canvas",
+    "subcategory": "1.25IN STRETCHED CANVAS",
+    "size": "8×10",
+    "width": 8,
+    "height": 10,
+    "wholesale_price": 10.99
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "1.5IN STRETCHED CANVAS",
+    "size": "8×10",
+    "width": 8,
+    "height": 10,
+    "wholesale_price": 12.09
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "0.75IN STRETCHED CANVAS",
+    "size": "8×10",
+    "width": 8,
+    "height": 10,
+    "wholesale_price": 9.89
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "ROLLED CANVAS",
+    "size": "8×10",
+    "width": 8,
+    "height": 10,
+    "wholesale_price": 9.13
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "1.25IN STRETCHED CANVAS",
+    "size": "8×12",
+    "width": 8,
+    "height": 12,
+    "wholesale_price": 16.23
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "1.5IN STRETCHED CANVAS",
+    "size": "8×12",
+    "width": 8,
+    "height": 12,
+    "wholesale_price": 18.76
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "0.75IN STRETCHED CANVAS",
+    "size": "8×12",
+    "width": 8,
+    "height": 12,
+    "wholesale_price": 15.39
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "ROLLED CANVAS",
+    "size": "8×12",
+    "width": 8,
+    "height": 12,
+    "wholesale_price": 10.28
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "1.25IN STRETCHED CANVAS",
+    "size": "10×20",
+    "width": 10,
+    "height": 20,
+    "wholesale_price": 24.13
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "1.5IN STRETCHED CANVAS",
+    "size": "10×20",
+    "width": 10,
+    "height": 20,
+    "wholesale_price": 28.29
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "0.75IN STRETCHED CANVAS",
+    "size": "10×20",
+    "width": 10,
+    "height": 20,
+    "wholesale_price": 22.73
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "ROLLED CANVAS",
+    "size": "10×20",
+    "width": 10,
+    "height": 20,
+    "wholesale_price": 13.05
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "1.25IN STRETCHED CANVAS",
+    "size": "11×14",
+    "width": 11,
+    "height": 14,
+    "wholesale_price": 13.19
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "1.5IN STRETCHED CANVAS",
+    "size": "11×14",
+    "width": 11,
+    "height": 14,
+    "wholesale_price": 14.29
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "0.75IN STRETCHED CANVAS",
+    "size": "11×14",
+    "width": 11,
+    "height": 14,
+    "wholesale_price": 12.09
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "ROLLED CANVAS",
+    "size": "11×14",
+    "width": 11,
+    "height": 14,
+    "wholesale_price": 12.20
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "1.25IN STRETCHED CANVAS",
+    "size": "12×12",
+    "width": 12,
+    "height": 12,
+    "wholesale_price": 19.36
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "1.5IN STRETCHED CANVAS",
+    "size": "12×12",
+    "width": 12,
+    "height": 12,
+    "wholesale_price": 22.56
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "0.75IN STRETCHED CANVAS",
+    "size": "12×12",
+    "width": 12,
+    "height": 12,
+    "wholesale_price": 18.31
+  },
+  {
+    "category": "Canvas",
+    "subcategory": "ROLLED CANVAS",
+    "size": "12×12",
+    "width": 12,
+    "height": 12,
+    "wholesale_price": 12.02
+  }
+]
