@@ -152,15 +152,7 @@
         "maxHeight": 60,
         "dpi": 300
       },
-      {
-        "subcategoryId": 103008,
-        "name": "Semi-Matte Fine Art Paper",
-        "minWidth": 5,
-        "maxWidth": 44,
-        "minHeight": 5,
-        "maxHeight": 60,
-        "dpi": 300
-      },
+
       {
         "subcategoryId": 103009,
         "name": "Somerset Velvet Fine Art Paper",
