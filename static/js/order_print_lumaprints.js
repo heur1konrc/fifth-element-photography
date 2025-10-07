@@ -426,6 +426,41 @@ class LumaprintsOrderInterface {
                 size.width >= minW && size.width <= maxW && 
                 size.height >= minH && size.height <= maxH
             );
+        } else if (productName.includes('1.50in Stretched Canvas')) {
+            // 1.50in Stretched Canvas sizes with 150% markup
+            const sizes150 = [
+                { width: 8, height: 10, price: 30.23 },    // $12.09 * 2.5
+                { width: 8, height: 12, price: 46.90 },    // $18.76 * 2.5
+                { width: 10, height: 20, price: 70.73 },   // $28.29 * 2.5
+                { width: 10, height: 30, price: 84.55 },   // $33.82 * 2.5
+                { width: 11, height: 14, price: 35.73 },   // $14.29 * 2.5
+                { width: 12, height: 12, price: 56.40 },   // $22.56 * 2.5
+                { width: 12, height: 16, price: 63.50 },   // $25.40 * 2.5
+                { width: 12, height: 18, price: 66.23 },   // $26.49 * 2.5
+                { width: 16, height: 20, price: 76.83 },   // $30.73 * 2.5
+                { width: 16, height: 24, price: 85.98 },   // $34.39 * 2.5
+                { width: 16, height: 48, price: 149.08 },  // $59.63 * 2.5
+                { width: 18, height: 24, price: 89.23 },   // $35.69 * 2.5
+                { width: 20, height: 20, price: 86.35 },   // $34.54 * 2.5
+                { width: 20, height: 40, price: 123.98 },  // $49.59 * 2.5
+                { width: 20, height: 60, price: 164.93 },  // $65.97 * 2.5
+                { width: 24, height: 30, price: 115.58 },  // $46.23 * 2.5
+                { width: 24, height: 32, price: 118.90 },  // $47.56 * 2.5
+                { width: 24, height: 36, price: 125.48 },  // $50.19 * 2.5
+                { width: 24, height: 72, price: 281.15 },  // $112.46 * 2.5
+                { width: 30, height: 30, price: 132.90 },  // $53.16 * 2.5
+                { width: 30, height: 40, price: 150.73 },  // $60.29 * 2.5
+                { width: 30, height: 60, price: 235.65 },  // $94.26 * 2.5
+                { width: 32, height: 48, price: 234.68 },  // $93.87 * 2.5
+                { width: 36, height: 48, price: 252.50 },  // $101.20 * 2.5
+                { width: 40, height: 40, price: 238.85 },  // $95.54 * 2.5
+                { width: 40, height: 60, price: 327.58 },  // $131.03 * 2.5
+                { width: 45, height: 60, price: 345.25 }   // $138.10 * 2.5
+            ];
+            return sizes150.filter(size => 
+                size.width >= minW && size.width <= maxW && 
+                size.height >= minH && size.height <= maxH
+            );
         } else if (productName.includes('1.25in Stretched Canvas')) {
             // 1.25in Stretched Canvas sizes with 150% markup
             const sizes125 = [
