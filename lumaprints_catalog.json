@@ -186,7 +186,16 @@
     "106": [
       {
         "subcategoryId": 106001,
-        "name": "Metal Print",
+        "name": "Glossy White Metal Print",
+        "minWidth": 5,
+        "maxWidth": 48,
+        "minHeight": 5,
+        "maxHeight": 96,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 106002,
+        "name": "Glossy Silver Metal Print",
         "minWidth": 5,
         "maxWidth": 48,
         "minHeight": 5,
