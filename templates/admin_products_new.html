@@ -72,8 +72,15 @@
 
                         <div class="form-group">
                             <label for="productVariant">Product Variant:</label>
-                            <select id="productVariant" onchange="showUploadSection()" disabled>
+                            <select id="productVariant" onchange="loadFrameOptions()" disabled>
                                 <option value="">Select Product Type First</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="frameOptionsGroup" style="display: none;">
+                            <label for="frameOption">Frame Option:</label>
+                            <select id="frameOption" onchange="showUploadSection()" disabled>
+                                <option value="">Select Frame Variant First</option>
                             </select>
                         </div>
                     </div>
@@ -157,34 +164,9 @@
                 'Rolled Canvas'
             ],
             'framed-canvas': [
-                // 0.75in Framed Canvas variants (matching catalog structure)
-                '0.75in Framed Canvas - Black Floating Frame',
-                '0.75in Framed Canvas - White Floating Frame',
-                '0.75in Framed Canvas - Silver Floating Frame',
-                '0.75in Framed Canvas - Gold Floating Frame',
-                '0.75in Framed Canvas - Espresso Floating Frame',
-                '0.75in Framed Canvas - Natural Wood Floating Frame',
-                '0.75in Framed Canvas - Maple Wood Floating Frame',
-                // 1.25in Framed Canvas variants (matching catalog structure)
-                '1.25in Framed Canvas - Black Floating Frame',
-                '1.25in Framed Canvas - Oak Floating Frame',
-                '1.25in Framed Canvas - Walnut Floating Frame',
-                '1.25in Framed Canvas - Espresso Floating Frame',
-                '1.25in Framed Canvas - White Floating Frame',
-                '1.25in Framed Canvas - Silver Floating Frame',
-                '1.25in Framed Canvas - Gold Floating Frame',
-                '1.25in Framed Canvas - Natural Wood Floating Frame',
-                '1.25in Framed Canvas - Maple Wood Floating Frame',
-                // 1.50in Framed Canvas variants (matching catalog structure)
-                '1.50in Framed Canvas - Black Floating Frame',
-                '1.50in Framed Canvas - White Floating Frame',
-                '1.50in Framed Canvas - Silver Floating Frame',
-                '1.50in Framed Canvas - Gold Floating Frame',
-                '1.50in Framed Canvas - Oak Floating Frame',
-                '1.50in Framed Canvas - Espresso Floating Frame',
-                '1.50in Framed Canvas - Walnut Floating Frame',
-                '1.50in Framed Canvas - Natural Wood Floating Frame',
-                '1.50in Framed Canvas - Maple Wood Floating Frame'
+                '0.75in Framed Canvas',
+                '1.25in Framed Canvas', 
+                '1.50in Framed Canvas'
             ],
             'fine-art-paper': [
                 'Archival Matte Fine Art Paper',
@@ -239,6 +221,41 @@
             ],
             'peel-and-stick': [
                 'Peel and Stick Art Print'
+            ]
+        };
+
+        // Frame options for Framed Canvas products
+        const FRAME_OPTIONS = {
+            '0.75in Framed Canvas': [
+                'Black Floating Frame',
+                'White Floating Frame',
+                'Silver Floating Frame',
+                'Gold Floating Frame',
+                'Espresso Floating Frame',
+                'Natural Wood Floating Frame',
+                'Maple Wood Floating Frame'
+            ],
+            '1.25in Framed Canvas': [
+                'Black Floating Frame',
+                'Oak Floating Frame',
+                'Walnut Floating Frame',
+                'Espresso Floating Frame',
+                'White Floating Frame',
+                'Silver Floating Frame',
+                'Gold Floating Frame',
+                'Natural Wood Floating Frame',
+                'Maple Wood Floating Frame'
+            ],
+            '1.50in Framed Canvas': [
+                'Black Floating Frame',
+                'White Floating Frame',
+                'Silver Floating Frame',
+                'Gold Floating Frame',
+                'Oak Floating Frame',
+                'Espresso Floating Frame',
+                'Walnut Floating Frame',
+                'Natural Wood Floating Frame',
+                'Maple Wood Floating Frame'
             ]
         };
     </script>

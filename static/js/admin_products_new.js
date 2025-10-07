@@ -71,11 +71,13 @@ function handleFileSelection(file) {
 function loadProductVariants() {
     const productType = document.getElementById('productType').value;
     const variantSelect = document.getElementById('productVariant');
+    const frameOptionsGroup = document.getElementById('frameOptionsGroup');
     
     // Reset variant dropdown
     variantSelect.innerHTML = '<option value="">Select Product Variant</option>';
     
-    // Hide sections
+    // Hide frame options and sections
+    frameOptionsGroup.style.display = 'none';
     document.getElementById('uploadSection').style.display = 'none';
     document.getElementById('currentThumbnail').style.display = 'none';
     
@@ -95,23 +97,70 @@ function loadProductVariants() {
     }
 }
 
+function loadFrameOptions() {
+    const productType = document.getElementById('productType').value;
+    const productVariant = document.getElementById('productVariant').value;
+    const frameOptionsGroup = document.getElementById('frameOptionsGroup');
+    const frameOptionSelect = document.getElementById('frameOption');
+    
+    // Hide upload section
+    document.getElementById('uploadSection').style.display = 'none';
+    document.getElementById('currentThumbnail').style.display = 'none';
+    
+    if (productType === 'framed-canvas' && productVariant && FRAME_OPTIONS[productVariant]) {
+        // Show frame options dropdown for Framed Canvas
+        frameOptionsGroup.style.display = 'block';
+        
+        // Reset frame options dropdown
+        frameOptionSelect.innerHTML = '<option value="">Select Frame Option</option>';
+        
+        const frameOptions = FRAME_OPTIONS[productVariant];
+        frameOptions.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option;
+            optionElement.textContent = option;
+            frameOptionSelect.appendChild(optionElement);
+        });
+        
+        frameOptionSelect.disabled = false;
+    } else if (productType !== 'framed-canvas' && productVariant) {
+        // For non-framed canvas products, proceed directly to upload
+        frameOptionsGroup.style.display = 'none';
+        showUploadSection();
+    } else {
+        frameOptionsGroup.style.display = 'none';
+        frameOptionSelect.disabled = true;
+    }
+}
+
 function showUploadSection() {
     const productType = document.getElementById('productType').value;
     const productVariant = document.getElementById('productVariant').value;
+    const frameOption = document.getElementById('frameOption').value;
     
-    if (productType && productVariant) {
-        // Create product key for file naming
+    // For Framed Canvas, we need all three selections
+    if (productType === 'framed-canvas') {
+        if (!productType || !productVariant || !frameOption) {
+            return; // Need all three selections for Framed Canvas
+        }
+        // Create product key for Framed Canvas with frame option
+        currentProductKey = `${productType}_${productVariant}_${frameOption}`.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+    } else {
+        // For other products, just need type and variant
+        if (!productType || !productVariant) {
+            return;
+        }
         currentProductKey = `${productType}_${productVariant}`.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
-        
-        // Check if thumbnail already exists
-        checkExistingThumbnail(currentProductKey);
-        
-        // Show upload section
-        document.getElementById('uploadSection').style.display = 'block';
-        
-        // Reset file selection
-        resetFileSelection();
     }
+    
+    // Check if thumbnail already exists
+    checkExistingThumbnail(currentProductKey);
+    
+    // Show upload section
+    document.getElementById('uploadSection').style.display = 'block';
+    
+    // Reset file selection
+    resetFileSelection();
 }
 
 function checkExistingThumbnail(productKey) {
