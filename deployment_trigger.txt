@@ -1,0 +1,2 @@
+Deployment trigger - Force rebuild to update size ranges
+Timestamp: 2025-01-07 - Fixed Canvas and Framed Canvas size ranges
