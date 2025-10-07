@@ -257,6 +257,11 @@ function setupEventListeners() {
     // Navigation links for sections
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function(e) {
+            // Skip cart link - let it navigate normally
+            if (this.classList.contains('cart-link')) {
+                return; // Don't prevent default, let the link navigate to /checkout
+            }
+            
             e.preventDefault();
             
             const section = this.getAttribute('data-section');
