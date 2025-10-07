@@ -89,29 +89,29 @@ class LumaprintsOrderInterface {
             103: {
                 name: 'Fine Art Paper',
                 subcategories: [
-                    { id: 103001, name: 'Archival Matte Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 103002, name: 'Hot Press Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 103003, name: 'Cold Press Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 103005, name: 'Semi-Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 103006, name: 'Metallic Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 103007, name: 'Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 103008, name: 'Semi-Matte Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 103009, name: 'Somerset Velvet Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 }
+                    { id: 103001, name: 'Archival Matte Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 103002, name: 'Hot Press Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 103003, name: 'Cold Press Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 103005, name: 'Semi-Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 103006, name: 'Metallic Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 103007, name: 'Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 103008, name: 'Semi-Matte Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 103009, name: 'Somerset Velvet Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 }
                 ]
             },
             // Foam-mounted Print Category (ID: 104) - Based on Fine Art Paper products
             104: {
                 name: 'Foam-mounted Print',
                 subcategories: [
-                    { id: 104001, name: 'Foam-mounted Archival Matte Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 104002, name: 'Foam-mounted Hot Press Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 104003, name: 'Foam-mounted Cold Press Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 104005, name: 'Foam-mounted Semi-Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 104006, name: 'Foam-mounted Metallic Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 104007, name: 'Foam-mounted Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 104009, name: 'Foam-mounted Somerset Velvet Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 104010, name: 'Foam-mounted Canvas', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 },
-                    { id: 104011, name: 'Foam-mounted Photo Paper', minWidth: 5, maxWidth: 44, minHeight: 5, maxHeight: 60, dpi: 300 }
+                    { id: 104001, name: 'Foam-mounted Archival Matte Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 104002, name: 'Foam-mounted Hot Press Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 104003, name: 'Foam-mounted Cold Press Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 104005, name: 'Foam-mounted Semi-Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 104006, name: 'Foam-mounted Metallic Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 104007, name: 'Foam-mounted Glossy Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 104009, name: 'Foam-mounted Somerset Velvet Fine Art Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 104010, name: 'Foam-mounted Canvas', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 },
+                    { id: 104011, name: 'Foam-mounted Photo Paper', minWidth: 5, maxWidth: 44, minHeight: 7, maxHeight: 60, dpi: 300 }
                 ]
             },
             // Framed Fine Art Paper Category (ID: 105) - Exactly 25 frame options
@@ -119,35 +119,35 @@ class LumaprintsOrderInterface {
                 name: 'Framed Fine Art Paper',
                 subcategories: [
                     // 0.875in Frame Options - 8 Colors
-                    { id: 105001, name: '0.875in Black Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105002, name: '0.875in White Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105003, name: '0.875in Oak Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105004, name: '0.875in Walnut Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105008, name: '0.875in Espresso Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105009, name: '0.875in Silver Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105010, name: '0.875in Gold Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105011, name: '0.875in Natural Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105001, name: '0.875in Black Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105002, name: '0.875in White Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105003, name: '0.875in Oak Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105004, name: '0.875in Walnut Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105008, name: '0.875in Espresso Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105009, name: '0.875in Silver Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105010, name: '0.875in Gold Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105011, name: '0.875in Natural Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
                     
                     // 1.25in Frame Options - 9 Colors  
-                    { id: 105005, name: '1.25in Black Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105006, name: '1.25in White Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105007, name: '1.25in Oak Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105014, name: '1.25in Walnut Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105015, name: '1.25in Espresso Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105016, name: '1.25in Silver Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105017, name: '1.25in Gold Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105018, name: '1.25in Natural Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105019, name: '1.25in Maple Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
+                    { id: 105005, name: '1.25in Black Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105006, name: '1.25in White Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105007, name: '1.25in Oak Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105014, name: '1.25in Walnut Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105015, name: '1.25in Espresso Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105016, name: '1.25in Silver Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105017, name: '1.25in Gold Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105018, name: '1.25in Natural Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105019, name: '1.25in Maple Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
                     
                     // 1.75in Frame Options - 8 Colors
-                    { id: 105021, name: '1.75in Black Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105022, name: '1.75in White Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105023, name: '1.75in Oak Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105024, name: '1.75in Walnut Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105025, name: '1.75in Espresso Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105026, name: '1.75in Silver Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105027, name: '1.75in Gold Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 },
-                    { id: 105028, name: '1.75in Natural Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 5, maxHeight: 48, dpi: 300 }
+                    { id: 105021, name: '1.75in Black Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105022, name: '1.75in White Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105023, name: '1.75in Oak Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105024, name: '1.75in Walnut Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105025, name: '1.75in Espresso Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105026, name: '1.75in Silver Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105027, name: '1.75in Gold Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 },
+                    { id: 105028, name: '1.75in Natural Wood Frame', minWidth: 5, maxWidth: 36, minHeight: 7, maxHeight: 48, dpi: 300 }
                 ]
             },
             // Metal Category (ID: 106)
