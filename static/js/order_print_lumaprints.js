@@ -281,7 +281,7 @@ class LumaprintsOrderInterface {
     createProductCard(product) {
         const card = document.createElement('div');
         card.className = 'product-card';
-        card.dataset.productId = product.subcategoryId;
+        card.dataset.productId = product.id;
         
         // Generate product key for thumbnail lookup
         const productKey = this.generateProductKey(product.name);
@@ -338,7 +338,7 @@ class LumaprintsOrderInterface {
         document.querySelectorAll('.product-card').forEach(card => {
             card.classList.remove('selected');
         });
-        document.querySelector(`[data-product-id="${product.subcategoryId}"]`).classList.add('selected');
+        document.querySelector(`[data-product-id="${product.id}"]`).classList.add('selected');
         
         // Update product title
         document.getElementById('productTitle').textContent = product.name;
