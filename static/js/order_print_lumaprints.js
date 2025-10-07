@@ -280,9 +280,11 @@ class LumaprintsOrderInterface {
     }
     
     generateProductKey(productName) {
-        // Match the exact format from the spreadsheet
-        // Canvas products: "0.75in Stretched Canvas", "1.25in Stretched Canvas", etc.
-        return `canvas_${productName}`.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+        // Match the exact format used by the admin system
+        // Convert product name to the same format as admin uploads
+        const productType = 'canvas';
+        const variantName = productName.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_');
+        return `${productType}_${variantName}`;
     }
     
     generateFrameProductKey(productName, frameName) {
