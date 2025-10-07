@@ -2451,9 +2451,14 @@ def upload_product_thumbnail_new():
         
         # Process and save image
         from PIL import Image
+        import io
         
-        # Open and process image
-        image = Image.open(file.stream)
+        # Read file content into memory
+        file.stream.seek(0)  # Reset stream position
+        file_content = file.stream.read()
+        
+        # Open and process image from bytes
+        image = Image.open(io.BytesIO(file_content))
         
         # Convert to RGB if necessary (handles AVIF, PNG with transparency, etc.)
         if image.mode in ('RGBA', 'LA', 'P'):
