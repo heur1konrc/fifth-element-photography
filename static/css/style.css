@@ -1561,7 +1561,7 @@ textarea {
     }
     
     .modal-image {
-        max-height: 85vh;
+        max-height: 70vh; /* Reduced to ensure button is visible */
         object-fit: contain;
     }
     
@@ -1575,6 +1575,10 @@ textarea {
     .modal-actions {
         margin-top: 15px;
         padding: 0 10px;
+        position: relative;
+        z-index: 1001;
+        background: rgba(0,0,0,0.9);
+        border-radius: 8px;
     }
     
     .btn-order-print {
@@ -1583,6 +1587,9 @@ textarea {
         width: 100%;
         max-width: 300px;
         justify-content: center;
+        min-height: 50px;
+        display: flex !important;
+        align-items: center;
     }
     
     .btn-order-print .btn-icon {
@@ -1591,9 +1598,29 @@ textarea {
 }
 
 @media (max-width: 480px) {
-    /* Extra small screens */
+    /* Extra small screens - iOS Safari fixes */
     .hero-title {
         font-size: 1.3rem;
+    }
+    
+    /* iOS Safari modal fixes */
+    .modal-image {
+        max-height: 60vh !important; /* Even smaller for iPhone */
+    }
+    
+    .modal-actions {
+        margin-top: 10px;
+        padding: 10px;
+        position: sticky;
+        bottom: 0;
+        background: rgba(0,0,0,0.95);
+    }
+    
+    .btn-order-print {
+        padding: 18px 25px;
+        font-size: 1.1rem;
+        min-height: 55px;
+        font-weight: bold;
     }
     
     .hero-subtitle {
