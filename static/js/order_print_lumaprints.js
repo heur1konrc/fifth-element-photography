@@ -500,6 +500,39 @@ class LumaprintsOrderInterface {
                 size.width >= minW && size.width <= maxW && 
                 size.height >= minH && size.height <= maxH
             );
+        } else if (productName.includes('Rolled Canvas')) {
+            // Rolled Canvas sizes with 150% markup
+            const sizesRolled = [
+                { width: 8, height: 10, price: 22.83 },    // $9.13 * 2.5
+                { width: 8, height: 12, price: 25.70 },    // $10.28 * 2.5
+                { width: 10, height: 20, price: 32.63 },   // $13.05 * 2.5
+                { width: 10, height: 30, price: 37.18 },   // $14.87 * 2.5
+                { width: 11, height: 14, price: 30.50 },   // $12.20 * 2.5
+                { width: 12, height: 12, price: 30.05 },   // $12.02 * 2.5
+                { width: 12, height: 16, price: 32.13 },   // $12.85 * 2.5
+                { width: 12, height: 18, price: 33.13 },   // $13.25 * 2.5
+                { width: 16, height: 20, price: 37.30 },   // $14.92 * 2.5
+                { width: 16, height: 24, price: 39.90 },   // $15.96 * 2.5
+                { width: 18, height: 24, price: 41.68 },   // $16.67 * 2.5
+                { width: 20, height: 20, price: 44.35 },   // $17.74 * 2.5
+                { width: 20, height: 40, price: 59.90 },   // $23.96 * 2.5
+                { width: 20, height: 60, price: 75.45 },   // $30.18 * 2.5
+                { width: 24, height: 30, price: 56.55 },   // $22.62 * 2.5
+                { width: 24, height: 32, price: 58.38 },   // $23.35 * 2.5
+                { width: 24, height: 36, price: 62.15 },   // $24.86 * 2.5
+                { width: 30, height: 30, price: 63.15 },   // $25.26 * 2.5
+                { width: 30, height: 40, price: 82.08 },   // $32.83 * 2.5
+                { width: 30, height: 60, price: 104.10 },  // $41.64 * 2.5
+                { width: 32, height: 48, price: 94.25 },   // $37.70 * 2.5
+                { width: 36, height: 48, price: 100.98 },  // $40.39 * 2.5
+                { width: 40, height: 40, price: 100.25 },  // $40.10 * 2.5
+                { width: 40, height: 60, price: 128.78 },  // $51.51 * 2.5
+                { width: 45, height: 60, price: 139.15 }   // $55.66 * 2.5
+            ];
+            return sizesRolled.filter(size => 
+                size.width >= minW && size.width <= maxW && 
+                size.height >= minH && size.height <= maxH
+            );
         }
         
         // Default fallback for other canvas types
