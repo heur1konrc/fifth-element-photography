@@ -233,11 +233,12 @@ textarea {
 
 .gallery-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid #333;
+    gap: 15px;
 }
 
 .gallery-header h3 {
@@ -247,6 +248,16 @@ textarea {
     font-weight: 400;
     text-transform: uppercase;
     letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.gallery-subtitle {
+    font-family: 'Poppins', sans-serif;
+    color: #888;
+    font-size: 0.8rem;
+    font-style: italic;
+    margin: 0;
+    text-align: center;
 }
 
 .image-count {
@@ -332,6 +343,33 @@ textarea {
 .image-item:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Order Print Overlay */
+.image-item::before {
+    content: "🖼️ ORDER PRINT";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(103, 153, 194, 0.95);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.image-item:hover::before {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
 }
 
 .image-item img {
