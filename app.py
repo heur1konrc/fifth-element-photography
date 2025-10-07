@@ -2853,3 +2853,165 @@ def serve_correct_canvas_sizes():
         return jsonify(data)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/lumaprints/submit-order', methods=['POST'])
+def submit_lumaprints_order():
+    """
+    Submit an order to Lumaprints for fulfillment
+    
+    Expected JSON payload:
+    {
+        "customer": {
+            "firstName": "John",
+            "lastName": "Doe", 
+            "email": "john@example.com",
+            "phone": "555-123-4567"
+        },
+        "shipping": {
+            "firstName": "John",
+            "lastName": "Doe",
+            "address1": "123 Main St",
+            "city": "Anytown",
+            "state": "CA",
+            "postalCode": "12345",
+            "country": "US"
+        },
+        "items": [
+            {
+                "subcategoryId": 101001,
+                "width": 16,
+                "height": 20,
+                "quantity": 1,
+                "imageUrl": "https://example.com/image.jpg",
+                "options": [11, 51]
+            }
+        ]
+    }
+    """
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'No data provided'
+            }), 400
+        
+        required_fields = ['customer', 'shipping', 'items']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }), 400
+        
+        # Validate customer info
+        customer = data['customer']
+        required_customer_fields = ['firstName', 'lastName', 'email']
+        for field in required_customer_fields:
+            if field not in customer:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required customer field: {field}'
+                }), 400
+        
+        # Validate shipping info
+        shipping = data['shipping']
+        required_shipping_fields = ['firstName', 'lastName', 'address1', 'city', 'state', 'postalCode', 'country']
+        for field in required_shipping_fields:
+            if field not in shipping:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required shipping field: {field}'
+                }), 400
+        
+        # Validate items
+        items = data['items']
+        if not items or len(items) == 0:
+            return jsonify({
+                'success': False,
+                'error': 'At least one item is required'
+            }), 400
+        
+        for i, item in enumerate(items):
+            required_item_fields = ['subcategoryId', 'width', 'height', 'quantity', 'imageUrl']
+            for field in required_item_fields:
+                if field not in item:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Missing required field in item {i}: {field}'
+                    }), 400
+        
+        # Get Lumaprints API client
+        api = get_lumaprints_client(sandbox=True)
+        
+        # Get stores to find a valid store ID
+        stores = api.get_stores()
+        if not stores:
+            return jsonify({
+                'success': False,
+                'error': 'No stores available'
+            }), 500
+        
+        store_id = stores[0]['id']  # Use first available store
+        
+        # Prepare order payload for Lumaprints
+        order_payload = {
+            "storeId": store_id,
+            "customer": {
+                "firstName": customer['firstName'],
+                "lastName": customer['lastName'],
+                "email": customer['email'],
+                "phone": customer.get('phone', '')
+            },
+            "shipping": {
+                "firstName": shipping['firstName'],
+                "lastName": shipping['lastName'],
+                "address1": shipping['address1'],
+                "address2": shipping.get('address2', ''),
+                "city": shipping['city'],
+                "state": shipping['state'],
+                "postalCode": shipping['postalCode'],
+                "country": shipping['country']
+            },
+            "items": []
+        }
+        
+        # Process each item
+        for item in items:
+            order_item = {
+                "subcategoryId": item['subcategoryId'],
+                "width": float(item['width']),
+                "height": float(item['height']),
+                "quantity": int(item['quantity']),
+                "imageUrl": item['imageUrl']
+            }
+            
+            # Add options if provided
+            if 'options' in item and item['options']:
+                order_item['options'] = item['options']
+            
+            order_payload['items'].append(order_item)
+        
+        # Submit order to Lumaprints
+        result = api.submit_order(order_payload)
+        
+        return jsonify({
+            'success': True,
+            'order': result,
+            'message': 'Order submitted successfully to Lumaprints'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/checkout')
+def checkout():
+    """Display the professional checkout form"""
+    return render_template('checkout.html')

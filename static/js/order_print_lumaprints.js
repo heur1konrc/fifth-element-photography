@@ -687,77 +687,20 @@ class LumaprintsOrderInterface {
         this.showView('products');
     }
     
-    async proceedToCheckout() {
+    proceedToCheckout() {
         if (this.cart.length === 0) {
             alert('Your cart is empty. Please add items before checkout.');
             return;
         }
+
+        // Save cart to localStorage for the checkout page
+        localStorage.setItem('lumaprintsCart', JSON.stringify(this.cart));
         
-        // Show loading state
-        const checkoutBtn = document.getElementById('checkoutBtn');
-        const originalText = checkoutBtn.textContent;
-        checkoutBtn.textContent = 'Processing...';
-        checkoutBtn.disabled = true;
+        // Save current image ID for order processing
+        localStorage.setItem('currentImageId', window.location.pathname.split('/').pop());
         
-        try {
-            // Collect customer information (you may want to show a form for this)
-            const customerInfo = await this.collectCustomerInfo();
-            if (!customerInfo) {
-                // User cancelled
-                checkoutBtn.textContent = originalText;
-                checkoutBtn.disabled = false;
-                return;
-            }
-            
-            // Prepare order payload
-            const orderPayload = {
-                customer: customerInfo.customer,
-                shipping: customerInfo.shipping,
-                items: this.cart.map(item => ({
-                    subcategoryId: item.subcategoryId,
-                    width: item.width,
-                    height: item.height,
-                    quantity: item.quantity,
-                    imageUrl: window.orderData.imageUrl,
-                    options: item.options || []
-                }))
-            };
-            
-            console.log('Submitting order to Lumaprints:', orderPayload);
-            
-            // Submit order to backend
-            const response = await fetch('/api/lumaprints/submit-order', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orderPayload)
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                // Order submitted successfully
-                alert(`Order submitted successfully!\n\nOrder ID: ${result.order.id || 'N/A'}\nItems: ${this.cart.length}\nTotal: $${this.cart.reduce((sum, item) => sum + item.totalPrice, 0).toFixed(2)}\n\nYou will receive a confirmation email shortly.`);
-                
-                // Clear cart
-                this.cart = [];
-                this.updateCartDisplay();
-                
-                // Redirect to gallery or show success page
-                window.location.href = '/';
-            } else {
-                alert(`Error submitting order: ${result.error}`);
-            }
-            
-        } catch (error) {
-            console.error('Checkout error:', error);
-            alert('Error submitting order. Please try again.');
-        } finally {
-            // Restore button state
-            checkoutBtn.textContent = originalText;
-            checkoutBtn.disabled = false;
-        }
+        // Redirect to professional checkout page
+        window.location.href = '/checkout';
     }
     
     async collectCustomerInfo() {
