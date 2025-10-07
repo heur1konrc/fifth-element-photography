@@ -1723,6 +1723,7 @@ textarea {
         text-align: center;
         padding: 0 1rem;
         align-items: center;
+        margin-top: 80px; /* Add space for sticky navigation */
     }
     
     .category-filters {
