@@ -353,6 +353,7 @@
         width: 100%;
         border-right: none;
         border-bottom: 1px solid #e9ecef;
+        padding: 15px;
     }
     
     .category-list {
@@ -360,11 +361,18 @@
         overflow-x: auto;
         gap: 10px;
         padding-bottom: 10px;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
     
     .category-item {
         flex-shrink: 0;
         min-width: 120px;
+        padding: 15px 20px; /* Larger touch targets */
+        font-size: 14px;
+    }
+    
+    .lumaprints-main {
+        padding: 15px;
     }
     
     .products-grid {
@@ -372,8 +380,108 @@
         gap: 15px;
     }
     
+    .product-card {
+        padding: 15px;
+        min-height: 120px; /* Larger touch targets */
+    }
+    
     .sizes-grid {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         gap: 10px;
+    }
+    
+    .size-option {
+        padding: 15px 10px; /* Larger touch targets */
+        font-size: 14px;
+    }
+    
+    /* Mobile cart and order controls */
+    .order-controls {
+        padding: 20px 15px;
+        position: sticky;
+        bottom: 0;
+        background: white;
+        border-top: 2px solid #e9ecef;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .quantity-controls {
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+    
+    .quantity-btn {
+        width: 50px;
+        height: 50px; /* Larger touch targets */
+        font-size: 20px;
+    }
+    
+    .quantity-input {
+        width: 80px;
+        height: 50px;
+        font-size: 18px;
+        text-align: center;
+    }
+    
+    .add-to-cart-btn,
+    .checkout-btn {
+        padding: 15px 25px;
+        font-size: 16px;
+        min-height: 50px; /* Larger touch targets */
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .lumaprints-sidebar {
+        padding: 10px;
+    }
+    
+    .category-item {
+        min-width: 100px;
+        padding: 12px 15px;
+        font-size: 13px;
+    }
+    
+    .lumaprints-main {
+        padding: 10px;
+    }
+    
+    .products-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+    
+    .product-card {
+        padding: 12px;
+        min-height: 100px;
+    }
+    
+    .sizes-grid {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 8px;
+    }
+    
+    .size-option {
+        padding: 12px 8px;
+        font-size: 12px;
+    }
+    
+    .order-controls {
+        padding: 15px 10px;
+    }
+    
+    .quantity-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+    
+    .quantity-input {
+        width: 70px;
+        height: 45px;
+        font-size: 16px;
     }
 }

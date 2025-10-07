@@ -654,6 +654,12 @@
     </div>
 
     <!-- Print Order Modal will be dynamically created by lumaprints_ordering.js -->
+    
+    <!-- Mobile Cart Floating Action Button -->
+    <a href="/checkout" class="mobile-cart-fab" id="mobileCartFab">
+        <i class="fas fa-shopping-cart"></i>
+        <span id="mobileCartCount" class="cart-count">0</span>
+    </a>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lumaprints_pricing.js') }}"></script>
@@ -665,14 +671,40 @@
             const cart = JSON.parse(localStorage.getItem('lumaprintsCart') || '[]');
             const cartCount = document.getElementById('cartCount');
             const cartLink = document.getElementById('cartLink');
+            const mobileCartCount = document.getElementById('mobileCartCount');
+            const mobileCartFab = document.getElementById('mobileCartFab');
             
             if (cart.length > 0) {
-                cartCount.textContent = cart.length;
-                cartCount.style.display = 'inline';
-                cartLink.style.opacity = '1';
+                // Update sidebar cart
+                if (cartCount) {
+                    cartCount.textContent = cart.length;
+                    cartCount.style.display = 'inline';
+                }
+                if (cartLink) {
+                    cartLink.style.opacity = '1';
+                }
+                
+                // Update mobile floating cart
+                if (mobileCartCount) {
+                    mobileCartCount.textContent = cart.length;
+                    mobileCartCount.style.display = 'flex';
+                }
+                if (mobileCartFab) {
+                    mobileCartFab.style.display = 'flex';
+                }
             } else {
-                cartCount.style.display = 'none';
-                cartLink.style.opacity = '0.6';
+                // Hide sidebar cart count
+                if (cartCount) {
+                    cartCount.style.display = 'none';
+                }
+                if (cartLink) {
+                    cartLink.style.opacity = '0.6';
+                }
+                
+                // Hide mobile cart count but keep button visible
+                if (mobileCartCount) {
+                    mobileCartCount.style.display = 'none';
+                }
             }
         }
         
