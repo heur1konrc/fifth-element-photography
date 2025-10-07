@@ -327,20 +327,23 @@
                         </div>
                     </div>
 
-                    <!-- Action Buttons -->
-                    <div class="d-grid gap-2 mt-4">
-                        <button type="button" class="btn btn-primary" id="placeOrderBtn">
+                    <!-- PayPal Payment Section -->
+                    <div class="mt-4">
+                        <h5 class="mb-3">
                             <i class="fas fa-credit-card me-2"></i>
-                            <span class="btn-text">Place Order</span>
-                            <span class="loading">
-                                <i class="fas fa-spinner fa-spin me-2"></i>
-                                Processing...
-                            </span>
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="history.back()">
-                            <i class="fas fa-arrow-left me-2"></i>
-                            Continue Shopping
-                        </button>
+                            Payment Method
+                        </h5>
+                        
+                        <!-- PayPal Button Container -->
+                        <div id="paypal-button-container" class="mb-3"></div>
+                        
+                        <!-- Alternative: Continue Shopping -->
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-secondary" onclick="history.back()">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Continue Shopping
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Order Processing Info -->
@@ -357,6 +360,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&components=buttons&currency=USD"></script>
     <script>
         // Checkout functionality
         class CheckoutManager {
@@ -411,25 +416,65 @@
             }
 
             setupEventListeners() {
-                document.getElementById('placeOrderBtn').addEventListener('click', () => {
-                    this.placeOrder();
-                });
+                this.initializePayPalButtons();
             }
 
-            async placeOrder() {
+            initializePayPalButtons() {
+                if (this.cart.length === 0) {
+                    document.getElementById('paypal-button-container').innerHTML = 
+                        '<p class="text-muted text-center">Add items to cart to enable payment</p>';
+                    return;
+                }
+
+                const total = this.cart.reduce((sum, item) => sum + item.totalPrice, 0);
+
+                paypal.Buttons({
+                    style: {
+                        layout: 'vertical',
+                        color: 'gold',
+                        shape: 'rect',
+                        label: 'paypal'
+                    },
+                    
+                    createOrder: (data, actions) => {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: {
+                                    value: total.toFixed(2),
+                                    currency_code: 'USD'
+                                },
+                                description: `Fifth Element Photography Print Order - ${this.cart.length} item(s)`
+                            }]
+                        });
+                    },
+                    
+                    onApprove: (data, actions) => {
+                        return actions.order.capture().then((details) => {
+                            this.handlePaymentSuccess(details);
+                        });
+                    },
+                    
+                    onError: (err) => {
+                        console.error('PayPal payment error:', err);
+                        alert('Payment failed. Please try again.');
+                    },
+                    
+                    onCancel: (data) => {
+                        console.log('PayPal payment cancelled:', data);
+                        // User cancelled payment - no action needed
+                    }
+                }).render('#paypal-button-container');
+            }
+
+            async handlePaymentSuccess(paymentDetails) {
                 const form = document.getElementById('checkoutForm');
-                const btn = document.getElementById('placeOrderBtn');
                 
                 // Validate form
                 if (!form.checkValidity()) {
                     form.reportValidity();
+                    alert('Please fill in all required fields before payment.');
                     return;
                 }
-
-                // Show loading state
-                btn.disabled = true;
-                btn.querySelector('.btn-text').style.display = 'none';
-                btn.querySelector('.loading').style.display = 'inline';
 
                 try {
                     // Collect form data
@@ -458,10 +503,10 @@
                         width: item.width,
                         height: item.height,
                         quantity: item.quantity,
-                        imageUrl: window.location.origin + '/static/images/' + window.currentImageId // This will need to be set
+                        imageUrl: item.imageUrl || window.location.origin + '/static/images/' + item.imageId
                     }));
 
-                    // Submit order
+                    // Submit order with payment details
                     const response = await fetch('/api/lumaprints/submit-order', {
                         method: 'POST',
                         headers: {
@@ -470,7 +515,13 @@
                         body: JSON.stringify({
                             customer,
                             shipping,
-                            items
+                            items,
+                            payment: {
+                                paypalOrderId: paymentDetails.id,
+                                paypalPayerId: paymentDetails.payer.payer_id,
+                                amount: paymentDetails.purchase_units[0].amount.value,
+                                status: paymentDetails.status
+                            }
                         })
                     });
 
@@ -481,7 +532,7 @@
                         localStorage.removeItem('lumaprintsCart');
                         
                         // Show success message
-                        alert(`Order placed successfully! Order ID: ${result.order.id || 'N/A'}`);
+                        alert(`Order placed successfully! Order ID: ${result.order.id || 'N/A'}\nPayment ID: ${paymentDetails.id}`);
                         
                         // Redirect to success page or gallery
                         window.location.href = '/';
@@ -491,12 +542,7 @@
 
                 } catch (error) {
                     console.error('Order submission error:', error);
-                    alert('Failed to place order: ' + error.message);
-                } finally {
-                    // Reset button state
-                    btn.disabled = false;
-                    btn.querySelector('.btn-text').style.display = 'inline';
-                    btn.querySelector('.loading').style.display = 'none';
+                    alert('Payment was successful, but order processing failed. Please contact support with Payment ID: ' + paymentDetails.id);
                 }
             }
         }

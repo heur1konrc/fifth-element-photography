@@ -1968,7 +1968,7 @@ def submit_lumaprints_order():
         data = request.get_json()
         
         # Validate required fields
-        required_fields = ['subcategoryId', 'width', 'height', 'quantity', 'imageUrl', 'price', 'shipping', 'payment']
+        required_fields = ['customer', 'shipping', 'items', 'payment']
         for field in required_fields:
             if field not in data:
                 return jsonify({
@@ -1979,24 +1979,18 @@ def submit_lumaprints_order():
         # Generate order ID
         order_id = str(uuid.uuid4())[:8].upper()
         
+        # Calculate total price from items
+        total_price = sum(item.get('totalPrice', 0) for item in data['items'])
+        
         # Create order record
         order_record = {
             'orderId': order_id,
             'timestamp': datetime.now().isoformat(),
-            'status': 'pending',
-            'product': {
-                'subcategoryId': data['subcategoryId'],
-                'width': data['width'],
-                'height': data['height'],
-                'quantity': data['quantity'],
-                'options': data.get('options', [])
-            },
-            'image': {
-                'url': data['imageUrl'],
-                'filename': os.path.basename(data['imageUrl'])
-            },
+            'status': 'payment_received',
+            'customer': data['customer'],
+            'items': data['items'],
             'pricing': {
-                'total': data['price']
+                'total': total_price
             },
             'shipping': data['shipping'],
             'payment': data['payment'],
@@ -2016,11 +2010,27 @@ def submit_lumaprints_order():
         try:
             api = get_lumaprints_client(sandbox=False)
             
-            # Convert local image URL to full URL
-            image_url = data['imageUrl']
-            if image_url.startswith('/static/'):
-                # Convert to full URL
-                image_url = f"https://fifth-element-photography-production.up.railway.app{image_url}"
+            # Prepare order items for Lumaprints
+            order_items = []
+            for i, item in enumerate(data['items']):
+                # Convert local image URL to full URL
+                image_url = item['imageUrl']
+                if image_url.startswith('/static/'):
+                    # Convert to full URL
+                    image_url = f"https://fifth-element-photography-production.up.railway.app{image_url}"
+                
+                order_items.append({
+                    "externalItemId": f"{order_id}-{i+1}",
+                    "subcategoryId": item['subcategoryId'],
+                    "quantity": item['quantity'],
+                    "width": item['width'],
+                    "height": item['height'],
+                    "file": {
+                        "imageUrl": image_url
+                    },
+                    "orderItemOptions": item.get('options', []),
+                    "solidColorHexCode": None
+                })
             
             # Prepare Lumaprints order payload
             lumaprints_payload = {
@@ -2031,27 +2041,16 @@ def submit_lumaprints_order():
                 "recipient": {
                     "firstName": data['shipping']['firstName'],
                     "lastName": data['shipping']['lastName'],
-                    "addressLine1": data['shipping']['addressLine1'],
-                    "addressLine2": data['shipping'].get('addressLine2', ''),
+                    "addressLine1": data['shipping']['address1'],
+                    "addressLine2": data['shipping'].get('address2', ''),
                     "city": data['shipping']['city'],
                     "state": data['shipping']['state'],
-                    "zipCode": data['shipping']['zipCode'],
+                    "zipCode": data['shipping']['postalCode'],
                     "country": data['shipping']['country'],
                     "phone": data['shipping'].get('phone', ''),
                     "company": ""
                 },
-                "orderItems": [{
-                    "externalItemId": f"{order_id}-1",
-                    "subcategoryId": data['subcategoryId'],
-                    "quantity": data['quantity'],
-                    "width": data['width'],
-                    "height": data['height'],
-                    "file": {
-                        "imageUrl": image_url
-                    },
-                    "orderItemOptions": data.get('options', []),
-                    "solidColorHexCode": None
-                }]
+                "orderItems": order_items
             }
             
             # Submit order to Lumaprints
@@ -2082,7 +2081,10 @@ def submit_lumaprints_order():
         
         return jsonify({
             'success': True,
-            'orderId': order_id,
+            'order': {
+                'id': order_id,
+                'status': order_record['status']
+            },
             'message': 'Order submitted successfully'
         })
         
