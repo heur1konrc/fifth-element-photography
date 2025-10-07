@@ -719,5 +719,16 @@ class LumaprintsOrderInterface {
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new LumaprintsOrderInterface();
+    window.orderInterface = new LumaprintsOrderInterface();
 });
+
+// Also initialize immediately if DOM is already ready
+if (document.readyState === 'loading') {
+    // DOM hasn't finished loading yet
+    document.addEventListener('DOMContentLoaded', () => {
+        window.orderInterface = new LumaprintsOrderInterface();
+    });
+} else {
+    // DOM is already ready
+    window.orderInterface = new LumaprintsOrderInterface();
+}
