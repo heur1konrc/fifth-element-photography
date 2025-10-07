@@ -308,10 +308,6 @@ def scan_images():
 @app.route('/')
 def index():
     """Main portfolio page"""
-    # Redirect mobile users to mobile-optimized gallery
-    if is_mobile_device():
-        return redirect(url_for('mobile_gallery'))
-    
     images = scan_images()
     categories = load_categories()
     

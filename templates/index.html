@@ -330,11 +330,22 @@
                 <div class="modal-info">
                     <h4 id="modalTitle"></h4>
                     <p id="modalCategory"></p>
-                    <div class="modal-actions" style="display: flex !important; justify-content: center !important; margin-top: 20px !important; padding: 15px !important; position: relative !important; z-index: 9999 !important;">
-                        <a href="#" class="btn-order-print" id="orderPrintBtn" style="display: flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; background: #6799c2 !important; color: white !important; padding: 15px 30px !important; border-radius: 25px !important; text-decoration: none !important; font-family: 'Poppins', sans-serif !important; font-weight: 600 !important; font-size: 1rem !important; text-transform: uppercase !important; letter-spacing: 1px !important; min-height: 50px !important; width: 100% !important; max-width: 300px !important; box-shadow: 0 4px 15px rgba(103, 153, 194, 0.3) !important;">
-                            <span class="btn-icon" style="font-size: 1.2rem !important;">🖼️</span>
-                            ORDER PRINT
-                        </a>
+                    <div style="text-align: center; margin-top: 20px; padding: 20px;">
+                        <a href="#" id="orderPrintBtn" onclick="handleOrderClick()" style="
+                            display: inline-block;
+                            background: #6799c2;
+                            color: white;
+                            padding: 15px 30px;
+                            border-radius: 8px;
+                            text-decoration: none;
+                            font-family: Arial, sans-serif;
+                            font-weight: bold;
+                            font-size: 16px;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                            border: 2px solid white;
+                            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                        ">🖼️ ORDER PRINT</a>
                     </div>
                 </div>
             </div>
@@ -715,6 +726,18 @@
         
         // Update cart count periodically in case of same-page updates
         setInterval(updateCartCount, 1000);
+        
+        // Handle order print click
+        function handleOrderClick() {
+            const modalImage = document.getElementById('modalImage');
+            if (modalImage && modalImage.src) {
+                const imageSrc = modalImage.src;
+                const filename = imageSrc.split('/').pop();
+                window.location.href = `/order-print/${filename}`;
+            } else {
+                alert('Please select an image first.');
+            }
+        }
     </script>
 </body>
 </html>
