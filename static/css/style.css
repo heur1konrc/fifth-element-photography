@@ -1552,12 +1552,17 @@ textarea {
         border-radius: 6px;
     }
     
-    /* Modal Mobile */
+    /* Modal Mobile - Chrome & Safari optimized */
     .modal-content {
         margin: 2% auto;
         width: 98%;
         max-width: none;
         padding: 5px;
+        max-height: 95vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+        display: flex;
+        flex-direction: column;
     }
     
     .modal-image {
@@ -1603,17 +1608,19 @@ textarea {
         font-size: 1.3rem;
     }
     
-    /* iOS Safari modal fixes */
+    /* Mobile browser optimizations - Chrome, Safari, etc. */
     .modal-image {
-        max-height: 60vh !important; /* Even smaller for iPhone */
+        max-height: 60vh !important; /* Ensure button space on all mobile browsers */
     }
     
     .modal-actions {
         margin-top: 10px;
-        padding: 10px;
+        padding: 15px;
         position: sticky;
         bottom: 0;
         background: rgba(0,0,0,0.95);
+        border-radius: 8px 8px 0 0;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
     }
     
     .btn-order-print {
@@ -1621,6 +1628,12 @@ textarea {
         font-size: 1.1rem;
         min-height: 55px;
         font-weight: bold;
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        -webkit-appearance: none; /* Chrome mobile fix */
+        -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
     }
     
     .hero-subtitle {
