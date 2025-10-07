@@ -254,9 +254,16 @@ class LumaprintsOrderInterface {
         card.className = 'product-card';
         card.dataset.productId = product.id;
         
+        // Generate product key for thumbnail lookup
+        const productKey = this.generateProductKey(product.name);
+        const thumbnailUrl = `/static/product-thumbnails/${productKey}.jpg`;
+        
         card.innerHTML = `
             <div class="product-thumbnail">
-                <span>Product Preview</span>
+                <img src="${thumbnailUrl}" alt="${product.name}" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                <span style="display: none;">Product Preview</span>
             </div>
             <div class="product-name">${product.name}</div>
             <div class="product-description">
@@ -270,6 +277,26 @@ class LumaprintsOrderInterface {
         });
         
         return card;
+    }
+    
+    generateProductKey(productName) {
+        // Match the exact format from the spreadsheet
+        // Canvas products: "0.75in Stretched Canvas", "1.25in Stretched Canvas", etc.
+        return `canvas_${productName}`.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+    }
+    
+    generateFrameProductKey(productName, frameName) {
+        // For framed canvas products from spreadsheet
+        // Format: "0.75in - 1.625inx1.375 Black Frame" etc.
+        const frameDepth = productName.replace(' Framed Canvas', '');
+        const fullVariantName = `${frameDepth} - ${frameName}`;
+        return `framed_canvas_${fullVariantName}`.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+    }
+    
+    generateOtherProductKey(categoryName, productName) {
+        // For other product types (Fine Art Paper, Metal, etc.)
+        const categoryKey = categoryName.toLowerCase().replace(/[^a-zA-Z0-9]/g, '-');
+        return `${categoryKey}_${productName}`.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
     }
     
     selectProduct(product) {
@@ -307,9 +334,16 @@ class LumaprintsOrderInterface {
             colorCard.className = 'product-card';
             colorCard.dataset.colorId = color.optionId;
             
+            // Generate product key for frame color thumbnail
+            const frameProductKey = this.generateFrameProductKey(product.name, color.name);
+            const thumbnailUrl = `/static/product-thumbnails/${frameProductKey}.jpg`;
+            
             colorCard.innerHTML = `
                 <div class="product-thumbnail">
-                    <span>Product Preview</span>
+                    <img src="${thumbnailUrl}" alt="${color.name}" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                    <span style="display: none;">Product Preview</span>
                 </div>
                 <div class="product-name">${color.name}</div>
                 <div class="product-description">
