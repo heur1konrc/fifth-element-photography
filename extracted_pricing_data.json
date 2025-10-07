@@ -1,0 +1,60 @@
+{
+  "extraction_timestamp": "2025-10-07T02:29:44.811Z",
+  "source": "https://www.lumaprints.com/pricing/",
+  "total_items": 1271,
+  "categories": [
+    "Canvas Prints",
+    "Framed Canvas Prints", 
+    "Fine Art Paper Prints",
+    "Framed Fine Art Paper Prints",
+    "Foam-Mounted Fine Art Paper",
+    "Metal Prints",
+    "Peel and Stick Prints",
+    "Canvas",
+    "Framed Canvas",
+    "Fine Art Paper", 
+    "Framed Fine Art Paper",
+    "Foam-mounted Fine Art Paper",
+    "Metal",
+    "Peel and Stick"
+  ],
+  "sample_pricing_data": [
+    {
+      "category": "Canvas",
+      "subcategory": "1.25IN STRETCHED CANVAS",
+      "size": "8×10",
+      "width": 8,
+      "height": 10,
+      "wholesale_price": 10.99,
+      "retail_price": 27.475,
+      "markup_percentage": 150.0
+    },
+    {
+      "category": "Canvas", 
+      "subcategory": "1.5IN STRETCHED CANVAS",
+      "size": "8×10",
+      "width": 8,
+      "height": 10,
+      "wholesale_price": 12.09,
+      "retail_price": 30.225,
+      "markup_percentage": 150.0
+    },
+    {
+      "category": "Metal",
+      "subcategory": "Metal Print",
+      "size": "8×10", 
+      "width": 8,
+      "height": 10,
+      "wholesale_price": 15.99,
+      "retail_price": 39.975,
+      "markup_percentage": 150.0
+    }
+  ],
+  "notes": [
+    "Successfully extracted 1271 pricing entries from Lumaprints website",
+    "Data includes product categories, sizes, wholesale prices, and calculated retail prices with 150% markup",
+    "Some entries may be shipping costs rather than product costs - needs filtering",
+    "Categories need to be cleaned and standardized",
+    "Width and height dimensions successfully parsed from size strings"
+  ]
+}

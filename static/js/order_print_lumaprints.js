@@ -687,18 +687,125 @@ class LumaprintsOrderInterface {
         this.showView('products');
     }
     
-    proceedToCheckout() {
-        // Here you would integrate with Lumaprints API to submit the order
-        // For now, show the order summary
-        const orderSummary = {
-            items: this.cart,
-            subtotal: this.cart.reduce((sum, item) => sum + item.totalPrice, 0),
-            imageUrl: window.orderData.imageUrl,
-            imageTitle: window.orderData.imageTitle
-        };
+    async proceedToCheckout() {
+        if (this.cart.length === 0) {
+            alert('Your cart is empty. Please add items before checkout.');
+            return;
+        }
         
-        console.log('Order Summary:', orderSummary);
-        alert(`Order ready for checkout!\n\nItems: ${this.cart.length}\nSubtotal: $${orderSummary.subtotal.toFixed(2)}\n\nThis would integrate with Lumaprints API for actual checkout.`);
+        // Show loading state
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const originalText = checkoutBtn.textContent;
+        checkoutBtn.textContent = 'Processing...';
+        checkoutBtn.disabled = true;
+        
+        try {
+            // Collect customer information (you may want to show a form for this)
+            const customerInfo = await this.collectCustomerInfo();
+            if (!customerInfo) {
+                // User cancelled
+                checkoutBtn.textContent = originalText;
+                checkoutBtn.disabled = false;
+                return;
+            }
+            
+            // Prepare order payload
+            const orderPayload = {
+                customer: customerInfo.customer,
+                shipping: customerInfo.shipping,
+                items: this.cart.map(item => ({
+                    subcategoryId: item.subcategoryId,
+                    width: item.width,
+                    height: item.height,
+                    quantity: item.quantity,
+                    imageUrl: window.orderData.imageUrl,
+                    options: item.options || []
+                }))
+            };
+            
+            console.log('Submitting order to Lumaprints:', orderPayload);
+            
+            // Submit order to backend
+            const response = await fetch('/api/lumaprints/submit-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderPayload)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Order submitted successfully
+                alert(`Order submitted successfully!\n\nOrder ID: ${result.order.id || 'N/A'}\nItems: ${this.cart.length}\nTotal: $${this.cart.reduce((sum, item) => sum + item.totalPrice, 0).toFixed(2)}\n\nYou will receive a confirmation email shortly.`);
+                
+                // Clear cart
+                this.cart = [];
+                this.updateCartDisplay();
+                
+                // Redirect to gallery or show success page
+                window.location.href = '/';
+            } else {
+                alert(`Error submitting order: ${result.error}`);
+            }
+            
+        } catch (error) {
+            console.error('Checkout error:', error);
+            alert('Error submitting order. Please try again.');
+        } finally {
+            // Restore button state
+            checkoutBtn.textContent = originalText;
+            checkoutBtn.disabled = false;
+        }
+    }
+    
+    async collectCustomerInfo() {
+        // Simple prompt-based customer info collection
+        // In a real implementation, you'd show a proper form
+        const firstName = prompt('Enter your first name:');
+        if (!firstName) return null;
+        
+        const lastName = prompt('Enter your last name:');
+        if (!lastName) return null;
+        
+        const email = prompt('Enter your email address:');
+        if (!email) return null;
+        
+        const phone = prompt('Enter your phone number (optional):') || '';
+        
+        const address1 = prompt('Enter your street address:');
+        if (!address1) return null;
+        
+        const city = prompt('Enter your city:');
+        if (!city) return null;
+        
+        const state = prompt('Enter your state (2-letter code):');
+        if (!state) return null;
+        
+        const postalCode = prompt('Enter your ZIP/postal code:');
+        if (!postalCode) return null;
+        
+        const country = prompt('Enter your country (2-letter code, default: US):') || 'US';
+        
+        return {
+            customer: {
+                firstName,
+                lastName,
+                email,
+                phone
+            },
+            shipping: {
+                firstName,
+                lastName,
+                address1,
+                address2: '',
+                city,
+                state,
+                postalCode,
+                country
+            }
+        };
     }
     
     showView(viewName) {
