@@ -450,54 +450,80 @@ class LumaprintsOrderInterface {
     }
     
     async generateSizes(minW, maxW, minH, maxH) {
-        // Use the correct canvas sizes data
-        try {
-            const response = await fetch('/correct_canvas_sizes.json');
-            const canvasData = await response.json();
-            const productName = this.currentProduct?.name || '';
-            
-            // Find the matching product in canvas data
-            let productSizes = [];
-            
-            if (productName.includes('0.75in Stretched Canvas')) {
-                productSizes = canvasData['0.75in Stretched Canvas']?.available_sizes || [];
-            } else if (productName.includes('1.25in Stretched Canvas')) {
-                productSizes = canvasData['1.25in Stretched Canvas']?.available_sizes || [];
-            } else if (productName.includes('1.50in Stretched Canvas')) {
-                productSizes = canvasData['1.50in Stretched Canvas']?.available_sizes || [];
-            } else if (productName.includes('Rolled Canvas')) {
-                productSizes = canvasData['Rolled Canvas']?.available_sizes || [];
+        const productName = this.currentProduct?.name || '';
+        
+        // Handle Canvas products with specific size data
+        if (productName.includes('Canvas') && this.currentCategory === 101) {
+            try {
+                const response = await fetch('/correct_canvas_sizes.json');
+                const canvasData = await response.json();
+                
+                // Find the matching product in canvas data
+                let productSizes = [];
+                
+                if (productName.includes('0.75in Stretched Canvas')) {
+                    productSizes = canvasData['0.75in Stretched Canvas']?.available_sizes || [];
+                } else if (productName.includes('1.25in Stretched Canvas')) {
+                    productSizes = canvasData['1.25in Stretched Canvas']?.available_sizes || [];
+                } else if (productName.includes('1.50in Stretched Canvas')) {
+                    productSizes = canvasData['1.50in Stretched Canvas']?.available_sizes || [];
+                } else if (productName.includes('Rolled Canvas')) {
+                    productSizes = canvasData['Rolled Canvas']?.available_sizes || [];
+                }
+                
+                // Convert canvas data to size objects with markup
+                const sizes = productSizes.map(item => {
+                    return {
+                        width: item.width,
+                        height: item.height,
+                        price: item.wholesale_price * 2.5 // 150% markup
+                    };
+                }).filter(size => 
+                    size.width >= minW && size.width <= maxW && 
+                    size.height >= minH && size.height <= maxH
+                );
+                
+                if (sizes.length > 0) return sizes;
+                
+            } catch (error) {
+                console.error('Error loading canvas sizes data:', error);
             }
-            
-            // Convert canvas data to size objects with markup
-            const sizes = productSizes.map(item => {
-                return {
-                    width: item.width,
-                    height: item.height,
-                    price: item.wholesale_price * 2.5 // 150% markup
-                };
-            }).filter(size => 
-                size.width >= minW && size.width <= maxW && 
-                size.height >= minH && size.height <= maxH
-            );
-            
-            return sizes;
-            
-        } catch (error) {
-            console.error('Error loading canvas sizes data:', error);
-            // Fallback to basic sizes if canvas data fails
-            const defaultSizes = [
-                { width: 8, height: 10, price: 29.99 },
-                { width: 11, height: 14, price: 39.99 },
-                { width: 16, height: 20, price: 59.99 },
-                { width: 18, height: 24, price: 79.99 }
-            ];
-            
-            return defaultSizes.filter(size => 
-                size.width >= minW && size.width <= maxW && 
-                size.height >= minH && size.height <= maxH
-            );
         }
+        
+        // Generate standard sizes for Fine Art Paper, Foam-mounted Print, and other products
+        const standardSizes = [
+            // Small sizes
+            { width: 5, height: 7, price: 15.99 },
+            { width: 8, height: 10, price: 24.99 },
+            { width: 8, height: 12, price: 29.99 },
+            { width: 9, height: 12, price: 32.99 },
+            { width: 11, height: 14, price: 39.99 },
+            { width: 12, height: 16, price: 49.99 },
+            { width: 12, height: 18, price: 54.99 },
+            
+            // Medium sizes
+            { width: 16, height: 20, price: 79.99 },
+            { width: 16, height: 24, price: 89.99 },
+            { width: 18, height: 24, price: 99.99 },
+            { width: 20, height: 24, price: 109.99 },
+            { width: 20, height: 30, price: 129.99 },
+            { width: 24, height: 30, price: 149.99 },
+            { width: 24, height: 36, price: 179.99 },
+            
+            // Large sizes
+            { width: 30, height: 40, price: 249.99 },
+            { width: 32, height: 40, price: 269.99 },
+            { width: 36, height: 48, price: 349.99 },
+            { width: 40, height: 50, price: 399.99 },
+            { width: 40, height: 60, price: 479.99 },
+            { width: 44, height: 60, price: 529.99 }
+        ];
+        
+        // Filter sizes based on product constraints
+        return standardSizes.filter(size => 
+            size.width >= minW && size.width <= maxW && 
+            size.height >= minH && size.height <= maxH
+        );
     }
     
     createSizeCard(size) {
