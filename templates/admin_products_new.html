@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Thumbnail Management - Fifth Element Photography</title>
+    <link rel="stylesheet" href="/static/css/admin_new.css">
+    <link rel="stylesheet" href="/static/css/admin_products.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-images"></i>
+                    Product Thumbnail Management
+                </h1>
+                <div class="header-actions">
+                    <a href="/admin" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Admin
+                    </a>
+                    <a href="/" class="btn btn-outline">
+                        <i class="fas fa-external-link-alt"></i>
+                        View Website
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message">
+                            <i class="fas fa-check-circle"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Product Management Section -->
+            <section class="products-section">
+                <div class="section-header">
+                    <h2 class="section-title">Upload Product Thumbnails</h2>
+                    <p class="section-description">Upload thumbnails for each product variant (150x150, AVIF/JPG format)</p>
+                </div>
+
+                <!-- Product Selection -->
+                <div class="product-selector">
+                    <div class="selector-row">
+                        <div class="form-group">
+                            <label for="productType">Product Type:</label>
+                            <select id="productType" onchange="loadProductVariants()">
+                                <option value="">Select Product Type</option>
+                                <option value="canvas">Canvas</option>
+                                <option value="framed-canvas">Framed Canvas</option>
+                                <option value="fine-art-paper">Fine Art Paper</option>
+                                <option value="foam-mounted-print">Foam-mounted Print</option>
+                                <option value="framed-fine-art-paper">Framed Fine Art Paper</option>
+                                <option value="metal">Metal</option>
+                                <option value="peel-and-stick">Peel and Stick</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productVariant">Product Variant:</label>
+                            <select id="productVariant" onchange="showUploadSection()" disabled>
+                                <option value="">Select Product Type First</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Thumbnail Display -->
+                <div class="current-thumbnail" id="currentThumbnail" style="display: none;">
+                    <h3>Current Thumbnail</h3>
+                    <div class="thumbnail-display">
+                        <img id="thumbnailPreview" src="" alt="Current thumbnail">
+                        <div class="thumbnail-info">
+                            <p id="thumbnailName"></p>
+                            <button class="btn btn-danger btn-small" onclick="deleteThumbnail()">
+                                <i class="fas fa-trash"></i>
+                                Delete Thumbnail
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Section -->
+                <div class="upload-section" id="uploadSection" style="display: none;">
+                    <h3>Upload Thumbnail</h3>
+                    <div class="upload-area">
+                        <div class="file-drop-zone" id="thumbnailDropZone">
+                            <div class="drop-zone-content">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h4>Upload Product Thumbnail</h4>
+                                <p>Drag & drop your thumbnail here or click to browse</p>
+                                <p class="file-info">150x150px, AVIF/JPG format</p>
+                            </div>
+                            <input type="file" id="thumbnailFileInput" accept="image/*,.avif" style="display: none;">
+                        </div>
+                        
+                        <div class="upload-actions">
+                            <button class="btn btn-primary" id="uploadThumbnailBtn" onclick="uploadThumbnail()" disabled>
+                                <i class="fas fa-upload"></i>
+                                Upload Thumbnail
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Tracker -->
+                <div class="progress-section">
+                    <h3>Upload Progress</h3>
+                    <div class="progress-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="uploadedCount">0</span>
+                            <span class="stat-label">Uploaded</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalCount">~100</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="progressPercent">0%</span>
+                            <span class="stat-label">Complete</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thumbnails Grid -->
+                <div class="thumbnails-grid">
+                    <h3>All Product Thumbnails</h3>
+                    <div class="grid-container" id="thumbnailsGrid">
+                        <!-- Thumbnails will be loaded here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Product Data (Based on Spreadsheet) -->
+    <script>
+        const PRODUCT_VARIANTS = {
+            'canvas': [
+                '0.75in Stretched Canvas',
+                '1.25in Stretched Canvas',
+                '1.50in Stretched Canvas',
+                'Rolled Canvas'
+            ],
+            'framed-canvas': [
+                // 0.75in Framed Canvas variants
+                '0.75in - 1.625inx1.375 Black Frame',
+                '0.75in - 1.25x0.875 White Frame',
+                '0.75in - 1.25x0.875 Oak Frame',
+                '0.75in - 1.25x0.875 Maple Frame',
+                '0.75in - 1.25x0.875 Black Frame',
+                '0.75in - 0.875x1.125 Natural Wood Frame',
+                '0.75in - 0.875x1.125 Maple Frame',
+                '0.75in - 0.875x1.125 Gold Frame',
+                '0.75in - 0.875x1.125 Espresso Frame',
+                '0.75in - 0.875x0.875 Oak Frame',
+                '0.75in - 0.875x0.875 White Frame',
+                '0.75in - 0.875x0.875 Black Frame',
+                '0.75in - 0.74x1.125 White Frame',
+                '0.75in - 0.75inx1.125 Black Frame',
+                '0.75in - Gold Plein Air Frame',
+                '0.75in - Vintage Collection Copper Frame',
+                '0.75in - Concerto Black w/Gold Frame',
+                '0.75in - Barnwood Driftwood White Frame',
+                '0.75in - Barnwood Driftwood Gray Frame',
+                '0.75in - Gold Floating Frame',
+                '0.75in - Silver Floating Frame',
+                '0.75in - White Floating Frame',
+                '0.75in - Black Floating Frame',
+                // 1.25in Framed Canvas variants
+                '1.25in - Walnut Floating Frame',
+                '1.25in - Oak Floating Frame',
+                '1.25in - Black Floating Frame',
+                // 1.50in Framed Canvas variants
+                '1.50in - Maple Wood Floating Frame',
+                '1.50in - Espresso Floating Frame',
+                '1.50in - Natural Wood Floating Frame',
+                '1.50in - Oak Floating Frame',
+                '1.50in - Gold Floating Frame',
+                '1.50in - Silver Floating Frame',
+                '1.50in - White Floating Frame',
+                '1.50in - Black Floating Frame'
+            ],
+            'fine-art-paper': [
+                'Archival Matte Fine Art Paper',
+                'Hot Press Fine Art Paper',
+                'Cold Press Fine Art Paper',
+                'Semi-Glossy Fine Art Paper',
+                'Metallic Fine Art Paper',
+                'Glossy Fine Art Paper',
+                'Somerset Velvet Fine Art Paper'
+            ],
+            'foam-mounted-print': [
+                'Foam Mounted Archival Matte Fine Art Paper',
+                'Foam-mounted Hot Press Fine Art Paper',
+                'Foam-mounted Cold Press Fine Art Paper',
+                'Foam-mounted Semi-Glossy Fine Art Paper',
+                'Foam-mounted Metallic Fine Art Paper',
+                'Foam-mounted Metallic Fine Art paper',
+                'Foam-mounted Glossy Fine Art Paper',
+                'Foam-mounted Somerset Velvet Fine Art Paper',
+                'Foam-mounted Canvas'
+            ],
+            'framed-fine-art-paper': [
+                '0.875x0.875 Black Frame',
+                '0.875x0.875 White Frame',
+                '0.875x0.875 Oak Frame',
+                '1.25x0.875 Black Frame',
+                '1.25x0.875 White Frame',
+                '1.125x0.875 Oak Frame',
+                '0.875x1.125 Natural Wood Frame',
+                '0.75x1.125 Black Frame',
+                '0.75x1.125 White Frame',
+                '0.875x1.125 Espresso Frame',
+                '2x1.0625 Framer\'s Choice Black w/Gold Frame',
+                '3x0.875 Concerto Black w/Gold Frame',
+                '1.125x0.75 Slimwoods Black Silver Frame',
+                '1.125x0.75 Slimwoods Black Gold Frame',
+                '3x1 Driftwood Gray Frame',
+                '3x1 Driftwood White Frame',
+                '2.5625x1 Plein Air Espresso Gold Frame',
+                '3.250x1.375 Vintage Collection Copper Frame',
+                '1.25x0.875 Maple Wood Frame',
+                '3x1.125 Gold Plein Air Frame',
+                '0.875x1.125 Maple Wood Frame',
+                '1.1625x1.375 Matte Black Frame',
+                '1x2.25 Matte Black Frame',
+                '1x2.25 Matte White Frame',
+                '1x2.25 Matte Maple Frame'
+            ],
+            'metal': [
+                'Glossy White Metal Print',
+                'Glossy Silver Metal Print'
+            ],
+            'peel-and-stick': [
+                'Peel and Stick Art Print'
+            ]
+        };
+    </script>
+
+    <script src="/static/js/admin_products_new.js"></script>
+</body>
+</html>

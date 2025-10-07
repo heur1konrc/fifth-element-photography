@@ -2409,7 +2409,198 @@ def get_image_storage_info():
 @app.route('/admin/products')
 def admin_products():
     """Product thumbnail management page"""
-    return render_template('admin_products.html')
+    return render_template('admin_products_new.html')
+
+@app.route('/api/product-thumbnail-check/<product_key>')
+def check_product_thumbnail(product_key):
+    """Check if a product thumbnail exists"""
+    try:
+        thumbnails_dir = os.path.join('static', 'product-thumbnails')
+        filename = f"{product_key}.jpg"
+        thumbnail_path = os.path.join(thumbnails_dir, filename)
+        
+        if os.path.exists(thumbnail_path):
+            return jsonify({
+                'exists': True,
+                'url': f'/static/product-thumbnails/{filename}',
+                'filename': filename
+            })
+        else:
+            return jsonify({'exists': False})
+    except Exception as e:
+        return jsonify({'exists': False, 'error': str(e)}), 500
+
+@app.route('/api/upload-product-thumbnail-new', methods=['POST'])
+def upload_product_thumbnail_new():
+    """Upload a product thumbnail with new structure"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'message': 'No file provided'}), 400
+        
+        file = request.files['file']
+        product_key = request.form.get('productKey')
+        product_type = request.form.get('productType')
+        product_variant = request.form.get('productVariant')
+        
+        if not file or file.filename == '' or not product_key:
+            return jsonify({'success': False, 'message': 'File and product information required'}), 400
+        
+        # Create thumbnails directory
+        thumbnails_dir = os.path.join('static', 'product-thumbnails')
+        os.makedirs(thumbnails_dir, exist_ok=True)
+        
+        # Process and save image
+        from PIL import Image
+        
+        # Open and process image
+        image = Image.open(file.stream)
+        
+        # Convert to RGB if necessary (handles AVIF, PNG with transparency, etc.)
+        if image.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', image.size, (255, 255, 255))
+            if image.mode == 'P':
+                image = image.convert('RGBA')
+            background.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+            image = background
+        
+        # Keep original size (150x150) - no resizing needed
+        filename = f"{product_key}.jpg"
+        thumbnail_path = os.path.join(thumbnails_dir, filename)
+        
+        # Save as JPEG
+        image.save(thumbnail_path, 'JPEG', quality=90, optimize=True)
+        
+        # Save metadata
+        metadata_file = os.path.join(thumbnails_dir, 'metadata.json')
+        metadata = {}
+        
+        if os.path.exists(metadata_file):
+            with open(metadata_file, 'r') as f:
+                metadata = json.load(f)
+        
+        metadata[product_key] = {
+            'productType': product_type,
+            'productVariant': product_variant,
+            'filename': filename,
+            'uploadDate': datetime.now().isoformat()
+        }
+        
+        with open(metadata_file, 'w') as f:
+            json.dump(metadata, f, indent=2)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Thumbnail uploaded successfully',
+            'url': f'/static/product-thumbnails/{filename}',
+            'productKey': product_key
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error uploading thumbnail: {str(e)}'
+        }), 500
+
+@app.route('/api/delete-product-thumbnail-new/<product_key>', methods=['DELETE'])
+def delete_product_thumbnail_new(product_key):
+    """Delete a product thumbnail"""
+    try:
+        thumbnails_dir = os.path.join('static', 'product-thumbnails')
+        filename = f"{product_key}.jpg"
+        thumbnail_path = os.path.join(thumbnails_dir, filename)
+        
+        if os.path.exists(thumbnail_path):
+            os.remove(thumbnail_path)
+            
+            # Remove from metadata
+            metadata_file = os.path.join(thumbnails_dir, 'metadata.json')
+            if os.path.exists(metadata_file):
+                with open(metadata_file, 'r') as f:
+                    metadata = json.load(f)
+                
+                if product_key in metadata:
+                    del metadata[product_key]
+                    
+                    with open(metadata_file, 'w') as f:
+                        json.dump(metadata, f, indent=2)
+            
+            return jsonify({'success': True, 'message': 'Thumbnail deleted successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Thumbnail not found'}), 404
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/product-thumbnails-new')
+def get_product_thumbnails_new():
+    """Get all product thumbnails with metadata"""
+    try:
+        thumbnails_dir = os.path.join('static', 'product-thumbnails')
+        metadata_file = os.path.join(thumbnails_dir, 'metadata.json')
+        
+        thumbnails = []
+        
+        if os.path.exists(metadata_file):
+            with open(metadata_file, 'r') as f:
+                metadata = json.load(f)
+            
+            for product_key, info in metadata.items():
+                thumbnail_path = os.path.join(thumbnails_dir, info['filename'])
+                if os.path.exists(thumbnail_path):
+                    thumbnails.append({
+                        'productKey': product_key,
+                        'productType': info['productType'],
+                        'productVariant': info['productVariant'],
+                        'filename': info['filename'],
+                        'url': f'/static/product-thumbnails/{info["filename"]}',
+                        'displayName': info['productVariant'],
+                        'uploadDate': info.get('uploadDate', '')
+                    })
+        
+        return jsonify({'thumbnails': thumbnails})
+        
+    except Exception as e:
+        return jsonify({'thumbnails': [], 'error': str(e)}), 500
+
+@app.route('/api/product-thumbnails-stats')
+def get_product_thumbnails_stats():
+    """Get thumbnail upload statistics"""
+    try:
+        # Count total possible thumbnails from PRODUCT_VARIANTS
+        total_variants = 0
+        total_variants += 4  # Canvas
+        total_variants += 32  # Framed Canvas (approximate)
+        total_variants += 7   # Fine Art Paper
+        total_variants += 9   # Foam-mounted Print
+        total_variants += 25  # Framed Fine Art Paper (approximate)
+        total_variants += 2   # Metal
+        total_variants += 1   # Peel and Stick
+        
+        # Count uploaded thumbnails
+        thumbnails_dir = os.path.join('static', 'product-thumbnails')
+        metadata_file = os.path.join(thumbnails_dir, 'metadata.json')
+        
+        uploaded_count = 0
+        if os.path.exists(metadata_file):
+            with open(metadata_file, 'r') as f:
+                metadata = json.load(f)
+                uploaded_count = len(metadata)
+        
+        percentage = round((uploaded_count / total_variants) * 100) if total_variants > 0 else 0
+        
+        return jsonify({
+            'uploaded': uploaded_count,
+            'total': total_variants,
+            'percentage': percentage
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'uploaded': 0,
+            'total': 80,
+            'percentage': 0,
+            'error': str(e)
+        }), 500
 
 @app.route('/api/product-thumbnail/<path:product_path>')
 def get_product_thumbnail(product_path):
