@@ -143,14 +143,23 @@
         <!-- Header -->
         <div class="checkout-header">
             <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h1 class="mb-0">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Fifth Element Photography Logo" style="height: 50px; margin-right: 15px;">
+                        <div>
+                            <h4 class="mb-0" style="color: #2c3e50;">Fifth Element Photography</h4>
+                            <small class="text-muted">Madison, WI</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h1 class="mb-0" style="color: #2c3e50;">
                         <i class="fas fa-shopping-cart me-2"></i>
                         Secure Checkout
                     </h1>
                     <p class="text-muted mb-0">Complete your order securely</p>
                 </div>
-                <div class="col-md-6 text-end">
+                <div class="col-md-4 text-end">
                     <a href="javascript:history.back()" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left me-2"></i>
                         Back to Order
@@ -354,6 +363,29 @@
                             You'll receive email confirmation and tracking information.
                         </small>
                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="checkout-header mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 style="color: #2c3e50; margin-bottom: 10px;">
+                        <i class="fas fa-envelope me-2"></i>
+                        Contact Information
+                    </h6>
+                    <p class="mb-1"><strong>Email:</strong> info@fifthelement.photos</p>
+                    <p class="mb-1"><strong>Location:</strong> Madison, Wisconsin</p>
+                    <p class="mb-0"><strong>Website:</strong> fifthelement.photos</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <h6 style="color: #2c3e50; margin-bottom: 10px;">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Secure Payment
+                    </h6>
+                    <p class="mb-1">Your payment information is encrypted and secure</p>
+                    <p class="mb-0">Professional print quality guaranteed</p>
                 </div>
             </div>
         </div>
