@@ -73,10 +73,10 @@ function handleFileUpload(files) {
 }
 
 function loadThumbnails() {
-    fetch('/admin/product-thumbnails')
+    fetch('/api/product-thumbnails')
         .then(response => response.json())
-        .then(thumbnails => {
-            displayThumbnails(thumbnails);
+        .then(data => {
+            displayThumbnails(data.thumbnails || []);
         })
         .catch(error => {
             console.error('Error loading thumbnails:', error);
