@@ -263,10 +263,10 @@ class LumaprintsOrderInterface {
             101: 'Canvas',
             102: 'Framed Canvas',
             103: 'Fine Art Paper',
+            104: 'Foam-mounted Print',
             105: 'Framed Fine Art Paper',
             106: 'Metal',
-            107: 'Peel and Stick',
-            108: 'Foam-mounted Fine Art Paper'
+            107: 'Peel and Stick'
         };
         return categoryNames[categoryId] || 'Unknown Category';
     }
