@@ -33,13 +33,29 @@ class LumaprintsOrderInterface {
                         name: '0.75" Framed Canvas', 
                         minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200,
                         frameColors: [
-                            { name: 'Black Floating Frame', optionId: 12 },
-                            { name: 'White Floating Frame', optionId: 13 },
-                            { name: 'Silver Floating Frame', optionId: 14 },
-                            { name: 'Gold Floating Frame', optionId: 15 },
-                            { name: 'Espresso Floating Frame', optionId: 121 }, // Adding missing Espresso
-                            { name: 'Natural Wood Floating Frame', optionId: 122 },
-                            { name: 'Maple Wood Floating Frame', optionId: 123 }
+                            { name: '1.625inx1.375 Black Frame', optionId: 12 },
+                            { name: '1.25x0.875 White Frame', optionId: 13 },
+                            { name: '1.25x0.875 Oak Frame', optionId: 14 },
+                            { name: '1.25x0.875 Maple Frame', optionId: 15 },
+                            { name: '1.25x0.875 Black Frame', optionId: 16 },
+                            { name: '0.875x1.125 Natural Wood Frame', optionId: 17 },
+                            { name: '0.875x1.125 Maple Frame', optionId: 18 },
+                            { name: '0.875x1.125 Gold Frame', optionId: 19 },
+                            { name: '0.875x1.125 Espresso Frame', optionId: 20 },
+                            { name: '0.875x0.875 Oak Frame', optionId: 21 },
+                            { name: '0.875x0.875 White Frame', optionId: 22 },
+                            { name: '0.875x0.875 Black Frame', optionId: 23 },
+                            { name: '0.74x1.125 White Frame', optionId: 24 },
+                            { name: '0.75inx1.125 Black Frame', optionId: 25 },
+                            { name: '0.75in Gold Plein Air Frame', optionId: 26 },
+                            { name: '0.75in Vintage Collection Copper Frame', optionId: 27 },
+                            { name: '0.75 Concerto Black w/Gold Frame', optionId: 28 },
+                            { name: '0.75in Barnwood - Driftwood White Frame', optionId: 29 },
+                            { name: '0.75 Barnwood - Driftwood Gray Frame', optionId: 30 },
+                            { name: '0.75in Gold Floating Frame', optionId: 31 },
+                            { name: '0.75in Silver Floating Frame', optionId: 32 },
+                            { name: '0.75in White Floating Frame', optionId: 33 },
+                            { name: '0.75in Black Floating Frame', optionId: 34 }
                         ]
                     },
                     { 
@@ -47,15 +63,9 @@ class LumaprintsOrderInterface {
                         name: '1.25" Framed Canvas', 
                         minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200,
                         frameColors: [
-                            { name: 'Black Floating Frame', optionId: 27 },
-                            { name: 'Oak Floating Frame', optionId: 91 },
-                            { name: 'Walnut Floating Frame', optionId: 120 },
-                            { name: 'Espresso Floating Frame', optionId: 124 }, // Adding missing Espresso
-                            { name: 'White Floating Frame', optionId: 125 },
-                            { name: 'Silver Floating Frame', optionId: 126 },
-                            { name: 'Gold Floating Frame', optionId: 127 },
-                            { name: 'Natural Wood Floating Frame', optionId: 128 },
-                            { name: 'Maple Wood Floating Frame', optionId: 129 }
+                            { name: '1.25in Walnut Floating Frame', optionId: 35 },
+                            { name: '1.25in Oak Floating Frame', optionId: 36 },
+                            { name: '1.25in Black Floating Frame', optionId: 37 }
                         ]
                     },
                     { 
@@ -63,15 +73,14 @@ class LumaprintsOrderInterface {
                         name: '1.50" Framed Canvas', 
                         minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200,
                         frameColors: [
-                            { name: 'Black Floating Frame', optionId: 23 },
-                            { name: 'White Floating Frame', optionId: 24 },
-                            { name: 'Silver Floating Frame', optionId: 25 },
-                            { name: 'Gold Floating Frame', optionId: 26 },
-                            { name: 'Oak Floating Frame', optionId: 92 },
-                            { name: 'Espresso Floating Frame', optionId: 130 }, // Adding missing Espresso
-                            { name: 'Walnut Floating Frame', optionId: 131 },
-                            { name: 'Natural Wood Floating Frame', optionId: 132 },
-                            { name: 'Maple Wood Floating Frame', optionId: 133 }
+                            { name: '1.50in Maple Wood Floating Frame', optionId: 38 },
+                            { name: '1.50in Espresso Floating Frame', optionId: 39 },
+                            { name: '1.50in Natural Wood Floating Frame', optionId: 40 },
+                            { name: '1.50in Oak Floating Frame', optionId: 41 },
+                            { name: '1.50in Gold Floating Frame', optionId: 42 },
+                            { name: '1.50in Silver Floating Frame', optionId: 43 },
+                            { name: '1.50in White Floating Frame', optionId: 44 },
+                            { name: '1.50in Black Floating Frame', optionId: 45 }
                         ]
                     }
                 ]
