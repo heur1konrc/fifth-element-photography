@@ -322,11 +322,12 @@ class LumaprintsOrderInterface {
     }
     
     generateFrameProductKey(productName, frameName) {
-        // For framed canvas products from spreadsheet
-        // Format: "0.75in - 1.625inx1.375 Black Frame" etc.
-        const frameDepth = productName.replace(' Framed Canvas', '');
-        const fullVariantName = `${frameDepth} - ${frameName}`;
-        return `framed_canvas_${fullVariantName}`.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+        // Match the admin interface naming convention exactly
+        // Admin format: framed-canvas_0.75in_framed_canvas_frame_name
+        const productType = 'framed-canvas';
+        const productVariant = productName.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_');
+        const frameOption = frameName.toLowerCase().replace(/[^a-zA-Z0-9]/g, '_');
+        return `${productType}_${productVariant}_${frameOption}`;
     }
     
     generateOtherProductKey(categoryName, productName) {
