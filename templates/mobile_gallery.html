@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fifth Element Photography - Mobile Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        .mobile-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.95);
+            padding: 15px 20px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .mobile-header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .mobile-gallery {
+            margin-top: 70px;
+            padding: 20px 15px;
+        }
+        
+        .mobile-image-card {
+            background: #111;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        .mobile-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .mobile-image-info {
+            padding: 15px;
+        }
+        
+        .mobile-image-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .mobile-image-category {
+            font-size: 12px;
+            color: #6799c2;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        
+        .mobile-order-btn {
+            display: block;
+            width: 100%;
+            background: #6799c2;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .mobile-order-btn:hover {
+            background: #5a8bb0;
+            transform: translateY(-2px);
+        }
+        
+        .mobile-order-btn:active {
+            transform: translateY(0);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px 20px;
+            color: #666;
+        }
+        
+        .mobile-cart {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #6799c2;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(103, 153, 194, 0.4);
+            z-index: 1000;
+        }
+        
+        .mobile-cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-header">
+        <h1>Fifth Element Photography</h1>
+    </div>
+    
+    <div class="mobile-gallery" id="mobileGallery">
+        <div class="loading">Loading images...</div>
+    </div>
+    
+    <a href="/checkout" class="mobile-cart" id="mobileCart" style="display: none;">
+        🛒
+        <span class="mobile-cart-badge" id="cartBadge">0</span>
+    </a>
+    
+    <script>
+        // Load images and create mobile gallery
+        async function loadMobileGallery() {
+            try {
+                const response = await fetch('/api/images');
+                const images = await response.json();
+                
+                const gallery = document.getElementById('mobileGallery');
+                gallery.innerHTML = '';
+                
+                images.forEach(image => {
+                    const card = document.createElement('div');
+                    card.className = 'mobile-image-card';
+                    
+                    card.innerHTML = `
+                        <img src="${image.url}" alt="${image.title}" class="mobile-image" loading="lazy">
+                        <div class="mobile-image-info">
+                            <div class="mobile-image-title">${image.title}</div>
+                            <div class="mobile-image-category">${image.category}</div>
+                            <a href="/order-print/${image.filename}" class="mobile-order-btn">
+                                🖼️ Order Print
+                            </a>
+                        </div>
+                    `;
+                    
+                    gallery.appendChild(card);
+                });
+                
+                updateCartDisplay();
+                
+            } catch (error) {
+                console.error('Error loading images:', error);
+                document.getElementById('mobileGallery').innerHTML = '<div class="loading">Error loading images</div>';
+            }
+        }
+        
+        // Update cart display
+        function updateCartDisplay() {
+            const cart = JSON.parse(localStorage.getItem('lumaprints_cart') || '[]');
+            const cartBtn = document.getElementById('mobileCart');
+            const badge = document.getElementById('cartBadge');
+            
+            if (cart.length > 0) {
+                cartBtn.style.display = 'flex';
+                badge.textContent = cart.length;
+            } else {
+                cartBtn.style.display = 'none';
+            }
+        }
+        
+        // Load gallery on page load
+        document.addEventListener('DOMContentLoaded', loadMobileGallery);
+        
+        // Update cart display when storage changes
+        window.addEventListener('storage', updateCartDisplay);
+    </script>
+</body>
+</html>
