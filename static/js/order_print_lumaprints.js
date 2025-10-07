@@ -399,33 +399,24 @@ class LumaprintsOrderInterface {
     }
     
     generateSizes(minW, maxW, minH, maxH) {
-        // Complete list of all available canvas sizes
+        // Correct sizes for 0.75in Stretched Canvas with 150% markup (2.5x wholesale)
         const allSizes = [
-            { width: 8, height: 10, price: 29.99 },
-            { width: 8, height: 12, price: 32.99 },
-            { width: 10, height: 20, price: 49.99 },
-            { width: 10, height: 30, price: 69.99 },
-            { width: 11, height: 14, price: 39.99 },
-            { width: 12, height: 12, price: 36.99 },
-            { width: 12, height: 16, price: 44.99 },
-            { width: 12, height: 18, price: 49.99 },
-            { width: 16, height: 20, price: 59.99 },
-            { width: 16, height: 24, price: 69.99 },
-            { width: 18, height: 24, price: 79.99 },
-            { width: 20, height: 20, price: 79.99 },
-            { width: 20, height: 40, price: 149.99 },
-            { width: 20, height: 60, price: 219.99 },
-            { width: 24, height: 30, price: 119.99 },
-            { width: 24, height: 32, price: 129.99 },
-            { width: 24, height: 36, price: 149.99 },
-            { width: 30, height: 30, price: 149.99 },
-            { width: 30, height: 40, price: 179.99 },
-            { width: 30, height: 60, price: 269.99 },
-            { width: 32, height: 48, price: 229.99 },
-            { width: 36, height: 48, price: 249.99 },
-            { width: 40, height: 40, price: 239.99 },
-            { width: 40, height: 60, price: 349.99 },
-            { width: 45, height: 60, price: 399.99 }
+            { width: 8, height: 10, price: 24.73 },    // $9.89 * 2.5
+            { width: 8, height: 12, price: 38.48 },    // $15.39 * 2.5
+            { width: 10, height: 20, price: 56.83 },   // $22.73 * 2.5
+            { width: 10, height: 30, price: 66.00 },   // $26.40 * 2.5
+            { width: 11, height: 14, price: 30.23 },   // $12.09 * 2.5
+            { width: 12, height: 12, price: 45.78 },   // $18.31 * 2.5
+            { width: 12, height: 16, price: 51.10 },   // $20.44 * 2.5
+            { width: 12, height: 18, price: 52.95 },   // $21.18 * 2.5
+            { width: 16, height: 20, price: 60.88 },   // $24.35 * 2.5
+            { width: 16, height: 24, price: 68.25 },   // $27.30 * 2.5
+            { width: 18, height: 24, price: 70.65 },   // $28.26 * 2.5
+            { width: 20, height: 20, price: 68.65 },   // $27.46 * 2.5
+            { width: 20, height: 40, price: 97.40 },   // $38.96 * 2.5
+            { width: 24, height: 30, price: 91.70 },   // $36.68 * 2.5
+            { width: 24, height: 32, price: 94.10 },   // $37.64 * 2.5
+            { width: 30, height: 36, price: 106.35 }   // $42.54 * 2.5
         ];
         
         return allSizes.filter(size => 
