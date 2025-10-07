@@ -31,7 +31,7 @@ class LumaprintsOrderInterface {
                     { 
                         id: 102001, 
                         name: '0.75" Framed Canvas', 
-                        minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200,
+                        minWidth: 8, maxWidth: 30, minHeight: 10, maxHeight: 40, dpi: 200,
                         frameColors: [
                             { name: '1.625inx1.375 Black Frame', optionId: 12 },
                             { name: '1.25x0.875 White Frame', optionId: 13 },
@@ -61,7 +61,7 @@ class LumaprintsOrderInterface {
                     { 
                         id: 102002, 
                         name: '1.25" Framed Canvas', 
-                        minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200,
+                        minWidth: 8, maxWidth: 48, minHeight: 10, maxHeight: 48, dpi: 200,
                         frameColors: [
                             { name: '1.25in Walnut Floating Frame', optionId: 35 },
                             { name: '1.25in Oak Floating Frame', optionId: 36 },
@@ -71,7 +71,7 @@ class LumaprintsOrderInterface {
                     { 
                         id: 102003, 
                         name: '1.50" Framed Canvas', 
-                        minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200,
+                        minWidth: 8, maxWidth: 48, minHeight: 10, maxHeight: 48, dpi: 200,
                         frameColors: [
                             { name: '1.50in Maple Wood Floating Frame', optionId: 38 },
                             { name: '1.50in Espresso Floating Frame', optionId: 39 },
