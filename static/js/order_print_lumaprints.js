@@ -399,27 +399,83 @@ class LumaprintsOrderInterface {
     }
     
     generateSizes(minW, maxW, minH, maxH) {
-        // Correct sizes for 0.75in Stretched Canvas with 150% markup (2.5x wholesale)
-        const allSizes = [
-            { width: 8, height: 10, price: 24.73 },    // $9.89 * 2.5
-            { width: 8, height: 12, price: 38.48 },    // $15.39 * 2.5
-            { width: 10, height: 20, price: 56.83 },   // $22.73 * 2.5
-            { width: 10, height: 30, price: 66.00 },   // $26.40 * 2.5
-            { width: 11, height: 14, price: 30.23 },   // $12.09 * 2.5
-            { width: 12, height: 12, price: 45.78 },   // $18.31 * 2.5
-            { width: 12, height: 16, price: 51.10 },   // $20.44 * 2.5
-            { width: 12, height: 18, price: 52.95 },   // $21.18 * 2.5
-            { width: 16, height: 20, price: 60.88 },   // $24.35 * 2.5
-            { width: 16, height: 24, price: 68.25 },   // $27.30 * 2.5
-            { width: 18, height: 24, price: 70.65 },   // $28.26 * 2.5
-            { width: 20, height: 20, price: 68.65 },   // $27.46 * 2.5
-            { width: 20, height: 40, price: 97.40 },   // $38.96 * 2.5
-            { width: 24, height: 30, price: 91.70 },   // $36.68 * 2.5
-            { width: 24, height: 32, price: 94.10 },   // $37.64 * 2.5
-            { width: 30, height: 36, price: 106.35 }   // $42.54 * 2.5
+        // Get sizes based on current product name
+        const productName = this.currentProduct?.name || '';
+        
+        if (productName.includes('0.75in Stretched Canvas')) {
+            // 0.75in Stretched Canvas sizes with 150% markup
+            const sizes075 = [
+                { width: 8, height: 10, price: 24.73 },    // $9.89 * 2.5
+                { width: 8, height: 12, price: 38.48 },    // $15.39 * 2.5
+                { width: 10, height: 20, price: 56.83 },   // $22.73 * 2.5
+                { width: 10, height: 30, price: 66.00 },   // $26.40 * 2.5
+                { width: 11, height: 14, price: 30.23 },   // $12.09 * 2.5
+                { width: 12, height: 12, price: 45.78 },   // $18.31 * 2.5
+                { width: 12, height: 16, price: 51.10 },   // $20.44 * 2.5
+                { width: 12, height: 18, price: 52.95 },   // $21.18 * 2.5
+                { width: 16, height: 20, price: 60.88 },   // $24.35 * 2.5
+                { width: 16, height: 24, price: 68.25 },   // $27.30 * 2.5
+                { width: 18, height: 24, price: 70.65 },   // $28.26 * 2.5
+                { width: 20, height: 20, price: 68.65 },   // $27.46 * 2.5
+                { width: 20, height: 40, price: 97.40 },   // $38.96 * 2.5
+                { width: 24, height: 30, price: 91.70 },   // $36.68 * 2.5
+                { width: 24, height: 32, price: 94.10 },   // $37.64 * 2.5
+                { width: 30, height: 36, price: 106.35 }   // $42.54 * 2.5
+            ];
+            return sizes075.filter(size => 
+                size.width >= minW && size.width <= maxW && 
+                size.height >= minH && size.height <= maxH
+            );
+        } else if (productName.includes('1.25in Stretched Canvas')) {
+            // 1.25in Stretched Canvas sizes with 150% markup
+            const sizes125 = [
+                { width: 8, height: 10, price: 27.48 },    // $10.99 * 2.5
+                { width: 8, height: 12, price: 40.58 },    // $16.23 * 2.5
+                { width: 10, height: 20, price: 60.33 },   // $24.13 * 2.5
+                { width: 10, height: 30, price: 70.65 },   // $28.26 * 2.5
+                { width: 11, height: 14, price: 32.98 },   // $13.19 * 2.5
+                { width: 12, height: 12, price: 48.40 },   // $19.36 * 2.5
+                { width: 12, height: 16, price: 54.20 },   // $21.68 * 2.5
+                { width: 12, height: 18, price: 56.25 },   // $22.50 * 2.5
+                { width: 16, height: 20, price: 64.88 },   // $25.95 * 2.5
+                { width: 16, height: 24, price: 72.68 },   // $29.07 * 2.5
+                { width: 16, height: 48, price: 126.53 },  // $50.61 * 2.5
+                { width: 18, height: 24, price: 75.30 },   // $30.12 * 2.5
+                { width: 19, height: 42, price: 107.23 },  // $42.89 * 2.5
+                { width: 20, height: 20, price: 73.08 },   // $29.23 * 2.5
+                { width: 20, height: 30, price: 84.20 },   // $33.68 * 2.5
+                { width: 20, height: 40, price: 104.08 },  // $41.63 * 2.5
+                { width: 20, height: 60, price: 138.35 },  // $55.34 * 2.5
+                { width: 22, height: 30, price: 93.85 },   // $37.54 * 2.5
+                { width: 24, height: 30, price: 97.68 },   // $39.07 * 2.5
+                { width: 24, height: 32, price: 100.28 },  // $40.11 * 2.5
+                { width: 24, height: 36, price: 105.53 },  // $42.21 * 2.5
+                { width: 24, height: 72, price: 239.30 },  // $95.72 * 2.5
+                { width: 27, height: 60, price: 186.45 },  // $74.58 * 2.5
+                { width: 30, height: 30, price: 113.00 },  // $45.20 * 2.5
+                { width: 30, height: 40, price: 127.48 },  // $50.99 * 2.5
+                { width: 30, height: 60, price: 200.08 },  // $80.03 * 2.5
+                { width: 32, height: 48, price: 199.23 },  // $79.69 * 2.5
+                { width: 36, height: 48, price: 215.83 },  // $86.33 * 2.5
+                { width: 40, height: 40, price: 240.93 },  // $96.37 * 2.5
+                { width: 40, height: 60, price: 280.18 },  // $112.07 * 2.5
+                { width: 45, height: 60, price: 295.43 }   // $118.17 * 2.5
+            ];
+            return sizes125.filter(size => 
+                size.width >= minW && size.width <= maxW && 
+                size.height >= minH && size.height <= maxH
+            );
+        }
+        
+        // Default fallback for other canvas types
+        const defaultSizes = [
+            { width: 8, height: 10, price: 29.99 },
+            { width: 11, height: 14, price: 39.99 },
+            { width: 16, height: 20, price: 59.99 },
+            { width: 18, height: 24, price: 79.99 }
         ];
         
-        return allSizes.filter(size => 
+        return defaultSizes.filter(size => 
             size.width >= minW && size.width <= maxW && 
             size.height >= minH && size.height <= maxH
         );
