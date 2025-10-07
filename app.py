@@ -2452,6 +2452,10 @@ def upload_product_thumbnail_new():
         # Process and save image
         from PIL import Image
         import io
+        import pillow_heif
+        
+        # Register HEIF opener for AVIF support
+        pillow_heif.register_heif_opener()
         
         # Read file content into memory
         file.stream.seek(0)  # Reset stream position
@@ -2667,6 +2671,10 @@ def upload_product_thumbnail():
         # Process and save image
         from PIL import Image
         import io
+        import pillow_heif
+        
+        # Register HEIF opener for AVIF support
+        pillow_heif.register_heif_opener()
         
         # Open and process image
         image = Image.open(file.stream)
