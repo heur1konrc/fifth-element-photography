@@ -490,33 +490,72 @@ class LumaprintsOrderInterface {
             }
         }
         
-        // Generate standard sizes for Fine Art Paper, Foam-mounted Print, and other products
+        // Generate comprehensive sizes for Fine Art Paper, Foam-mounted Print, and other products
+        // Based on actual Lumaprints catalog with 50+ size options
         const standardSizes = [
             // Small sizes
             { width: 5, height: 7, price: 15.99 },
+            { width: 6, height: 8, price: 18.99 },
+            { width: 8.5, height: 11, price: 22.99 },
             { width: 8, height: 10, price: 24.99 },
             { width: 8, height: 12, price: 29.99 },
+            { width: 8, height: 16, price: 34.99 },
             { width: 9, height: 12, price: 32.99 },
+            { width: 9, height: 16, price: 38.99 },
+            { width: 10, height: 8, price: 28.99 },
+            { width: 10, height: 10, price: 32.99 },
+            { width: 10, height: 20, price: 54.99 },
+            { width: 10, height: 30, price: 74.99 },
+            { width: 10, height: 40, price: 94.99 },
             { width: 11, height: 14, price: 39.99 },
+            { width: 11, height: 17, price: 44.99 },
+            { width: 12, height: 12, price: 42.99 },
             { width: 12, height: 16, price: 49.99 },
             { width: 12, height: 18, price: 54.99 },
+            { width: 12, height: 20, price: 59.99 },
+            { width: 12, height: 24, price: 69.99 },
+            { width: 12, height: 30, price: 84.99 },
+            { width: 12, height: 36, price: 99.99 },
+            { width: 14, height: 14, price: 54.99 },
+            { width: 14, height: 18, price: 64.99 },
+            { width: 15, height: 15, price: 59.99 },
             
             // Medium sizes
             { width: 16, height: 20, price: 79.99 },
             { width: 16, height: 24, price: 89.99 },
+            { width: 16, height: 32, price: 119.99 },
+            { width: 16, height: 40, price: 149.99 },
             { width: 18, height: 24, price: 99.99 },
-            { width: 20, height: 24, price: 109.99 },
-            { width: 20, height: 30, price: 129.99 },
-            { width: 24, height: 30, price: 149.99 },
-            { width: 24, height: 36, price: 179.99 },
+            { width: 18, height: 27, price: 109.99 },
+            { width: 18, height: 36, price: 139.99 },
+            { width: 18, height: 48, price: 179.99 },
+            { width: 18, height: 60, price: 219.99 },
+            { width: 18, height: 72, price: 259.99 },
+            { width: 20, height: 20, price: 109.99 },
+            { width: 20, height: 24, price: 119.99 },
+            { width: 20, height: 30, price: 139.99 },
+            { width: 20, height: 40, price: 179.99 },
+            { width: 20, height: 60, price: 249.99 },
+            { width: 22, height: 28, price: 149.99 },
+            { width: 24, height: 24, price: 139.99 },
+            { width: 24, height: 30, price: 159.99 },
+            { width: 24, height: 36, price: 189.99 },
+            { width: 24, height: 48, price: 239.99 },
+            { width: 24, height: 60, price: 299.99 },
+            { width: 24, height: 72, price: 359.99 },
             
             // Large sizes
-            { width: 30, height: 40, price: 249.99 },
-            { width: 32, height: 40, price: 269.99 },
-            { width: 36, height: 48, price: 349.99 },
-            { width: 40, height: 50, price: 399.99 },
-            { width: 40, height: 60, price: 479.99 },
-            { width: 44, height: 60, price: 529.99 }
+            { width: 30, height: 30, price: 219.99 },
+            { width: 30, height: 40, price: 279.99 },
+            { width: 30, height: 45, price: 309.99 },
+            { width: 30, height: 60, price: 399.99 },
+            { width: 32, height: 40, price: 299.99 },
+            { width: 32, height: 42, price: 319.99 },
+            { width: 32, height: 48, price: 359.99 },
+            { width: 36, height: 48, price: 399.99 },
+            { width: 40, height: 40, price: 379.99 },
+            { width: 40, height: 60, price: 529.99 },
+            { width: 44, height: 60, price: 579.99 }
         ];
         
         // Filter sizes based on product constraints
