@@ -399,18 +399,36 @@ class LumaprintsOrderInterface {
     }
     
     generateSizes(minW, maxW, minH, maxH) {
-        // Common print sizes that fit within constraints
-        const commonSizes = [
+        // Complete list of all available canvas sizes
+        const allSizes = [
             { width: 8, height: 10, price: 29.99 },
+            { width: 8, height: 12, price: 32.99 },
+            { width: 10, height: 20, price: 49.99 },
+            { width: 10, height: 30, price: 69.99 },
             { width: 11, height: 14, price: 39.99 },
+            { width: 12, height: 12, price: 36.99 },
+            { width: 12, height: 16, price: 44.99 },
+            { width: 12, height: 18, price: 49.99 },
             { width: 16, height: 20, price: 59.99 },
+            { width: 16, height: 24, price: 69.99 },
             { width: 18, height: 24, price: 79.99 },
+            { width: 20, height: 20, price: 79.99 },
+            { width: 20, height: 40, price: 149.99 },
+            { width: 20, height: 60, price: 219.99 },
             { width: 24, height: 30, price: 119.99 },
+            { width: 24, height: 32, price: 129.99 },
+            { width: 24, height: 36, price: 149.99 },
+            { width: 30, height: 30, price: 149.99 },
             { width: 30, height: 40, price: 179.99 },
-            { width: 36, height: 48, price: 249.99 }
+            { width: 30, height: 60, price: 269.99 },
+            { width: 32, height: 48, price: 229.99 },
+            { width: 36, height: 48, price: 249.99 },
+            { width: 40, height: 40, price: 239.99 },
+            { width: 40, height: 60, price: 349.99 },
+            { width: 45, height: 60, price: 399.99 }
         ];
         
-        return commonSizes.filter(size => 
+        return allSizes.filter(size => 
             size.width >= minW && size.width <= maxW && 
             size.height >= minH && size.height <= maxH
         );
