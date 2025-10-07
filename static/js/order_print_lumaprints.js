@@ -20,7 +20,7 @@ class LumaprintsOrderInterface {
                     { id: 101001, name: '0.75in Stretched Canvas', minWidth: 8, maxWidth: 30, minHeight: 10, maxHeight: 30, dpi: 200 },
                     { id: 101002, name: '1.25in Stretched Canvas', minWidth: 8, maxWidth: 45, minHeight: 10, maxHeight: 60, dpi: 200 },
                     { id: 101003, name: '1.50in Stretched Canvas', minWidth: 8, maxWidth: 45, minHeight: 10, maxHeight: 60, dpi: 200 },
-                    { id: 101005, name: 'Rolled Canvas', minWidth: 5, maxWidth: 120, minHeight: 5, maxHeight: 52, dpi: 200 }
+                    { id: 101005, name: 'Rolled Canvas', minWidth: 8, maxWidth: 45, minHeight: 10, maxHeight: 60, dpi: 200 }
                 ]
             },
             // Framed Canvas Category (ID: 102)
