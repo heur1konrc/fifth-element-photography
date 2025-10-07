@@ -232,6 +232,69 @@
         "minHeight": 5,
         "maxHeight": 60,
         "dpi": 300
+      },
+      {
+        "subcategoryId": 108003,
+        "name": "Foam-mounted Cold Press Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 108005,
+        "name": "Foam-mounted Semi-Glossy Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 108006,
+        "name": "Foam-mounted Metallic Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 108007,
+        "name": "Foam-mounted Glossy Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 108009,
+        "name": "Foam-mounted Somerset Velvet Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 108010,
+        "name": "Foam-mounted Canvas",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 108011,
+        "name": "Foam-mounted Photo Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
       }
     ]
   },
@@ -376,6 +439,108 @@
       {
         "optionId": 45,
         "name": "1.50in Black Floating Frame"
+      }
+    ],
+    "105001": [
+      {
+        "optionId": 105001001,
+        "name": "0.875x0.875 Black Frame"
+      },
+      {
+        "optionId": 105001002,
+        "name": "0.875x0.875 White Frame"
+      },
+      {
+        "optionId": 105001003,
+        "name": "0.875x0.875 Oak Frame"
+      },
+      {
+        "optionId": 105001004,
+        "name": "1.25x0.875 Black Frame"
+      },
+      {
+        "optionId": 105001005,
+        "name": "1.25x0.875 White Frame"
+      },
+      {
+        "optionId": 105001006,
+        "name": "1.25x0.875 Oak Frame"
+      },
+      {
+        "optionId": 105001007,
+        "name": "0.875x1.125 Natural Wood Frame"
+      },
+      {
+        "optionId": 105001008,
+        "name": "0.75x1.125 Black Frame"
+      },
+      {
+        "optionId": 105001009,
+        "name": "0.75x1.125 White Frame"
+      },
+      {
+        "optionId": 105001010,
+        "name": "0.875x1.125 Espresso Frame"
+      },
+      {
+        "optionId": 105001011,
+        "name": "2x1.0625 Framer's Choice Black w/Gold Frame"
+      },
+      {
+        "optionId": 105001012,
+        "name": "3x0.875 Concerto Black w/Gold Frame"
+      },
+      {
+        "optionId": 105001013,
+        "name": "1.125x0.75 Slimwoods Black Silver Frame"
+      },
+      {
+        "optionId": 105001014,
+        "name": "1.125x0.75 Slimwoods Black Gold Frame"
+      },
+      {
+        "optionId": 105001015,
+        "name": "3x1 Driftwood Gray Frame"
+      },
+      {
+        "optionId": 105001016,
+        "name": "3x1 Driftwood White Frame"
+      },
+      {
+        "optionId": 105001017,
+        "name": "2.5625x1 Plain Air Espresso Gold Frame"
+      },
+      {
+        "optionId": 105001018,
+        "name": "3.25x1.375 Vintage Collection Copper Frame"
+      },
+      {
+        "optionId": 105001019,
+        "name": "1.25x0.875 Maple Wood Frame"
+      },
+      {
+        "optionId": 105001020,
+        "name": "3x1.125 Gold Plain Air Frame"
+      },
+      {
+        "optionId": 105001021,
+        "name": "0.875x1.125 Maple Wood Frame"
+      },
+      {
+        "optionId": 105001022,
+        "name": "1.1625x1.375 Matte Black Frame"
+      },
+      {
+        "optionId": 105001023,
+        "name": "1x2.25 Matte Black Frame"
+      },
+      {
+        "optionId": 105001024,
+        "name": "1x2.25 Matte White Frame"
+      },
+      {
+        "optionId": 105001025,
+        "name": "1x2.25 Matte Maple Frame"
       }
     ]
   },
