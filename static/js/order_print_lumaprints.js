@@ -235,6 +235,9 @@ class LumaprintsOrderInterface {
     
     async loadCategory(categoryId) {
         try {
+            // Set current category
+            this.currentCategory = categoryId;
+            
             // Use local productData instead of API call
             const categoryData = this.productData[categoryId];
             
