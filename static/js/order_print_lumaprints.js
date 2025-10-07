@@ -688,8 +688,17 @@ class LumaprintsOrderInterface {
     }
     
     proceedToCheckout() {
+        // Refresh cart from localStorage to ensure we have the latest data
+        const savedCart = localStorage.getItem('lumaprintsCart');
+        if (savedCart) {
+            this.cart = JSON.parse(savedCart);
+        }
+        
+        // Double-check cart contents
         if (this.cart.length === 0) {
-            alert('Your cart is empty. Please add items before checkout.');
+            console.log('Cart is empty, refreshing cart display');
+            this.updateCartDisplay();
+            // Instead of showing alert, just return - let the checkout page handle empty cart
             return;
         }
 
