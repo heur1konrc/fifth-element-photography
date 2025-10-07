@@ -234,30 +234,27 @@ class LumaprintsOrderInterface {
     }
     
     async loadCategory(categoryId) {
-        this.currentCategory = categoryId;
-        
         try {
-            // Load subcategories from API
-            const response = await fetch(`/api/lumaprints/subcategories/${categoryId}`);
-            const data = await response.json();
+            // Use local productData instead of API call
+            const categoryData = this.productData[categoryId];
             
-            if (data.success) {
-                // Get category name from the categories list
+            if (categoryData) {
+                // Get category name
                 const categoryName = this.getCategoryName(categoryId);
                 
                 // Update category title
                 document.getElementById('categoryTitle').textContent = categoryName;
                 
-                // Load products
-                this.loadProducts(data.subcategories);
+                // Load products from local data
+                this.loadProducts(categoryData.subcategories);
             } else {
-                console.error('Failed to load subcategories:', data.error);
+                console.error('Category not found in productData:', categoryId);
             }
         } catch (error) {
             console.error('Error loading category:', error);
         }
     }
-
+    
     getCategoryName(categoryId) {
         const categoryNames = {
             101: 'Canvas',
