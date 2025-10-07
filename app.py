@@ -1808,7 +1808,22 @@ def get_lumaprints_subcategories(category_id):
             'success': False,
             'error': str(e)
         }), 500
-# 
+@app.route('/api/lumaprints/options/<int:subcategory_id>')
+def get_lumaprints_options(subcategory_id):
+    """Get frame options for a specific subcategory (3rd level for Framed Canvas)"""
+    try:
+        catalog = load_lumaprints_catalog()
+        options = catalog.get('options', {}).get(str(subcategory_id), [])
+        return jsonify({
+            'success': True,
+            'options': options
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/api/lumaprints/pricing-detailed', methods=['POST'])
 def get_lumaprints_pricing_detailed():
     """Calculate detailed pricing for a specific product configuration"""
@@ -2119,9 +2134,9 @@ def load_catalog():
     except FileNotFoundError:
         return {"categories": [], "subcategories": {}, "options": {}, "stores": []}
 
-# Initialize realistic pricing calculator with 3x markup based on actual Lumaprints costs
-from realistic_pricing_calculator import get_realistic_pricing_calculator
-pricing_calc = get_realistic_pricing_calculator(markup_multiplier=3.0)
+# Initialize dynamic pricing calculator with 150% markup using database
+from dynamic_pricing_calculator import get_dynamic_pricing_calculator
+pricing_calc = get_dynamic_pricing_calculator(markup_percentage=150.0)
 
 @app.route('/api/lumaprints/categories')
 def get_lumaprints_categories():
@@ -2174,14 +2189,69 @@ def get_lumaprints_pricing():
                 'error': pricing_result['error']
             }), 500
         
-        # Return the pricing result directly (it's already in the correct format)
-        return jsonify(pricing_result)
+        # Format response for frontend compatibility
+        formatted_response = {
+            'success': True,
+            'pricing': {
+                'formatted_price': f"${pricing_result['total_retail']:.2f}",
+                'formatted_price_per_item': f"${pricing_result['price_per_item']:.2f}",
+                'total_price': pricing_result['total_retail'],
+                'price_per_item': pricing_result['price_per_item'],
+                'wholesale_price': pricing_result['wholesale_price'],
+                'quantity': pricing_result['quantity'],
+                'markup_percentage': pricing_result['markup_percentage']
+            },
+            'product_info': {
+                'subcategory_id': subcategory_id,
+                'category': pricing_result.get('category', ''),
+                'subcategory': pricing_result.get('subcategory', ''),
+                'width': width,
+                'height': height
+            }
+        }
+        
+        return jsonify(formatted_response)
         
     except ValueError as e:
         return jsonify({
             'success': False,
             'error': f'Invalid data format: {str(e)}'
         }), 400
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/lumaprints/sizes/<int:subcategory_id>')
+def get_lumaprints_sizes(subcategory_id):
+    """Get available sizes for a specific subcategory"""
+    try:
+        sizes = pricing_calc.get_available_sizes(subcategory_id)
+        
+        return jsonify({
+            'success': True,
+            'subcategory_id': subcategory_id,
+            'sizes': sizes
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/lumaprints/pricing-summary')
+def get_pricing_summary():
+    """Get pricing database summary information"""
+    try:
+        summary = pricing_calc.pricing_manager.get_pricing_summary()
+        
+        return jsonify({
+            'success': True,
+            'summary': summary
+        })
+        
     except Exception as e:
         return jsonify({
             'success': False,

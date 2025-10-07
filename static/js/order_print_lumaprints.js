@@ -226,17 +226,42 @@ class LumaprintsOrderInterface {
         this.showView('products');
     }
     
-    loadCategory(categoryId) {
+    async loadCategory(categoryId) {
         this.currentCategory = categoryId;
-        const categoryData = this.productData[categoryId];
         
-        if (!categoryData) return;
-        
-        // Update category title
-        document.getElementById('categoryTitle').textContent = categoryData.name;
-        
-        // Load products
-        this.loadProducts(categoryData.subcategories);
+        try {
+            // Load subcategories from API
+            const response = await fetch(`/api/lumaprints/subcategories/${categoryId}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                // Get category name from the categories list
+                const categoryName = this.getCategoryName(categoryId);
+                
+                // Update category title
+                document.getElementById('categoryTitle').textContent = categoryName;
+                
+                // Load products
+                this.loadProducts(data.subcategories);
+            } else {
+                console.error('Failed to load subcategories:', data.error);
+            }
+        } catch (error) {
+            console.error('Error loading category:', error);
+        }
+    }
+
+    getCategoryName(categoryId) {
+        const categoryNames = {
+            101: 'Canvas',
+            102: 'Framed Canvas',
+            103: 'Fine Art Paper',
+            105: 'Framed Fine Art Paper',
+            106: 'Metal',
+            107: 'Peel and Stick',
+            108: 'Foam-mounted Fine Art Paper'
+        };
+        return categoryNames[categoryId] || 'Unknown Category';
     }
     
     loadProducts(subcategories) {
@@ -252,7 +277,7 @@ class LumaprintsOrderInterface {
     createProductCard(product) {
         const card = document.createElement('div');
         card.className = 'product-card';
-        card.dataset.productId = product.id;
+        card.dataset.productId = product.subcategoryId;
         
         // Generate product key for thumbnail lookup
         const productKey = this.generateProductKey(product.name);
@@ -308,22 +333,42 @@ class LumaprintsOrderInterface {
         document.querySelectorAll('.product-card').forEach(card => {
             card.classList.remove('selected');
         });
-        document.querySelector(`[data-product-id="${product.id}"]`).classList.add('selected');
+        document.querySelector(`[data-product-id="${product.subcategoryId}"]`).classList.add('selected');
         
         // Update product title
         document.getElementById('productTitle').textContent = product.name;
         
-        // Check if this product has frame color options (for Framed Canvas)
-        if (product.frameColors && product.frameColors.length > 0) {
-            this.showFrameColorSelection(product);
+        // Check if this is a Framed Canvas product (category 102) that needs frame options
+        if (this.currentCategory === 102) {
+            this.loadFrameOptions(product);
         } else {
-            // Load sizes directly for products without color options
+            // Load sizes directly for products without frame options
             this.loadSizes(product);
             this.showView('sizes');
         }
     }
 
-    showFrameColorSelection(product) {
+    async loadFrameOptions(product) {
+        try {
+            const response = await fetch(`/api/lumaprints/options/${product.subcategoryId}`);
+            const data = await response.json();
+            
+            if (data.success && data.options.length > 0) {
+                this.showFrameColorSelection(product, data.options);
+            } else {
+                // No frame options available, proceed to sizes
+                this.loadSizes(product);
+                this.showView('sizes');
+            }
+        } catch (error) {
+            console.error('Error loading frame options:', error);
+            // Fallback to sizes if API fails
+            this.loadSizes(product);
+            this.showView('sizes');
+        }
+    }
+
+    showFrameColorSelection(product, frameOptions) {
         // Update the products grid to show frame color options
         const grid = document.getElementById('productsGrid');
         grid.innerHTML = '';
@@ -331,23 +376,23 @@ class LumaprintsOrderInterface {
         // Update category title to show we're selecting frame colors
         document.getElementById('categoryTitle').textContent = product.name + ' - Choose Frame Color';
         
-        product.frameColors.forEach(color => {
+        frameOptions.forEach(option => {
             const colorCard = document.createElement('div');
             colorCard.className = 'product-card';
-            colorCard.dataset.colorId = color.optionId;
+            colorCard.dataset.colorId = option.optionId;
             
             // Generate product key for frame color thumbnail
-            const frameProductKey = this.generateFrameProductKey(product.name, color.name);
+            const frameProductKey = this.generateFrameProductKey(product.name, option.name);
             const thumbnailUrl = `/static/product-thumbnails/${frameProductKey}.jpg`;
             
             colorCard.innerHTML = `
                 <div class="product-thumbnail">
-                    <img src="${thumbnailUrl}" alt="${color.name}" 
+                    <img src="${thumbnailUrl}" alt="${option.name}" 
                          onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
                          style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
                     <span style="display: none;">Product Preview</span>
                 </div>
-                <div class="product-name">${color.name}</div>
+                <div class="product-name">${option.name}</div>
                 <div class="product-description">
                     Size range: ${product.minWidth}"×${product.minHeight}" to ${product.maxWidth}"×${product.maxHeight}"<br>
                     Required DPI: ${product.dpi}
@@ -355,27 +400,27 @@ class LumaprintsOrderInterface {
             `;
             
             colorCard.addEventListener('click', () => {
-                this.selectFrameColor(product, color);
+                this.selectFrameColor(product, option);
             });
             
             grid.appendChild(colorCard);
         });
     }
 
-    selectFrameColor(product, color) {
-        // Create a new product object with the selected color
+    selectFrameColor(product, option) {
+        // Create a new product object with the selected frame option
         this.currentProduct = {
             ...product,
-            name: product.name + ' - ' + color.name,
-            optionId: color.optionId,
-            selectedColor: color
+            name: product.name + ' - ' + option.name,
+            optionId: option.optionId,
+            selectedOption: option
         };
         
         // Update UI
         document.querySelectorAll('.product-card').forEach(card => {
             card.classList.remove('selected');
         });
-        document.querySelector(`[data-color-id="${color.optionId}"]`).classList.add('selected');
+        document.querySelector(`[data-color-id="${option.optionId}"]`).classList.add('selected');
         
         // Update product title
         document.getElementById('productTitle').textContent = this.currentProduct.name;

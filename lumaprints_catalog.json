@@ -29,6 +29,319 @@
       "name": "Foam-mounted Fine Art Paper"
     }
   ],
+  "subcategories": {
+    "101": [
+      {
+        "subcategoryId": 101001,
+        "name": "0.75in Stretched Canvas",
+        "minWidth": 5,
+        "maxWidth": 120,
+        "minHeight": 5,
+        "maxHeight": 52,
+        "dpi": 200
+      },
+      {
+        "subcategoryId": 101002,
+        "name": "1.25in Stretched Canvas",
+        "minWidth": 5,
+        "maxWidth": 120,
+        "minHeight": 5,
+        "maxHeight": 52,
+        "dpi": 200
+      },
+      {
+        "subcategoryId": 101003,
+        "name": "1.50in Stretched Canvas",
+        "minWidth": 5,
+        "maxWidth": 120,
+        "minHeight": 5,
+        "maxHeight": 52,
+        "dpi": 200
+      },
+      {
+        "subcategoryId": 101005,
+        "name": "Rolled Canvas",
+        "minWidth": 5,
+        "maxWidth": 120,
+        "minHeight": 5,
+        "maxHeight": 52,
+        "dpi": 200
+      }
+    ],
+    "102": [
+      {
+        "subcategoryId": 102001,
+        "name": "0.75in Framed Canvas",
+        "minWidth": 5,
+        "maxWidth": 120,
+        "minHeight": 5,
+        "maxHeight": 52,
+        "dpi": 200
+      },
+      {
+        "subcategoryId": 102002,
+        "name": "1.25in Framed Canvas",
+        "minWidth": 5,
+        "maxWidth": 120,
+        "minHeight": 5,
+        "maxHeight": 52,
+        "dpi": 200
+      },
+      {
+        "subcategoryId": 102003,
+        "name": "1.50in Framed Canvas",
+        "minWidth": 5,
+        "maxWidth": 120,
+        "minHeight": 5,
+        "maxHeight": 52,
+        "dpi": 200
+      }
+    ],
+    "103": [
+      {
+        "subcategoryId": 103001,
+        "name": "Archival Matte Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 103002,
+        "name": "Hot Press Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 103003,
+        "name": "Cold Press Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 103005,
+        "name": "Semi-Glossy Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 103006,
+        "name": "Metallic Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 103007,
+        "name": "Glossy Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 103008,
+        "name": "Semi-Matte Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 103009,
+        "name": "Somerset Velvet Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      }
+    ],
+    "105": [
+      {
+        "subcategoryId": 105001,
+        "name": "Framed Archival Matte Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 105002,
+        "name": "Framed Hot Press Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      }
+    ],
+    "106": [
+      {
+        "subcategoryId": 106001,
+        "name": "Metal Print",
+        "minWidth": 5,
+        "maxWidth": 48,
+        "minHeight": 5,
+        "maxHeight": 96,
+        "dpi": 300
+      }
+    ],
+    "107": [
+      {
+        "subcategoryId": 107001,
+        "name": "Peel and Stick Print",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      }
+    ],
+    "108": [
+      {
+        "subcategoryId": 108001,
+        "name": "Foam-mounted Archival Matte Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      },
+      {
+        "subcategoryId": 108002,
+        "name": "Foam-mounted Hot Press Fine Art Paper",
+        "minWidth": 5,
+        "maxWidth": 44,
+        "minHeight": 5,
+        "maxHeight": 60,
+        "dpi": 300
+      }
+    ]
+  },
+  "options": {
+    "102001": [
+      {
+        "optionId": 12,
+        "name": "Black Floating Frame"
+      },
+      {
+        "optionId": 13,
+        "name": "White Floating Frame"
+      },
+      {
+        "optionId": 14,
+        "name": "Silver Floating Frame"
+      },
+      {
+        "optionId": 15,
+        "name": "Gold Floating Frame"
+      },
+      {
+        "optionId": 121,
+        "name": "Espresso Floating Frame"
+      },
+      {
+        "optionId": 122,
+        "name": "Natural Wood Floating Frame"
+      },
+      {
+        "optionId": 123,
+        "name": "Maple Wood Floating Frame"
+      }
+    ],
+    "102002": [
+      {
+        "optionId": 27,
+        "name": "Black Floating Frame"
+      },
+      {
+        "optionId": 91,
+        "name": "Oak Floating Frame"
+      },
+      {
+        "optionId": 120,
+        "name": "Walnut Floating Frame"
+      },
+      {
+        "optionId": 124,
+        "name": "Espresso Floating Frame"
+      },
+      {
+        "optionId": 125,
+        "name": "White Floating Frame"
+      },
+      {
+        "optionId": 126,
+        "name": "Silver Floating Frame"
+      },
+      {
+        "optionId": 127,
+        "name": "Gold Floating Frame"
+      },
+      {
+        "optionId": 128,
+        "name": "Natural Wood Floating Frame"
+      },
+      {
+        "optionId": 129,
+        "name": "Maple Wood Floating Frame"
+      }
+    ],
+    "102003": [
+      {
+        "optionId": 23,
+        "name": "Black Floating Frame"
+      },
+      {
+        "optionId": 24,
+        "name": "White Floating Frame"
+      },
+      {
+        "optionId": 25,
+        "name": "Silver Floating Frame"
+      },
+      {
+        "optionId": 26,
+        "name": "Gold Floating Frame"
+      },
+      {
+        "optionId": 92,
+        "name": "Oak Floating Frame"
+      },
+      {
+        "optionId": 130,
+        "name": "Espresso Floating Frame"
+      },
+      {
+        "optionId": 131,
+        "name": "Walnut Floating Frame"
+      },
+      {
+        "optionId": 132,
+        "name": "Natural Wood Floating Frame"
+      },
+      {
+        "optionId": 133,
+        "name": "Maple Wood Floating Frame"
+      }
+    ]
+  },
   "stores": [
     {
       "storeId": 20027,
