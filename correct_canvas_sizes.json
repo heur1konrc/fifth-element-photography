@@ -1,0 +1,686 @@
+{
+  "0.75in Stretched Canvas": {
+    "subcategory_id": 101001,
+    "constraints": {
+      "min_width": 8,
+      "max_width": 30,
+      "min_height": 10,
+      "max_height": 30
+    },
+    "available_sizes": [
+      {
+        "width": 8,
+        "height": 10,
+        "size_string": "8x10",
+        "wholesale_price": 23.0
+      },
+      {
+        "width": 8,
+        "height": 12,
+        "size_string": "8x12",
+        "wholesale_price": 24.6
+      },
+      {
+        "width": 9,
+        "height": 12,
+        "size_string": "9x12",
+        "wholesale_price": 25.8
+      },
+      {
+        "width": 10,
+        "height": 10,
+        "size_string": "10x10",
+        "wholesale_price": 25.0
+      },
+      {
+        "width": 10,
+        "height": 12,
+        "size_string": "10x12",
+        "wholesale_price": 27.0
+      },
+      {
+        "width": 10,
+        "height": 14,
+        "size_string": "10x14",
+        "wholesale_price": 29.0
+      },
+      {
+        "width": 11,
+        "height": 14,
+        "size_string": "11x14",
+        "wholesale_price": 30.4
+      },
+      {
+        "width": 12,
+        "height": 12,
+        "size_string": "12x12",
+        "wholesale_price": 29.4
+      },
+      {
+        "width": 12,
+        "height": 16,
+        "size_string": "12x16",
+        "wholesale_price": 34.2
+      },
+      {
+        "width": 14,
+        "height": 18,
+        "size_string": "14x18",
+        "wholesale_price": 40.2
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "size_string": "16x16",
+        "wholesale_price": 40.6
+      },
+      {
+        "width": 16,
+        "height": 20,
+        "size_string": "16x20",
+        "wholesale_price": 47.0
+      },
+      {
+        "width": 18,
+        "height": 18,
+        "size_string": "18x18",
+        "wholesale_price": 47.4
+      },
+      {
+        "width": 20,
+        "height": 20,
+        "size_string": "20x20",
+        "wholesale_price": 55.0
+      },
+      {
+        "width": 20,
+        "height": 24,
+        "size_string": "20x24",
+        "wholesale_price": 63.0
+      },
+      {
+        "width": 24,
+        "height": 24,
+        "size_string": "24x24",
+        "wholesale_price": 72.6
+      },
+      {
+        "width": 30,
+        "height": 30,
+        "size_string": "30x30",
+        "wholesale_price": 105.0
+      }
+    ],
+    "total_sizes": 17
+  },
+  "1.25in Stretched Canvas": {
+    "subcategory_id": 101002,
+    "constraints": {
+      "min_width": 8,
+      "max_width": 45,
+      "min_height": 10,
+      "max_height": 60
+    },
+    "available_sizes": [
+      {
+        "width": 8,
+        "height": 10,
+        "size_string": "8x10",
+        "wholesale_price": 27.6
+      },
+      {
+        "width": 8,
+        "height": 12,
+        "size_string": "8x12",
+        "wholesale_price": 29.52
+      },
+      {
+        "width": 9,
+        "height": 12,
+        "size_string": "9x12",
+        "wholesale_price": 30.96
+      },
+      {
+        "width": 10,
+        "height": 10,
+        "size_string": "10x10",
+        "wholesale_price": 30.0
+      },
+      {
+        "width": 10,
+        "height": 12,
+        "size_string": "10x12",
+        "wholesale_price": 32.4
+      },
+      {
+        "width": 10,
+        "height": 14,
+        "size_string": "10x14",
+        "wholesale_price": 34.8
+      },
+      {
+        "width": 10,
+        "height": 20,
+        "size_string": "10x20",
+        "wholesale_price": 42.0
+      },
+      {
+        "width": 11,
+        "height": 14,
+        "size_string": "11x14",
+        "wholesale_price": 36.480000000000004
+      },
+      {
+        "width": 11,
+        "height": 17,
+        "size_string": "11x17",
+        "wholesale_price": 40.44
+      },
+      {
+        "width": 12,
+        "height": 12,
+        "size_string": "12x12",
+        "wholesale_price": 35.28
+      },
+      {
+        "width": 12,
+        "height": 16,
+        "size_string": "12x16",
+        "wholesale_price": 41.04
+      },
+      {
+        "width": 12,
+        "height": 18,
+        "size_string": "12x18",
+        "wholesale_price": 43.92
+      },
+      {
+        "width": 12,
+        "height": 24,
+        "size_string": "12x24",
+        "wholesale_price": 52.56
+      },
+      {
+        "width": 14,
+        "height": 18,
+        "size_string": "14x18",
+        "wholesale_price": 48.239999999999995
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "size_string": "16x16",
+        "wholesale_price": 48.72
+      },
+      {
+        "width": 16,
+        "height": 20,
+        "size_string": "16x20",
+        "wholesale_price": 56.4
+      },
+      {
+        "width": 16,
+        "height": 24,
+        "size_string": "16x24",
+        "wholesale_price": 64.08
+      },
+      {
+        "width": 18,
+        "height": 18,
+        "size_string": "18x18",
+        "wholesale_price": 56.879999999999995
+      },
+      {
+        "width": 18,
+        "height": 24,
+        "size_string": "18x24",
+        "wholesale_price": 69.84
+      },
+      {
+        "width": 20,
+        "height": 20,
+        "size_string": "20x20",
+        "wholesale_price": 66.0
+      },
+      {
+        "width": 20,
+        "height": 24,
+        "size_string": "20x24",
+        "wholesale_price": 75.6
+      },
+      {
+        "width": 20,
+        "height": 30,
+        "size_string": "20x30",
+        "wholesale_price": 90.0
+      },
+      {
+        "width": 24,
+        "height": 24,
+        "size_string": "24x24",
+        "wholesale_price": 87.12
+      },
+      {
+        "width": 24,
+        "height": 30,
+        "size_string": "24x30",
+        "wholesale_price": 104.39999999999999
+      },
+      {
+        "width": 24,
+        "height": 36,
+        "size_string": "24x36",
+        "wholesale_price": 121.67999999999999
+      },
+      {
+        "width": 30,
+        "height": 30,
+        "size_string": "30x30",
+        "wholesale_price": 126.0
+      },
+      {
+        "width": 30,
+        "height": 40,
+        "size_string": "30x40",
+        "wholesale_price": 162.0
+      },
+      {
+        "width": 36,
+        "height": 36,
+        "size_string": "36x36",
+        "wholesale_price": 173.51999999999998
+      },
+      {
+        "width": 36,
+        "height": 48,
+        "size_string": "36x48",
+        "wholesale_price": 225.35999999999999
+      },
+      {
+        "width": 40,
+        "height": 40,
+        "size_string": "40x40",
+        "wholesale_price": 210.0
+      },
+      {
+        "width": 45,
+        "height": 60,
+        "size_string": "45x60",
+        "wholesale_price": 342.0
+      }
+    ],
+    "total_sizes": 31
+  },
+  "1.50in Stretched Canvas": {
+    "subcategory_id": 101003,
+    "constraints": {
+      "min_width": 8,
+      "max_width": 45,
+      "min_height": 10,
+      "max_height": 60
+    },
+    "available_sizes": [
+      {
+        "width": 8,
+        "height": 10,
+        "size_string": "8x10",
+        "wholesale_price": 31.200000000000003
+      },
+      {
+        "width": 8,
+        "height": 12,
+        "size_string": "8x12",
+        "wholesale_price": 33.44
+      },
+      {
+        "width": 9,
+        "height": 12,
+        "size_string": "9x12",
+        "wholesale_price": 35.120000000000005
+      },
+      {
+        "width": 10,
+        "height": 10,
+        "size_string": "10x10",
+        "wholesale_price": 34.0
+      },
+      {
+        "width": 10,
+        "height": 12,
+        "size_string": "10x12",
+        "wholesale_price": 36.8
+      },
+      {
+        "width": 10,
+        "height": 14,
+        "size_string": "10x14",
+        "wholesale_price": 39.6
+      },
+      {
+        "width": 10,
+        "height": 20,
+        "size_string": "10x20",
+        "wholesale_price": 48.0
+      },
+      {
+        "width": 11,
+        "height": 14,
+        "size_string": "11x14",
+        "wholesale_price": 41.56
+      },
+      {
+        "width": 11,
+        "height": 17,
+        "size_string": "11x17",
+        "wholesale_price": 46.18000000000001
+      },
+      {
+        "width": 12,
+        "height": 12,
+        "size_string": "12x12",
+        "wholesale_price": 40.160000000000004
+      },
+      {
+        "width": 12,
+        "height": 16,
+        "size_string": "12x16",
+        "wholesale_price": 46.88
+      },
+      {
+        "width": 12,
+        "height": 18,
+        "size_string": "12x18",
+        "wholesale_price": 50.24
+      },
+      {
+        "width": 12,
+        "height": 24,
+        "size_string": "12x24",
+        "wholesale_price": 60.32000000000001
+      },
+      {
+        "width": 14,
+        "height": 18,
+        "size_string": "14x18",
+        "wholesale_price": 55.28
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "size_string": "16x16",
+        "wholesale_price": 55.84
+      },
+      {
+        "width": 16,
+        "height": 20,
+        "size_string": "16x20",
+        "wholesale_price": 64.80000000000001
+      },
+      {
+        "width": 16,
+        "height": 24,
+        "size_string": "16x24",
+        "wholesale_price": 73.76
+      },
+      {
+        "width": 18,
+        "height": 18,
+        "size_string": "18x18",
+        "wholesale_price": 65.36000000000001
+      },
+      {
+        "width": 18,
+        "height": 24,
+        "size_string": "18x24",
+        "wholesale_price": 80.48
+      },
+      {
+        "width": 20,
+        "height": 20,
+        "size_string": "20x20",
+        "wholesale_price": 76.0
+      },
+      {
+        "width": 20,
+        "height": 24,
+        "size_string": "20x24",
+        "wholesale_price": 87.2
+      },
+      {
+        "width": 20,
+        "height": 30,
+        "size_string": "20x30",
+        "wholesale_price": 104.00000000000001
+      },
+      {
+        "width": 24,
+        "height": 24,
+        "size_string": "24x24",
+        "wholesale_price": 100.64000000000001
+      },
+      {
+        "width": 24,
+        "height": 30,
+        "size_string": "24x30",
+        "wholesale_price": 120.80000000000001
+      },
+      {
+        "width": 30,
+        "height": 30,
+        "size_string": "30x30",
+        "wholesale_price": 146.0
+      },
+      {
+        "width": 36,
+        "height": 36,
+        "size_string": "36x36",
+        "wholesale_price": 201.44000000000003
+      },
+      {
+        "width": 40,
+        "height": 40,
+        "size_string": "40x40",
+        "wholesale_price": 244.00000000000003
+      }
+    ],
+    "total_sizes": 27
+  },
+  "Rolled Canvas": {
+    "subcategory_id": 101005,
+    "constraints": {
+      "min_width": 8,
+      "max_width": 45,
+      "min_height": 10,
+      "max_height": 60
+    },
+    "available_sizes": [
+      {
+        "width": 8,
+        "height": 10,
+        "size_string": "8x10",
+        "wholesale_price": 18.4
+      },
+      {
+        "width": 8,
+        "height": 12,
+        "size_string": "8x12",
+        "wholesale_price": 19.68
+      },
+      {
+        "width": 9,
+        "height": 12,
+        "size_string": "9x12",
+        "wholesale_price": 20.64
+      },
+      {
+        "width": 10,
+        "height": 10,
+        "size_string": "10x10",
+        "wholesale_price": 20.0
+      },
+      {
+        "width": 10,
+        "height": 12,
+        "size_string": "10x12",
+        "wholesale_price": 21.6
+      },
+      {
+        "width": 10,
+        "height": 14,
+        "size_string": "10x14",
+        "wholesale_price": 23.200000000000003
+      },
+      {
+        "width": 10,
+        "height": 20,
+        "size_string": "10x20",
+        "wholesale_price": 28.0
+      },
+      {
+        "width": 11,
+        "height": 14,
+        "size_string": "11x14",
+        "wholesale_price": 24.32
+      },
+      {
+        "width": 11,
+        "height": 17,
+        "size_string": "11x17",
+        "wholesale_price": 26.96
+      },
+      {
+        "width": 12,
+        "height": 12,
+        "size_string": "12x12",
+        "wholesale_price": 23.52
+      },
+      {
+        "width": 12,
+        "height": 16,
+        "size_string": "12x16",
+        "wholesale_price": 27.36
+      },
+      {
+        "width": 12,
+        "height": 18,
+        "size_string": "12x18",
+        "wholesale_price": 29.28
+      },
+      {
+        "width": 12,
+        "height": 24,
+        "size_string": "12x24",
+        "wholesale_price": 35.04
+      },
+      {
+        "width": 14,
+        "height": 18,
+        "size_string": "14x18",
+        "wholesale_price": 32.16
+      },
+      {
+        "width": 16,
+        "height": 16,
+        "size_string": "16x16",
+        "wholesale_price": 32.480000000000004
+      },
+      {
+        "width": 16,
+        "height": 20,
+        "size_string": "16x20",
+        "wholesale_price": 37.6
+      },
+      {
+        "width": 16,
+        "height": 24,
+        "size_string": "16x24",
+        "wholesale_price": 42.72
+      },
+      {
+        "width": 18,
+        "height": 18,
+        "size_string": "18x18",
+        "wholesale_price": 37.92
+      },
+      {
+        "width": 18,
+        "height": 24,
+        "size_string": "18x24",
+        "wholesale_price": 46.56
+      },
+      {
+        "width": 20,
+        "height": 20,
+        "size_string": "20x20",
+        "wholesale_price": 44.0
+      },
+      {
+        "width": 20,
+        "height": 24,
+        "size_string": "20x24",
+        "wholesale_price": 50.4
+      },
+      {
+        "width": 20,
+        "height": 30,
+        "size_string": "20x30",
+        "wholesale_price": 60.0
+      },
+      {
+        "width": 24,
+        "height": 24,
+        "size_string": "24x24",
+        "wholesale_price": 58.08
+      },
+      {
+        "width": 24,
+        "height": 30,
+        "size_string": "24x30",
+        "wholesale_price": 69.6
+      },
+      {
+        "width": 24,
+        "height": 36,
+        "size_string": "24x36",
+        "wholesale_price": 81.12
+      },
+      {
+        "width": 30,
+        "height": 30,
+        "size_string": "30x30",
+        "wholesale_price": 84.0
+      },
+      {
+        "width": 30,
+        "height": 40,
+        "size_string": "30x40",
+        "wholesale_price": 108.0
+      },
+      {
+        "width": 36,
+        "height": 36,
+        "size_string": "36x36",
+        "wholesale_price": 115.68
+      },
+      {
+        "width": 36,
+        "height": 48,
+        "size_string": "36x48",
+        "wholesale_price": 150.24
+      },
+      {
+        "width": 40,
+        "height": 40,
+        "size_string": "40x40",
+        "wholesale_price": 140.0
+      },
+      {
+        "width": 45,
+        "height": 60,
+        "size_string": "45x60",
+        "wholesale_price": 228.0
+      }
+    ],
+    "total_sizes": 31
+  }
+}

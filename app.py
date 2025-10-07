@@ -2840,3 +2840,14 @@ def get_all_product_thumbnails():
             'success': False,
             'error': str(e)
         }), 500
+
+# Route to serve correct canvas sizes data
+@app.route('/correct_canvas_sizes.json')
+def serve_correct_canvas_sizes():
+    """Serve the correct canvas sizes data"""
+    try:
+        with open('correct_canvas_sizes.json', 'r') as f:
+            data = json.load(f)
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
