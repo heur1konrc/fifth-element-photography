@@ -310,21 +310,29 @@ function resetFileSelection() {
     
     // Reset drop zone
     const dropZone = document.getElementById('thumbnailDropZone');
-    dropZone.classList.remove('file-selected');
-    dropZone.innerHTML = `
-        <div class="drop-zone-content">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <h4>Upload Product Thumbnail</h4>
-            <p>Drag & drop your thumbnail here or click to browse</p>
-            <p class="file-info">150x150px, AVIF/JPG format</p>
-        </div>
-    `;
+    if (dropZone) {
+        dropZone.classList.remove('file-selected');
+        dropZone.innerHTML = `
+            <div class="drop-zone-content">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h4>Upload Product Thumbnail</h4>
+                <p>Drag & drop your thumbnail here or click to browse</p>
+                <p class="file-info">150x150px, AVIF/JPG format</p>
+            </div>
+        `;
+    }
     
-    // Reset file input
-    document.getElementById('thumbnailFileInput').value = '';
+    // Reset file input safely
+    const fileInput = document.getElementById('thumbnailFileInput');
+    if (fileInput) {
+        fileInput.value = '';
+    }
     
-    // Disable upload button
-    document.getElementById('uploadThumbnailBtn').disabled = true;
+    // Disable upload button safely
+    const uploadBtn = document.getElementById('uploadThumbnailBtn');
+    if (uploadBtn) {
+        uploadBtn.disabled = true;
+    }
 }
 
 // Alert function for user feedback
