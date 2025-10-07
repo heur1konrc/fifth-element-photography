@@ -306,79 +306,12 @@ function openModal(imageUrl, title, category) {
     modalImage.src = imageUrl;
     modalTitle.textContent = title;
     modalCategory.innerHTML = '<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>';
-    
-    // NUCLEAR OPTION: Force inject ORDER PRINT button with JavaScript
-    setTimeout(() => {
-        // Remove any existing injected buttons
-        const existingBtn = document.getElementById('js-injected-order-btn');
-        if (existingBtn) existingBtn.remove();
-        
-        // Create button with JavaScript
-        const orderButton = document.createElement('div');
-        orderButton.id = 'js-injected-order-btn';
-        orderButton.innerHTML = `
-            <div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 99999; width: 90%; max-width: 300px;">
-                <a href="#" onclick="handleOrderPrintClick()" style="
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    gap: 10px !important;
-                    background: #6799c2 !important;
-                    color: white !important;
-                    padding: 18px 30px !important;
-                    border-radius: 25px !important;
-                    text-decoration: none !important;
-                    font-family: Arial, sans-serif !important;
-                    font-weight: bold !important;
-                    font-size: 16px !important;
-                    text-transform: uppercase !important;
-                    letter-spacing: 1px !important;
-                    min-height: 55px !important;
-                    width: 100% !important;
-                    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
-                    border: 3px solid white !important;
-                ">
-                    <span style="font-size: 20px !important;">🖼️</span>
-                    ORDER PRINT
-                </a>
-            </div>
-        `;
-        
-        // Inject into modal
-        const modalContent = document.querySelector('.modal-content');
-        if (modalContent) {
-            modalContent.appendChild(orderButton);
-        } else {
-            // Fallback: inject into body
-            document.body.appendChild(orderButton);
-        }
-        
-        console.log('ORDER PRINT button injected via JavaScript');
-    }, 100);
-    
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
 }
 
-// Handle order print click
-function handleOrderPrintClick() {
-    // Get current image filename from modal
-    const modalImage = document.getElementById('modalImage');
-    if (modalImage && modalImage.src) {
-        const imageSrc = modalImage.src;
-        const filename = imageSrc.split('/').pop();
-        window.location.href = `/order-print/${filename}`;
-    } else {
-        alert('Please select an image first.');
-    }
-}
-
 // Close modal
 function closeImageModal() {
-    // Clean up injected button
-    const injectedBtn = document.getElementById('js-injected-order-btn');
-    if (injectedBtn) injectedBtn.remove();
-    
     modal.classList.remove('show');
     document.body.style.overflow = 'auto';
 }
