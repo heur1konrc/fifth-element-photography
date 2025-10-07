@@ -1,0 +1,20 @@
+{
+  "canvas_8x10_standard-canvas.jpg": {
+    "product_type": "canvas",
+    "variant": "8x10_standard-canvas",
+    "uploaded_at": "2025-10-07T03:00:00Z",
+    "filename": "canvas_8x10_standard-canvas.jpg"
+  },
+  "canvas_rolled_canvas.jpg": {
+    "product_type": "canvas", 
+    "variant": "rolled_canvas",
+    "uploaded_at": "2025-10-07T03:00:00Z",
+    "filename": "canvas_rolled_canvas.jpg"
+  },
+  "test_canvas_8x10_standard-canvas.jpg": {
+    "product_type": "canvas",
+    "variant": "8x10_standard-canvas", 
+    "uploaded_at": "2025-10-07T03:00:00Z",
+    "filename": "test_canvas_8x10_standard-canvas.jpg"
+  }
+}
