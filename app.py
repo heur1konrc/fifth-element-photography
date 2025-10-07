@@ -60,7 +60,6 @@ LUMAPRINTS_CATALOG_FILE = os.path.join(os.path.dirname(__file__), 'lumaprints_ca
 # pricing_calc = get_pricing_calculator(markup_percentage=100.0, sandbox=False)  # TEMPORARILY DISABLED TO FIX CRASH
 
 # Import Lumaprints routes (must be after app creation)
-import lumaprints_routes
 
 # SMTP Configuration
 SMTP_SERVER = 'smtp.gmail.com'

@@ -1,6 +1,6 @@
 """
 Flask routes for Lumaprints integration
-Add these routes to your main app.py file
+Function-based route registration to avoid import issues
 """
 
 from flask import request, jsonify
