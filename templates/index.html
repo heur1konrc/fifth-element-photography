@@ -60,6 +60,9 @@
                 <li><a href="#" class="nav-link" data-section="featured">FEATURED IMAGE</a></li>
                 <li><a href="#" class="nav-link" data-section="about">ABOUT</a></li>
                 <li><a href="#" class="nav-link" data-section="contact">CONTACT</a></li>
+                <li><a href="/checkout" class="nav-link cart-link" id="cartLink">
+                    <i class="fas fa-shopping-cart"></i> CART <span id="cartCount" class="cart-count">0</span>
+                </a></li>
             </ul>
             <br>
              <!--<button onclick="window.location.href='https://buymeacoffee.com/fifthelementphotography'">BUY ME A COFFEE</button>
@@ -655,6 +658,31 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lumaprints_pricing.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lumaprints_inline_ordering.js') }}"></script>
+    
+    <script>
+        // Update cart count in navigation
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('lumaprintsCart') || '[]');
+            const cartCount = document.getElementById('cartCount');
+            const cartLink = document.getElementById('cartLink');
+            
+            if (cart.length > 0) {
+                cartCount.textContent = cart.length;
+                cartCount.style.display = 'inline';
+                cartLink.style.opacity = '1';
+            } else {
+                cartCount.style.display = 'none';
+                cartLink.style.opacity = '0.6';
+            }
+        }
+        
+        // Update cart count on page load and when localStorage changes
+        document.addEventListener('DOMContentLoaded', updateCartCount);
+        window.addEventListener('storage', updateCartCount);
+        
+        // Update cart count periodically in case of same-page updates
+        setInterval(updateCartCount, 1000);
+    </script>
 </body>
 </html>
 
