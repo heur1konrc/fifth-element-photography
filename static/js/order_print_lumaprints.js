@@ -163,134 +163,70 @@ class LumaprintsOrderInterface {
         
         this.init();
     }
-    
     async init() {
+        // Show loading state immediately
+        this.showLoadingState();
+        
         this.setupEventListeners();
         this.createMobileDropdowns(); // Create mobile dropdowns if on mobile
-        await this.loadProductDataFromAPI(); // Load real data from Lumaprints API
-    }
-    
-    async loadProductDataFromAPI() {
+        
+        // Load API data in background
         try {
-            console.log('Loading product data from Lumaprints API...');
-            
-            // Step 1: Get all categories
-            const categoriesResponse = await fetch('/api/lumaprints/categories');
-            this.categories = await categoriesResponse.json();
-            console.log('Categories loaded:', this.categories.length);
-            
-            // Step 2: Get subcategories for each category
-            for (const category of this.categories) {
-                const subcategoriesResponse = await fetch(`/api/lumaprints/subcategories/${category.id}`);
-                this.subcategories[category.id] = await subcategoriesResponse.json();
-                console.log(`Subcategories loaded for ${category.name}:`, this.subcategories[category.id].length);
-                
-                // Step 3: Get options for each subcategory
-                for (const subcategory of this.subcategories[category.id]) {
-                    const optionsResponse = await fetch(`/api/lumaprints/options/${subcategory.subcategoryId}`);
-                    this.options[subcategory.subcategoryId] = await optionsResponse.json();
-                    console.log(`Options loaded for ${subcategory.name}:`, this.options[subcategory.subcategoryId].length);
-                }
-            }
-            
-            this.isDataLoaded = true;
-            console.log('All product data loaded successfully');
-            
-            // Populate mobile dropdowns if on mobile
-            if (window.innerWidth <= 768) {
-                this.populateMobileDropdowns();
-            }
-            
-            // Initialize interface with first category
-            if (this.categories.length > 0) {
-                this.loadCategoryFromAPI(this.categories[0].id);
-            }
-            
+            await this.loadProductDataFromAPI();
+            this.hideLoadingState();
+            this.loadCategory(101); // Start with Canvas category
         } catch (error) {
-            console.error('Error loading product data from API:', error);
-            // Fallback to show error message
+            console.error('Failed to load product data:', error);
             this.showError('Failed to load product data. Please refresh the page.');
         }
     }
     
-    loadCategoryFromAPI(categoryId) {
-        // Update category title
-        const category = this.categories.find(c => c.id === categoryId);
-        if (category) {
-            const categoryTitle = document.getElementById('categoryTitle');
-            if (categoryTitle) {
-                categoryTitle.textContent = category.name;
-            }
-        }
-        
-        // Load subcategories for desktop grid
-        const subcategories = this.subcategories[categoryId];
-        if (subcategories) {
-            this.loadProductsFromAPI(subcategories);
-        }
-    }
-    
-    loadProductsFromAPI(subcategories) {
+    showLoadingState() {
         const grid = document.getElementById('productsGrid');
         if (grid) {
-            grid.innerHTML = '';
-            
-            // Desktop: Create product cards
-            subcategories.forEach(subcategory => {
-                const productCard = this.createProductCardFromAPI(subcategory);
-                grid.appendChild(productCard);
-            });
-        }
-    }
-    
-    createProductCardFromAPI(subcategory) {
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.dataset.subcategoryId = subcategory.subcategoryId;
-        
-        card.innerHTML = `
-            <div class="product-info">
-                <h3 class="product-name">${subcategory.name}</h3>
-                <div class="product-specs">
-                    <p>Size: ${subcategory.minimumWidth}"×${subcategory.minimumHeight}" to ${subcategory.maximumWidth}"×${subcategory.maximumHeight}"</p>
-                    <p>Required DPI: ${subcategory.requiredDPI}</p>
-                </div>
-            </div>
-        `;
-        
-        // Add click handler
-        card.addEventListener('click', () => {
-            this.selectSubcategory(subcategory.subcategoryId);
-        });
-        
-        return card;
-    }
-    
-    selectSubcategory(subcategoryId) {
-        console.log('Selected subcategory:', subcategoryId);
-        // Handle subcategory selection - check if options are needed
-        const options = this.options[subcategoryId];
-        if (options && options.length > 0) {
-            // Show options selection
-            this.showSubcategoryOptions(subcategoryId);
-        } else {
-            // Proceed directly to size/quantity selection
-            this.proceedToSizeSelection(subcategoryId);
-        }
-    }
-    
-    showError(message) {
-        const grid = document.getElementById('productsGrid');
-        if (grid) {
-            grid.innerHTML = `<div class="error-message">${message}</div>`;
+            grid.innerHTML = '<div class="loading-message">Loading products...</div>';
         }
         
         const mobileContainer = document.querySelector('.mobile-dropdowns-container');
         if (mobileContainer) {
-            mobileContainer.innerHTML = `<div class="error-message">${message}</div>`;
+            mobileContainer.innerHTML = '<div class="loading-message">Loading products...</div>';
         }
     }
     
+    hideLoadingState() {
+        // Loading states will be replaced by actual content
+    }
+    
+    async loadProductDataFromAPI() {
+        console.log('Loading product data from Lumaprints API...');
+        
+        // Step 1: Get all categories
+        const categoriesResponse = await fetch('/api/lumaprints/categories');
+        this.categories = await categoriesResponse.json();
+        console.log('Categories loaded:', this.categories.length);
+        
+        // Step 2: Get subcategories for each category
+        for (const category of this.categories) {
+            const subcategoriesResponse = await fetch(`/api/lumaprints/subcategories/${category.id}`);
+            this.subcategories[category.id] = await subcategoriesResponse.json();
+            console.log(`Subcategories loaded for ${category.name}:`, this.subcategories[category.id].length);
+            
+            // Step 3: Get options for each subcategory
+            for (const subcategory of this.subcategories[category.id]) {
+                const optionsResponse = await fetch(`/api/lumaprints/options/${subcategory.subcategoryId}`);
+                this.options[subcategory.subcategoryId] = await optionsResponse.json();
+                console.log(`Options loaded for ${subcategory.name}:`, this.options[subcategory.subcategoryId].length);
+            }
+        }
+        
+        this.isDataLoaded = true;
+        console.log('All product data loaded successfully');
+        
+        // Populate mobile dropdowns if on mobile
+        if (window.innerWidth <= 768) {
+            this.populateMobileDropdowns();
+        }
+    }    
     createMobileDropdowns() {
         // Check if we're on mobile (screen width < 768px)
         if (window.innerWidth <= 768) {
@@ -299,11 +235,15 @@ class LumaprintsOrderInterface {
     }
     
     createMobileInterface() {
-        const categoriesSection = document.querySelector('.categories-section');
-        if (!categoriesSection) return;
+        // Target the main panel where products should appear on mobile
+        const mainPanel = document.querySelector('.main-panel');
+        if (!mainPanel) {
+            console.error('Main panel not found for mobile interface');
+            return;
+        }
         
         // Clear any existing mobile dropdowns
-        const existingDropdowns = categoriesSection.querySelectorAll('.mobile-dropdown');
+        const existingDropdowns = mainPanel.querySelectorAll('.mobile-dropdown');
         existingDropdowns.forEach(dropdown => dropdown.remove());
         
         // Create container for all mobile dropdowns
@@ -314,9 +254,16 @@ class LumaprintsOrderInterface {
         const productTypeDropdown = document.createElement('select');
         productTypeDropdown.className = 'mobile-category-dropdown mobile-dropdown';
         productTypeDropdown.id = 'mobileProductType';
-        productTypeDropdown.innerHTML = '<option value="">Select Product Type...</option>';
-        
-        // Will be populated when API data loads
+        productTypeDropdown.innerHTML = `
+            <option value="">Select Product Type...</option>
+            <option value="101">Canvas</option>
+            <option value="102">Framed Canvas</option>
+            <option value="103">Fine Art Paper</option>
+            <option value="104">Foam-mounted Print</option>
+            <option value="105">Framed Fine Art Paper</option>
+            <option value="106">Metal</option>
+            <option value="107">Peel and Stick</option>
+        `;
         
         // Dropdown 2: Variant
         const variantDropdown = document.createElement('select');
@@ -337,8 +284,13 @@ class LumaprintsOrderInterface {
         mobileContainer.appendChild(variantDropdown);
         mobileContainer.appendChild(variant2Dropdown);
         
-        // Add container to categories section
-        categoriesSection.appendChild(mobileContainer);
+        // Add container to main panel for mobile
+        const productsGrid = mainPanel.querySelector('#productsGrid');
+        if (productsGrid) {
+            productsGrid.appendChild(mobileContainer);
+        } else {
+            mainPanel.appendChild(mobileContainer);
+        }
         
         // Add event listeners
         this.setupMobileDropdownListeners();
@@ -379,34 +331,20 @@ class LumaprintsOrderInterface {
         });
     }
     
-    populateMobileDropdowns() {
-        const productTypeDropdown = document.getElementById('mobileProductType');
-        if (!productTypeDropdown || !this.isDataLoaded) return;
-        
-        // Populate product type dropdown with categories from API
-        productTypeDropdown.innerHTML = '<option value="">Select Product Type...</option>';
-        this.categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.id;
-            option.textContent = category.name;
-            productTypeDropdown.appendChild(option);
-        });
-    }
-    
     loadMobileVariants(categoryId) {
         const variantDropdown = document.getElementById('mobileVariant');
         const variant2Dropdown = document.getElementById('mobileVariant2');
         
-        // Get subcategories for this category from API data
-        const subcategories = this.subcategories[categoryId];
-        if (!subcategories) return;
+        // Get category data
+        const categoryData = this.productData[categoryId];
+        if (!categoryData) return;
         
         // Clear and populate variant dropdown
         variantDropdown.innerHTML = '<option value="">Select Variant...</option>';
-        subcategories.forEach(subcategory => {
+        categoryData.subcategories.forEach(product => {
             const option = document.createElement('option');
-            option.value = subcategory.subcategoryId;
-            option.textContent = subcategory.name;
+            option.value = product.id;
+            option.textContent = product.name;
             variantDropdown.appendChild(option);
         });
         
@@ -415,40 +353,34 @@ class LumaprintsOrderInterface {
         variant2Dropdown.style.display = 'none';
     }
     
-    handleMobileVariantSelection(subcategoryId) {
+    handleMobileVariantSelection(variantId) {
         const variant2Dropdown = document.getElementById('mobileVariant2');
         
-        // Get options for this subcategory from API data
-        const options = this.options[subcategoryId];
-        if (!options || options.length === 0) {
-            // No additional options needed, proceed directly
-            variant2Dropdown.style.display = 'none';
-            this.proceedToMobileOrdering(subcategoryId);
-            return;
+        // Find the selected variant
+        let selectedVariant = null;
+        for (const categoryData of Object.values(this.productData)) {
+            selectedVariant = categoryData.subcategories.find(p => p.id === variantId);
+            if (selectedVariant) break;
         }
         
-        // Show variant #2 dropdown with options
-        variant2Dropdown.innerHTML = '<option value="">Select Option...</option>';
+        if (!selectedVariant) return;
         
-        // Group options by optionGroup
-        options.forEach(optionGroup => {
-            if (optionGroup.optionGroupItems && optionGroup.optionGroupItems.length > 0) {
-                // Add optgroup for better organization
-                const optgroup = document.createElement('optgroup');
-                optgroup.label = optionGroup.optionGroup;
-                
-                optionGroup.optionGroupItems.forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = item.optionId;
-                    option.textContent = item.optionName;
-                    optgroup.appendChild(option);
-                });
-                
-                variant2Dropdown.appendChild(optgroup);
-            }
-        });
-        
-        variant2Dropdown.style.display = 'block';
+        // Check if this variant has frame colors (requires variant #2)
+        if (selectedVariant.frameColors && selectedVariant.frameColors.length > 0) {
+            // Show variant #2 dropdown with frame colors
+            variant2Dropdown.innerHTML = '<option value="">Select Frame Color...</option>';
+            selectedVariant.frameColors.forEach(frame => {
+                const option = document.createElement('option');
+                option.value = frame.optionId;
+                option.textContent = frame.name;
+                variant2Dropdown.appendChild(option);
+            });
+            variant2Dropdown.style.display = 'block';
+        } else {
+            // No variant #2 needed, proceed directly
+            variant2Dropdown.style.display = 'none';
+            this.proceedToMobileOrdering(selectedVariant);
+        }
     }
     
     handleMobileVariant2Selection(variant2Id) {
