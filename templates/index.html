@@ -88,13 +88,10 @@
                         <h3 id="galleryTitle">Portfolio Gallery</h3>
                         <p class="gallery-subtitle">Click any image to view details and order prints</p>
                         <div class="category-filters">
-                            <button class="category-badge active" data-category="all">ALL</button>
-                            <button class="category-badge" data-category="portrait">PORTRAIT</button>
-                            <button class="category-badge" data-category="landscape">LANDSCAPE</button>
-                            <button class="category-badge" data-category="wildlife">WILDLIFE</button>
-                            <button class="category-badge" data-category="events">EVENTS</button>
-                            <button class="category-badge" data-category="architecture">ARCHITECTURE</button>
-                            <button class="category-badge" data-category="other">OTHER</button>
+                            <a href="#" class="category-link active" data-category="all">ALL</a>
+                            {% for category in categories %}
+                            <a href="#" class="category-link" data-category="{{ category }}">{{ category.upper() }}</a>
+                            {% endfor %}
                         </div>
                         <div class="image-count" id="imageCount">Loading...</div>
                     </div>

@@ -235,14 +235,8 @@ function filterImages(category) {
         filteredImages = allImages;
         galleryTitle.textContent = 'Portfolio Gallery';
     } else {
-        // Handle both 'landscape' and 'landscapes' categories
-        if (category === 'landscape') {
-            filteredImages = allImages.filter(image => 
-                image.category === 'landscape' || image.category === 'landscapes'
-            );
-        } else {
-            filteredImages = allImages.filter(image => image.category === category);
-        }
+        // Filter images by exact category match
+        filteredImages = allImages.filter(image => image.category === category);
         galleryTitle.textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Gallery`;
     }
     
@@ -441,15 +435,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Category Filtering
 document.addEventListener('DOMContentLoaded', function() {
-    const categoryBadges = document.querySelectorAll('.category-badge');
+    const categoryLinks = document.querySelectorAll('.category-link');
     
-    // Add click event listeners to category badges
-    categoryBadges.forEach(badge => {
-        badge.addEventListener('click', function() {
+    // Add click event listeners to category links
+    categoryLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default link behavior
             const category = this.getAttribute('data-category');
             
-            // Update active badge
-            categoryBadges.forEach(b => b.classList.remove('active'));
+            // Update active link
+            categoryLinks.forEach(l => l.classList.remove('active'));
             this.classList.add('active');
             
             // Filter images using the correct function

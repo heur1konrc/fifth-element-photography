@@ -1661,13 +1661,14 @@ textarea {
     border-radius: 50%;
 }
 
-.category-badge {
+/* Desktop: Text-based category links */
+.category-link {
     background: none;
     color: #6799c2;
-    border: none;
-    padding: 8px 16px;
+    text-decoration: none;
+    padding: 4px 8px;
     font-family: 'Poppins', sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -1675,19 +1676,50 @@ textarea {
     transition: all 0.3s ease;
     white-space: nowrap;
     flex-shrink: 0;
+    border: none;
+    display: inline-block;
 }
 
-.category-badge:hover {
-    background: none;
-    color: #6799c2;
-    /*transform: translateY(-1px);*/
-    transform: translateY(-5px);
+.category-link:hover {
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-2px);
 }
 
-.category-badge.active {
-    background: none;
-    color: #6799c2;
-    font-weight: 900; /*from 600 to 900*/
+.category-link.active {
+    color: #ffffff;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+/* Mobile: Button-style category badges */
+@media (max-width: 768px) {
+    .category-link {
+        background: rgba(103, 153, 194, 0.1);
+        color: #6799c2;
+        border: 1px solid #6799c2;
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        margin: 2px;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .category-link:hover {
+        background: rgba(103, 153, 194, 0.2);
+        color: #6799c2;
+        transform: none;
+        text-decoration: none;
+    }
+    
+    .category-link.active {
+        background: #6799c2;
+        color: #ffffff;
+        font-weight: 600;
+        text-decoration: none;
+    }
 }
 
 /* Update gallery header layout for badges */
@@ -1709,13 +1741,6 @@ textarea {
     flex-shrink: 0;
 }
 
-@media (max-width: 1200px) {
-    .category-badge {
-        font-size: 0.75rem;
-        padding: 6px 12px;
-    }
-}
-
 @media (max-width: 768px) {
     .gallery-header {
         flex-direction: column;
@@ -1730,18 +1755,6 @@ textarea {
         justify-content: center;
         gap: 0.4rem;
         flex-wrap: wrap;
-    }
-    
-    .category-badge {
-        font-size: 0.7rem;
-        padding: 6px 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    .category-badge {
-        font-size: 0.65rem;
-        padding: 5px 10px;
     }
 }
 
