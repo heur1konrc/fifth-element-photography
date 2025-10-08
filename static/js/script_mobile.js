@@ -369,16 +369,15 @@ window.addEventListener('orientationchange', function() {
 function initStickyNavigation() {
     const header = document.querySelector('.mobile-header');
     const nav = document.querySelector('.mobile-nav');
-    const filters = document.querySelector('.mobile-filters');
     const main = document.querySelector('.mobile-main');
     
-    if (!header || !nav || !filters || !main) return;
+    if (!header || !nav || !main) {
+        console.log('Sticky nav elements not found');
+        return;
+    }
     
     let headerHeight = header.offsetHeight;
-    let navHeight = nav.offsetHeight;
-    let filtersHeight = filters.offsetHeight;
     let isNavSticky = false;
-    let isFiltersSticky = false;
     
     function handleScroll() {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -388,49 +387,23 @@ function initStickyNavigation() {
             nav.classList.add('sticky');
             main.classList.add('nav-sticky');
             isNavSticky = true;
+            console.log('Nav made sticky');
         } 
         // When scrolled back to top, remove nav sticky
         else if (scrollTop < headerHeight && isNavSticky) {
             nav.classList.remove('sticky');
             main.classList.remove('nav-sticky');
-            main.classList.remove('filters-sticky');
-            filters.classList.remove('sticky');
             isNavSticky = false;
-            isFiltersSticky = false;
-        }
-        
-        // When scrolled past nav + filters, make filters sticky too
-        const navFiltersHeight = headerHeight + navHeight + filtersHeight;
-        if (scrollTop >= navFiltersHeight && isNavSticky && !isFiltersSticky) {
-            filters.classList.add('sticky');
-            main.classList.remove('nav-sticky');
-            main.classList.add('filters-sticky');
-            isFiltersSticky = true;
-        }
-        // When scrolled back above filters threshold, remove filters sticky
-        else if (scrollTop < navFiltersHeight && isFiltersSticky) {
-            filters.classList.remove('sticky');
-            main.classList.remove('filters-sticky');
-            main.classList.add('nav-sticky');
-            isFiltersSticky = false;
+            console.log('Nav sticky removed');
         }
     }
     
-    // Throttle scroll events for better performance
-    let ticking = false;
-    function requestTick() {
-        if (!ticking) {
-            requestAnimationFrame(handleScroll);
-            ticking = true;
-        }
-    }
-    
-    window.addEventListener('scroll', requestTick);
+    // Add scroll listener
+    window.addEventListener('scroll', handleScroll);
+    console.log('Sticky navigation initialized');
     
     // Handle window resize to recalculate heights
     window.addEventListener('resize', function() {
         headerHeight = header.offsetHeight;
-        navHeight = nav.offsetHeight;
-        filtersHeight = filters.offsetHeight;
     });
 }
