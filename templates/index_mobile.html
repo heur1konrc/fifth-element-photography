@@ -28,6 +28,12 @@
     {% endif %}
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style_mobile.css') }}?v=20241008-001">
+    <script>
+        // Pass images data to JavaScript (same as desktop approach)
+        window.imagesData = {{ images|tojson }};
+        window.categoriesData = {{ categories|tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/script_mobile_simple.js') }}?v=20241008-002"></script>
 </head>
 <body>
     <div class="mobile-container">
@@ -56,7 +62,7 @@
             <!-- HOME Section -->
             <section class="content-section active" id="home-section">
                 <!-- Hero Image -->
-                <div class="mobile-hero" id="mobileHero" {% if featured_image %}style="background-image: url('{{ featured_image.url }}');"{% endif %}>
+                <div class="mobile-hero" id="mobileHero">
                     <div class="hero-overlay">
                         <div class="hero-content">
                             <img src="{{ url_for('static', filename='images/TaglineWhite.png') }}" alt="Capturing the Quintessence" class="hero-tagline-image">
@@ -293,6 +299,6 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script_mobile.js') }}?v=20241008-001"></script>
+
 </body>
 </html>
