@@ -499,24 +499,7 @@ class LumaprintsOrderInterface {
             grid.innerHTML = `<div class="error-message">${message}</div>`;
         }
     }
-}
-
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    window.orderInterface = new LumaprintsOrderInterface();
-});
-
-// Also initialize immediately if DOM is already ready
-if (document.readyState === 'loading') {
-    // DOM hasn't finished loading yet
-    document.addEventListener('DOMContentLoaded', () => {
-        window.orderInterface = new LumaprintsOrderInterface();
-    });
-} else {
-    // DOM is already ready
-    window.orderInterface = new LumaprintsOrderInterface();
-}
-
+    
     updatePricing() {
         const widthInput = document.getElementById('widthInput');
         const heightInput = document.getElementById('heightInput');
@@ -587,3 +570,20 @@ if (document.readyState === 'loading') {
         quantityInput.value = '1';
         this.updatePricing();
     }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.orderInterface = new LumaprintsOrderInterface();
+});
+
+// Also initialize immediately if DOM is already ready
+if (document.readyState === 'loading') {
+    // DOM hasn't finished loading yet
+    document.addEventListener('DOMContentLoaded', () => {
+        window.orderInterface = new LumaprintsOrderInterface();
+    });
+} else {
+    // DOM is already ready
+    window.orderInterface = new LumaprintsOrderInterface();
+}
