@@ -110,10 +110,13 @@ function initMobileSwipeGallery(images) {
     updateSwipeNavigation();
     updateImageInfo();
     
-    // Add touch event listeners
-    wrapper.addEventListener('touchstart', handleTouchStart, { passive: true });
-    wrapper.addEventListener('touchmove', handleTouchMove, { passive: false });
-    wrapper.addEventListener('touchend', handleTouchEnd, { passive: true });
+    // Add touch event listeners to the gallery container
+    const gallery = document.getElementById('mobileSwipeGallery');
+    if (gallery) {
+        gallery.addEventListener('touchstart', handleTouchStart, { passive: true });
+        gallery.addEventListener('touchmove', handleTouchMove, { passive: false });
+        gallery.addEventListener('touchend', handleTouchEnd, { passive: true });
+    }
     
     // Add button event listeners
     if (prevBtn) {
@@ -161,7 +164,10 @@ function initMobileSwipeGallery(images) {
 // Touch Event Handlers
 function handleTouchStart(e) {
     touchStartX = e.touches[0].clientX;
+    touchEndX = touchStartX;
     isDragging = true;
+    
+    console.log('Touch start:', touchStartX);
 }
 
 function handleTouchMove(e) {
@@ -174,6 +180,8 @@ function handleTouchMove(e) {
     if (Math.abs(diff) > 10) {
         e.preventDefault();
     }
+    
+    console.log('Touch move:', touchEndX, 'diff:', diff);
 }
 
 function handleTouchEnd(e) {
@@ -181,22 +189,28 @@ function handleTouchEnd(e) {
     isDragging = false;
     
     const diff = touchStartX - touchEndX;
-    const threshold = 50; // Minimum swipe distance
+    const threshold = 30; // Reduced threshold for easier swiping
+    
+    console.log('Touch end - diff:', diff, 'threshold:', threshold);
     
     if (Math.abs(diff) > threshold) {
         if (diff > 0 && currentSwipeIndex < filteredImages.length - 1) {
             // Swipe left - next image
+            console.log('Swiping to next image');
             currentSwipeIndex++;
             updateSwipePosition();
             updateSwipeNavigation();
             updateImageInfo();
         } else if (diff < 0 && currentSwipeIndex > 0) {
             // Swipe right - previous image
+            console.log('Swiping to previous image');
             currentSwipeIndex--;
             updateSwipePosition();
             updateSwipeNavigation();
             updateImageInfo();
         }
+    } else {
+        console.log('Swipe distance too small:', Math.abs(diff));
     }
 }
 
