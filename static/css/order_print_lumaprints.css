@@ -532,14 +532,76 @@ body {
         order: 2;  /* Product preview second */
     }
     
-    .products-grid {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
+    /* Convert category list to dropdown on mobile */
+    .category-list {
+        display: none; /* Hide the grid of category boxes */
     }
     
+    .categories-section::after {
+        content: '';
+        display: block;
+        position: relative;
+    }
+    
+    /* Add mobile dropdown for categories */
+    .mobile-category-dropdown {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        font-size: 16px;
+        color: #333;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 20px;
+        padding-right: 40px;
+    }
+    
+    /* Convert products grid to dropdown on mobile */
+    .products-grid {
+        display: none; /* Hide the grid of product boxes */
+    }
+    
+    .mobile-products-dropdown {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        font-size: 16px;
+        color: #333;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 20px;
+        padding-right: 40px;
+        margin-top: 10px;
+    }
+    
+    /* Convert sizes grid to dropdown on mobile */
     .sizes-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 0.5rem;
+        display: none; /* Hide the grid of size boxes */
+    }
+    
+    .mobile-sizes-dropdown {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        background: white;
+        font-size: 16px;
+        color: #333;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 20px;
+        padding-right: 40px;
+        margin-top: 10px;
     }
     
     .action-buttons {

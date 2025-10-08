@@ -173,7 +173,72 @@ class LumaprintsOrderInterface {
     
     init() {
         this.setupEventListeners();
+        this.createMobileDropdowns(); // Create mobile dropdowns if on mobile
         this.loadCategory(101); // Start with Canvas category
+    }
+    
+    createMobileDropdowns() {
+        // Check if we're on mobile (screen width < 768px)
+        if (window.innerWidth <= 768) {
+            this.createCategoryDropdown();
+            this.createProductDropdowns();
+        }
+    }
+    
+    createCategoryDropdown() {
+        const categoriesSection = document.querySelector('.categories-section');
+        if (!categoriesSection) return;
+        
+        // Create category dropdown
+        const categoryDropdown = document.createElement('select');
+        categoryDropdown.className = 'mobile-category-dropdown';
+        categoryDropdown.innerHTML = `
+            <option value="101">Canvas</option>
+            <option value="102">Framed Canvas</option>
+            <option value="103">Fine Art Paper</option>
+            <option value="104">Foam-mounted Print</option>
+            <option value="105">Framed Fine Art Paper</option>
+            <option value="106">Metal</option>
+            <option value="107">Peel and Stick</option>
+        `;
+        
+        // Add event listener
+        categoryDropdown.addEventListener('change', (e) => {
+            const categoryId = parseInt(e.target.value);
+            this.selectCategory(categoryId);
+        });
+        
+        categoriesSection.appendChild(categoryDropdown);
+    }
+    
+    createProductDropdowns() {
+        const productsView = document.getElementById('productsView');
+        if (!productsView) return;
+        
+        // Create container for mobile dropdowns
+        const mobileContainer = document.createElement('div');
+        mobileContainer.className = 'mobile-dropdowns-container';
+        mobileContainer.style.display = 'none'; // Hidden by default, shown on mobile
+        
+        // Product variant dropdown (0.75", 1.25", etc.)
+        const productDropdown = document.createElement('select');
+        productDropdown.className = 'mobile-products-dropdown';
+        productDropdown.id = 'mobileProductDropdown';
+        
+        // Second variant dropdown (for frame colors, etc.)
+        const variantDropdown = document.createElement('select');
+        variantDropdown.className = 'mobile-sizes-dropdown';
+        variantDropdown.id = 'mobileVariantDropdown';
+        variantDropdown.style.display = 'none'; // Hidden until needed
+        
+        mobileContainer.appendChild(productDropdown);
+        mobileContainer.appendChild(variantDropdown);
+        productsView.appendChild(mobileContainer);
+        
+        // Show mobile container on mobile screens
+        if (window.innerWidth <= 768) {
+            mobileContainer.style.display = 'block';
+        }
     }
     
     setupEventListeners() {
@@ -275,10 +340,88 @@ class LumaprintsOrderInterface {
         const grid = document.getElementById('productsGrid');
         grid.innerHTML = '';
         
+        // Desktop: Create product cards
         subcategories.forEach(product => {
             const productCard = this.createProductCard(product);
             grid.appendChild(productCard);
         });
+        
+        // Mobile: Populate dropdowns
+        if (window.innerWidth <= 768) {
+            this.populateMobileDropdowns(subcategories);
+        }
+    }
+    
+    populateMobileDropdowns(subcategories) {
+        const productDropdown = document.getElementById('mobileProductDropdown');
+        const variantDropdown = document.getElementById('mobileVariantDropdown');
+        
+        if (!productDropdown) return;
+        
+        // Clear existing options
+        productDropdown.innerHTML = '<option value="">Select product type...</option>';
+        variantDropdown.innerHTML = '<option value="">Select variant...</option>';
+        variantDropdown.style.display = 'none';
+        
+        // Populate first dropdown with subcategories (0.75", 1.25", etc.)
+        subcategories.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = product.name;
+            productDropdown.appendChild(option);
+        });
+        
+        // Add event listener for product selection
+        productDropdown.addEventListener('change', (e) => {
+            const productId = parseInt(e.target.value);
+            if (productId) {
+                const selectedProduct = subcategories.find(p => p.id === productId);
+                this.handleMobileProductSelection(selectedProduct);
+            }
+        });
+    }
+    
+    handleMobileProductSelection(product) {
+        const variantDropdown = document.getElementById('mobileVariantDropdown');
+        
+        // Check if this product has frame colors (two-variant system)
+        if (product.frameColors && product.frameColors.length > 0) {
+            // Show second dropdown for frame colors
+            variantDropdown.style.display = 'block';
+            variantDropdown.innerHTML = '<option value="">Select frame color...</option>';
+            
+            product.frameColors.forEach(frame => {
+                const option = document.createElement('option');
+                option.value = frame.optionId;
+                option.textContent = frame.name;
+                variantDropdown.appendChild(option);
+            });
+            
+            // Add event listener for frame color selection
+            variantDropdown.addEventListener('change', (e) => {
+                const frameOptionId = parseInt(e.target.value);
+                if (frameOptionId) {
+                    this.proceedToMobileSizes(product, frameOptionId);
+                }
+            });
+        } else {
+            // Single variant product - proceed directly to sizes
+            variantDropdown.style.display = 'none';
+            this.proceedToMobileSizes(product);
+        }
+    }
+    
+    proceedToMobileSizes(product, frameOptionId = null) {
+        // Store selected product and variant
+        this.currentProduct = product;
+        this.currentFrameOption = frameOptionId;
+        
+        // For mobile, we can show a size selection dropdown or proceed to quantity
+        // This depends on how you want to handle size selection on mobile
+        console.log('Selected product:', product.name);
+        if (frameOptionId) {
+            console.log('Selected frame option:', frameOptionId);
+        }
     }
     
     createProductCard(product) {
