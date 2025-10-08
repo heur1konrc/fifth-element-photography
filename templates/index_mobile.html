@@ -27,7 +27,7 @@
     <meta name="twitter:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url }}">
     {% endif %}
     
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_mobile.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_mobile.css') }}?v=20241008-001">
 </head>
 <body>
     <div class="mobile-container">
@@ -68,12 +68,9 @@
                 <div class="mobile-filters">
                     <div class="filter-grid">
                         <button class="filter-btn active" data-category="all">ALL</button>
-                        <button class="filter-btn" data-category="portrait">PORTRAIT</button>
-                        <button class="filter-btn" data-category="landscape">LANDSCAPE</button>
-                        <button class="filter-btn" data-category="wildlife">WILDLIFE</button>
-                        <button class="filter-btn" data-category="events">EVENTS</button>
-                        <button class="filter-btn" data-category="architecture">ARCHITECTURE</button>
-                        <button class="filter-btn" data-category="other">OTHER</button>
+                        {% for category in categories %}
+                        <button class="filter-btn" data-category="{{ category }}">{{ category.upper() }}</button>
+                        {% endfor %}
                     </div>
                 </div>
 
@@ -280,6 +277,6 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script_mobile.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script_mobile.js') }}?v=20241008-001"></script>
 </body>
 </html>
