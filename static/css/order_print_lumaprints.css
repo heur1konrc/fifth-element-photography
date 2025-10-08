@@ -525,11 +525,11 @@ body {
     }
     
     .order-sidebar {
-        order: 2;
+        order: 1;  /* Image and product selection first */
     }
     
     .main-panel {
-        order: 1;
+        order: 2;  /* Product preview second */
     }
     
     .products-grid {
