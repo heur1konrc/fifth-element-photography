@@ -845,11 +845,11 @@ body {
 /* Mobile Swipe Gallery */
 .mobile-swipe-gallery {
     width: 100%;
-    height: 60vh;
+    height: 50vh;
     position: relative;
     overflow: hidden;
     background: #000;
-    margin: 20px 0;
+    margin: 10px 0;
 }
 
 .swipe-container {
@@ -934,66 +934,49 @@ body {
     text-align: center;
 }
 
-/* Image Info Overlay */
+/* Image Info - Below Gallery */
 .swipe-image-info {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.8);
     padding: 15px;
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-    transform: translateY(-100px);
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.swipe-image-info.show {
-    transform: translateY(0);
-    opacity: 1;
+    text-align: center;
+    background: #000;
 }
 
 .swipe-image-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     margin-bottom: 5px;
     color: #ffffff;
 }
 
 .swipe-image-category {
-    font-size: 12px;
+    font-size: 11px;
     color: #6799c2;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
-/* Order Print Section - Below Image */
+/* Order Print Section - Below Everything */
 .swipe-order-section {
-    position: absolute;
-    bottom: 60px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
+    padding: 15px;
+    text-align: center;
+    background: #000;
 }
 
 .mobile-order-btn {
     background: #6799c2;
     color: #ffffff;
     border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 12px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     white-space: nowrap;
-    backdrop-filter: blur(10px);
-    background: rgba(103, 153, 194, 0.9);
 }
 
 .mobile-order-btn:hover {

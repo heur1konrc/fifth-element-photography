@@ -153,12 +153,7 @@ function initMobileSwipeGallery(images) {
         });
     }
     
-    // Show image info after a delay
-    setTimeout(() => {
-        if (imageInfo) {
-            imageInfo.classList.add('show');
-        }
-    }, 500);
+    // Image info is now always visible below gallery
 }
 
 // Touch Event Handlers
