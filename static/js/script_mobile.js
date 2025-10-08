@@ -108,7 +108,6 @@ function initMobileSwipeGallery(images) {
     
     // Initialize navigation
     updateSwipeNavigation();
-    updateImageInfo();
     
     // Add touch event listeners to the gallery container
     const gallery = document.getElementById('mobileSwipeGallery');
@@ -125,7 +124,6 @@ function initMobileSwipeGallery(images) {
                 currentSwipeIndex--;
                 updateSwipePosition();
                 updateSwipeNavigation();
-                updateImageInfo();
             }
         });
     }
@@ -136,7 +134,6 @@ function initMobileSwipeGallery(images) {
                 currentSwipeIndex++;
                 updateSwipePosition();
                 updateSwipeNavigation();
-                updateImageInfo();
             }
         });
     }
@@ -195,14 +192,12 @@ function handleTouchEnd(e) {
             currentSwipeIndex++;
             updateSwipePosition();
             updateSwipeNavigation();
-            updateImageInfo();
         } else if (diff < 0 && currentSwipeIndex > 0) {
             // Swipe right - previous image
             console.log('Swiping to previous image');
             currentSwipeIndex--;
             updateSwipePosition();
             updateSwipeNavigation();
-            updateImageInfo();
         }
     } else {
         console.log('Swipe distance too small:', Math.abs(diff));
@@ -237,22 +232,6 @@ function updateSwipeNavigation() {
     }
 }
 
-// Update image info
-function updateImageInfo() {
-    const currentImage = filteredImages[currentSwipeIndex];
-    if (!currentImage) return;
-    
-    const title = document.getElementById('mobileImageTitle');
-    const category = document.getElementById('mobileImageCategory');
-    
-    if (title) {
-        title.textContent = currentImage.title;
-    }
-    
-    if (category) {
-        category.textContent = currentImage.category.toUpperCase();
-    }
-}
 
 // Mobile Filters
 function initMobileFilters() {
