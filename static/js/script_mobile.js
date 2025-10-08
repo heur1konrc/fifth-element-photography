@@ -166,18 +166,16 @@ function handleTouchEnd(e) {
     console.log('Touch end - diff:', diff, 'threshold:', threshold);
     
     if (Math.abs(diff) > threshold) {
-        if (diff > 0 && currentSwipeIndex < filteredImages.length - 1) {
-            // Swipe left - next image
+        if (diff > 0) {
+            // Swipe left - next image (with carousel wrap)
             console.log('Swiping to next image');
-            currentSwipeIndex++;
+            currentSwipeIndex = (currentSwipeIndex + 1) % filteredImages.length;
             updateSwipePosition();
-            
-        } else if (diff < 0 && currentSwipeIndex > 0) {
-            // Swipe right - previous image
+        } else if (diff < 0) {
+            // Swipe right - previous image (with carousel wrap)
             console.log('Swiping to previous image');
-            currentSwipeIndex--;
+            currentSwipeIndex = currentSwipeIndex === 0 ? filteredImages.length - 1 : currentSwipeIndex - 1;
             updateSwipePosition();
-            
         }
     } else {
         console.log('Swipe distance too small:', Math.abs(diff));
@@ -239,7 +237,7 @@ function filterMobileImages(category) {
 function updateMobileImageCount(count) {
     const countElement = document.getElementById('mobileImageCount');
     if (countElement) {
-        countElement.textContent = `${count} images`;
+        countElement.textContent = `Swipe through ${count} images`;
     }
 }
 
