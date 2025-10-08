@@ -74,7 +74,8 @@ function initMobileGallery() {
     fetch('/api/images')
         .then(response => response.json())
         .then(data => {
-            allImages = data.images;
+            // API returns images array directly, not wrapped in data.images
+            allImages = Array.isArray(data) ? data : data.images || [];
             filteredImages = allImages;
             initMobileSwipeGallery(allImages);
             updateMobileImageCount(allImages.length);
