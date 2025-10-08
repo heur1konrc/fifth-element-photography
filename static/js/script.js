@@ -235,7 +235,14 @@ function filterImages(category) {
         filteredImages = allImages;
         galleryTitle.textContent = 'Portfolio Gallery';
     } else {
-        filteredImages = allImages.filter(image => image.category === category);
+        // Handle both 'landscape' and 'landscapes' categories
+        if (category === 'landscape') {
+            filteredImages = allImages.filter(image => 
+                image.category === 'landscape' || image.category === 'landscapes'
+            );
+        } else {
+            filteredImages = allImages.filter(image => image.category === category);
+        }
         galleryTitle.textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Gallery`;
     }
     
