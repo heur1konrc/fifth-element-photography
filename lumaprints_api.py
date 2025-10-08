@@ -302,8 +302,8 @@ def get_lumaprints_client(sandbox: bool = True) -> LumaprintsAPI:
         Configured API client
     """
     # Your API credentials (Sandbox)
-    API_KEY = "4fca2b7f5f9f14ba643eadf24b8f6c11735f434e2d31303538393431"
-    API_SECRET = "3a8e919361b3d4353bae2d31303538393431"
+    API_KEY = "c5675f9b5bcab0799a49bba00da28405f2ca2ab72d31303137373136"
+    API_SECRET = "541614636cad6ba7f6be2d31303137373136"
     
     return LumaprintsAPI(API_KEY, API_SECRET, sandbox=sandbox)
 
