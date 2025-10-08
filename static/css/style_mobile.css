@@ -887,6 +887,27 @@ body {
     border-radius: 8px;
 }
 
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a1a1a;
+    border-radius: 8px;
+    color: #666;
+}
+
+.loading-spinner {
+    font-size: 14px;
+    color: #666;
+}
+
+.image-placeholder .error {
+    font-size: 14px;
+    color: #ff6b6b;
+}
+
 /* Navigation Controls */
 .swipe-navigation {
     position: absolute;

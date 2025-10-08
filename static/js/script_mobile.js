@@ -86,27 +86,25 @@ function initMobileGallery() {
         });
 }
 
-// Mobile Swipe Gallery
+// Mobile Swipe Gallery with Smart Lazy Loading
 function initMobileSwipeGallery(images) {
     filteredImages = images;
     currentSwipeIndex = 0;
     
     const wrapper = document.getElementById('mobileSwipeWrapper');
-    const prevBtn = document.getElementById('mobilePrevBtn');
-    const nextBtn = document.getElementById('mobileNextBtn');
-    const indicator = document.getElementById('mobileSwipeIndicator');
-    const imageInfo = document.getElementById('mobileImageInfo');
-    
     if (!wrapper) return;
     
-    // Create swipe slides
+    // Create placeholder slides for all images (but don't load them yet)
     wrapper.innerHTML = images.map((image, index) => `
         <div class="swipe-slide" data-index="${index}">
-            <img src="${image.url}" alt="${image.title}" loading="lazy">
+            <div class="image-placeholder" data-src="${image.url}" data-title="${image.title}">
+                <div class="loading-spinner">Loading...</div>
+            </div>
         </div>
     `).join('');
     
-    // Pure swipe - no navigation to initialize
+    // Load initial images (current + adjacent)
+    loadImagesAroundIndex(currentSwipeIndex);
     
     // Add touch event listeners to the gallery container
     const gallery = document.getElementById('mobileSwipeGallery');
@@ -115,8 +113,66 @@ function initMobileSwipeGallery(images) {
         gallery.addEventListener('touchmove', handleTouchMove, { passive: false });
         gallery.addEventListener('touchend', handleTouchEnd, { passive: true });
     }
+}
+
+// Smart Lazy Loading Functions
+function loadImagesAroundIndex(centerIndex) {
+    const loadRange = 2; // Load 2 images before and after current
+    const startIndex = Math.max(0, centerIndex - loadRange);
+    const endIndex = Math.min(filteredImages.length - 1, centerIndex + loadRange);
     
-    // Pure swipe - no buttons needed
+    console.log(`Loading images ${startIndex} to ${endIndex} around index ${centerIndex}`);
+    
+    for (let i = startIndex; i <= endIndex; i++) {
+        loadImageAtIndex(i);
+    }
+    
+    // Unload images that are far away to save memory
+    unloadDistantImages(centerIndex, loadRange + 1);
+}
+
+function loadImageAtIndex(index) {
+    const slide = document.querySelector(`[data-index="${index}"]`);
+    if (!slide) return;
+    
+    const placeholder = slide.querySelector('.image-placeholder');
+    if (!placeholder || placeholder.querySelector('img')) return; // Already loaded
+    
+    const imgSrc = placeholder.getAttribute('data-src');
+    const imgTitle = placeholder.getAttribute('data-title');
+    
+    // Create and load the actual image
+    const img = document.createElement('img');
+    img.src = imgSrc;
+    img.alt = imgTitle;
+    img.loading = 'eager'; // Load immediately since we're being selective
+    
+    img.onload = () => {
+        placeholder.innerHTML = '';
+        placeholder.appendChild(img);
+        console.log(`Loaded image ${index}: ${imgTitle}`);
+    };
+    
+    img.onerror = () => {
+        placeholder.innerHTML = '<div class="error">Failed to load</div>';
+    };
+}
+
+function unloadDistantImages(centerIndex, threshold) {
+    const slides = document.querySelectorAll('.swipe-slide');
+    slides.forEach((slide, index) => {
+        const distance = Math.abs(index - centerIndex);
+        if (distance > threshold) {
+            const placeholder = slide.querySelector('.image-placeholder');
+            const img = placeholder?.querySelector('img');
+            if (img) {
+                // Replace image with placeholder to save memory
+                placeholder.innerHTML = '<div class="loading-spinner">Loading...</div>';
+                console.log(`Unloaded distant image ${index}`);
+            }
+        }
+    });
+}
     
     // Add order button functionality
     const orderBtn = document.getElementById('mobileOrderBtn');
@@ -171,11 +227,15 @@ function handleTouchEnd(e) {
             console.log('Swiping to next image');
             currentSwipeIndex = (currentSwipeIndex + 1) % filteredImages.length;
             updateSwipePosition();
+            // Load images around new position
+            loadImagesAroundIndex(currentSwipeIndex);
         } else if (diff < 0) {
             // Swipe right - previous image (with carousel wrap)
             console.log('Swiping to previous image');
             currentSwipeIndex = currentSwipeIndex === 0 ? filteredImages.length - 1 : currentSwipeIndex - 1;
             updateSwipePosition();
+            // Load images around new position
+            loadImagesAroundIndex(currentSwipeIndex);
         }
     } else {
         console.log('Swipe distance too small:', Math.abs(diff));
