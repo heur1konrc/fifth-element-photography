@@ -11,18 +11,11 @@ class LumaprintsOrderInterface {
         this.cart = [];
         this.currentView = 'products';
         
-        // Lumaprints API product data based on official documentation
-        this.productData = {
-            // Canvas Category (ID: 101)
-            101: {
-                name: 'Canvas',
-                subcategories: [
-                    { id: 101001, name: '0.75in Stretched Canvas', minWidth: 8, maxWidth: 30, minHeight: 10, maxHeight: 30, dpi: 200 },
-                    { id: 101002, name: '1.25in Stretched Canvas', minWidth: 8, maxWidth: 45, minHeight: 10, maxHeight: 60, dpi: 200 },
-                    { id: 101003, name: '1.50in Stretched Canvas', minWidth: 8, maxWidth: 45, minHeight: 10, maxHeight: 60, dpi: 200 },
-                    { id: 101005, name: 'Rolled Canvas', minWidth: 8, maxWidth: 45, minHeight: 10, maxHeight: 60, dpi: 200 }
-                ]
-            },
+        // Dynamic product data from Lumaprints API
+        this.productData = {};
+        this.categories = [];
+        this.subcategories = {};
+        this.options = {};
             // Framed Canvas Category (ID: 102)
             102: {
                 name: 'Framed Canvas',
