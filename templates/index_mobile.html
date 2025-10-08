@@ -56,7 +56,7 @@
             <!-- HOME Section -->
             <section class="content-section active" id="home-section">
                 <!-- Hero Image -->
-                <div class="mobile-hero" id="mobileHero">
+                <div class="mobile-hero" id="mobileHero" {% if featured_image %}style="background-image: url('{{ featured_image.url }}');"{% endif %}>
                     <div class="hero-overlay">
                         <div class="hero-content">
                             <img src="{{ url_for('static', filename='images/TaglineWhite.png') }}" alt="Capturing the Quintessence" class="hero-tagline-image">
@@ -66,7 +66,7 @@
 
                 <!-- Category Filters -->
                 <div class="mobile-filters">
-                    <div class="filter-grid">
+                    <div class="filter-scroll">
                         <button class="filter-btn active" data-category="all">ALL</button>
                         {% for category in categories %}
                         <button class="filter-btn" data-category="{{ category }}">{{ category.upper() }}</button>
@@ -95,6 +95,10 @@
                         <div class="swipe-image-info" id="mobileImageInfo">
                             <h3 class="swipe-image-title" id="mobileImageTitle">Image Title</h3>
                             <p class="swipe-image-category" id="mobileImageCategory">CATEGORY</p>
+                        </div>
+                        
+                        <!-- Order Print Button - Below Image -->
+                        <div class="swipe-order-section">
                             <button class="mobile-order-btn" id="mobileOrderBtn">
                                 <i class="fas fa-shopping-cart"></i>
                                 ORDER PRINT
