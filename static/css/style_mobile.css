@@ -181,6 +181,9 @@ body {
 .mobile-hero {
     height: 250px;
     background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;

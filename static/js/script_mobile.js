@@ -243,9 +243,27 @@ function updateMobileImageCount(count) {
     }
 }
 
-// Mobile Hero Image
+// Mobile Hero
 function initMobileHero() {
-    // Hero image functionality if needed
+    loadMobileHeroImage();
+}
+
+// Load hero image from admin (same as desktop)
+async function loadMobileHeroImage() {
+    try {
+        const response = await fetch('/api/hero_image');
+        const heroData = await response.json();
+        
+        const heroElement = document.getElementById('mobileHero');
+        if (heroData.filename && heroElement) {
+            heroElement.style.backgroundImage = `url('/images/${heroData.filename}')`;
+            console.log('Mobile hero image loaded:', heroData.filename);
+        } else {
+            console.log('No hero image set in admin');
+        }
+    } catch (error) {
+        console.error('Error loading mobile hero image:', error);
+    }
 }
 
 // Mobile Contact Form

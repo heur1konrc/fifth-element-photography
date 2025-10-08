@@ -205,6 +205,16 @@ def save_featured_image(featured_data):
     except:
         return False
 
+def load_hero_image():
+    """Load hero image set in admin"""
+    try:
+        if os.path.exists('/data/hero_image.json'):
+            with open('/data/hero_image.json', 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return None
+
 def scan_images():
     """Scan /data directory for images"""
     images = []
