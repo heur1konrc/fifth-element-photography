@@ -384,21 +384,80 @@ class LumaprintsOrderInterface {
     
     selectProduct(product) {
         this.currentProduct = product;
-        this.showView('sizes');
         
-        // Update product info
-        const productTitle = document.getElementById('productTitle');
-        if (productTitle) {
-            productTitle.textContent = product.name;
+        // Update the main panel to show size selection
+        const categoryTitle = document.getElementById('categoryTitle');
+        if (categoryTitle) {
+            categoryTitle.textContent = product.name;
         }
         
-        // Load size options for this product
-        this.loadSizeOptions(product);
+        // Clear the products grid and show size inputs
+        const grid = document.getElementById('productsGrid');
+        if (grid) {
+            grid.innerHTML = `
+                <div class="size-selection">
+                    <h3>Select Size for ${product.name}</h3>
+                    <div class="size-specs">
+                        <p><strong>Size Range:</strong> ${product.minimumWidth}"×${product.minimumHeight}" to ${product.maximumWidth}"×${product.maximumHeight}"</p>
+                        <p><strong>Required DPI:</strong> ${product.requiredDPI}</p>
+                    </div>
+                    <div class="size-inputs">
+                        <div class="input-group">
+                            <label for="widthInput">Width (inches):</label>
+                            <input type="number" id="widthInput" min="${product.minimumWidth}" max="${product.maximumWidth}" step="0.1" placeholder="Width">
+                        </div>
+                        <div class="input-group">
+                            <label for="heightInput">Height (inches):</label>
+                            <input type="number" id="heightInput" min="${product.minimumHeight}" max="${product.maximumHeight}" step="0.1" placeholder="Height">
+                        </div>
+                    </div>
+                    <div class="pricing-section">
+                        <div class="price-display">
+                            <span class="unit-price">Unit Price: $<span id="unitPrice">0.00</span></span>
+                        </div>
+                        <div class="quantity-section">
+                            <label for="quantityInput">Quantity:</label>
+                            <input type="number" id="quantityInput" min="1" value="1">
+                        </div>
+                        <div class="total-price">
+                            <span class="total">Total: $<span id="totalPrice">0.00</span></span>
+                        </div>
+                        <button id="addToCartBtn" class="add-to-cart-btn" disabled>Add to Cart</button>
+                    </div>
+                    <button id="backToProductsBtn" class="back-btn">← Back to Products</button>
+                </div>
+            `;
+            
+            // Add event listeners for the new elements
+            this.setupSizeInputListeners();
+        }
     }
     
-    loadSizeOptions(product) {
-        // Implementation for loading size options
-        console.log('Loading size options for:', product.name);
+    setupSizeInputListeners() {
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+        const quantityInput = document.getElementById('quantityInput');
+        const backBtn = document.getElementById('backToProductsBtn');
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        
+        // Size input listeners
+        [widthInput, heightInput, quantityInput].forEach(input => {
+            if (input) {
+                input.addEventListener('input', () => this.updatePricing());
+            }
+        });
+        
+        // Back button
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                this.loadCategoryFromAPI(this.currentCategory);
+            });
+        }
+        
+        // Add to cart button
+        if (addToCartBtn) {
+            addToCartBtn.addEventListener('click', () => this.addToCart());
+        }
     }
     
     showView(viewName) {
@@ -457,3 +516,74 @@ if (document.readyState === 'loading') {
     // DOM is already ready
     window.orderInterface = new LumaprintsOrderInterface();
 }
+
+    updatePricing() {
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+        const quantityInput = document.getElementById('quantityInput');
+        const unitPriceSpan = document.getElementById('unitPrice');
+        const totalPriceSpan = document.getElementById('totalPrice');
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        
+        if (!widthInput || !heightInput || !quantityInput) return;
+        
+        const width = parseFloat(widthInput.value);
+        const height = parseFloat(heightInput.value);
+        const quantity = parseInt(quantityInput.value) || 1;
+        
+        // Check if dimensions are valid
+        if (width && height && width > 0 && height > 0) {
+            // Calculate pricing (placeholder - would use Lumaprints pricing API)
+            const area = width * height;
+            const basePrice = area * 2.50; // $2.50 per square inch as example
+            const unitPrice = Math.max(basePrice, 15.00); // Minimum $15
+            const totalPrice = unitPrice * quantity;
+            
+            // Update display
+            if (unitPriceSpan) unitPriceSpan.textContent = unitPrice.toFixed(2);
+            if (totalPriceSpan) totalPriceSpan.textContent = totalPrice.toFixed(2);
+            if (addToCartBtn) addToCartBtn.disabled = false;
+        } else {
+            // Invalid dimensions
+            if (unitPriceSpan) unitPriceSpan.textContent = '0.00';
+            if (totalPriceSpan) totalPriceSpan.textContent = '0.00';
+            if (addToCartBtn) addToCartBtn.disabled = true;
+        }
+    }
+    
+    addToCart() {
+        const widthInput = document.getElementById('widthInput');
+        const heightInput = document.getElementById('heightInput');
+        const quantityInput = document.getElementById('quantityInput');
+        
+        if (!widthInput || !heightInput || !quantityInput || !this.currentProduct) return;
+        
+        const width = parseFloat(widthInput.value);
+        const height = parseFloat(heightInput.value);
+        const quantity = parseInt(quantityInput.value) || 1;
+        
+        if (!width || !height || width <= 0 || height <= 0) {
+            alert('Please enter valid dimensions');
+            return;
+        }
+        
+        // Create cart item
+        const cartItem = {
+            product: this.currentProduct,
+            width: width,
+            height: height,
+            quantity: quantity,
+            unitPrice: parseFloat(document.getElementById('unitPrice').textContent),
+            totalPrice: parseFloat(document.getElementById('totalPrice').textContent)
+        };
+        
+        // Add to cart (placeholder - would integrate with actual cart system)
+        console.log('Adding to cart:', cartItem);
+        alert(`Added ${quantity}x ${this.currentProduct.name} (${width}"×${height}") to cart!`);
+        
+        // Reset form
+        widthInput.value = '';
+        heightInput.value = '';
+        quantityInput.value = '1';
+        this.updatePricing();
+    }
