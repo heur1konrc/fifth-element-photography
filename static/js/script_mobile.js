@@ -106,8 +106,7 @@ function initMobileSwipeGallery(images) {
         </div>
     `).join('');
     
-    // Initialize navigation
-    updateSwipeNavigation();
+    // Pure swipe - no navigation to initialize
     
     // Add touch event listeners to the gallery container
     const gallery = document.getElementById('mobileSwipeGallery');
@@ -117,26 +116,7 @@ function initMobileSwipeGallery(images) {
         gallery.addEventListener('touchend', handleTouchEnd, { passive: true });
     }
     
-    // Add button event listeners
-    if (prevBtn) {
-        prevBtn.addEventListener('click', () => {
-            if (currentSwipeIndex > 0) {
-                currentSwipeIndex--;
-                updateSwipePosition();
-                updateSwipeNavigation();
-            }
-        });
-    }
-    
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            if (currentSwipeIndex < filteredImages.length - 1) {
-                currentSwipeIndex++;
-                updateSwipePosition();
-                updateSwipeNavigation();
-            }
-        });
-    }
+    // Pure swipe - no buttons needed
     
     // Add order button functionality
     const orderBtn = document.getElementById('mobileOrderBtn');
@@ -191,13 +171,13 @@ function handleTouchEnd(e) {
             console.log('Swiping to next image');
             currentSwipeIndex++;
             updateSwipePosition();
-            updateSwipeNavigation();
+            
         } else if (diff < 0 && currentSwipeIndex > 0) {
             // Swipe right - previous image
             console.log('Swiping to previous image');
             currentSwipeIndex--;
             updateSwipePosition();
-            updateSwipeNavigation();
+            
         }
     } else {
         console.log('Swipe distance too small:', Math.abs(diff));
@@ -213,24 +193,6 @@ function updateSwipePosition() {
     }
 }
 
-// Update navigation controls
-function updateSwipeNavigation() {
-    const prevBtn = document.getElementById('mobilePrevBtn');
-    const nextBtn = document.getElementById('mobileNextBtn');
-    const indicator = document.getElementById('mobileSwipeIndicator');
-    
-    if (prevBtn) {
-        prevBtn.disabled = currentSwipeIndex === 0;
-    }
-    
-    if (nextBtn) {
-        nextBtn.disabled = currentSwipeIndex === filteredImages.length - 1;
-    }
-    
-    if (indicator) {
-        indicator.textContent = `${currentSwipeIndex + 1} / ${filteredImages.length}`;
-    }
-}
 
 
 // Mobile Filters
