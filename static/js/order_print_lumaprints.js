@@ -516,20 +516,15 @@ class LumaprintsOrderInterface {
         
         // Check if dimensions are valid
         if (width && height && width > 0 && height > 0) {
-            // Calculate pricing (placeholder - would use Lumaprints pricing API)
-            const area = width * height;
-            const basePrice = area * 2.50; // $2.50 per square inch as example
-            const unitPrice = Math.max(basePrice, 15.00); // Minimum $15
-            const totalPrice = unitPrice * quantity;
-            
-            // Update display
-            if (unitPriceSpan) unitPriceSpan.textContent = unitPrice.toFixed(2);
-            if (totalPriceSpan) totalPriceSpan.textContent = totalPrice.toFixed(2);
+            // No pricing calculation - would need real Lumaprints pricing API
+            // For now, just show that dimensions are valid
+            if (unitPriceSpan) unitPriceSpan.textContent = 'TBD';
+            if (totalPriceSpan) totalPriceSpan.textContent = 'TBD';
             if (addToCartBtn) addToCartBtn.disabled = false;
         } else {
             // Invalid dimensions
-            if (unitPriceSpan) unitPriceSpan.textContent = '0.00';
-            if (totalPriceSpan) totalPriceSpan.textContent = '0.00';
+            if (unitPriceSpan) unitPriceSpan.textContent = '--';
+            if (totalPriceSpan) totalPriceSpan.textContent = '--';
             if (addToCartBtn) addToCartBtn.disabled = true;
         }
     }
