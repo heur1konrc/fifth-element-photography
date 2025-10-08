@@ -180,19 +180,28 @@ class LumaprintsOrderInterface {
     createMobileDropdowns() {
         // Check if we're on mobile (screen width < 768px)
         if (window.innerWidth <= 768) {
-            this.createCategoryDropdown();
-            this.createProductDropdowns();
+            this.createMobileInterface();
         }
     }
     
-    createCategoryDropdown() {
+    createMobileInterface() {
         const categoriesSection = document.querySelector('.categories-section');
         if (!categoriesSection) return;
         
-        // Create category dropdown
-        const categoryDropdown = document.createElement('select');
-        categoryDropdown.className = 'mobile-category-dropdown';
-        categoryDropdown.innerHTML = `
+        // Clear any existing mobile dropdowns
+        const existingDropdowns = categoriesSection.querySelectorAll('.mobile-dropdown');
+        existingDropdowns.forEach(dropdown => dropdown.remove());
+        
+        // Create container for all mobile dropdowns
+        const mobileContainer = document.createElement('div');
+        mobileContainer.className = 'mobile-dropdowns-container';
+        
+        // Dropdown 1: Product Type
+        const productTypeDropdown = document.createElement('select');
+        productTypeDropdown.className = 'mobile-category-dropdown mobile-dropdown';
+        productTypeDropdown.id = 'mobileProductType';
+        productTypeDropdown.innerHTML = `
+            <option value="">Select Product Type...</option>
             <option value="101">Canvas</option>
             <option value="102">Framed Canvas</option>
             <option value="103">Fine Art Paper</option>
@@ -202,43 +211,131 @@ class LumaprintsOrderInterface {
             <option value="107">Peel and Stick</option>
         `;
         
-        // Add event listener
-        categoryDropdown.addEventListener('change', (e) => {
-            const categoryId = parseInt(e.target.value);
-            this.selectCategory(categoryId);
-        });
+        // Dropdown 2: Variant
+        const variantDropdown = document.createElement('select');
+        variantDropdown.className = 'mobile-products-dropdown mobile-dropdown';
+        variantDropdown.id = 'mobileVariant';
+        variantDropdown.innerHTML = '<option value="">Select Variant...</option>';
+        variantDropdown.style.display = 'none';
         
-        categoriesSection.appendChild(categoryDropdown);
+        // Dropdown 3: Variant #2 (if required)
+        const variant2Dropdown = document.createElement('select');
+        variant2Dropdown.className = 'mobile-sizes-dropdown mobile-dropdown';
+        variant2Dropdown.id = 'mobileVariant2';
+        variant2Dropdown.innerHTML = '<option value="">Select Option...</option>';
+        variant2Dropdown.style.display = 'none';
+        
+        // Add dropdowns to container
+        mobileContainer.appendChild(productTypeDropdown);
+        mobileContainer.appendChild(variantDropdown);
+        mobileContainer.appendChild(variant2Dropdown);
+        
+        // Add container to categories section
+        categoriesSection.appendChild(mobileContainer);
+        
+        // Add event listeners
+        this.setupMobileDropdownListeners();
     }
     
-    createProductDropdowns() {
-        const productsView = document.getElementById('productsView');
-        if (!productsView) return;
+    setupMobileDropdownListeners() {
+        const productTypeDropdown = document.getElementById('mobileProductType');
+        const variantDropdown = document.getElementById('mobileVariant');
+        const variant2Dropdown = document.getElementById('mobileVariant2');
         
-        // Create container for mobile dropdowns
-        const mobileContainer = document.createElement('div');
-        mobileContainer.className = 'mobile-dropdowns-container';
-        mobileContainer.style.display = 'none'; // Hidden by default, shown on mobile
+        // Product Type selection
+        productTypeDropdown.addEventListener('change', (e) => {
+            const categoryId = parseInt(e.target.value);
+            if (categoryId) {
+                this.loadMobileVariants(categoryId);
+            } else {
+                variantDropdown.style.display = 'none';
+                variant2Dropdown.style.display = 'none';
+            }
+        });
         
-        // Product variant dropdown (0.75", 1.25", etc.)
-        const productDropdown = document.createElement('select');
-        productDropdown.className = 'mobile-products-dropdown';
-        productDropdown.id = 'mobileProductDropdown';
+        // Variant selection
+        variantDropdown.addEventListener('change', (e) => {
+            const variantId = parseInt(e.target.value);
+            if (variantId) {
+                this.handleMobileVariantSelection(variantId);
+            } else {
+                variant2Dropdown.style.display = 'none';
+            }
+        });
         
-        // Second variant dropdown (for frame colors, etc.)
-        const variantDropdown = document.createElement('select');
-        variantDropdown.className = 'mobile-sizes-dropdown';
-        variantDropdown.id = 'mobileVariantDropdown';
-        variantDropdown.style.display = 'none'; // Hidden until needed
+        // Variant #2 selection
+        variant2Dropdown.addEventListener('change', (e) => {
+            const variant2Id = parseInt(e.target.value);
+            if (variant2Id) {
+                this.handleMobileVariant2Selection(variant2Id);
+            }
+        });
+    }
+    
+    loadMobileVariants(categoryId) {
+        const variantDropdown = document.getElementById('mobileVariant');
+        const variant2Dropdown = document.getElementById('mobileVariant2');
         
-        mobileContainer.appendChild(productDropdown);
-        mobileContainer.appendChild(variantDropdown);
-        productsView.appendChild(mobileContainer);
+        // Get category data
+        const categoryData = this.productData[categoryId];
+        if (!categoryData) return;
         
-        // Show mobile container on mobile screens
-        if (window.innerWidth <= 768) {
-            mobileContainer.style.display = 'block';
+        // Clear and populate variant dropdown
+        variantDropdown.innerHTML = '<option value="">Select Variant...</option>';
+        categoryData.subcategories.forEach(product => {
+            const option = document.createElement('option');
+            option.value = product.id;
+            option.textContent = product.name;
+            variantDropdown.appendChild(option);
+        });
+        
+        // Show variant dropdown, hide variant2
+        variantDropdown.style.display = 'block';
+        variant2Dropdown.style.display = 'none';
+    }
+    
+    handleMobileVariantSelection(variantId) {
+        const variant2Dropdown = document.getElementById('mobileVariant2');
+        
+        // Find the selected variant
+        let selectedVariant = null;
+        for (const categoryData of Object.values(this.productData)) {
+            selectedVariant = categoryData.subcategories.find(p => p.id === variantId);
+            if (selectedVariant) break;
         }
+        
+        if (!selectedVariant) return;
+        
+        // Check if this variant has frame colors (requires variant #2)
+        if (selectedVariant.frameColors && selectedVariant.frameColors.length > 0) {
+            // Show variant #2 dropdown with frame colors
+            variant2Dropdown.innerHTML = '<option value="">Select Frame Color...</option>';
+            selectedVariant.frameColors.forEach(frame => {
+                const option = document.createElement('option');
+                option.value = frame.optionId;
+                option.textContent = frame.name;
+                variant2Dropdown.appendChild(option);
+            });
+            variant2Dropdown.style.display = 'block';
+        } else {
+            // No variant #2 needed, proceed directly
+            variant2Dropdown.style.display = 'none';
+            this.proceedToMobileOrdering(selectedVariant);
+        }
+    }
+    
+    handleMobileVariant2Selection(variant2Id) {
+        // Handle final selection with both variants
+        console.log('Selected variant #2:', variant2Id);
+        // Proceed to ordering with both variants selected
+    }
+    
+    proceedToMobileOrdering(product, frameOptionId = null) {
+        console.log('Proceeding to mobile ordering:', product.name);
+        if (frameOptionId) {
+            console.log('With frame option:', frameOptionId);
+        }
+        // This is where we'll integrate with the ordering system
     }
     
     setupEventListeners() {
@@ -346,82 +443,7 @@ class LumaprintsOrderInterface {
             grid.appendChild(productCard);
         });
         
-        // Mobile: Populate dropdowns
-        if (window.innerWidth <= 768) {
-            this.populateMobileDropdowns(subcategories);
-        }
-    }
-    
-    populateMobileDropdowns(subcategories) {
-        const productDropdown = document.getElementById('mobileProductDropdown');
-        const variantDropdown = document.getElementById('mobileVariantDropdown');
-        
-        if (!productDropdown) return;
-        
-        // Clear existing options
-        productDropdown.innerHTML = '<option value="">Select product type...</option>';
-        variantDropdown.innerHTML = '<option value="">Select variant...</option>';
-        variantDropdown.style.display = 'none';
-        
-        // Populate first dropdown with subcategories (0.75", 1.25", etc.)
-        subcategories.forEach(product => {
-            const option = document.createElement('option');
-            option.value = product.id;
-            option.textContent = product.name;
-            productDropdown.appendChild(option);
-        });
-        
-        // Add event listener for product selection
-        productDropdown.addEventListener('change', (e) => {
-            const productId = parseInt(e.target.value);
-            if (productId) {
-                const selectedProduct = subcategories.find(p => p.id === productId);
-                this.handleMobileProductSelection(selectedProduct);
-            }
-        });
-    }
-    
-    handleMobileProductSelection(product) {
-        const variantDropdown = document.getElementById('mobileVariantDropdown');
-        
-        // Check if this product has frame colors (two-variant system)
-        if (product.frameColors && product.frameColors.length > 0) {
-            // Show second dropdown for frame colors
-            variantDropdown.style.display = 'block';
-            variantDropdown.innerHTML = '<option value="">Select frame color...</option>';
-            
-            product.frameColors.forEach(frame => {
-                const option = document.createElement('option');
-                option.value = frame.optionId;
-                option.textContent = frame.name;
-                variantDropdown.appendChild(option);
-            });
-            
-            // Add event listener for frame color selection
-            variantDropdown.addEventListener('change', (e) => {
-                const frameOptionId = parseInt(e.target.value);
-                if (frameOptionId) {
-                    this.proceedToMobileSizes(product, frameOptionId);
-                }
-            });
-        } else {
-            // Single variant product - proceed directly to sizes
-            variantDropdown.style.display = 'none';
-            this.proceedToMobileSizes(product);
-        }
-    }
-    
-    proceedToMobileSizes(product, frameOptionId = null) {
-        // Store selected product and variant
-        this.currentProduct = product;
-        this.currentFrameOption = frameOptionId;
-        
-        // For mobile, we can show a size selection dropdown or proceed to quantity
-        // This depends on how you want to handle size selection on mobile
-        console.log('Selected product:', product.name);
-        if (frameOptionId) {
-            console.log('Selected frame option:', frameOptionId);
-        }
+        // Mobile dropdowns are handled separately in createMobileInterface()
     }
     
     createProductCard(product) {
