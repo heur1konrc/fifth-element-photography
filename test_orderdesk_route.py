@@ -52,7 +52,7 @@ def test_order_submit():
             },
             "order_items": [
                 {
-                    "name": product_info["name"] + " - Yahara River Glass",
+                    "name": product_info["name"] + " - SPARROW 12x12 SQUARE CANVAS",
                     "price": product_info["price"],
                     "quantity": 1,
                     "weight": 1.0,
