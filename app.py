@@ -2964,16 +2964,16 @@ def test_order_submit():
             },
             "order_items": [
                 {
-                    "name": product_info["name"] + " - Yahara River Glass",
+                    "name": product_info["name"] + " - SPARROW 12x12 SQUARE CANVAS",
                     "price": product_info["price"],
                     "quantity": 1,
                     "weight": 1.0,
                     "code": product_sku,
                     "metadata": {
                         "print_sku": product_sku,
-                        "print_url": "https://fifthelement.photos/images/batch-images-02aaae91.jpg",
-                        "print_width": "8",
-                        "print_height": "10",
+                        "print_url": "https://fifthelement.photos/images/12x12_Sparrow.jpg",
+                        "print_width": "12",
+                        "print_height": "12",,
                         "lumaprints_options": product_info["lumaprints_options"]
                     }
                 }
