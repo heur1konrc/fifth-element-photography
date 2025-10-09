@@ -59,7 +59,7 @@ def test_order_submit():
                     "code": product_sku,
                     "metadata": {
                         "print_sku": product_sku,
-                        "print_url": "https://fifthelement.photos/images/batch-images-02aaae91.jpg",
+                        "print_url": "https://fifthelement.photos/images/download.jpg",
                         "print_width": "12",
                         "print_height": "8",
                         "lumaprints_options": product_info["lumaprints_options"]
