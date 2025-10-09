@@ -1,0 +1,5 @@
+Railway deployment trigger - 12x12 square canvas test
+Timestamp: 2025-10-09 05:45:00
+Changes: Updated test form for 12x12 square canvas with Sparrow image
+Image URL: https://fifthelement.photos/images/12x12_Sparrow.jpg
+Dimensions: 12x12 (1:1 aspect ratio)

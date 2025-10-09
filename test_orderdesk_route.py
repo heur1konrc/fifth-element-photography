@@ -19,7 +19,7 @@ app.secret_key = 'test_secret_key'
 
 @app.route('/test_order_form')
 def test_order_form():
-    """Display the test order form"""
+    """Display the test order form - Updated for 12x12 square canvas"""
     return render_template('test_order_form.html')
 
 @app.route('/test_order_submit', methods=['POST'])
