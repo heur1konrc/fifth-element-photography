@@ -95,7 +95,7 @@ def test_order_submit():
                 "response": order_response
             })
         else:
-            # Error
+            # Errors
             flash(f'Error submitting order: {response.text}', 'error')
             return jsonify({
                 "status": "error",
