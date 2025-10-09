@@ -2987,9 +2987,27 @@ def test_order_submit():
             "Content-Type": "application/json"
         }
         
-        print("Submitting order to OrderDesk...")
+        print("=== ORDERDESK DEBUG INFO ===")
+        print(f"Store ID: {ORDERDESK_STORE_ID}")
+        print(f"API Key: {ORDERDESK_API_KEY[:10]}...")
+        print(f"URL: {ORDERDESK_API_URL}")
         print("Headers:", headers)
         print("Order Data:", json.dumps(order_data, indent=2))
+        
+        # Test authentication first
+        test_url = "https://app.orderdesk.me/api/v2/test"
+        test_response = requests.get(test_url, headers=headers)
+        print(f"Auth Test Status: {test_response.status_code}")
+        print(f"Auth Test Response: {test_response.text}")
+        
+        if test_response.status_code != 200:
+            print("❌ Authentication test failed!")
+            return jsonify({
+                "status": "error",
+                "message": "OrderDesk authentication failed",
+                "auth_test_status": test_response.status_code,
+                "auth_test_response": test_response.text
+            }), 401
         
         response = requests.post(ORDERDESK_API_URL, headers=headers, json=order_data)
         
