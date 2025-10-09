@@ -2919,8 +2919,8 @@ import requests
 
 # OrderDesk API Configuration - UPDATE THESE WITH YOUR ACTUAL VALUES
 ORDERDESK_API_URL = "https://app.orderdesk.me/api/v2/orders"
-ORDERDESK_STORE_ID = "YOUR_STORE_ID"  # Replace with your actual Store ID
-ORDERDESK_API_KEY = "YOUR_API_KEY"    # Replace with your actual API Key
+ORDERDESK_STORE_ID = "125137"
+ORDERDESK_API_KEY = "pXmXDSnjdoRsjPYWD6uU2CBCcKPgZUur7SDDSMUa6NR2R4v6mQ"
 
 # Product mapping for test
 ORDERDESK_PRODUCT_MAPPING = {
