@@ -2924,7 +2924,7 @@ ORDERDESK_API_KEY = "pXmXDSnjdoRsjPYWD6uU2CBCcKPgZUur7SDDSMUa6NR2R4v6mQ"
 
 # Product mapping for test
 ORDERDESK_PRODUCT_MAPPING = {
-    "101001": {"name": "Canvas Print 0.75in", "price": 25.00, "lumaprints_options": "1,5"},
+    "101001": {"name": "Canvas Print 0.75in (12x12)", "price": 25.00, "lumaprints_options": "1,5"},
     "106001": {"name": "Metal Print", "price": 35.00, "lumaprints_options": "29,31"},
     "103001": {"name": "Fine Art Paper", "price": 20.00, "lumaprints_options": "36"}
 }
@@ -2973,7 +2973,7 @@ def test_order_submit():
                         "print_sku": product_sku,
                         "print_url": "https://fifthelement.photos/images/12x12_Sparrow.jpg",
                         "print_width": "12",
-                        "print_height": "12",,
+                        "print_height": "12",
                         "lumaprints_options": product_info["lumaprints_options"]
                     }
                 }
