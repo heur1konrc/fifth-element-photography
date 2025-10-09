@@ -2922,7 +2922,7 @@ ORDERDESK_API_URL = "https://app.orderdesk.me/api/v2/orders"
 ORDERDESK_STORE_ID = "125137"
 ORDERDESK_API_KEY = "pXmXDSnjdoRsjPYWD6uU2CBCcKPgZUur7SDDSMUa6NR2R4v6mQ"
 
-# Product mapping for test
+# Product mapping for test - 12x12 Sparrow canvas
 ORDERDESK_PRODUCT_MAPPING = {
     "101001": {"name": "Canvas Print 0.75in (12x12)", "price": 25.00, "lumaprints_options": "1,5"},
     "106001": {"name": "Metal Print", "price": 35.00, "lumaprints_options": "29,31"},
