@@ -61,7 +61,7 @@ def test_order_submit():
                         "print_sku": product_sku,
                         "print_url": "https://fifthelement.photos/images/batch-images-02aaae91.jpg",
                         "print_width": "8",
-                        "print_height": "10",
+                        "print_height": "12",
                         "lumaprints_options": product_info["lumaprints_options"]
                     }
                 }
