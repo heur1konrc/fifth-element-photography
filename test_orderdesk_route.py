@@ -7,7 +7,7 @@ ORDERDESK_API_URL = "https://app.orderdesk.me/api/v2/orders"
 ORDERDESK_STORE_ID = "YOUR_STORE_ID"  # Replace with your actual Store ID
 ORDERDESK_API_KEY = "YOUR_API_KEY"    # Replace with your actual API Key
 
-# Product mapping
+# Product mapping - Updated for 12x12 square canvas test
 PRODUCT_MAPPING = {
     "101001": {"name": "Canvas Print 0.75in (12x12)", "price": 25.00, "lumaprints_options": "1,5"},
     "106001": {"name": "Metal Print", "price": 35.00, "lumaprints_options": "29,31"},
