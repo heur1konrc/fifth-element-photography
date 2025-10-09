@@ -9,7 +9,7 @@ ORDERDESK_API_KEY = "YOUR_API_KEY"    # Replace with your actual API Key
 
 # Product mapping
 PRODUCT_MAPPING = {
-    "101001": {"name": "Canvas Print 0.75in (12x8)", "price": 25.00, "lumaprints_options": "1,5"},
+    "101001": {"name": "Canvas Print 0.75in (12x12)", "price": 25.00, "lumaprints_options": "1,5"},
     "106001": {"name": "Metal Print", "price": 35.00, "lumaprints_options": "29,31"},
     "103001": {"name": "Fine Art Paper", "price": 20.00, "lumaprints_options": "36"}
 }
@@ -59,9 +59,9 @@ def test_order_submit():
                     "code": product_sku,
                     "metadata": {
                         "print_sku": product_sku,
-                        "print_url": "https://fifthelement.photos/images/download.jpg",
+                        "print_url": "https://fifthelement.photos/images/12x12_Sparrow.jpg",
                         "print_width": "12",
-                        "print_height": "8",
+                        "print_height": "12",
                         "lumaprints_options": product_info["lumaprints_options"]
                     }
                 }
