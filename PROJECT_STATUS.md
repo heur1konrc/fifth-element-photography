@@ -19,6 +19,12 @@
 - **Repository:** GitHub - heur1konrc/fifth-element-photography
 - **Auto-deploy:** Connected to main branch
 
+### Staging Environment ✅
+- **Platform:** Railway (staging-fifth-element project)
+- **Repository:** GitHub - staging branch
+- **Purpose:** Safe testing before live deployment
+- **Workflow:** Test on staging → merge to main → auto-deploy to live
+
 ### Print Fulfillment Stack
 - **Frontend:** Flask website with gallery system
 - **Order Processing:** OrderDesk API integration
@@ -91,12 +97,23 @@
 - **Metadata Format:** print_url, print_width, print_height, print_sku, lumaprints_options
 
 ## Deployment Process
-1. Make changes to local files
-2. `git add .`
-3. `git commit -m "description"`
-4. `git push origin main`
-5. Railway auto-deploys (usually 1-2 minutes)
-6. Test at fifthelement.photos
+
+### Safe Staging Workflow (NEW)
+1. Work on `staging` branch
+2. Make changes to local files
+3. `git add .`
+4. `git commit -m "description"`
+5. `git push origin staging`
+6. Railway staging deploys automatically
+7. Test on staging URL
+8. When ready: `git checkout main && git merge staging && git push origin main`
+9. Live site auto-deploys
+
+### Direct to Live (Emergency Only)
+1. `git checkout main`
+2. Make changes
+3. `git add . && git commit -m "description" && git push origin main`
+4. Test at fifthelement.photos
 
 ## Emergency Recovery Information
 - **Repository:** https://github.com/heur1konrc/fifth-element-photography
