@@ -2932,6 +2932,7 @@ ORDERDESK_PRODUCT_MAPPING = {
 @app.route('/test_order_form')
 def test_order_form():
     """Display the test order form for OrderDesk integration"""
+    # PayPal integration added - force staging redeploy
     return render_template('test_order_form.html')
 
 @app.route('/test_order_submit', methods=['POST'])
