@@ -1,0 +1,48 @@
+{
+  "global_margin": 100,
+  "last_updated": "2025-10-10T04:00:00Z",
+  "products": {
+    "canvas": {
+      "display_name": "Canvas Prints",
+      "active": true,
+      "variants": {
+        "12x12_075": {
+          "display_name": "12x12 Canvas (0.75\" depth)",
+          "base_cost": 18.31,
+          "sku": "101001",
+          "lumaprints_options": "1,5"
+        },
+        "12x12_125": {
+          "display_name": "12x12 Canvas (1.25\" depth)",
+          "base_cost": 22.56,
+          "sku": "101002",
+          "lumaprints_options": "2,5"
+        }
+      }
+    },
+    "metal": {
+      "display_name": "Metal Prints",
+      "active": true,
+      "variants": {
+        "12x12": {
+          "display_name": "12x12 Metal Print",
+          "base_cost": 18.99,
+          "sku": "106001",
+          "lumaprints_options": "29,31"
+        }
+      }
+    },
+    "paper": {
+      "display_name": "Fine Art Paper",
+      "active": true,
+      "variants": {
+        "12x12": {
+          "display_name": "12x12 Fine Art Paper",
+          "base_cost": 12.99,
+          "sku": "103001",
+          "lumaprints_options": "36"
+        }
+      }
+    }
+  }
+}

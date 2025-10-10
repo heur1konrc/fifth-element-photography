@@ -2912,6 +2912,250 @@ def checkout():
 
 
 # ============================================================================
+# PRICING MANAGEMENT ROUTES
+# ============================================================================
+
+def load_pricing_config():
+    """Load pricing configuration from JSON file"""
+    try:
+        config_path = os.path.join(os.path.dirname(__file__), 'pricing_config.json')
+        if os.path.exists(config_path):
+            with open(config_path, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading pricing config: {e}")
+    
+    # Return default config if file doesn't exist or has errors
+    return {
+        "global_margin": 100,
+        "products": {}
+    }
+
+def save_pricing_config(config):
+    """Save pricing configuration to JSON file"""
+    try:
+        config_path = os.path.join(os.path.dirname(__file__), 'pricing_config.json')
+        config['last_updated'] = datetime.now().isoformat()
+        with open(config_path, 'w') as f:
+            json.dump(config, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving pricing config: {e}")
+        return False
+
+@app.route('/admin/pricing')
+def admin_pricing():
+    """Pricing management admin page"""
+    try:
+        pricing_config = load_pricing_config()
+        return render_template('admin_pricing.html', pricing_config=pricing_config)
+    except Exception as e:
+        return f"Pricing Admin Error: {str(e)}", 500
+
+@app.route('/admin/pricing/update-margin', methods=['POST'])
+def update_global_margin():
+    """Update global margin percentage"""
+    try:
+        data = request.get_json()
+        margin = float(data.get('margin', 100))
+        
+        config = load_pricing_config()
+        config['global_margin'] = margin
+        
+        if save_pricing_config(config):
+            return jsonify({'success': True, 'message': 'Global margin updated successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/pricing/update-variant', methods=['POST'])
+def update_variant_price():
+    """Update individual variant base cost"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        variant_key = data.get('variant_key')
+        base_cost = float(data.get('base_cost', 0))
+        
+        config = load_pricing_config()
+        
+        if product_type in config['products'] and variant_key in config['products'][product_type]['variants']:
+            config['products'][product_type]['variants'][variant_key]['base_cost'] = base_cost
+            
+            if save_pricing_config(config):
+                return jsonify({'success': True, 'message': 'Variant price updated successfully'})
+            else:
+                return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+        else:
+            return jsonify({'success': False, 'message': 'Product or variant not found'}), 404
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/pricing/add-variant', methods=['POST'])
+def add_variant():
+    """Add new variant to existing product"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        variant_name = data.get('variant_name')
+        base_cost = float(data.get('base_cost', 0))
+        sku = data.get('sku', '')
+        lumaprints_options = data.get('lumaprints_options', '')
+        
+        config = load_pricing_config()
+        
+        if product_type not in config['products']:
+            return jsonify({'success': False, 'message': 'Product type not found'}), 404
+        
+        # Create variant key from name
+        variant_key = variant_name.lower().replace(' ', '_').replace('(', '').replace(')', '').replace('"', '')
+        
+        config['products'][product_type]['variants'][variant_key] = {
+            'display_name': variant_name,
+            'base_cost': base_cost,
+            'sku': sku,
+            'lumaprints_options': lumaprints_options
+        }
+        
+        if save_pricing_config(config):
+            return jsonify({'success': True, 'message': 'Variant added successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/pricing/delete-variant', methods=['POST'])
+def delete_variant():
+    """Delete variant from product"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        variant_key = data.get('variant_key')
+        
+        config = load_pricing_config()
+        
+        if product_type in config['products'] and variant_key in config['products'][product_type]['variants']:
+            del config['products'][product_type]['variants'][variant_key]
+            
+            if save_pricing_config(config):
+                return jsonify({'success': True, 'message': 'Variant deleted successfully'})
+            else:
+                return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+        else:
+            return jsonify({'success': False, 'message': 'Product or variant not found'}), 404
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/pricing/add-product', methods=['POST'])
+def add_new_product():
+    """Add new product type"""
+    try:
+        data = request.get_json()
+        product_key = data.get('product_key', '').lower()
+        display_name = data.get('display_name', '')
+        
+        if not product_key or not display_name:
+            return jsonify({'success': False, 'message': 'Product key and display name are required'}), 400
+        
+        config = load_pricing_config()
+        
+        if product_key in config['products']:
+            return jsonify({'success': False, 'message': 'Product already exists'}), 400
+        
+        config['products'][product_key] = {
+            'display_name': display_name,
+            'active': True,
+            'variants': {}
+        }
+        
+        if save_pricing_config(config):
+            return jsonify({'success': True, 'message': 'Product added successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/pricing/toggle-product', methods=['POST'])
+def toggle_product():
+    """Toggle product active/inactive status"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        
+        config = load_pricing_config()
+        
+        if product_type not in config['products']:
+            return jsonify({'success': False, 'message': 'Product not found'}), 404
+        
+        config['products'][product_type]['active'] = not config['products'][product_type].get('active', True)
+        
+        if save_pricing_config(config):
+            return jsonify({'success': True, 'message': 'Product status updated successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/pricing/delete-product', methods=['POST'])
+def delete_product():
+    """Delete entire product and all variants"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        
+        config = load_pricing_config()
+        
+        if product_type not in config['products']:
+            return jsonify({'success': False, 'message': 'Product not found'}), 404
+        
+        del config['products'][product_type]
+        
+        if save_pricing_config(config):
+            return jsonify({'success': True, 'message': 'Product deleted successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/pricing/calculate', methods=['POST'])
+def calculate_price():
+    """Calculate final price for a product variant"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        variant_key = data.get('variant_key')
+        
+        config = load_pricing_config()
+        
+        if product_type not in config['products'] or variant_key not in config['products'][product_type]['variants']:
+            return jsonify({'success': False, 'message': 'Product or variant not found'}), 404
+        
+        variant = config['products'][product_type]['variants'][variant_key]
+        base_cost = variant.get('base_cost', 0)
+        margin = config.get('global_margin', 100)
+        
+        final_price = base_cost * (1 + margin / 100)
+        
+        return jsonify({
+            'success': True,
+            'base_cost': base_cost,
+            'margin_percent': margin,
+            'final_price': round(final_price, 2),
+            'variant_info': variant
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ============================================================================
 # ORDERDESK TEST INTEGRATION ROUTES
 # ============================================================================
 
@@ -2937,26 +3181,42 @@ def test_order_form():
 
 @app.route('/test_order_submit', methods=['POST'])
 def test_order_submit():
-    """Submit test order to OrderDesk API"""
+    """Submit test order to OrderDesk API with dynamic pricing"""
     try:
         # Get form data
         form_data = request.form
-        product_sku = form_data.get('product_type')
+        product_sku = form_data.get('product_sku')  # Now comes from dynamic pricing
+        lumaprints_options = form_data.get('lumaprints_options')  # From dynamic pricing
+        product_price = float(form_data.get('product_price', 0))  # From dynamic pricing
         paypal_order_id = form_data.get('paypal_order_id')
         paypal_payer_id = form_data.get('paypal_payer_id')
         
         # Verify PayPal payment was completed
         if not paypal_order_id or not paypal_payer_id:
-            flash('Payment required before order submission', 'error')
-            return redirect(url_for('test_order_form'))
+            return jsonify({
+                "status": "error",
+                "message": "Payment required before order submission"
+            }), 400
         
-        if product_sku not in ORDERDESK_PRODUCT_MAPPING:
-            flash('Invalid product selected', 'error')
-            return redirect(url_for('test_order_form'))
+        # Verify we have product information
+        if not product_sku or not lumaprints_options or product_price <= 0:
+            return jsonify({
+                "status": "error", 
+                "message": "Invalid product information"
+            }), 400
         
-        product_info = ORDERDESK_PRODUCT_MAPPING[product_sku]
+        # Get product name from form data or create a generic one
+        product_name = f"Print Order - SKU {product_sku}"
+        if product_sku == "101001":
+            product_name = "Canvas Print 0.75\" (12x12)"
+        elif product_sku == "101002":
+            product_name = "Canvas Print 1.25\" (12x12)"
+        elif product_sku == "106001":
+            product_name = "Metal Print (12x12)"
+        elif product_sku == "103001":
+            product_name = "Fine Art Paper (12x12)"
         
-        # Prepare OrderDesk order data
+        # Prepare OrderDesk order data with dynamic pricing
         order_data = {
             "source_name": "Fifth Element Photography",
             "email": form_data.get('email'),
@@ -2972,8 +3232,8 @@ def test_order_submit():
             },
             "order_items": [
                 {
-                    "name": product_info["name"] + " - SPARROW 12x12 SQUARE CANVAS",
-                    "price": product_info["price"],
+                    "name": product_name + " - SPARROW 12x12 SQUARE CANVAS",
+                    "price": product_price,  # Use dynamic pricing
                     "quantity": 1,
                     "weight": 1.0,
                     "code": product_sku,
@@ -2982,10 +3242,11 @@ def test_order_submit():
                         "print_url": "https://fifthelement.photos/images/12x12_Sparrow.jpg",
                         "print_width": "12",
                         "print_height": "12",
-                        "lumaprints_options": product_info["lumaprints_options"],
+                        "lumaprints_options": lumaprints_options,  # Use dynamic options
                         "paypal_order_id": paypal_order_id,
                         "paypal_payer_id": paypal_payer_id,
-                        "payment_status": "COMPLETED"
+                        "payment_status": "COMPLETED",
+                        "dynamic_pricing": True  # Flag to indicate this uses new pricing system
                     }
                 }
             ]
@@ -3028,7 +3289,7 @@ def test_order_submit():
         if response.status_code == 201:
             # Success
             order_response = response.json()
-            flash(f'Order submitted successfully! OrderDesk Order ID: {order_response.get("id")}', 'success')
+            # flash(f'Order submitted successfully! OrderDesk Order ID: {order_response.get("id")}', 'success')  # Removed to clean up admin
             return jsonify({
                 "status": "success",
                 "message": "Order submitted to OrderDesk successfully",
@@ -3037,7 +3298,7 @@ def test_order_submit():
             })
         else:
             # Error
-            flash(f'Error submitting order: {response.text}', 'error')
+            # flash(f'Error submitting order: {response.text}', 'error')  # Removed to clean up admin
             return jsonify({
                 "status": "error",
                 "message": f"OrderDesk API error: {response.status_code}",
@@ -3046,7 +3307,7 @@ def test_order_submit():
             
     except Exception as e:
         print("Exception:", str(e))
-        flash(f'Error: {str(e)}', 'error')
+        # flash(f'Error: {str(e)}', 'error')  # Removed to clean up admin
         return jsonify({
             "status": "error",
             "message": str(e)

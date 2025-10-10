@@ -79,18 +79,27 @@
         
         <div class="form-group">
             <label for="product_type">Product Type:</label>
-            <select id="product_type" name="product_type" required>
-                <option value="101001">Canvas Print 0.75in (12x12) - $0.01</option>
-                <option value="106001">Metal Print (12x12) - $0.02</option>
-                <option value="103001">Fine Art Paper (12x12) - $0.03</option>
+            <select id="product_type" name="product_type" required onchange="updatePricing()">
+                <option value="">Select a product...</option>
+                <option value="canvas|12x12_075" data-sku="101001" data-options="1,5">Canvas Print 0.75" (12x12) - Loading...</option>
+                <option value="canvas|12x12_125" data-sku="101002" data-options="2,5">Canvas Print 1.25" (12x12) - Loading...</option>
+                <option value="metal|12x12" data-sku="106001" data-options="29,31">Metal Print (12x12) - Loading...</option>
+                <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - Loading...</option>
             </select>
         </div>
 
         <!-- PayPal Payment Section -->
         <div class="payment-section" style="margin-top: 20px; padding: 20px; border: 2px solid #0070ba; border-radius: 8px;">
             <h3>Payment</h3>
-            <p><strong>Total: $0.01</strong></p>
+            <p><strong>Total: <span id="total-price">$0.00</span></strong></p>
+            <div id="pricing-breakdown" style="font-size: 0.9em; color: #666; margin-bottom: 15px;">
+                <div>Base Cost: <span id="base-cost">$0.00</span></div>
+                <div>Margin: <span id="margin-percent">0</span>%</div>
+            </div>
             <div id="paypal-button-container"></div>
+            <div id="payment-message" style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                Please select a product to see pricing
+            </div>
         </div>
 
         <!-- Hidden submit for after payment -->
@@ -101,51 +110,192 @@
     <script src="https://www.paypal.com/sdk/js?client-id=AVE6LeJKagwJXHf2BPamlaDQghtNBoRmRU8j5KK7wi7wDN61Ufm2dGZFi_CFH5L4MuKjh8KLhHLVwP5w&currency=USD&disable-funding=paylater"></script>
     
     <script>
-        paypal.Buttons({
-            style: {
-                layout: 'vertical',
-                color: 'blue',
-                shape: 'rect',
-                label: 'paypal'
-            },
-            createOrder: function(data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value: '0.01'
-                        },
-                        description: 'Canvas Print 0.75in (12x12) - Sparrow (TEST)'
-                    }]
+        let currentPrice = 0;
+        let currentProductInfo = null;
+        let paypalButtonsInstance = null;
+
+        // Load pricing on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadInitialPricing();
+        });
+
+        // Load pricing for all products and update the dropdown
+        function loadInitialPricing() {
+            const options = document.querySelectorAll('#product_type option[value]');
+            
+            options.forEach(option => {
+                if (option.value === '') return; // Skip the "Select a product..." option
+                
+                const [productType, variantKey] = option.value.split('|');
+                
+                fetch('/api/pricing/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        product_type: productType,
+                        variant_key: variantKey
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const displayName = option.textContent.split(' - ')[0];
+                        option.textContent = `${displayName} - $${data.final_price.toFixed(2)}`;
+                    } else {
+                        option.textContent = option.textContent.replace('Loading...', 'Price Error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading price:', error);
+                    option.textContent = option.textContent.replace('Loading...', 'Price Error');
                 });
-            },
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(details) {
-                    // Payment successful
-                    alert('Payment completed by ' + details.payer.name.given_name);
-                    
-                    // Add payment info to form
-                    const form = document.querySelector('form');
-                    const paymentInput = document.createElement('input');
-                    paymentInput.type = 'hidden';
-                    paymentInput.name = 'paypal_order_id';
-                    paymentInput.value = data.orderID;
-                    form.appendChild(paymentInput);
-                    
-                    const payerInput = document.createElement('input');
-                    payerInput.type = 'hidden';
-                    payerInput.name = 'paypal_payer_id';
-                    payerInput.value = details.payer.payer_id;
-                    form.appendChild(payerInput);
-                    
-                    // Submit order to OrderDesk
-                    document.getElementById('submit-order').click();
-                });
-            },
-            onError: function(err) {
-                console.error('PayPal error:', err);
-                alert('Payment failed. Please try again.');
+            });
+        }
+
+        // Update pricing when product selection changes
+        function updatePricing() {
+            const select = document.getElementById('product_type');
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (!selectedOption.value) {
+                // No product selected
+                currentPrice = 0;
+                currentProductInfo = null;
+                updatePriceDisplay(0, 0, 0);
+                document.getElementById('payment-message').textContent = 'Please select a product to see pricing';
+                if (paypalButtonsInstance) {
+                    document.getElementById('paypal-button-container').innerHTML = '';
+                    paypalButtonsInstance = null;
+                }
+                return;
             }
-        }).render('#paypal-button-container');
+
+            const [productType, variantKey] = selectedOption.value.split('|');
+            
+            fetch('/api/pricing/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_type: productType,
+                    variant_key: variantKey
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentPrice = data.final_price;
+                    currentProductInfo = {
+                        productType: productType,
+                        variantKey: variantKey,
+                        sku: selectedOption.getAttribute('data-sku'),
+                        options: selectedOption.getAttribute('data-options'),
+                        displayName: selectedOption.textContent.split(' - ')[0]
+                    };
+                    
+                    updatePriceDisplay(data.final_price, data.base_cost, data.margin_percent);
+                    initializePayPal();
+                } else {
+                    console.error('Pricing error:', data.message);
+                    document.getElementById('payment-message').textContent = 'Error loading pricing';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('payment-message').textContent = 'Error loading pricing';
+            });
+        }
+
+        // Update price display elements
+        function updatePriceDisplay(finalPrice, baseCost, marginPercent) {
+            document.getElementById('total-price').textContent = `$${finalPrice.toFixed(2)}`;
+            document.getElementById('base-cost').textContent = `$${baseCost.toFixed(2)}`;
+            document.getElementById('margin-percent').textContent = marginPercent;
+            
+            if (finalPrice > 0) {
+                document.getElementById('payment-message').textContent = 'Ready for payment';
+            }
+        }
+
+        // Initialize PayPal buttons with current price
+        function initializePayPal() {
+            if (currentPrice <= 0 || !currentProductInfo) return;
+
+            // Clear existing PayPal buttons
+            document.getElementById('paypal-button-container').innerHTML = '';
+            
+            paypalButtonsInstance = paypal.Buttons({
+                style: {
+                    layout: 'vertical',
+                    color: 'blue',
+                    shape: 'rect',
+                    label: 'paypal'
+                },
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: currentPrice.toFixed(2)
+                            },
+                            description: `${currentProductInfo.displayName} - Sparrow 12x12`
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        // Payment successful
+                        alert('Payment completed by ' + details.payer.name.given_name);
+                        
+                        // Add payment info to form
+                        const form = document.querySelector('form');
+                        
+                        // Add PayPal payment info
+                        const paymentInput = document.createElement('input');
+                        paymentInput.type = 'hidden';
+                        paymentInput.name = 'paypal_order_id';
+                        paymentInput.value = data.orderID;
+                        form.appendChild(paymentInput);
+                        
+                        const payerInput = document.createElement('input');
+                        payerInput.type = 'hidden';
+                        payerInput.name = 'paypal_payer_id';
+                        payerInput.value = details.payer.payer_id;
+                        form.appendChild(payerInput);
+                        
+                        // Add product info for OrderDesk
+                        const productSkuInput = document.createElement('input');
+                        productSkuInput.type = 'hidden';
+                        productSkuInput.name = 'product_sku';
+                        productSkuInput.value = currentProductInfo.sku;
+                        form.appendChild(productSkuInput);
+                        
+                        const productOptionsInput = document.createElement('input');
+                        productOptionsInput.type = 'hidden';
+                        productOptionsInput.name = 'lumaprints_options';
+                        productOptionsInput.value = currentProductInfo.options;
+                        form.appendChild(productOptionsInput);
+                        
+                        const productPriceInput = document.createElement('input');
+                        productPriceInput.type = 'hidden';
+                        productPriceInput.name = 'product_price';
+                        productPriceInput.value = currentPrice.toFixed(2);
+                        form.appendChild(productPriceInput);
+                        
+                        // Submit order to OrderDesk
+                        document.getElementById('submit-order').click();
+                    });
+                },
+                onError: function(err) {
+                    console.error('PayPal error:', err);
+                    alert('Payment failed. Please try again.');
+                }
+            });
+            
+            paypalButtonsInstance.render('#paypal-button-container');
+        }
     </script>
 </body>
 </html>

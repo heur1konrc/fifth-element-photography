@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Management - Fifth Element Photography Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_new.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .pricing-section {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #404040;
+        }
+        
+        .pricing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #404040;
+        }
+        
+        .pricing-title {
+            color: #ffffff;
+            font-size: 1.4em;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .global-margin {
+            background: #1a4d3a;
+            border: 1px solid #2d7a5f;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .global-margin h3 {
+            color: #4ade80;
+            margin: 0 0 15px 0;
+            font-size: 1.2em;
+        }
+        
+        .margin-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .margin-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .margin-input input {
+            width: 80px;
+            padding: 8px 12px;
+            border: 1px solid #404040;
+            border-radius: 6px;
+            background: #1a1a1a;
+            color: #ffffff;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+        }
+        
+        .product-card {
+            background: #1a1a1a;
+            border: 1px solid #404040;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .product-card-header {
+            background: #333333;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .product-name {
+            color: #ffffff;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .variant-list {
+            padding: 0;
+        }
+        
+        .variant-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-bottom: 1px solid #2a2a2a;
+            transition: background-color 0.2s;
+        }
+        
+        .variant-item:hover {
+            background: #252525;
+        }
+        
+        .variant-item:last-child {
+            border-bottom: none;
+        }
+        
+        .variant-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .variant-name {
+            color: #ffffff;
+            font-weight: 500;
+        }
+        
+        .variant-details {
+            color: #888888;
+            font-size: 0.9em;
+        }
+        
+        .variant-pricing {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .price-input {
+            width: 80px;
+            padding: 6px 10px;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            background: #2a2a2a;
+            color: #ffffff;
+            text-align: right;
+        }
+        
+        .calculated-price {
+            color: #4ade80;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        .add-variant-form {
+            padding: 20px;
+            background: #252525;
+            border-top: 1px solid #404040;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-group label {
+            color: #cccccc;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            padding: 8px 12px;
+            border: 1px solid #404040;
+            border-radius: 4px;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+        
+        .btn-tiny {
+            padding: 4px 8px;
+            font-size: 0.8em;
+            min-width: auto;
+        }
+        
+        .add-product-section {
+            background: #1a3d5c;
+            border: 1px solid #2d5a87;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .add-product-section h3 {
+            color: #60a5fa;
+            margin: 0 0 15px 0;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-active {
+            background: #4ade80;
+        }
+        
+        .status-inactive {
+            background: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="dashboard-title">
+                    <i class="fas fa-dollar-sign"></i>
+                    Pricing Management
+                </h1>
+                <div class="header-actions">
+                    <a href="{{ url_for('admin') }}" class="btn btn-outline">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Admin
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline">
+                        <i class="fas fa-external-link-alt"></i>
+                        View Website
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message">
+                            <i class="fas fa-check-circle"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Global Margin Control -->
+            <div class="global-margin">
+                <h3><i class="fas fa-percentage"></i> Global Margin Control</h3>
+                <div class="margin-controls">
+                    <div class="margin-input">
+                        <label for="global-margin">Margin Percentage:</label>
+                        <input type="number" id="global-margin" value="{{ pricing_config.global_margin or 100 }}" min="0" max="500" step="5">
+                        <span>%</span>
+                    </div>
+                    <button class="btn btn-success btn-small" onclick="updateGlobalMargin()">
+                        <i class="fas fa-save"></i>
+                        Update All Prices
+                    </button>
+                    <div class="margin-info">
+                        <span style="color: #888;">Example: 100% margin = 2x cost, 50% margin = 1.5x cost</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <div class="pricing-section">
+                <div class="pricing-header">
+                    <h2 class="pricing-title">Product Pricing</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary btn-small" onclick="toggleAddProduct()">
+                            <i class="fas fa-plus"></i>
+                            Add New Product
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="product-grid">
+                    {% for product_type, product_data in pricing_config.products.items() %}
+                    <div class="product-card">
+                        <div class="product-card-header">
+                            <h3 class="product-name">
+                                <span class="status-indicator status-{{ 'active' if product_data.active else 'inactive' }}"></span>
+                                {{ product_data.display_name or product_type.title() }}
+                            </h3>
+                            <div class="product-actions">
+                                <button class="btn btn-secondary btn-tiny" onclick="toggleProduct('{{ product_type }}')">
+                                    <i class="fas fa-{{ 'eye-slash' if product_data.active else 'eye' }}"></i>
+                                </button>
+                                <button class="btn btn-danger btn-tiny" onclick="deleteProduct('{{ product_type }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="variant-list">
+                            {% for variant_key, variant_data in product_data.variants.items() %}
+                            <div class="variant-item">
+                                <div class="variant-info">
+                                    <div class="variant-name">{{ variant_data.display_name or variant_key }}</div>
+                                    <div class="variant-details">
+                                        SKU: {{ variant_data.sku or 'N/A' }} | 
+                                        Lumaprints Options: {{ variant_data.lumaprints_options or 'N/A' }}
+                                    </div>
+                                </div>
+                                <div class="variant-pricing">
+                                    <span style="color: #888;">$</span>
+                                    <input type="number" class="price-input" 
+                                           value="{{ variant_data.base_cost or 0 }}" 
+                                           step="0.01" min="0"
+                                           onchange="updateVariantPrice('{{ product_type }}', '{{ variant_key }}', this.value)">
+                                    <span style="color: #888;">→</span>
+                                    <div class="calculated-price">
+                                        $<span id="calc-{{ product_type }}-{{ variant_key }}">{{ "%.2f"|format((variant_data.base_cost or 0) * (1 + (pricing_config.global_margin or 100) / 100)) }}</span>
+                                    </div>
+                                    <button class="btn btn-danger btn-tiny" onclick="deleteVariant('{{ product_type }}', '{{ variant_key }}')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="add-variant-form" id="add-variant-{{ product_type }}" style="display: none;">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Variant Name</label>
+                                    <input type="text" placeholder="e.g., 12x12 Canvas" id="variant-name-{{ product_type }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Base Cost ($)</label>
+                                    <input type="number" step="0.01" min="0" placeholder="0.00" id="variant-cost-{{ product_type }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>SKU</label>
+                                    <input type="text" placeholder="101001" id="variant-sku-{{ product_type }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Lumaprints Options</label>
+                                    <input type="text" placeholder="1,5" id="variant-options-{{ product_type }}">
+                                </div>
+                                <button class="btn btn-success btn-small" onclick="addVariant('{{ product_type }}')">
+                                    <i class="fas fa-plus"></i>
+                                    Add
+                                </button>
+                                <button class="btn btn-secondary btn-small" onclick="toggleAddVariant('{{ product_type }}')">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 12px 20px; border-top: 1px solid #404040; background: #252525;">
+                            <button class="btn btn-primary btn-small" onclick="toggleAddVariant('{{ product_type }}')">
+                                <i class="fas fa-plus"></i>
+                                Add Variant
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Add New Product Section -->
+            <div class="add-product-section" id="add-product-section" style="display: none;">
+                <h3><i class="fas fa-plus-circle"></i> Add New Product Type</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Product Type Key</label>
+                        <input type="text" id="new-product-key" placeholder="e.g., mugs, shirts, coasters">
+                    </div>
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text" id="new-product-name" placeholder="e.g., Coffee Mugs">
+                    </div>
+                    <button class="btn btn-success" onclick="addNewProduct()">
+                        <i class="fas fa-plus"></i>
+                        Create Product
+                    </button>
+                    <button class="btn btn-secondary" onclick="toggleAddProduct()">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Update global margin and recalculate all prices
+        function updateGlobalMargin() {
+            const margin = document.getElementById('global-margin').value;
+            
+            fetch('/admin/pricing/update-margin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ margin: parseFloat(margin) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload(); // Refresh to show updated prices
+                } else {
+                    alert('Error updating margin: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating margin');
+            });
+        }
+
+        // Update individual variant price
+        function updateVariantPrice(productType, variantKey, cost) {
+            const margin = parseFloat(document.getElementById('global-margin').value) || 100;
+            const finalPrice = parseFloat(cost) * (1 + margin / 100);
+            
+            // Update display
+            document.getElementById(`calc-${productType}-${variantKey}`).textContent = finalPrice.toFixed(2);
+            
+            // Save to backend
+            fetch('/admin/pricing/update-variant', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_type: productType,
+                    variant_key: variantKey,
+                    base_cost: parseFloat(cost)
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert('Error updating price: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Toggle add variant form
+        function toggleAddVariant(productType) {
+            const form = document.getElementById(`add-variant-${productType}`);
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Add new variant
+        function addVariant(productType) {
+            const name = document.getElementById(`variant-name-${productType}`).value;
+            const cost = document.getElementById(`variant-cost-${productType}`).value;
+            const sku = document.getElementById(`variant-sku-${productType}`).value;
+            const options = document.getElementById(`variant-options-${productType}`).value;
+            
+            if (!name || !cost) {
+                alert('Please fill in variant name and cost');
+                return;
+            }
+            
+            fetch('/admin/pricing/add-variant', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_type: productType,
+                    variant_name: name,
+                    base_cost: parseFloat(cost),
+                    sku: sku,
+                    lumaprints_options: options
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error adding variant: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding variant');
+            });
+        }
+
+        // Delete variant
+        function deleteVariant(productType, variantKey) {
+            if (!confirm('Are you sure you want to delete this variant?')) return;
+            
+            fetch('/admin/pricing/delete-variant', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_type: productType,
+                    variant_key: variantKey
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error deleting variant: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting variant');
+            });
+        }
+
+        // Toggle add product form
+        function toggleAddProduct() {
+            const section = document.getElementById('add-product-section');
+            section.style.display = section.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Add new product
+        function addNewProduct() {
+            const key = document.getElementById('new-product-key').value;
+            const name = document.getElementById('new-product-name').value;
+            
+            if (!key || !name) {
+                alert('Please fill in both product key and display name');
+                return;
+            }
+            
+            fetch('/admin/pricing/add-product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_key: key.toLowerCase(),
+                    display_name: name
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error adding product: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding product');
+            });
+        }
+
+        // Toggle product active/inactive
+        function toggleProduct(productType) {
+            fetch('/admin/pricing/toggle-product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ product_type: productType })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error toggling product: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error toggling product');
+            });
+        }
+
+        // Delete product
+        function deleteProduct(productType) {
+            if (!confirm('Are you sure you want to delete this entire product and all its variants?')) return;
+            
+            fetch('/admin/pricing/delete-product', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ product_type: productType })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error deleting product: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting product');
+            });
+        }
+    </script>
+</body>
+</html>
