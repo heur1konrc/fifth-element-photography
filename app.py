@@ -2941,6 +2941,13 @@ def test_order_submit():
         # Get form data
         form_data = request.form
         product_sku = form_data.get('product_type')
+        paypal_order_id = form_data.get('paypal_order_id')
+        paypal_payer_id = form_data.get('paypal_payer_id')
+        
+        # Verify PayPal payment was completed
+        if not paypal_order_id or not paypal_payer_id:
+            flash('Payment required before order submission', 'error')
+            return redirect(url_for('test_order_form'))
         
         if product_sku not in ORDERDESK_PRODUCT_MAPPING:
             flash('Invalid product selected', 'error')
@@ -2974,7 +2981,10 @@ def test_order_submit():
                         "print_url": "https://fifthelement.photos/images/12x12_Sparrow.jpg",
                         "print_width": "12",
                         "print_height": "12",
-                        "lumaprints_options": product_info["lumaprints_options"]
+                        "lumaprints_options": product_info["lumaprints_options"],
+                        "paypal_order_id": paypal_order_id,
+                        "paypal_payer_id": paypal_payer_id,
+                        "payment_status": "COMPLETED"
                     }
                 }
             ]

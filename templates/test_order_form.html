@@ -86,7 +86,60 @@
             </select>
         </div>
 
-        <button type="submit">Submit Test Order to OrderDesk</button>
+        <!-- PayPal Payment Section -->
+        <div class="payment-section" style="margin-top: 20px; padding: 20px; border: 2px solid #0070ba; border-radius: 8px;">
+            <h3>Payment</h3>
+            <p><strong>Total: $25.00</strong></p>
+            <div id="paypal-button-container"></div>
+        </div>
+
+        <!-- Hidden submit for after payment -->
+        <button type="submit" id="submit-order" style="display: none;">Submit Order to OrderDesk</button>
     </form>
+
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AVE6LeJKagwJXHf2BPamlaDQghtNBoRmRU8j5KK7wi7wDN61Ufm2dGZFi_CFH5L4MuKjh8KLhHLVwP5w&currency=USD"></script>
+    
+    <script>
+        paypal.Buttons({
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: '25.00'
+                        },
+                        description: 'Canvas Print 0.75in (12x12) - Sparrow'
+                    }]
+                });
+            },
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(details) {
+                    // Payment successful
+                    alert('Payment completed by ' + details.payer.name.given_name);
+                    
+                    // Add payment info to form
+                    const form = document.querySelector('form');
+                    const paymentInput = document.createElement('input');
+                    paymentInput.type = 'hidden';
+                    paymentInput.name = 'paypal_order_id';
+                    paymentInput.value = data.orderID;
+                    form.appendChild(paymentInput);
+                    
+                    const payerInput = document.createElement('input');
+                    payerInput.type = 'hidden';
+                    payerInput.name = 'paypal_payer_id';
+                    payerInput.value = details.payer.payer_id;
+                    form.appendChild(payerInput);
+                    
+                    // Submit order to OrderDesk
+                    document.getElementById('submit-order').click();
+                });
+            },
+            onError: function(err) {
+                console.error('PayPal error:', err);
+                alert('Payment failed. Please try again.');
+            }
+        }).render('#paypal-button-container');
+    </script>
 </body>
 </html>
