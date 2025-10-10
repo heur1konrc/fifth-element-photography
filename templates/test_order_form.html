@@ -80,16 +80,16 @@
         <div class="form-group">
             <label for="product_type">Product Type:</label>
             <select id="product_type" name="product_type" required>
-                <option value="101001">Canvas Print 0.75in (12x12) - $25.00</option>
-                <option value="106001">Metal Print (12x12) - $35.00</option>
-                <option value="103001">Fine Art Paper (12x12) - $20.00</option>
+                <option value="101001">Canvas Print 0.75in (12x12) - $0.01</option>
+                <option value="106001">Metal Print (12x12) - $0.02</option>
+                <option value="103001">Fine Art Paper (12x12) - $0.03</option>
             </select>
         </div>
 
         <!-- PayPal Payment Section -->
         <div class="payment-section" style="margin-top: 20px; padding: 20px; border: 2px solid #0070ba; border-radius: 8px;">
             <h3>Payment</h3>
-            <p><strong>Total: $25.00</strong></p>
+            <p><strong>Total: $0.01</strong></p>
             <div id="paypal-button-container"></div>
         </div>
 
@@ -112,9 +112,9 @@
                 return actions.order.create({
                     purchase_units: [{
                         amount: {
-                            value: '25.00'
+                            value: '0.01'
                         },
-                        description: 'Canvas Print 0.75in (12x12) - Sparrow'
+                        description: 'Canvas Print 0.75in (12x12) - Sparrow (TEST)'
                     }]
                 });
             },
