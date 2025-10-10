@@ -98,10 +98,16 @@
     </form>
 
     <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AVE6LeJKagwJXHf2BPamlaDQghtNBoRmRU8j5KK7wi7wDN61Ufm2dGZFi_CFH5L4MuKjh8KLhHLVwP5w&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AVE6LeJKagwJXHf2BPamlaDQghtNBoRmRU8j5KK7wi7wDN61Ufm2dGZFi_CFH5L4MuKjh8KLhHLVwP5w&currency=USD&disable-funding=paylater"></script>
     
     <script>
         paypal.Buttons({
+            style: {
+                layout: 'vertical',
+                color: 'blue',
+                shape: 'rect',
+                label: 'paypal'
+            },
             createOrder: function(data, actions) {
                 return actions.order.create({
                     purchase_units: [{
