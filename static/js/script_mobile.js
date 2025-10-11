@@ -178,11 +178,8 @@ function unloadDistantImages(centerIndex, threshold) {
     const orderBtn = document.getElementById('mobileOrderBtn');
     if (orderBtn) {
         orderBtn.addEventListener('click', () => {
-            const currentImage = filteredImages[currentSwipeIndex];
-            if (currentImage) {
-                // Redirect to order print page
-                window.location.href = `/order_print?image=${encodeURIComponent(currentImage.filename)}`;
-            }
+            // Redirect to new PayPal-integrated order form
+            window.open('/test_order_form', '_blank');
         });
     }
     

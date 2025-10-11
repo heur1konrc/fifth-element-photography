@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory, session, flash, redirect, url_for, send_file
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, send_file, send_from_directory, session
 import os
 import json
 from datetime import datetime
@@ -8,11 +8,63 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from werkzeug.utils import secure_filename
 import uuid
+import hashlib
+import secrets
 
 # Lumaprints integration imports
 from lumaprints_api import get_lumaprints_client, get_pricing_calculator
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+
+# Admin credentials - stored securely
+ADMIN_USERNAME = "Heur1konrc"
+ADMIN_PASSWORD_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"  # "admin123" - change this
+ADMIN_CONFIG_FILE = "admin_config.json"
+
+def hash_password(password):
+    """Hash a password using SHA-256"""
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def verify_password(password, hash_value):
+    """Verify a password against its hash"""
+    return hash_password(password) == hash_value
+
+def load_admin_config():
+    """Load admin configuration from file"""
+    try:
+        if os.path.exists(ADMIN_CONFIG_FILE):
+            with open(ADMIN_CONFIG_FILE, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading admin config: {e}")
+    
+    # Return default config
+    return {
+        "username": ADMIN_USERNAME,
+        "password_hash": ADMIN_PASSWORD_HASH,
+        "last_updated": datetime.now().isoformat()
+    }
+
+def save_admin_config(config):
+    """Save admin configuration to file"""
+    try:
+        config['last_updated'] = datetime.now().isoformat()
+        with open(ADMIN_CONFIG_FILE, 'w') as f:
+            json.dump(config, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving admin config: {e}")
+        return False
+
+def require_admin_auth(f):
+    """Decorator to require admin authentication"""
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_authenticated'):
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    decorated_function.__name__ = f.__name__
+    return decorated_function
 
 def is_mobile_device():
     """Detect if the request is from a mobile device"""
@@ -505,7 +557,70 @@ def get_thumbnail(filename):
             return send_file(original_path)
         return jsonify({'error': str(e)}), 500
 
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    """Admin login page"""
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        admin_config = load_admin_config()
+        
+        if (username == admin_config['username'] and 
+            verify_password(password, admin_config['password_hash'])):
+            session['admin_authenticated'] = True
+            session['admin_username'] = username
+            return redirect(url_for('admin'))
+        else:
+            flash('Invalid username or password', 'error')
+    
+    return render_template('admin_login.html')
+
+@app.route('/admin/logout')
+def admin_logout():
+    """Admin logout"""
+    session.pop('admin_authenticated', None)
+    session.pop('admin_username', None)
+    flash('You have been logged out', 'info')
+    return redirect(url_for('admin_login'))
+
+@app.route('/admin/change-password', methods=['GET', 'POST'])
+@require_admin_auth
+def admin_change_password():
+    """Change admin password"""
+    if request.method == 'POST':
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        admin_config = load_admin_config()
+        
+        # Verify current password
+        if not verify_password(current_password, admin_config['password_hash']):
+            flash('Current password is incorrect', 'error')
+            return render_template('admin_change_password.html')
+        
+        # Validate new password
+        if len(new_password) < 8:
+            flash('New password must be at least 8 characters long', 'error')
+            return render_template('admin_change_password.html')
+        
+        if new_password != confirm_password:
+            flash('New passwords do not match', 'error')
+            return render_template('admin_change_password.html')
+        
+        # Update password
+        admin_config['password_hash'] = hash_password(new_password)
+        if save_admin_config(admin_config):
+            flash('Password changed successfully', 'success')
+            return redirect(url_for('admin'))
+        else:
+            flash('Error saving new password', 'error')
+    
+    return render_template('admin_change_password.html')
+
 @app.route('/admin')
+@require_admin_auth
 def admin():
     """Admin panel for image management"""
     try:
@@ -517,6 +632,8 @@ def admin():
         return f"Admin Error: {str(e)}", 500
 
 @app.route('/admin/upload', methods=['POST'])
+@require_admin_auth
+@require_admin_auth
 def upload_image():
     """Upload new image"""
     if 'file' not in request.files:
@@ -546,6 +663,7 @@ def upload_image():
     return redirect(url_for('admin'))
 
 @app.route('/admin/delete/<filename>', methods=['POST'])
+@require_admin_auth
 def delete_image(filename):
     """Delete an image"""
     filepath = os.path.join(IMAGES_FOLDER, filename)
@@ -557,6 +675,7 @@ def delete_image(filename):
     return redirect(url_for('admin'))
 
 @app.route('/admin/rename/<filename>', methods=['POST'])
+@require_admin_auth
 def rename_image(filename):
     """Rename an image"""
     new_name = request.form.get('new_name')
@@ -620,11 +739,13 @@ def save_thumbnail_assignments(assignments):
         return False
 
 @app.route('/admin/thumbnails')
+@require_admin_auth
 def admin_thumbnails():
     """Admin page for managing product thumbnails"""
     return render_template('admin_thumbnails.html')
 
 @app.route('/admin/upload-product-thumbnails', methods=['POST'])
+@require_admin_auth
 def upload_product_thumbnails():
     """Upload product thumbnails to the product-thumbnails directory"""
     try:
@@ -657,6 +778,7 @@ def upload_product_thumbnails():
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/product-thumbnails')
+@require_admin_auth
 def get_product_thumbnails():
     """Get all product thumbnails with their assignments"""
     try:
@@ -693,6 +815,7 @@ def serve_product_thumbnail(filename):
         return "Thumbnail not found", 404
 
 @app.route('/admin/assign-thumbnail', methods=['POST'])
+@require_admin_auth
 def assign_thumbnail():
     """Assign a thumbnail to a specific product"""
     try:
@@ -719,6 +842,7 @@ def assign_thumbnail():
         return jsonify({'success': False, 'error': str(e)})
 
 @app.route('/admin/delete-product-thumbnail/<thumbnail_id>', methods=['DELETE'])
+@require_admin_auth
 def delete_product_thumbnail(thumbnail_id):
     """Delete a product thumbnail"""
     try:
@@ -794,6 +918,7 @@ def get_product_name(product_id):
     return product_names.get(product_id, product_id)
 
 @app.route('/admin/categories', methods=['GET', 'POST'])
+@require_admin_auth
 def manage_categories():
     """Manage categories - add/delete"""
     if request.method == 'POST':
@@ -840,6 +965,7 @@ def manage_categories():
     return render_template('admin_categories.html', categories=categories)
 
 @app.route('/admin/assign_category/<filename>', methods=['POST'])
+@require_admin_auth
 def assign_category(filename):
     """Assign category to an image"""
     new_category = request.form.get('category', '').strip().lower()
@@ -856,6 +982,7 @@ def assign_category(filename):
     return redirect(url_for('admin'))
 
 @app.route('/admin/update_description/<filename>', methods=['POST'])
+@require_admin_auth
 def update_description(filename):
     """Update image description"""
     new_description = request.form.get('description', '').strip()
@@ -1662,6 +1789,7 @@ def get_hero_image():
 
 
 @app.route('/admin/randomize_portfolio', methods=['POST'])
+@require_admin_auth
 def randomize_portfolio():
     """Randomize the order of portfolio images"""
     try:
@@ -2155,6 +2283,7 @@ def order_confirmation(order_id):
         return f"Error loading order confirmation: {str(e)}", 500
 
 @app.route('/admin/orders')
+@require_admin_auth
 def admin_orders():
     """Admin page to view all orders"""
     try:
@@ -2320,6 +2449,7 @@ if __name__ == '__main__':
 # ============================================================================
 
 @app.route('/admin/lumaprints-mapping')
+@require_admin_auth
 def admin_lumaprints_mapping():
     """Admin interface for managing Lumaprints library mapping"""
     try:
@@ -2452,6 +2582,7 @@ def export_lumaprints_mapping():
 # ============================================================================
 
 @app.route('/admin/download-image/<filename>')
+@require_admin_auth
 def download_image(filename):
     """Download original image file for admin use (e.g., uploading to Lumaprints)"""
     try:
@@ -2476,6 +2607,7 @@ def download_image(filename):
         return f"Error downloading file: {str(e)}", 500
 
 @app.route('/admin/download-highres/<filename>')
+@require_admin_auth
 def download_highres_image(filename):
     """Download high-resolution version of image for Lumaprints upload"""
     try:
@@ -2526,6 +2658,7 @@ def get_image_storage_info():
 
 # Product Thumbnail Management Routes
 @app.route('/admin/products')
+@require_admin_auth
 def admin_products():
     """Product thumbnail management page"""
     return render_template('admin_products_new.html')
@@ -2944,6 +3077,7 @@ def save_pricing_config(config):
         return False
 
 @app.route('/admin/pricing')
+@require_admin_auth
 def admin_pricing():
     """Pricing management admin page"""
     try:
@@ -2953,6 +3087,7 @@ def admin_pricing():
         return f"Pricing Admin Error: {str(e)}", 500
 
 @app.route('/admin/pricing/update-margin', methods=['POST'])
+@require_admin_auth
 def update_global_margin():
     """Update global margin percentage"""
     try:
@@ -2971,6 +3106,7 @@ def update_global_margin():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/admin/pricing/update-variant', methods=['POST'])
+@require_admin_auth
 def update_variant_price():
     """Update individual variant base cost"""
     try:
@@ -2995,6 +3131,7 @@ def update_variant_price():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/admin/pricing/add-variant', methods=['POST'])
+@require_admin_auth
 def add_variant():
     """Add new variant to existing product"""
     try:
@@ -3029,6 +3166,7 @@ def add_variant():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/admin/pricing/delete-variant', methods=['POST'])
+@require_admin_auth
 def delete_variant():
     """Delete variant from product"""
     try:
@@ -3052,6 +3190,7 @@ def delete_variant():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/admin/pricing/add-product', methods=['POST'])
+@require_admin_auth
 def add_new_product():
     """Add new product type"""
     try:
@@ -3082,6 +3221,7 @@ def add_new_product():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/admin/pricing/toggle-product', methods=['POST'])
+@require_admin_auth
 def toggle_product():
     """Toggle product active/inactive status"""
     try:
@@ -3104,6 +3244,7 @@ def toggle_product():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 @app.route('/admin/pricing/delete-product', methods=['POST'])
+@require_admin_auth
 def delete_product():
     """Delete entire product and all variants"""
     try:

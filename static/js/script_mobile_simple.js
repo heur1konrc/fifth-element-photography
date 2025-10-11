@@ -171,14 +171,11 @@ function updateSwipePosition() {
 // Update order button with correct route
 function updateOrderButton() {
     const orderBtn = document.getElementById('mobileOrderBtn');
-    if (orderBtn && filteredImages.length > 0) {
-        const currentImage = filteredImages[currentSwipeIndex];
-        if (currentImage) {
-            // Update button to use correct route format
-            orderBtn.onclick = () => {
-                window.location.href = `/order-print/${currentImage.filename}`;
-            };
-        }
+    if (orderBtn) {
+        // Update button to use new PayPal-integrated form
+        orderBtn.onclick = () => {
+            window.open('/test_order_form', '_blank');
+        };
     }
 }
 
