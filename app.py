@@ -19,7 +19,7 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
 # Admin credentials - stored securely
 ADMIN_USERNAME = "Heur1konrc"
-ADMIN_PASSWORD_HASH = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"  # "admin123" - change this
+ADMIN_PASSWORD_HASH = "3afeed04eeca02f36260571b19deb0898adfabcf3d0283aacdc9cafb81e0b0e1"  # "SecurePass123"
 ADMIN_CONFIG_FILE = "admin_config.json"
 
 def hash_password(password):
