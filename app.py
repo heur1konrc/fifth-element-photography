@@ -496,21 +496,8 @@ def api_lumaprints_options(subcategory_id):
 
 @app.route('/order-print/<image_id>')
 def order_print(image_id):
-    """Dedicated Lumaprints order page"""
-    images = scan_images()
-    
-    # Find the specific image
-    selected_image = None
-    for image in images:
-        if image['filename'] == image_id or str(image.get('id', '')) == image_id:
-            selected_image = image
-            break
-    
-    if not selected_image:
-        # If image not found, redirect to main page
-        return redirect(url_for('index'))
-    
-    return render_template('order_print_lumaprints.html', image=selected_image)
+    """Redirect old order print route to new PayPal-integrated form"""
+    return redirect('/test_order_form')
 
 @app.route('/images/<filename>')
 def serve_image(filename):
@@ -2069,71 +2056,9 @@ def get_lumaprints_pricing_detailed():
 # 
 @app.route('/order-print')
 def order_print_form():
-    """Display the order form for a specific product configuration"""
-    try:
-        # Get parameters from query string
-        image_filename = request.args.get('image', '')
-        image_title = request.args.get('title', 'Untitled')
-        subcategory_id = int(request.args.get('subcategory_id', 0))
-        width = float(request.args.get('width', 0))
-        height = float(request.args.get('height', 0))
-        quantity = int(request.args.get('quantity', 1))
-        price = float(request.args.get('price', 0))
-        options = request.args.get('options', '[]')
-        
-        # Parse options
-        try:
-            options = json.loads(options)
-        except:
-            options = []
-        
-        # Validate required parameters
-        if not all([image_filename, subcategory_id, width, height, price]):
-            return "Missing required parameters", 400
-        
-        # Load catalog to get product names
-        catalog = load_lumaprints_catalog()
-        
-        # Find product and subcategory names
-        product_name = "Unknown Product"
-        size_name = "Custom Size"
-        
-        for category in catalog['categories']:
-            subcategories = catalog['subcategories'].get(str(category['id']), [])
-            for subcat in subcategories:
-                if subcat['subcategoryId'] == subcategory_id:
-                    product_name = category['name']
-                    size_name = subcat['name']
-                    break
-        
-        # Check if image is mapped to Lumaprints library
-        from lumaprints_mapping import LumaprintsMapping
-        mapping_manager = LumaprintsMapping()
-        
-        if not mapping_manager.is_mapped(image_filename):
-            return f"Error: Image '{image_filename}' is not mapped to Lumaprints library. Please contact admin to add this image to the print catalog.", 400
-        
-        # Construct image URL for display
-        image_url = f"/images/{image_filename}"
-        
-        # Render order form
-        return render_template('lumaprints_order_form.html',
-            image_url=image_url,
-            image_title=image_title,
-            product_name=product_name,
-            size_name=size_name,
-            width=width,
-            height=height,
-            quantity=quantity,
-            formatted_price=f"${price:.2f}",
-            subcategory_id=subcategory_id,
-            options=options,
-            price=price
-        )
-        
-    except Exception as e:
-        return f"Error loading order form: {str(e)}", 500
-# 
+    """Redirect old order print form to new PayPal-integrated form"""
+    return redirect('/test_order_form')
+
 @app.route('/api/lumaprints/submit-order', methods=['POST'])
 def submit_lumaprints_order():
     """Submit an order to Lumaprints and store locally"""

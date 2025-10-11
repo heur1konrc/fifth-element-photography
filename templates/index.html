@@ -726,14 +726,8 @@
         
         // Handle order print click
         function handleOrderClick() {
-            const modalImage = document.getElementById('modalImage');
-            if (modalImage && modalImage.src) {
-                const imageSrc = modalImage.src;
-                const filename = imageSrc.split('/').pop();
-                window.location.href = `/order-print/${filename}`;
-            } else {
-                alert('Please select an image first.');
-            }
+            // Redirect to new PayPal-integrated order form
+            window.open('/test_order_form', '_blank');
         }
     </script>
 </body>
