@@ -144,10 +144,7 @@
                             <i class="fas fa-dollar-sign"></i>
                             Pricing Management
                         </a>
-                        <a href="/admin/image-analyzer" class="btn btn-info">
-                            <i class="fas fa-search"></i>
-                            Image Analyzer
-                        </a>
+
                     </div>
                 </div>
 
@@ -259,6 +256,10 @@
                                     <button class="btn btn-small btn-hero" data-action="set-hero" data-filename="{{ image.filename }}" data-title="{{ image.title }}">
                                         <i class="fas fa-home"></i>
                                         Set as Hero
+                                    </button>
+                                    <button class="btn btn-small btn-warning" onclick="analyzeImage('{{ image.filename }}', '{{ image.title }}', {{ image.width }}, {{ image.height }})">
+                                        <i class="fas fa-search"></i>
+                                        Analyze
                                     </button>
                                     <button class="btn btn-small btn-danger" onclick="deleteImage('{{ image.filename }}')">
                                         <i class="fas fa-trash"></i>
@@ -553,8 +554,64 @@
         </div>
     </div>
 
+    <!-- Image Analysis Modal -->
+    <div id="analysisModal" class="modal">
+        <div class="modal-content analysis-modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-search"></i> Image Print Analysis</h2>
+                <span class="close" onclick="closeAnalysisModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="analysis-image-preview">
+                    <img id="analysisImage" src="" alt="Image being analyzed">
+                    <h3 id="analysisImageTitle">Image Title</h3>
+                </div>
+                
+                <div class="analysis-stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Aspect Ratio</div>
+                        <div class="stat-value" id="analysisAspectRatio">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Dimensions</div>
+                        <div class="stat-value" id="analysisDimensions">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Megapixels</div>
+                        <div class="stat-value" id="analysisMegapixels">--</div>
+                    </div>
+                </div>
+
+                <div class="print-analysis">
+                    <h3>Print Suitability Analysis</h3>
+                    <div class="analysis-table-container">
+                        <table class="analysis-table">
+                            <thead>
+                                <tr>
+                                    <th>Print Size</th>
+                                    <th>Aspect Match</th>
+                                    <th>DPI</th>
+                                    <th>Quality</th>
+                                </tr>
+                            </thead>
+                            <tbody id="printAnalysisResults">
+                                <!-- Results will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="quality-legend">
+                        <span class="legend-item excellent">Excellent (300+ DPI)</span>
+                        <span class="legend-item good">Good (150-299 DPI)</span>
+                        <span class="legend-item poor">Poor (&lt;150 DPI)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='js/admin_new.js') }}"></script>
     <script src="{{ url_for('static', filename='js/thumbnail_admin.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/image_analysis.js') }}"></script>
 </body>
 </html>
 
