@@ -119,8 +119,11 @@ function analyzeImageFromUrl(imageUrl, filename, title) {
             printResults.appendChild(row);
         });
         
-        // Show the modal
-        modal.style.display = 'block';
+        // Show the modal with a slight delay to ensure it appears on top
+        setTimeout(() => {
+            modal.style.display = 'block';
+            modal.focus(); // Bring modal to front
+        }, 500);
     };
     
     // Handle image load error
