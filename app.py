@@ -189,8 +189,8 @@ def get_image_info(filepath):
     
     # If not cached, fetch from URL
     try:
-        # Construct the URL for the image
-        image_url = f"https://fifth-element-photography-staging.up.railway.app/images/{filename}"
+        # Construct the URL for the image (use production where images actually exist)
+        image_url = f"https://fifthelement.photos/images/{filename}"
         
         # Import required modules
         import requests
