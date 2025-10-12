@@ -1311,10 +1311,6 @@ def toggle_featured(filename):
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
-
 @app.route('/save_featured_story/<filename>', methods=['POST'])
 def save_featured_story(filename):
     """Save story for featured image and sync with image description - SINGLE SOURCE OF TRUTH"""
