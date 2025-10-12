@@ -169,11 +169,26 @@ def save_image_categories(assignments):
         return False
 
 def get_image_info(filepath):
-    """Get image dimensions and basic info"""
+    """Get image dimensions and basic info with caching"""
+    filename = os.path.basename(filepath)
+    
+    # Check cache first
+    cache_file = '/data/image_dimensions_cache.json'
+    cache = {}
+    
     try:
-        # Extract filename from filepath
-        filename = os.path.basename(filepath)
-        
+        if os.path.exists(cache_file):
+            with open(cache_file, 'r') as f:
+                cache = json.load(f)
+    except:
+        pass
+    
+    # Return cached dimensions if available
+    if filename in cache:
+        return cache[filename]
+    
+    # If not cached, fetch from URL
+    try:
         # Construct the URL for the image
         image_url = f"https://fifth-element-photography-staging.up.railway.app/images/{filename}"
         
@@ -189,14 +204,35 @@ def get_image_info(filepath):
         # Open image from response content
         with Image.open(BytesIO(response.content)) as img:
             width, height = img.size
-            return {
+            result = {
                 'width': width,
                 'height': height,
                 'format': img.format
             }
+            
+            # Cache the result
+            cache[filename] = result
+            try:
+                os.makedirs('/data', exist_ok=True)
+                with open(cache_file, 'w') as f:
+                    json.dump(cache, f)
+            except:
+                pass
+            
+            return result
+            
     except Exception as e:
         print(f"Error getting image info for {filepath}: {e}")
-        return {'width': 400, 'height': 300, 'format': 'JPEG'}
+        # Cache the fallback result too
+        result = {'width': 400, 'height': 300, 'format': 'JPEG'}
+        cache[filename] = result
+        try:
+            os.makedirs('/data', exist_ok=True)
+            with open(cache_file, 'w') as f:
+                json.dump(cache, f)
+        except:
+            pass
+        return result
 
 def load_image_descriptions():
     """Load image descriptions"""
