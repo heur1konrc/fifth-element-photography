@@ -168,7 +168,7 @@ def save_image_categories(assignments):
     except:
         return False
 
-def get_image_info(filepath):
+def get_image_info(filepath, skip_network_fetch=False):
     """Get image dimensions and basic info with caching"""
     filename = os.path.basename(filepath)
     
@@ -186,6 +186,11 @@ def get_image_info(filepath):
     # Return cached dimensions if available
     if filename in cache:
         return cache[filename]
+    
+    # If skip_network_fetch is True (during startup), return default dimensions
+    if skip_network_fetch:
+        result = {'width': 400, 'height': 300, 'format': 'JPEG'}
+        return result
     
     # If not cached, fetch from URL
     try:
@@ -381,8 +386,8 @@ def scan_images():
             # Description and story are now the same field
             featured_story = description
             
-            # Get image info
-            info = get_image_info(filepath)
+            # Get image info (skip network fetch during startup to prevent timeouts)
+            info = get_image_info(filepath, skip_network_fetch=True)
             
             # Load display order from metadata if available
             display_order = None
