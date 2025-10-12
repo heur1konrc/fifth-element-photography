@@ -3222,6 +3222,16 @@ def calculate_price():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 # ============================================================================
+# IMAGE ANALYZER ADMIN ROUTE
+# ============================================================================
+
+@app.route('/admin/image-analyzer')
+@require_admin_auth
+def admin_image_analyzer():
+    """Image analysis utility admin page"""
+    return render_template('admin_image_analyzer.html')
+
+# ============================================================================
 # ORDERDESK TEST INTEGRATION ROUTES
 # ============================================================================
 

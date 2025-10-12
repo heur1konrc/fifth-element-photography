@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Analyzer - Fifth Element Photography Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_new.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .analyzer-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .analyzer-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            flex-direction: column;
+        }
+        @media (min-width: 640px) {
+            .input-group {
+                flex-direction: row;
+            }
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-item .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 10px;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="analyzer-container">
+        <!-- Header -->
+        <div class="admin-header" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); margin-bottom: 20px; border-radius: 15px;">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1><i class="fas fa-search"></i> Image Analyzer</h1>
+                    <p>Analyze image dimensions, aspect ratios, and print suitability</p>
+                </div>
+                <div class="header-right">
+                    <div class="admin-user-dropdown">
+                        <button class="admin-user-btn" onclick="toggleUserDropdown()">
+                            <i class="fas fa-user-circle"></i>
+                            <span>{{ session.get('admin_user', 'Admin') }}</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="admin-user-menu" id="adminUserMenu">
+                            <a href="/admin/change-password"><i class="fas fa-key"></i> Change Password</a>
+                            <a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analyzer-card">
+            <!-- Navigation Back to Admin -->
+            <div class="mb-6">
+                <a href="/admin" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Back to Admin Dashboard
+                </a>
+            </div>
+
+            <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-700 mb-2">Image Print Analyzer</h1>
+            <p class="text-gray-600 mb-8">Analyze images from your gallery or enter external URLs to check dimensions and print suitability.</p>
+
+            <!-- Tab Selection -->
+            <div class="mb-6">
+                <div class="flex border-b border-gray-200">
+                    <button onclick="showTab('url')" id="urlTab" class="tab-button px-4 py-2 font-medium text-indigo-600 border-b-2 border-indigo-600">
+                        <i class="fas fa-link mr-2"></i>URL Analysis
+                    </button>
+                    <button onclick="showTab('gallery')" id="galleryTab" class="tab-button px-4 py-2 font-medium text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-images mr-2"></i>Gallery Images
+                    </button>
+                </div>
+            </div>
+
+            <!-- URL Input Tab -->
+            <div id="urlContent" class="tab-content">
+                <div class="input-group mb-8">
+                    <input
+                        type="url"
+                        id="imageUrl"
+                        placeholder="Paste Image URL (e.g., https://example.com/photo.jpg)"
+                        class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
+                    >
+                    <button
+                        onclick="analyzeImage()"
+                        class="flex-shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition duration-150 ease-in-out shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50"
+                    >
+                        <i class="fas fa-search mr-2"></i>Analyze Image
+                    </button>
+                </div>
+            </div>
+
+            <!-- Gallery Tab -->
+            <div id="galleryContent" class="tab-content hidden">
+                <p class="text-gray-600 mb-4">Select an image from your gallery to analyze:</p>
+                <div id="galleryGrid" class="gallery-grid">
+                    <!-- Gallery images will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Loading Indicator and Messages -->
+            <div id="messageBox" class="text-center text-sm mb-6 hidden">
+                <div id="loading" class="text-indigo-600 font-semibold hidden">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-500 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Loading image...
+                </div>
+                <p id="error" class="text-red-500 font-semibold hidden"></p>
+            </div>
+
+            <!-- Results Area -->
+            <div id="resultsContainer" class="hidden">
+                <!-- Current Image Display -->
+                <div class="mb-6 text-center">
+                    <img id="currentImage" src="" alt="Analyzed Image" class="max-w-full max-h-64 mx-auto rounded-lg shadow-lg">
+                    <p id="currentImageName" class="text-sm text-gray-600 mt-2"></p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Aspect Ratio Card -->
+                    <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-inner">
+                        <p class="text-sm font-medium text-gray-500">Aspect Ratio</p>
+                        <p id="resultAspectRatio" class="text-2xl font-bold text-indigo-600 mt-1">--</p>
+                    </div>
+                    <!-- Pixel Size Card -->
+                    <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-inner">
+                        <p class="text-sm font-medium text-gray-500">Size in Pixels (W x H)</p>
+                        <p id="resultPixelSize" class="text-2xl font-bold text-indigo-600 mt-1">--</p>
+                    </div>
+                    <!-- Resolution Card (Total Pixels) -->
+                    <div class="bg-gray-50 p-5 rounded-xl border border-gray-200 shadow-inner">
+                        <p class="text-sm font-medium text-gray-500">Total Megapixels</p>
+                        <p id="resultResolution" class="text-2xl font-bold text-indigo-600 mt-1">--</p>
+                    </div>
+                </div>
+
+                <!-- Print Suitability Table -->
+                <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Common Print Suitability (DPI/PPI)</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden border border-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Print Size (Inches)</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aspect Ratio Match</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Calculated DPI</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quality Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody id="printResults" class="bg-white divide-y divide-gray-200">
+                            <!-- Results will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="mt-6 text-sm text-gray-500">
+                    <span class="font-semibold text-gray-700">Print Quality Guidelines:</span> 
+                    <span class="text-green-600">Excellent (300+ DPI)</span>, 
+                    <span class="text-yellow-600">Good (150-299 DPI)</span>, 
+                    <span class="text-red-600">Poor (&lt;150 DPI)</span>. 
+                    DPI is calculated based on the minimum dimension.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messageBox = document.getElementById('messageBox');
+        const loadingEl = document.getElementById('loading');
+        const errorEl = document.getElementById('error');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const printResultsTable = document.getElementById('printResults');
+        
+        // Define common print sizes in inches (Width x Height)
+        const printSizes = [
+            { name: "4 x 6", width: 6, height: 4, ratio: "3:2" },
+            { name: "5 x 7", width: 7, height: 5, ratio: "7:5" },
+            { name: "8 x 10", width: 10, height: 8, ratio: "5:4" },
+            { name: "8.5 x 11 (Letter)", width: 11, height: 8.5, ratio: "22:17" },
+            { name: "11 x 14", width: 14, height: 11, ratio: "14:11" },
+            { name: "16 x 20", width: 20, height: 16, ratio: "5:4" },
+            { name: "20 x 30", width: 30, height: 20, ratio: "3:2" },
+            { name: "12 x 12 (Square)", width: 12, height: 12, ratio: "1:1" },
+        ];
+
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('text-indigo-600', 'border-indigo-600');
+                button.classList.add('text-gray-500');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+            
+            // Add active class to selected tab
+            const activeTab = document.getElementById(tabName + 'Tab');
+            activeTab.classList.remove('text-gray-500');
+            activeTab.classList.add('text-indigo-600', 'border-indigo-600');
+            
+            // Load gallery if gallery tab is selected
+            if (tabName === 'gallery') {
+                loadGalleryImages();
+            }
+        }
+
+        // Load gallery images
+        async function loadGalleryImages() {
+            try {
+                const response = await fetch('/api/images');
+                const images = await response.json();
+                const galleryGrid = document.getElementById('galleryGrid');
+                
+                galleryGrid.innerHTML = '';
+                
+                images.forEach(image => {
+                    const item = document.createElement('div');
+                    item.className = 'gallery-item';
+                    item.onclick = () => analyzeGalleryImage(image.filename);
+                    
+                    item.innerHTML = `
+                        <img src="/images/${image.filename}" alt="${image.title}" loading="lazy">
+                        <div class="overlay">
+                            <div>${image.title}</div>
+                        </div>
+                    `;
+                    
+                    galleryGrid.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Error loading gallery:', error);
+            }
+        }
+
+        // Analyze gallery image
+        function analyzeGalleryImage(filename) {
+            const imageUrl = window.location.origin + '/images/' + filename;
+            document.getElementById('imageUrl').value = imageUrl;
+            showTab('url');
+            analyzeImage();
+        }
+
+        // Admin dropdown functionality
+        function toggleUserDropdown() {
+            const menu = document.getElementById('adminUserMenu');
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.admin-user-dropdown');
+            if (!dropdown.contains(event.target)) {
+                document.getElementById('adminUserMenu').style.display = 'none';
+            }
+        });
+
+        // Utility function to find the Greatest Common Divisor (GCD)
+        function calculateGCD(a, b) {
+            return (b === 0) ? a : calculateGCD(b, a % b);
+        }
+
+        // Utility function to get the simplified aspect ratio string
+        function getAspectRatio(width, height) {
+            if (width === 0 || height === 0) return "0:0";
+            const divisor = calculateGCD(width, height);
+            return `${width / divisor}:${height / divisor}`;
+        }
+
+        // Utility function to determine print quality rating based on DPI
+        function getQualityRating(dpi) {
+            if (dpi >= 300) {
+                return { text: "Excellent", class: "text-green-600 font-semibold" };
+            } else if (dpi >= 150) {
+                return { text: "Good", class: "text-yellow-600 font-semibold" };
+            } else {
+                return { text: "Poor", class: "text-red-600 font-semibold" };
+            }
+        }
+
+        async function analyzeImage() {
+            const imageUrl = document.getElementById('imageUrl').value.trim();
+            
+            // Reset state and show loading
+            messageBox.classList.remove('hidden');
+            loadingEl.classList.remove('hidden');
+            errorEl.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            printResultsTable.innerHTML = '';
+
+            if (!imageUrl) {
+                loadingEl.classList.add('hidden');
+                errorEl.textContent = 'Please enter a valid image URL.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // Load the image object
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                
+                const imageLoadPromise = new Promise((resolve, reject) => {
+                    img.onload = () => resolve(img);
+                    img.onerror = () => reject(new Error("Failed to load image. Check the URL and CORS settings."));
+                    img.src = imageUrl;
+                });
+
+                const loadedImg = await Promise.race([
+                    imageLoadPromise,
+                    new Promise((_, reject) => setTimeout(() => reject(new Error("Image loading timed out.")), 15000))
+                ]);
+
+                // Get dimensions and general info
+                const width = loadedImg.naturalWidth;
+                const height = loadedImg.naturalHeight;
+                const aspectRatio = getAspectRatio(width, height);
+                const totalPixels = width * height;
+                const megaPixels = (totalPixels / 1000000).toFixed(2);
+
+                // Update current image display
+                document.getElementById('currentImage').src = imageUrl;
+                document.getElementById('currentImageName').textContent = imageUrl.split('/').pop();
+
+                // Update General Info Cards
+                document.getElementById('resultAspectRatio').textContent = aspectRatio;
+                document.getElementById('resultPixelSize').textContent = `${width} x ${height} px`;
+                document.getElementById('resultResolution').textContent = `${megaPixels} MP`;
+
+                // Calculate and display print suitability
+                const isImagePortrait = height > width;
+
+                printSizes.forEach(size => {
+                    let printWidth, printHeight;
+
+                    if (isImagePortrait) {
+                        printWidth = Math.min(size.width, size.height);
+                        printHeight = Math.max(size.width, size.height);
+                    } else {
+                        printWidth = Math.max(size.width, size.height);
+                        printHeight = Math.min(size.width, size.height);
+                    }
+
+                    const dpiHorizontal = width / printWidth;
+                    const dpiVertical = height / printHeight;
+                    const effectiveDPI = Math.floor(Math.min(dpiHorizontal, dpiVertical));
+                    
+                    const quality = getQualityRating(effectiveDPI);
+                    const sizeRatio = getAspectRatio(Math.round(printWidth * 10), Math.round(printHeight * 10));
+
+                    const ratioMatchText = aspectRatio === sizeRatio ? 
+                        '<span class="text-green-600 font-medium">Perfect Match</span>' : 
+                        '<span class="text-yellow-600">Requires Cropping</span>';
+                    
+                    const row = `
+                        <tr class="hover:bg-gray-50 transition duration-100">
+                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${size.name}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">${ratioMatchText}</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-mono">${effectiveDPI} DPI</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                <span class="${quality.class}">${quality.text}</span>
+                            </td>
+                        </tr>
+                    `;
+                    printResultsTable.insertAdjacentHTML('beforeend', row);
+                });
+
+                // Final cleanup
+                loadingEl.classList.add('hidden');
+                messageBox.classList.add('hidden');
+                resultsContainer.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Analysis error:", error);
+                loadingEl.classList.add('hidden');
+                errorEl.textContent = `Error: ${error.message}`;
+                errorEl.classList.remove('hidden');
+                resultsContainer.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
