@@ -171,14 +171,31 @@ def save_image_categories(assignments):
 def get_image_info(filepath):
     """Get image dimensions and basic info"""
     try:
-        with Image.open(filepath) as img:
+        # Extract filename from filepath
+        filename = os.path.basename(filepath)
+        
+        # Construct the URL for the image
+        image_url = f"https://fifth-element-photography-staging.up.railway.app/images/{filename}"
+        
+        # Import required modules
+        import requests
+        from PIL import Image
+        from io import BytesIO
+        
+        # Fetch the image from URL
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        # Open image from response content
+        with Image.open(BytesIO(response.content)) as img:
             width, height = img.size
             return {
                 'width': width,
                 'height': height,
                 'format': img.format
             }
-    except:
+    except Exception as e:
+        print(f"Error getting image info for {filepath}: {e}")
         return {'width': 400, 'height': 300, 'format': 'JPEG'}
 
 def load_image_descriptions():
