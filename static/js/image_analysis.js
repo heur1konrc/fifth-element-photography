@@ -37,6 +37,9 @@ function getQualityRating(dpi) {
 
 // Main analysis function called from the admin buttons
 function analyzeImage(filename, title, width, height) {
+    // Debug: Log what parameters we're receiving
+    console.log('analyzeImage called with:', { filename, title, width, height });
+    
     // Set up the modal with image info
     const modal = document.getElementById('analysisModal');
     const analysisImage = document.getElementById('analysisImage');
@@ -47,8 +50,10 @@ function analyzeImage(filename, title, width, height) {
     analysisImageTitle.textContent = title || filename;
     
     // Use the actual image dimensions passed from the template (not the displayed image size)
-    const actualWidth = parseInt(width);
-    const actualHeight = parseInt(height);
+    const actualWidth = parseInt(width) || 0;
+    const actualHeight = parseInt(height) || 0;
+    
+    console.log('Parsed dimensions:', { actualWidth, actualHeight });
     
     // Calculate basic stats using ACTUAL dimensions
     const aspectRatio = getAspectRatio(actualWidth, actualHeight);
