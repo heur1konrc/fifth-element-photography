@@ -54,6 +54,120 @@
 - **Pricing:** Dynamic pricing management system ✅ WORKING
 - **Security:** Admin password protection ✅ WORKING
 
+## 🔧 TECHNICAL INFRASTRUCTURE & CONNECTION DETAILS
+
+### GitHub Repository Setup
+- **Repository:** https://github.com/heur1konrc/fifth-element-photography
+- **Owner:** heur1konrc
+- **Access:** Private repository
+- **Main Branch:** `main` (production deployment)
+- **Staging Branch:** `Staging` (capital S - staging deployment)
+- **Local Path:** `/home/ubuntu/fifth-element-photography/`
+- **Git Commands:**
+  ```bash
+  git checkout main          # Switch to production branch
+  git checkout Staging       # Switch to staging branch
+  git merge Staging         # Merge staging to main
+  git push origin main      # Deploy to production
+  git push origin Staging   # Deploy to staging
+  ```
+
+### Railway Deployment Configuration
+- **Production Project:** fifth-element-photography
+- **Production URL:** https://fifth-element-photography-production.up.railway.app/
+- **Production Domain:** fifthelement.photos
+- **Staging Project:** staging-fifth-element
+- **Staging URL:** [Staging URL - check Railway dashboard]
+- **Auto-Deploy:** Both environments auto-deploy from their respective branches
+- **Build Command:** Automatic (Flask app detection)
+- **Start Command:** `python app.py`
+
+### Environment Variables & API Keys
+- **OrderDesk Store ID:** 125137
+- **OrderDesk API Key:** [Stored in Railway environment variables]
+- **PayPal Client ID:** AVE6LeJKagwJXHf2BPamlaDQghtNBoRmRU8j5KK7wi7wDN61Ufm2dGZFi_CFH5L4MuKjh8KLhHLVwP5w
+- **Flask Secret Key:** Auto-generated in Railway environment
+- **Admin Config:** Stored in `admin_config.json` (Username: Heur1konrc, Password: SecurePass123)
+
+### File Structure & Key Files
+```
+/home/ubuntu/fifth-element-photography/
+├── app.py                          # Main Flask application
+├── PROJECT_STATUS.md               # This documentation file
+├── admin_config.json              # Admin credentials
+├── pricing_config.json            # Dynamic pricing configuration
+├── lumaprints_pricing_data.json   # Lumaprints pricing reference
+├── templates/
+│   ├── admin_login.html           # Admin login page
+│   ├── admin_new.html             # Main admin interface
+│   ├── test_order_form.html       # PayPal-integrated order form
+│   └── [other templates]
+├── static/
+│   ├── js/
+│   │   ├── script.js              # Main frontend JavaScript
+│   │   ├── script_mobile.js       # Mobile JavaScript
+│   │   └── [other JS files]
+│   └── css/
+│       └── [CSS files]
+└── [other project files]
+```
+
+### Critical Routes & URLs
+- **Main Website:** `/` (gallery and homepage)
+- **Admin Login:** `/admin/login`
+- **Admin Dashboard:** `/admin` (requires authentication)
+- **Pricing Management:** `/admin/pricing`
+- **Order Form:** `/test_order_form` (PayPal-integrated)
+- **API Endpoints:** `/api/images`, `/api/pricing/calculate`
+
+### Database & Data Storage
+- **Image Storage:** `/data/` directory (Railway persistent volume)
+- **Configuration:** JSON files (admin_config.json, pricing_config.json)
+- **No Traditional Database:** File-based storage system
+- **Image Scanning:** Dynamic scanning of `/data/` directory
+
+### Deployment Workflow (CRITICAL FOR NEW AI ASSISTANTS)
+1. **Work on Staging Branch:**
+   ```bash
+   git checkout Staging
+   # Make changes
+   git add .
+   git commit -m "description"
+   git push origin Staging
+   ```
+2. **Test on Staging URL**
+3. **Deploy to Production:**
+   ```bash
+   git checkout main
+   git merge Staging
+   git push origin main
+   ```
+4. **Production auto-deploys to fifthelement.photos**
+
+### External Service Integrations
+- **OrderDesk:** Order management and Lumaprints fulfillment
+  - Dashboard: https://app.orderdesk.me/
+  - Store ID: 125137
+- **Lumaprints:** Print fulfillment (via OrderDesk)
+  - API Docs: https://api-docs.lumaprints.com/
+- **PayPal:** Payment processing
+  - Developer Console: https://developer.paypal.com/
+
+### Security & Access
+- **Admin Authentication:** Username/password system with session management
+- **Route Protection:** All admin routes require authentication
+- **Password Hashing:** SHA-256 for secure storage
+- **Session Management:** Flask sessions with secure cookies
+
+### FOR NEW AI ASSISTANTS - IMPORTANT INSTRUCTIONS
+**When starting a new task, you MUST:**
+1. **Read this entire PROJECT_STATUS.md file first**
+2. **Navigate to `/home/ubuntu/fifth-element-photography/`**
+3. **Understand this is an EXISTING, WORKING system**
+4. **Check current git branch with `git branch`**
+5. **Use staging workflow for testing changes**
+6. **Never start from scratch - everything is already built and working**
+
 ## What's Working Right Now - COMPLETE SYSTEM
 
 ### ✅ Completed & Fully Functional
