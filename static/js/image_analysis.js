@@ -38,13 +38,10 @@ function getQualityRating(dpi) {
     }
 }
 
-// Main function called from "Open Image And Analyze" button
-function openImageAndAnalyze(filename, title) {
-    // Open the full-size image in a new window
+// Main function called from "Analyze" button
+function analyzeImage(filename, title) {
+    // Analyze the image by loading it from the URL (no window opening)
     const imageUrl = `https://fifthelement.photos/images/${filename}`;
-    window.open(imageUrl, '_blank');
-    
-    // Analyze the image by loading it from the URL
     analyzeImageFromUrl(imageUrl, filename, title);
 }
 
@@ -119,11 +116,8 @@ function analyzeImageFromUrl(imageUrl, filename, title) {
             printResults.appendChild(row);
         });
         
-        // Show the modal with a slight delay to ensure it appears on top
-        setTimeout(() => {
-            modal.style.display = 'block';
-            modal.focus(); // Bring modal to front
-        }, 500);
+        // Show the modal immediately
+        modal.style.display = 'block';
     };
     
     // Handle image load error
@@ -139,14 +133,14 @@ function analyzeImageFromUrl(imageUrl, filename, title) {
 // Modal close functionality
 document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('analysisModal');
-    const closeBtn = document.querySelector('.analysis-close');
     
-    // Close modal when clicking the X
-    if (closeBtn) {
-        closeBtn.onclick = function() {
+    // Close modal when clicking the X (multiple selectors to ensure it works)
+    const closeBtns = document.querySelectorAll('.analysis-close, .close, [data-close="modal"]');
+    closeBtns.forEach(btn => {
+        btn.onclick = function() {
             modal.style.display = 'none';
         };
-    }
+    });
     
     // Close modal when clicking outside
     window.onclick = function(event) {
@@ -162,3 +156,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Global function to close modal (backup method)
+function closeAnalysisModal() {
+    const modal = document.getElementById('analysisModal');
+    modal.style.display = 'none';
+}
