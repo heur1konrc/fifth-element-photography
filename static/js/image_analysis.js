@@ -46,21 +46,25 @@ function analyzeImage(filename, title, width, height) {
     analysisImage.src = `/images/${filename}`;
     analysisImageTitle.textContent = title || filename;
     
-    // Calculate basic stats
-    const aspectRatio = getAspectRatio(width, height);
-    const totalPixels = width * height;
+    // Use the actual image dimensions passed from the template (not the displayed image size)
+    const actualWidth = parseInt(width);
+    const actualHeight = parseInt(height);
+    
+    // Calculate basic stats using ACTUAL dimensions
+    const aspectRatio = getAspectRatio(actualWidth, actualHeight);
+    const totalPixels = actualWidth * actualHeight;
     const megaPixels = (totalPixels / 1000000).toFixed(2);
     
-    // Update stats display
+    // Update stats display with ACTUAL dimensions
     document.getElementById('analysisAspectRatio').textContent = aspectRatio;
-    document.getElementById('analysisDimensions').textContent = `${width} x ${height} px`;
+    document.getElementById('analysisDimensions').textContent = `${actualWidth} x ${actualHeight} px`;
     document.getElementById('analysisMegapixels').textContent = `${megaPixels} MP`;
     
-    // Calculate print suitability
+    // Calculate print suitability using ACTUAL dimensions
     const printResults = document.getElementById('printAnalysisResults');
     printResults.innerHTML = '';
     
-    const isImagePortrait = height > width;
+    const isImagePortrait = actualHeight > actualWidth;
     
     printSizes.forEach(size => {
         let printWidth, printHeight;
@@ -73,8 +77,9 @@ function analyzeImage(filename, title, width, height) {
             printHeight = Math.min(size.width, size.height);
         }
         
-        const dpiHorizontal = width / printWidth;
-        const dpiVertical = height / printHeight;
+        // Use ACTUAL image dimensions for DPI calculation
+        const dpiHorizontal = actualWidth / printWidth;
+        const dpiVertical = actualHeight / printHeight;
         const effectiveDPI = Math.floor(Math.min(dpiHorizontal, dpiVertical));
         
         const quality = getQualityRating(effectiveDPI);
