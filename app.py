@@ -17,10 +17,10 @@ from lumaprints_api import get_lumaprints_client, get_pricing_calculator
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
-# Admin credentials - stored securely
-ADMIN_USERNAME = "Heur1konrc"
-ADMIN_PASSWORD_HASH = "3afeed04eeca02f36260571b19deb0898adfabcf3d0283aacdc9cafb81e0b0e1"  # "SecurePass123"
+# Admin system - Multi-user support (up to 4 users)
+ADMIN_USERS_FILE = "data/admin_users.json"
 ADMIN_CONFIG_FILE = "admin_config.json"
+RESET_TOKENS_FILE = "data/reset_tokens.json"
 
 def hash_password(password):
     """Hash a password using SHA-256"""
@@ -30,8 +30,98 @@ def verify_password(password, hash_value):
     """Verify a password against its hash"""
     return hash_password(password) == hash_value
 
+def generate_reset_token():
+    """Generate a secure reset token"""
+    return secrets.token_urlsafe(32)
+
+def load_admin_users():
+    """Load admin users from file"""
+    try:
+        if os.path.exists(ADMIN_USERS_FILE):
+            with open(ADMIN_USERS_FILE, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading admin users: {e}")
+    
+    # Return default admin user (backward compatibility)
+    default_users = {
+        "Heur1konrc": {
+            "password_hash": "3afeed04eeca02f36260571b19deb0898adfabcf3d0283aacdc9cafb81e0b0e1",  # "SecurePass123"
+            "email": "",
+            "created_at": datetime.now().isoformat(),
+            "last_login": None,
+            "is_active": True
+        }
+    }
+    save_admin_users(default_users)
+    return default_users
+
+def save_admin_users(users):
+    """Save admin users to file"""
+    try:
+        os.makedirs('data', exist_ok=True)
+        with open(ADMIN_USERS_FILE, 'w') as f:
+            json.dump(users, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving admin users: {e}")
+        return False
+
+def load_reset_tokens():
+    """Load password reset tokens"""
+    try:
+        if os.path.exists(RESET_TOKENS_FILE):
+            with open(RESET_TOKENS_FILE, 'r') as f:
+                tokens = json.load(f)
+                # Clean expired tokens (24 hour expiry)
+                current_time = datetime.now()
+                valid_tokens = {}
+                for token, data in tokens.items():
+                    token_time = datetime.fromisoformat(data['created_at'])
+                    if (current_time - token_time).total_seconds() < 86400:  # 24 hours
+                        valid_tokens[token] = data
+                if len(valid_tokens) != len(tokens):
+                    save_reset_tokens(valid_tokens)
+                return valid_tokens
+    except Exception as e:
+        print(f"Error loading reset tokens: {e}")
+    return {}
+
+def save_reset_tokens(tokens):
+    """Save password reset tokens"""
+    try:
+        os.makedirs('data', exist_ok=True)
+        with open(RESET_TOKENS_FILE, 'w') as f:
+            json.dump(tokens, f, indent=2)
+        return True
+    except Exception as e:
+        print(f"Error saving reset tokens: {e}")
+        return False
+
+def authenticate_user(username, password):
+    """Authenticate a user"""
+    users = load_admin_users()
+    if username in users:
+        user = users[username]
+        if user.get('is_active', True) and verify_password(password, user['password_hash']):
+            # Update last login
+            user['last_login'] = datetime.now().isoformat()
+            users[username] = user
+            save_admin_users(users)
+            return True
+    return False
+
+def get_user_count():
+    """Get current number of admin users"""
+    users = load_admin_users()
+    return len([u for u in users.values() if u.get('is_active', True)])
+
+def can_add_user():
+    """Check if we can add another user (max 4)"""
+    return get_user_count() < 4
+
 def load_admin_config():
-    """Load admin configuration from file"""
+    """Load admin configuration from file (backward compatibility)"""
     try:
         if os.path.exists(ADMIN_CONFIG_FILE):
             with open(ADMIN_CONFIG_FILE, 'r') as f:
@@ -41,13 +131,11 @@ def load_admin_config():
     
     # Return default config
     return {
-        "username": ADMIN_USERNAME,
-        "password_hash": ADMIN_PASSWORD_HASH,
         "last_updated": datetime.now().isoformat()
     }
 
 def save_admin_config(config):
-    """Save admin configuration to file"""
+    """Save admin configuration to file (backward compatibility)"""
     try:
         config['last_updated'] = datetime.now().isoformat()
         with open(ADMIN_CONFIG_FILE, 'w') as f:
@@ -609,12 +697,10 @@ def admin_login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        admin_config = load_admin_config()
-        
-        if (username == admin_config['username'] and 
-            verify_password(password, admin_config['password_hash'])):
+        if authenticate_user(username, password):
             session['admin_authenticated'] = True
             session['admin_username'] = username
+            flash(f'Welcome back, {username}!', 'success')
             return redirect(url_for('admin'))
         else:
             flash('Invalid username or password', 'error')
@@ -628,6 +714,204 @@ def admin_logout():
     session.pop('admin_username', None)
     flash('You have been logged out', 'info')
     return redirect(url_for('admin_login'))
+
+@app.route('/admin/forgot-password', methods=['GET', 'POST'])
+def admin_forgot_password():
+    """Forgot password page"""
+    if request.method == 'POST':
+        username = request.form.get('username')
+        
+        users = load_admin_users()
+        if username in users and users[username].get('is_active', True):
+            # Generate reset token
+            reset_token = generate_reset_token()
+            tokens = load_reset_tokens()
+            tokens[reset_token] = {
+                'username': username,
+                'created_at': datetime.now().isoformat()
+            }
+            save_reset_tokens(tokens)
+            
+            # Create reset URL
+            reset_url = f"{request.url_root}admin/reset-password/{reset_token}"
+            
+            flash(f'Password reset link generated! Copy this URL: {reset_url}', 'success')
+            flash('This link will expire in 24 hours.', 'info')
+        else:
+            flash('Username not found or account is inactive.', 'error')
+    
+    return render_template('admin_forgot_password.html')
+
+@app.route('/admin/reset-password/<token>', methods=['GET', 'POST'])
+def admin_reset_password(token):
+    """Reset password with token"""
+    tokens = load_reset_tokens()
+    
+    if token not in tokens:
+        flash('Invalid or expired reset token.', 'error')
+        return redirect(url_for('admin_login'))
+    
+    token_data = tokens[token]
+    username = token_data['username']
+    
+    if request.method == 'POST':
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if len(password) < 8:
+            flash('Password must be at least 8 characters long.', 'error')
+        elif password != confirm_password:
+            flash('Passwords do not match.', 'error')
+        else:
+            # Update password
+            users = load_admin_users()
+            if username in users:
+                users[username]['password_hash'] = hash_password(password)
+                save_admin_users(users)
+                
+                # Remove used token
+                del tokens[token]
+                save_reset_tokens(tokens)
+                
+                flash('Password updated successfully! You can now log in.', 'success')
+                return redirect(url_for('admin_login'))
+            else:
+                flash('User not found.', 'error')
+    
+    return render_template('admin_reset_password.html', username=username)
+
+@app.route('/admin/users')
+@require_admin_auth
+def admin_users():
+    """User management page"""
+    users = load_admin_users()
+    user_count = get_user_count()
+    can_add = can_add_user()
+    
+    return render_template('admin_users.html', 
+                         users=users, 
+                         user_count=user_count, 
+                         can_add_user=can_add)
+
+@app.route('/admin/users/add', methods=['GET', 'POST'])
+@require_admin_auth
+def admin_add_user():
+    """Add new user"""
+    if not can_add_user():
+        flash('Maximum number of users (4) reached.', 'error')
+        return redirect(url_for('admin_users'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        # Validation
+        if not username:
+            flash('Username is required.', 'error')
+        elif not username.replace('_', '').isalnum():
+            flash('Username can only contain letters, numbers, and underscores.', 'error')
+        elif len(password) < 8:
+            flash('Password must be at least 8 characters long.', 'error')
+        elif password != confirm_password:
+            flash('Passwords do not match.', 'error')
+        else:
+            users = load_admin_users()
+            if username in users:
+                flash('Username already exists.', 'error')
+            else:
+                # Create new user
+                users[username] = {
+                    'password_hash': hash_password(password),
+                    'email': email,
+                    'created_at': datetime.now().isoformat(),
+                    'last_login': None,
+                    'is_active': True
+                }
+                
+                if save_admin_users(users):
+                    flash(f'User "{username}" created successfully!', 'success')
+                    return redirect(url_for('admin_users'))
+                else:
+                    flash('Error creating user. Please try again.', 'error')
+    
+    user_count = get_user_count()
+    return render_template('admin_add_user.html', user_count=user_count)
+
+@app.route('/admin/users/edit/<username>', methods=['GET', 'POST'])
+@require_admin_auth
+def admin_edit_user(username):
+    """Edit user"""
+    users = load_admin_users()
+    if username not in users:
+        flash('User not found.', 'error')
+        return redirect(url_for('admin_users'))
+    
+    user = users[username]
+    
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        
+        # Update email
+        user['email'] = email
+        
+        # Update password if provided
+        if new_password:
+            if len(new_password) < 8:
+                flash('Password must be at least 8 characters long.', 'error')
+            elif new_password != confirm_password:
+                flash('Passwords do not match.', 'error')
+            else:
+                user['password_hash'] = hash_password(new_password)
+                flash('Password updated successfully!', 'success')
+        
+        users[username] = user
+        if save_admin_users(users):
+            flash(f'User "{username}" updated successfully!', 'success')
+            return redirect(url_for('admin_users'))
+        else:
+            flash('Error updating user. Please try again.', 'error')
+    
+    return render_template('admin_edit_user.html', username=username, user=user)
+
+@app.route('/admin/users/deactivate/<username>')
+@require_admin_auth
+def admin_deactivate_user(username):
+    """Deactivate user"""
+    if username == session.get('admin_username'):
+        flash('You cannot deactivate your own account.', 'error')
+        return redirect(url_for('admin_users'))
+    
+    users = load_admin_users()
+    if username in users:
+        users[username]['is_active'] = False
+        if save_admin_users(users):
+            flash(f'User "{username}" deactivated successfully.', 'success')
+        else:
+            flash('Error deactivating user.', 'error')
+    else:
+        flash('User not found.', 'error')
+    
+    return redirect(url_for('admin_users'))
+
+@app.route('/admin/users/activate/<username>')
+@require_admin_auth
+def admin_activate_user(username):
+    """Activate user"""
+    users = load_admin_users()
+    if username in users:
+        users[username]['is_active'] = True
+        if save_admin_users(users):
+            flash(f'User "{username}" activated successfully.', 'success')
+        else:
+            flash('Error activating user.', 'error')
+    else:
+        flash('User not found.', 'error')
+    
+    return redirect(url_for('admin_users'))
 
 @app.route('/admin/change-password', methods=['GET', 'POST'])
 @require_admin_auth
