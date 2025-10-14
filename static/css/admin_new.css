@@ -159,7 +159,8 @@ body {
 .category-btn {
     background: rgba(255, 107, 53, 0.1);
     border: 1px solid #ff6b35;
-    color: #ff6b35;
+    /*color: #ff6b35;*/
+    color: #35a9ff;
     padding: 0.5rem 1rem;
     border-radius: 20px;
     cursor: pointer;
