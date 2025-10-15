@@ -1779,3 +1779,191 @@ textarea {
     }
 }
 
+
+
+/* ===== COMPREHENSIVE MOBILE OVERRIDES ===== */
+@media screen and (max-width: 768px) {
+    
+    /* FORCE HIDE SIDEBAR ON MOBILE */
+    .sidebar {
+        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+    
+    /* FORCE MOBILE CONTAINER */
+    .container {
+        margin-left: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* FORCE MOBILE MASONRY GRID TO 2-COLUMN */
+    .masonry-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
+        padding: 20px 16px !important;
+        margin: 0 !important;
+        width: 100% !important;
+        columns: unset !important;
+        column-gap: unset !important;
+    }
+    
+    /* FORCE MOBILE IMAGE ITEMS */
+    .masonry-item {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 !important;
+        margin: 0 !important;
+        margin-bottom: 0 !important;
+        break-inside: unset !important;
+        display: block !important;
+        position: relative !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+    
+    /* FORCE MOBILE IMAGE SIZING */
+    .masonry-item img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+    
+    /* MOBILE CATEGORY FILTERS */
+    .category-filters {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        padding: 20px 16px !important;
+        margin: 0 !important;
+        justify-content: center !important;
+    }
+    
+    .category-filters a {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        padding: 8px 16px !important;
+        border-radius: 20px !important;
+        font-size: 0.875rem !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        white-space: nowrap !important;
+        min-height: 36px !important;
+        line-height: 1.2 !important;
+    }
+    
+    .category-filters a.active {
+        background: #6799c2 !important;
+        border-color: #6799c2 !important;
+        color: #ffffff !important;
+    }
+    
+    /* MOBILE HERO SECTION */
+    .hero {
+        height: 50vh !important;
+        min-height: 300px !important;
+        max-height: 400px !important;
+        padding: 20px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+    
+    .hero h1 {
+        font-size: 2rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 16px !important;
+    }
+    
+    .hero p {
+        font-size: 1rem !important;
+        margin-bottom: 24px !important;
+    }
+    
+    /* MOBILE GALLERY HEADER */
+    .gallery-header {
+        padding: 20px 16px !important;
+        margin-top: 0 !important;
+        text-align: center !important;
+    }
+    
+    .gallery-header h3 {
+        font-size: 1.5rem !important;
+        margin-bottom: 16px !important;
+    }
+    
+    /* MOBILE TOUCH TARGETS */
+    a, button, input, select, textarea {
+        min-height: 44px !important;
+        min-width: 44px !important;
+        touch-action: manipulation !important;
+    }
+    
+    /* MOBILE TYPOGRAPHY */
+    body {
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+    }
+    
+    h1 { font-size: 2rem !important; }
+    h2 { font-size: 1.5rem !important; }
+    h3 { font-size: 1.25rem !important; }
+    
+    /* MOBILE SPACING */
+    .section {
+        padding: 20px 16px !important;
+        margin: 0 !important;
+    }
+    
+    /* MOBILE FORMS */
+    input, select, textarea {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        font-size: 16px !important;
+        border-radius: 8px !important;
+    }
+    
+    /* MOBILE BUTTONS */
+    button, .button, .btn {
+        width: 100% !important;
+        padding: 14px 20px !important;
+        font-size: 1rem !important;
+        border-radius: 8px !important;
+        min-height: 48px !important;
+    }
+    
+    /* MOBILE SCROLLING */
+    body, html {
+        -webkit-overflow-scrolling: touch !important;
+        scroll-behavior: smooth !important;
+    }
+    
+    /* MOBILE VIEWPORT */
+    * {
+        -webkit-tap-highlight-color: transparent !important;
+    }
+}
+
+/* SMALL MOBILE ADJUSTMENTS */
+@media screen and (max-width: 480px) {
+    .masonry-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        padding: 20px 12px !important;
+    }
+    
+    .category-filters {
+        padding: 20px 12px !important;
+    }
+    
+    .hero h1 {
+        font-size: 1.75rem !important;
+    }
+}
