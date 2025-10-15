@@ -1967,3 +1967,35 @@ textarea {
         font-size: 1.75rem !important;
     }
 }
+
+/* Mobile Grid Layout */
+.mobile-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+    padding: 20px 16px !important;
+    margin: 0 !important;
+    width: 100% !important;
+    columns: unset !important;
+    column-gap: unset !important;
+}
+
+.mobile-item {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 !important;
+    margin: 0 !important;
+    margin-bottom: 0 !important;
+    break-inside: unset !important;
+    display: block !important;
+    position: relative !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+
+.mobile-item img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+}
