@@ -1,0 +1,386 @@
+/* 
+ * Mobile Override CSS - AGGRESSIVE VERSION
+ * Fifth Element Photography
+ * Version: 2.2 High Specificity Mobile Override
+ * Focus: Force mobile styles over desktop
+ */
+
+/* ===== MOBILE VIEWPORT ONLY ===== */
+@media screen and (max-width: 768px) {
+    
+    /* FORCE HIDE DESKTOP SIDEBAR */
+    .sidebar,
+    nav.sidebar,
+    .container .sidebar {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    /* FORCE MOBILE CONTAINER */
+    .container,
+    body .container,
+    html .container {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* FORCE MOBILE BODY */
+    body,
+    html body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        overflow-x: hidden !important;
+        font-size: 16px !important;
+    }
+
+    /* FORCE MOBILE MAIN CONTENT */
+    .main-content,
+    .content,
+    main {
+        margin-left: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* MOBILE HEADER - CREATE IF NOT EXISTS */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 1000;
+        display: block;
+    }
+
+    /* MOBILE MENU BUTTON */
+    body::after {
+        content: '☰';
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        width: 30px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        z-index: 1001;
+        cursor: pointer;
+    }
+
+    /* FORCE MOBILE GALLERY LAYOUT */
+    .masonry-grid,
+    .gallery-grid,
+    .image-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 12px !important;
+        padding: 80px 16px 20px 16px !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        columns: unset !important;
+        column-gap: unset !important;
+    }
+
+    /* FORCE MOBILE IMAGE ITEMS */
+    .image-item,
+    .masonry-item,
+    .gallery-item {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1 !important;
+        margin: 0 !important;
+        margin-bottom: 0 !important;
+        break-inside: unset !important;
+        display: block !important;
+        position: relative !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+    }
+
+    /* FORCE MOBILE IMAGE SIZING */
+    .image-item img,
+    .masonry-item img,
+    .gallery-item img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+    }
+
+    /* FORCE MOBILE CATEGORY FILTERS */
+    .category-filters,
+    .filters,
+    .portfolio-filters {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        padding: 80px 16px 20px 16px !important;
+        margin: 0 !important;
+        justify-content: center !important;
+    }
+
+    .category-filters a,
+    .filters a,
+    .portfolio-filters a,
+    .category-filters button,
+    .filters button,
+    .portfolio-filters button {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        padding: 8px 16px !important;
+        border-radius: 20px !important;
+        font-size: 0.875rem !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        white-space: nowrap !important;
+        min-height: 36px !important;
+        line-height: 1.2 !important;
+    }
+
+    .category-filters a.active,
+    .filters a.active,
+    .portfolio-filters a.active,
+    .category-filters button.active,
+    .filters button.active,
+    .portfolio-filters button.active {
+        background: #6799c2 !important;
+        border-color: #6799c2 !important;
+        color: #ffffff !important;
+    }
+
+    /* FORCE MOBILE HERO SECTION */
+    .hero,
+    .hero-section,
+    .banner {
+        height: 50vh !important;
+        min-height: 300px !important;
+        max-height: 400px !important;
+        padding: 80px 20px 20px 20px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    .hero h1,
+    .hero-section h1,
+    .banner h1 {
+        font-size: 2rem !important;
+        line-height: 1.2 !important;
+        margin-bottom: 16px !important;
+    }
+
+    .hero p,
+    .hero-section p,
+    .banner p {
+        font-size: 1rem !important;
+        margin-bottom: 24px !important;
+    }
+
+    /* FORCE MOBILE NAVIGATION HIDING */
+    .nav,
+    .navigation,
+    .main-nav,
+    .desktop-nav {
+        display: none !important;
+    }
+
+    /* FORCE MOBILE TOUCH TARGETS */
+    a, button, input, select, textarea {
+        min-height: 44px !important;
+        min-width: 44px !important;
+        touch-action: manipulation !important;
+    }
+
+    /* FORCE MOBILE TYPOGRAPHY */
+    h1 { font-size: 2rem !important; }
+    h2 { font-size: 1.5rem !important; }
+    h3 { font-size: 1.25rem !important; }
+    h4 { font-size: 1.1rem !important; }
+    h5 { font-size: 1rem !important; }
+    h6 { font-size: 0.9rem !important; }
+
+    p, div, span {
+        font-size: 1rem !important;
+        line-height: 1.5 !important;
+    }
+
+    /* FORCE MOBILE SPACING */
+    .section,
+    .content-section,
+    section {
+        padding: 20px 16px !important;
+        margin: 0 !important;
+    }
+
+    /* FORCE MOBILE FORMS */
+    input, select, textarea {
+        width: 100% !important;
+        padding: 12px 16px !important;
+        font-size: 16px !important;
+        border-radius: 8px !important;
+        border: 2px solid rgba(255, 255, 255, 0.2) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: #ffffff !important;
+    }
+
+    /* FORCE MOBILE BUTTONS */
+    button,
+    .button,
+    .btn {
+        width: 100% !important;
+        padding: 14px 20px !important;
+        font-size: 1rem !important;
+        border-radius: 8px !important;
+        min-height: 48px !important;
+        cursor: pointer !important;
+        touch-action: manipulation !important;
+    }
+
+    /* FORCE MOBILE MODAL/POPUP FIXES */
+    .modal,
+    .popup,
+    .overlay {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+    }
+
+    /* FORCE MOBILE SCROLLING */
+    body, html {
+        -webkit-overflow-scrolling: touch !important;
+        scroll-behavior: smooth !important;
+    }
+
+    /* FORCE MOBILE VIEWPORT */
+    * {
+        -webkit-tap-highlight-color: transparent !important;
+        -webkit-touch-callout: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+    }
+
+    /* ALLOW TEXT SELECTION FOR CONTENT */
+    p, span, div, h1, h2, h3, h4, h5, h6 {
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
+        user-select: text !important;
+    }
+
+    /* FORCE MOBILE IMAGE OVERLAY */
+    .image-item::after,
+    .masonry-item::after,
+    .gallery-item::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+        pointer-events: none;
+    }
+
+    /* FORCE MOBILE CATEGORY LABELS */
+    .image-category,
+    .category-label,
+    .image-tag {
+        position: absolute !important;
+        bottom: 8px !important;
+        left: 8px !important;
+        background: rgba(103, 153, 194, 0.9) !important;
+        color: #ffffff !important;
+        padding: 4px 8px !important;
+        border-radius: 4px !important;
+        font-size: 0.75rem !important;
+        font-weight: 500 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        z-index: 10 !important;
+    }
+
+    /* FORCE MOBILE LOADING STATES */
+    .loading,
+    .spinner {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 20px auto !important;
+    }
+
+    /* FORCE MOBILE ACCESSIBILITY */
+    .sr-only {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
+    }
+}
+
+/* ===== SMALL MOBILE ADJUSTMENTS ===== */
+@media screen and (max-width: 480px) {
+    .masonry-grid,
+    .gallery-grid,
+    .image-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        padding: 80px 12px 20px 12px !important;
+    }
+
+    .category-filters,
+    .filters,
+    .portfolio-filters {
+        padding: 80px 12px 20px 12px !important;
+    }
+}
+
+/* ===== VERY SMALL MOBILE ===== */
+@media screen and (max-width: 360px) {
+    .masonry-grid,
+    .gallery-grid,
+    .image-grid {
+        padding: 80px 8px 20px 8px !important;
+        gap: 6px !important;
+    }
+
+    .category-filters,
+    .filters,
+    .portfolio-filters {
+        padding: 80px 8px 20px 8px !important;
+    }
+}
