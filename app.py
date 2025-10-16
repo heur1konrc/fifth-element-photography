@@ -747,7 +747,7 @@ def admin_forgot_password():
             # Create reset URL
             reset_url = f"{request.url_root}admin/reset-password/{reset_token}"
             
-            flash(f'Password reset link generated! Copy this URL: {reset_url}', 'success')
+            flash(f'Password reset link generated! <a href="{reset_url}" target="_blank" style="color: #ff6b35; text-decoration: underline;">Click here to reset your password</a>', 'success')
             flash('This link will expire in 24 hours.', 'info')
         else:
             flash('Username not found or account is inactive.', 'error')
