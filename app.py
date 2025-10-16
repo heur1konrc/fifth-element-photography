@@ -629,8 +629,8 @@ def mobile_new():
         except Exception:
             pass
     
-    # Get categories
-    categories = load_categories()
+    # Get categories from actual images
+    categories = list(set([img["category"] for img in images if img.get("category")]))
     
     # Get about data
     about_data = load_about_data()
