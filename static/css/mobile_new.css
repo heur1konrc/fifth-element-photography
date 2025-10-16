@@ -437,3 +437,31 @@ body {
         padding: 0 3px;
     }
 }
+
+/* Updated Logo Styles - Larger and More Prominent */
+.mobile-logo {
+    width: 200px;
+    height: auto;
+    max-width: 80vw;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Remove text styling since logo contains all text */
+.brand-name,
+.brand-subtitle, 
+.brand-tagline {
+    display: none;
+}
+
+/* Adjust logo container for better spacing */
+.logo-container {
+    text-align: center;
+    padding: 20px 0;
+}
+
+@media (max-width: 360px) {
+    .mobile-logo {
+        width: 180px;
+    }
+}
