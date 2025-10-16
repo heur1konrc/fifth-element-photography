@@ -87,7 +87,6 @@
                     <div class="swipe-item" data-category="{{ image.category.lower() }}" onclick="openImageModal('{{ image.url }}', '{{ image.title }}', '{{ image.category }}')">
                         <img src="{{ image.url }}" alt="{{ image.title }}" loading="lazy">
                         <div class="image-overlay">
-                            <h3>{{ image.title }}</h3>
                             <p>{{ image.category.upper() }}</p>
                         </div>
                     </div>
@@ -137,7 +136,7 @@
                     </div>
                     {% endif %}
                     
-                    <button class="order-btn" onclick="openOrderModal('{{ featured_image.url }}', '{{ featured_image.title }}')">
+                    <button class="order-btn modal-order-btn" onclick="openOrderModal('{{ featured_image.url }}', '{{ featured_image.title }}')">
                         <i class="fas fa-shopping-cart"></i>
                         ORDER THIS PRINT
                     </button>
@@ -259,7 +258,7 @@
             <div class="modal-info">
                 <h3 id="modalTitle"></h3>
                 <p id="modalCategory"></p>
-                <button class="order-btn" onclick="openOrderModal()">
+                <button class="order-btn modal-order-btn" onclick="openOrderModal()">
                     <i class="fas fa-shopping-cart"></i>
                     ORDER THIS PRINT
                 </button>
