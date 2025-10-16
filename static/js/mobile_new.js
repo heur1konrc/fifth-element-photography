@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initMobileNavigation();
     initSectionSwitching();
     initActionButtons();
+    initCategoriesCarousel();
+    initMobileContactForm();
 });
 
 // Mobile Navigation Toggle
@@ -133,22 +135,27 @@ document.addEventListener('DOMContentLoaded', function() {
 // Touch and Swipe Enhancements
 let touchStartY = 0;
 let touchEndY = 0;
+let touchStartX = 0;
+let touchEndX = 0;
 
 document.addEventListener('touchstart', function(e) {
     touchStartY = e.changedTouches[0].screenY;
+    touchStartX = e.changedTouches[0].screenX;
 });
 
 document.addEventListener('touchend', function(e) {
     touchEndY = e.changedTouches[0].screenY;
+    touchEndX = e.changedTouches[0].screenX;
     handleSwipe();
 });
 
 function handleSwipe() {
     const swipeThreshold = 50;
-    const swipeDistance = touchStartY - touchEndY;
+    const swipeDistanceY = touchStartY - touchEndY;
+    const swipeDistanceX = touchStartX - touchEndX;
     
     // Swipe up to close menu
-    if (swipeDistance > swipeThreshold) {
+    if (swipeDistanceY > swipeThreshold) {
         const mobileNav = document.getElementById('mobileNav');
         
         if (mobileNav && mobileNav.classList.contains('active')) {
@@ -156,6 +163,167 @@ function handleSwipe() {
             console.log('Menu closed by swipe');
         }
     }
+    
+    // Handle horizontal swipes for carousel
+    const carousel = document.getElementById('categoriesCarousel');
+    if (carousel && Math.abs(swipeDistanceX) > swipeThreshold) {
+        if (swipeDistanceX > 0) {
+            // Swipe left - scroll right
+            scrollCarousel('next');
+        } else {
+            // Swipe right - scroll left
+            scrollCarousel('prev');
+        }
+    }
+}
+
+// Enhanced Categories Carousel Functionality
+function initCategoriesCarousel() {
+    const carousel = document.getElementById('categoriesCarousel');
+    const prevBtn = document.getElementById('carouselPrev');
+    const nextBtn = document.getElementById('carouselNext');
+    const indicators = document.getElementById('carouselIndicators');
+    const categoryBtns = document.querySelectorAll('.category-btn');
+    
+    if (!carousel || categoryBtns.length === 0) return;
+    
+    let currentIndex = 0;
+    const itemsPerView = getItemsPerView();
+    const totalItems = categoryBtns.length;
+    const maxIndex = Math.max(0, totalItems - itemsPerView);
+    
+    // Create indicators
+    const totalPages = Math.ceil(totalItems / itemsPerView);
+    for (let i = 0; i < totalPages; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'carousel-dot';
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToPage(i));
+        indicators.appendChild(dot);
+    }
+    
+    // Navigation button handlers
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => scrollCarousel('prev'));
+    }
+    
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => scrollCarousel('next'));
+    }
+    
+    // Category button handlers
+    categoryBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Remove active class from all buttons
+            categoryBtns.forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked button
+            btn.classList.add('active');
+            
+            // Filter gallery
+            const category = btn.dataset.category;
+            filterGallery(category);
+            
+            // Scroll to gallery section
+            const gallerySection = document.querySelector('.gallery-section');
+            if (gallerySection) {
+                gallerySection.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+    
+    function getItemsPerView() {
+        const screenWidth = window.innerWidth;
+        if (screenWidth < 360) return 2;
+        if (screenWidth < 480) return 3;
+        return 4;
+    }
+    
+    function scrollCarousel(direction) {
+        const itemWidth = carousel.children[0].offsetWidth + 15; // width + gap
+        
+        if (direction === 'next' && currentIndex < maxIndex) {
+            currentIndex++;
+        } else if (direction === 'prev' && currentIndex > 0) {
+            currentIndex--;
+        }
+        
+        const scrollPosition = currentIndex * itemWidth;
+        carousel.scrollTo({
+            left: scrollPosition,
+            behavior: 'smooth'
+        });
+        
+        updateIndicators();
+        updateNavButtons();
+    }
+    
+    function goToPage(pageIndex) {
+        currentIndex = Math.min(pageIndex * itemsPerView, maxIndex);
+        const itemWidth = carousel.children[0].offsetWidth + 15;
+        const scrollPosition = currentIndex * itemWidth;
+        
+        carousel.scrollTo({
+            left: scrollPosition,
+            behavior: 'smooth'
+        });
+        
+        updateIndicators();
+        updateNavButtons();
+    }
+    
+    function updateIndicators() {
+        const dots = indicators.querySelectorAll('.carousel-dot');
+        const currentPage = Math.floor(currentIndex / itemsPerView);
+        
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentPage);
+        });
+    }
+    
+    function updateNavButtons() {
+        if (prevBtn) {
+            prevBtn.disabled = currentIndex === 0;
+        }
+        if (nextBtn) {
+            nextBtn.disabled = currentIndex >= maxIndex;
+        }
+    }
+    
+    // Initialize button states
+    updateNavButtons();
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        const newItemsPerView = getItemsPerView();
+        if (newItemsPerView !== itemsPerView) {
+            // Reinitialize carousel on significant layout changes
+            setTimeout(() => {
+                initCategoriesCarousel();
+            }, 100);
+        }
+    });
+}
+
+// Gallery Filtering
+function filterGallery(category) {
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    
+    galleryItems.forEach(item => {
+        const itemCategory = item.getAttribute('data-image-category');
+        
+        if (category === 'all' || itemCategory === category) {
+            item.style.display = 'block';
+            item.style.opacity = '1';
+        } else {
+            item.style.display = 'none';
+            item.style.opacity = '0';
+        }
+    });
+    
+    console.log(`Filtered gallery by category: ${category}`);
 }
 
 // Mobile Contact Form Handling
@@ -244,66 +412,6 @@ function showMobileMessage(message, type) {
     }, 5000);
 }
 
-// Initialize contact form when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initMobileContactForm();
-});
-
-// Categories Dropdown Functionality
-function initCategoriesDropdown() {
-    const categoriesBtn = document.getElementById('mobileCategoriesBtn');
-    const categoriesDropdown = document.getElementById('mobileCategoriesDropdown');
-    const categoryLinks = document.querySelectorAll('.category-link');
-    
-    if (categoriesBtn && categoriesDropdown) {
-        categoriesBtn.addEventListener('click', function() {
-            categoriesDropdown.classList.toggle('active');
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!categoriesBtn.contains(e.target) && !categoriesDropdown.contains(e.target)) {
-                categoriesDropdown.classList.remove('active');
-            }
-        });
-    }
-    
-    // Category filtering
-    categoryLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const category = this.getAttribute('data-category');
-            
-            // Update active state
-            categoryLinks.forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Filter gallery
-            filterGalleryByCategory(category);
-            
-            // Close dropdown
-            if (categoriesDropdown) {
-                categoriesDropdown.classList.remove('active');
-            }
-        });
-    });
-}
-
-// Gallery Filtering
-function filterGalleryByCategory(category) {
-    const galleryItems = document.querySelectorAll('.gallery-item');
-    
-    galleryItems.forEach(item => {
-        const itemCategory = item.getAttribute('data-image-category');
-        
-        if (category === 'all' || itemCategory === category) {
-            item.style.display = 'block';
-        } else {
-            item.style.display = 'none';
-        }
-    });
-}
-
 // Image Modal Functionality
 let currentImageCategory = '';
 
@@ -344,17 +452,17 @@ function filterByModalCategory() {
     
     // Filter gallery by the category from the modal
     if (currentImageCategory) {
-        // Update category dropdown selection
-        const categoryLinks = document.querySelectorAll('.category-link');
-        categoryLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('data-category') === currentImageCategory) {
-                link.classList.add('active');
+        // Update category button selection
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        categoryBtns.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-category') === currentImageCategory) {
+                btn.classList.add('active');
             }
         });
         
         // Filter gallery
-        filterGalleryByCategory(currentImageCategory);
+        filterGallery(currentImageCategory);
         
         // Navigate to home section if not already there
         const homeSection = document.getElementById('home');
@@ -369,70 +477,89 @@ function filterByModalCategory() {
             const homeLink = document.querySelector('.nav-link[href="#home"]');
             if (homeLink) homeLink.classList.add('active');
             
-            // Scroll to top
-            window.scrollTo(0, 0);
+            // Scroll to gallery section
+            const gallerySection = document.querySelector('.gallery-section');
+            if (gallerySection) {
+                setTimeout(() => {
+                    gallerySection.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+            }
         }
     }
 }
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    initCategoriesDropdown();
+// Utility function for smooth scrolling
+function scrollToElement(element) {
+    if (element) {
+        element.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+}
+
+// Handle keyboard navigation for accessibility
+document.addEventListener('keydown', function(e) {
+    const modal = document.getElementById('imageModal');
+    
+    if (modal && modal.style.display === 'block') {
+        if (e.key === 'Escape') {
+            closeImageModal();
+        }
+    }
+    
+    // Handle arrow keys for carousel navigation
+    const carousel = document.getElementById('categoriesCarousel');
+    if (carousel && document.activeElement.classList.contains('category-btn')) {
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            scrollCarousel('prev');
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            scrollCarousel('next');
+        }
+    }
 });
 
-// Categories Carousel Functionality
-function initCategoriesCarousel() {
+// Intersection Observer for carousel auto-scroll indicators
+function initCarouselObserver() {
     const carousel = document.getElementById('categoriesCarousel');
     const indicators = document.getElementById('carouselIndicators');
-    const slides = carousel.querySelectorAll('.category-slide');
     
-    if (!carousel || slides.length === 0) return;
+    if (!carousel || !indicators) return;
     
-    // Create indicators
-    const totalSlides = Math.ceil(slides.length / 3); // Show 3 categories per "page"
-    for (let i = 0; i < totalSlides; i++) {
-        const dot = document.createElement('div');
-        dot.className = 'carousel-dot';
-        if (i === 0) dot.classList.add('active');
-        dot.addEventListener('click', () => scrollToSlide(i));
-        indicators.appendChild(dot);
-    }
-    
-    function scrollToSlide(index) {
-        const slideWidth = slides[0].offsetWidth + 15; // width + gap
-        const scrollPosition = index * slideWidth * 3;
-        carousel.scrollTo({
-            left: scrollPosition,
-            behavior: 'smooth'
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const index = Array.from(carousel.children).indexOf(entry.target);
+                const pageIndex = Math.floor(index / getItemsPerView());
+                
+                // Update indicators
+                const dots = indicators.querySelectorAll('.carousel-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === pageIndex);
+                });
+            }
         });
-        
-        // Update indicators
-        indicators.querySelectorAll('.carousel-dot').forEach((dot, i) => {
-            dot.classList.toggle('active', i === index);
-        });
-    }
+    }, {
+        root: carousel,
+        threshold: 0.5
+    });
     
-    // Handle category selection
-    slides.forEach(slide => {
-        const link = slide.querySelector('.category-link');
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Remove active class from all links
-            slides.forEach(s => s.querySelector('.category-link').classList.remove('active'));
-            
-            // Add active class to clicked link
-            link.classList.add('active');
-            
-            // Filter gallery
-            const category = link.dataset.category;
-            filterGallery(category);
-            
-            // Return to home section
-            showSection('home');
-        });
+    // Observe all category slides
+    carousel.querySelectorAll('.category-slide').forEach(slide => {
+        observer.observe(slide);
     });
 }
 
-// Initialize carousel when DOM is loaded
-document.addEventListener('DOMContentLoaded', initCategoriesCarousel);
+// Initialize carousel observer when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initCarouselObserver, 100);
+});
+
+function getItemsPerView() {
+    const screenWidth = window.innerWidth;
+    if (screenWidth < 360) return 2;
+    if (screenWidth < 480) return 3;
+    return 4;
+}

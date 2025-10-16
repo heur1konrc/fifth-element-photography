@@ -576,7 +576,7 @@ def index():
     
     # Mobile detection - serve different template based on device
     if is_mobile_device():
-        return render_template('mobile_new.html', 
+        return render_template('mobile.html', 
                              images=images, 
                              categories=categories,
                              category_counts=category_counts,

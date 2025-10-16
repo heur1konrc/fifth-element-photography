@@ -18,22 +18,6 @@
         
         <!-- Menu Button -->
         <div class="menu-section">
-        
-        <!-- Categories Carousel -->
-        <div class="categories-carousel-container">
-            <div class="categories-carousel" id="categoriesCarousel">
-                <div class="category-slide">
-                    <a href="#" class="category-link active" data-category="all">ALL</a>
-                </div>
-                {% for category in categories %}
-                <div class="category-slide">
-                    <a href="#" class="category-link" data-category="{{ category }}">{{ category.upper() }}</a>
-                </div>
-                {% endfor %}
-            </div>
-            <div class="carousel-indicators" id="carouselIndicators"></div>
-        </div>
-        </div>
             <button class="menu-btn" id="mobileMenuBtn">MENU</button>
         </div>
     </header>
@@ -89,9 +73,31 @@
                 </div>
             </div>
 
+            <!-- Categories Carousel -->
+            <div class="categories-carousel-container">
+                <div class="carousel-wrapper">
+                    <button class="carousel-nav-btn carousel-prev" id="carouselPrev" aria-label="Previous categories">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="categories-carousel" id="categoriesCarousel">
+                        <div class="category-slide">
+                            <button class="category-btn active" data-category="all">ALL</button>
+                        </div>
+                        {% for category in categories %}
+                        <div class="category-slide">
+                            <button class="category-btn" data-category="{{ category }}">{{ category.upper() }}</button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button class="carousel-nav-btn carousel-next" id="carouselNext" aria-label="Next categories">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="carousel-indicators" id="carouselIndicators"></div>
+            </div>
+
             <!-- Gallery Section -->
             <div class="gallery-section">
-                <h2 class="gallery-title">GALLERY</h2>
                 <div class="gallery-grid">
                     <!-- Gallery images from admin -->
                     {% for image in images[:8] %}
@@ -250,11 +256,7 @@
 
     </main>
 
-    <script src="{{ url_for('static', filename='js/mobile_new.js') }}"></script>
-</body>
-</html>
-
-    <!-- Image Modal -->
+    <!-- Image Modal - Redesigned for full-width layout -->
     <div id="imageModal" class="image-modal" onclick="closeImageModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <span class="modal-close" onclick="closeImageModal()">&times;</span>
@@ -262,10 +264,20 @@
                 <img id="modalImage" src="" alt="" class="modal-image">
             </div>
             <div class="modal-info">
-                <h3 id="modalTitle">Image Title</h3>
-                <p id="modalCategory" class="modal-category-link" onclick="filterByModalCategory()">Category</p>
-                <a href="https://fifthelement.photos/test_order_form" target="_blank" class="order-prints-btn">Order Prints</a>
+                <div class="modal-title-section">
+                    <div class="modal-title-row">
+                        <span class="title-label">TITLE:</span>
+                        <span id="modalTitle" class="title-value">Image Title</span>
+                        <span id="modalCategory" class="category-badge" onclick="filterByModalCategory()">Category</span>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <a href="https://fifthelement.photos/test_order_form" target="_blank" class="order-prints-btn">ORDER PRINTS</a>
+                </div>
             </div>
         </div>
     </div>
 
+    <script src="{{ url_for('static', filename='js/mobile_new.js') }}"></script>
+</body>
+</html>
