@@ -84,7 +84,7 @@ function initCategoryFilters() {
 
 // Swipe Gallery
 function initSwipeGallery() {
-    const swipeContainer = document.getElementById('swipeContainer');
+    const swipeContainer = document.getElementById("swipeContainer");
     
     if (!swipeContainer) return;
     
@@ -92,43 +92,63 @@ function initSwipeGallery() {
     let isDown = false;
     let startX;
     let scrollLeft;
+    let hasMoved = false;
     
-    swipeContainer.addEventListener('mousedown', (e) => {
+    swipeContainer.addEventListener("mousedown", (e) => {
+        // Don't interfere with clicks on swipe-item elements
+        if (e.target.closest(".swipe-item")) {
+            return;
+        }
+        
         isDown = true;
-        swipeContainer.classList.add('active');
+        hasMoved = false;
+        swipeContainer.classList.add("active");
         startX = e.pageX - swipeContainer.offsetLeft;
         scrollLeft = swipeContainer.scrollLeft;
     });
     
-    swipeContainer.addEventListener('mouseleave', () => {
+    swipeContainer.addEventListener("mouseleave", () => {
         isDown = false;
-        swipeContainer.classList.remove('active');
+        swipeContainer.classList.remove("active");
     });
     
-    swipeContainer.addEventListener('mouseup', () => {
+    swipeContainer.addEventListener("mouseup", () => {
         isDown = false;
-        swipeContainer.classList.remove('active');
+        swipeContainer.classList.remove("active");
     });
     
-    swipeContainer.addEventListener('mousemove', (e) => {
+    swipeContainer.addEventListener("mousemove", (e) => {
         if (!isDown) return;
+        hasMoved = true;
         e.preventDefault();
         const x = e.pageX - swipeContainer.offsetLeft;
         const walk = (x - startX) * 2;
         swipeContainer.scrollLeft = scrollLeft - walk;
     });
     
-    // Touch events for mobile
-    swipeContainer.addEventListener('touchstart', (e) => {
-        startX = e.touches[0].pageX - swipeContainer.offsetLeft;
-        scrollLeft = swipeContainer.scrollLeft;
+    // Touch events for mobile - allow clicks
+    let touchStartX;
+    let touchStartTime;
+    
+    swipeContainer.addEventListener("touchstart", (e) => {
+        touchStartX = e.touches[0].pageX;
+        touchStartTime = Date.now();
     });
     
-    swipeContainer.addEventListener('touchmove', (e) => {
-        if (!startX) return;
-        const x = e.touches[0].pageX - swipeContainer.offsetLeft;
-        const walk = (x - startX) * 2;
-        swipeContainer.scrollLeft = scrollLeft - walk;
+    swipeContainer.addEventListener("touchend", (e) => {
+        const touchEndX = e.changedTouches[0].pageX;
+        const touchEndTime = Date.now();
+        const touchDuration = touchEndTime - touchStartTime;
+        const touchDistance = Math.abs(touchEndX - touchStartX);
+        
+        // If it's a quick tap with minimal movement, allow the click
+        if (touchDuration < 300 && touchDistance < 10) {
+            // This is a tap, not a swipe - let the click event fire
+            return;
+        }
+        
+        // Otherwise, it's a swipe - prevent any click events
+        e.preventDefault();
     });
 }
 

@@ -553,6 +553,16 @@ def index():
         featured_image['story'] = featured_image.get('description', '')
     
     about_data = load_about_data()
+
+        # Load hero image for admin template
+        hero_image_data = load_hero_image()
+        hero_image = None
+        if hero_image_data and hero_image_data.get("filename"):
+            # Find the hero image in the images list
+            for image in images:
+                if image["filename"] == hero_image_data["filename"]:
+                    hero_image = image
+                    break
     
     # Load hero image for mobile template
     hero_image_data = load_hero_image()
@@ -968,6 +978,16 @@ def admin():
         images = scan_images()
         all_categories = load_categories()
         about_data = load_about_data()
+
+        # Load hero image for admin template
+        hero_image_data = load_hero_image()
+        hero_image = None
+        if hero_image_data and hero_image_data.get("filename"):
+            # Find the hero image in the images list
+            for image in images:
+                if image["filename"] == hero_image_data["filename"]:
+                    hero_image = image
+                    break
         return render_template('admin_new.html', images=images, all_categories=all_categories, about_data=about_data,
                              hero_image=hero_image)
     except Exception as e:
@@ -1731,6 +1751,16 @@ def remove_about_image(filename):
 def debug_about():
     """Debug about data"""
     about_data = load_about_data()
+
+        # Load hero image for admin template
+        hero_image_data = load_hero_image()
+        hero_image = None
+        if hero_image_data and hero_image_data.get("filename"):
+            # Find the hero image in the images list
+            for image in images:
+                if image["filename"] == hero_image_data["filename"]:
+                    hero_image = image
+                    break
     return jsonify({
         'about_data': about_data,
         'about_data_exists': bool(about_data),
