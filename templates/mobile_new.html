@@ -19,15 +19,20 @@
         <!-- Menu Button -->
         <div class="menu-section">
         
-        <!-- Categories Dropdown -->
-        <div class="categories-section">
-            <button class="categories-btn" id="mobileCategoriesBtn">CATEGORIES</button>
-            <div class="categories-dropdown" id="mobileCategoriesDropdown">
-                <a href="#" class="category-link active" data-category="all">ALL</a>
+        <!-- Categories Carousel -->
+        <div class="categories-carousel-container">
+            <div class="categories-carousel" id="categoriesCarousel">
+                <div class="category-slide">
+                    <a href="#" class="category-link active" data-category="all">ALL</a>
+                </div>
                 {% for category in categories %}
-                <a href="#" class="category-link" data-category="{{ category }}">{{ category.upper() }}</a>
+                <div class="category-slide">
+                    <a href="#" class="category-link" data-category="{{ category }}">{{ category.upper() }}</a>
+                </div>
                 {% endfor %}
             </div>
+            <div class="carousel-indicators" id="carouselIndicators"></div>
+        </div>
         </div>
             <button class="menu-btn" id="mobileMenuBtn">MENU</button>
         </div>

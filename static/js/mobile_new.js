@@ -379,3 +379,60 @@ function filterByModalCategory() {
 document.addEventListener('DOMContentLoaded', function() {
     initCategoriesDropdown();
 });
+
+// Categories Carousel Functionality
+function initCategoriesCarousel() {
+    const carousel = document.getElementById('categoriesCarousel');
+    const indicators = document.getElementById('carouselIndicators');
+    const slides = carousel.querySelectorAll('.category-slide');
+    
+    if (!carousel || slides.length === 0) return;
+    
+    // Create indicators
+    const totalSlides = Math.ceil(slides.length / 3); // Show 3 categories per "page"
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'carousel-dot';
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => scrollToSlide(i));
+        indicators.appendChild(dot);
+    }
+    
+    function scrollToSlide(index) {
+        const slideWidth = slides[0].offsetWidth + 15; // width + gap
+        const scrollPosition = index * slideWidth * 3;
+        carousel.scrollTo({
+            left: scrollPosition,
+            behavior: 'smooth'
+        });
+        
+        // Update indicators
+        indicators.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+    }
+    
+    // Handle category selection
+    slides.forEach(slide => {
+        const link = slide.querySelector('.category-link');
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Remove active class from all links
+            slides.forEach(s => s.querySelector('.category-link').classList.remove('active'));
+            
+            // Add active class to clicked link
+            link.classList.add('active');
+            
+            // Filter gallery
+            const category = link.dataset.category;
+            filterGallery(category);
+            
+            // Return to home section
+            showSection('home');
+        });
+    });
+}
+
+// Initialize carousel when DOM is loaded
+document.addEventListener('DOMContentLoaded', initCategoriesCarousel);

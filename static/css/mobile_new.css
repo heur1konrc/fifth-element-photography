@@ -883,3 +883,71 @@ body {
 .gallery-item:hover {
     transform: scale(1.05);
 }
+
+/* Categories Carousel */
+.categories-carousel-container {
+    margin: 20px 0;
+    position: relative;
+}
+
+.categories-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 15px;
+    padding: 10px 20px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.categories-carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.category-slide {
+    flex: 0 0 auto;
+    min-width: 120px;
+}
+
+.category-slide .category-link {
+    display: block;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #4a9eff;
+    color: #4a9eff;
+    text-decoration: none;
+    padding: 12px 20px;
+    text-align: center;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.category-slide .category-link:hover,
+.category-slide .category-link.active {
+    background: #4a9eff;
+    color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+}
+
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(74, 158, 255, 0.3);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.carousel-dot.active {
+    background: #4a9eff;
+}
