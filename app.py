@@ -629,6 +629,9 @@ def mobile_new():
         except Exception:
             pass
     
+    # Get categories
+    categories = load_categories()
+    
     # Get about data
     about_data = load_about_data()
     
