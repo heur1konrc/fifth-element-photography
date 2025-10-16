@@ -502,3 +502,54 @@ body {
 .featured-placeholder {
     border-radius: 0 !important;
 }
+/* Specific fix for hero image rounded corners */
+.hero-section,
+.hero-section .hero-image,
+.hero-section img,
+#home .hero-image,
+#home .hero-section {
+    border-radius: 0 !important;
+}
+
+/* Force logo to display properly */
+.mobile-logo {
+    display: block !important;
+    width: 200px !important;
+    height: auto !important;
+    max-width: 80vw !important;
+    margin: 0 auto !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Ensure logo container has no styling issues */
+.logo-container {
+    background: transparent !important;
+    border: none !important;
+    padding: 20px 0 !important;
+    text-align: center !important;
+}
+
+/* FINAL OVERRIDES - Force hero image to be squared */
+* {
+    border-radius: 0 !important;
+}
+
+.hero-image,
+.hero-section,
+.hero-section > *,
+#home .hero-image,
+#home .hero-section,
+div[class*="hero"] {
+    border-radius: 0 !important;
+}
+
+/* FINAL LOGO FIX - Force logo to display */
+.mobile-logo {
+    content: url('/static/images/logo.png') !important;
+    display: block !important;
+    width: 200px !important;
+    height: auto !important;
+    background: transparent !important;
+}
