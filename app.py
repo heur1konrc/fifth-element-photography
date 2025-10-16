@@ -517,7 +517,7 @@ def scan_images():
 def index():
     """Main portfolio page"""
     images = scan_images()
-    categories = load_categories()
+    categories = sorted(load_categories())
     
     # Get category counts
     category_counts = {}
@@ -606,7 +606,7 @@ def mobile_gallery():
 def mobile_new():
     """Mobile layout with admin data - using same data loading as main route"""
     images = scan_images()
-    categories = load_categories()
+    categories = sorted(load_categories())
     
     # Get category counts (same as main route)
     category_counts = {}
@@ -1037,7 +1037,7 @@ def admin():
     """Admin panel for image management"""
     try:
         images = scan_images()
-        all_categories = load_categories()
+        all_categories = sorted(load_categories())
         about_data = load_about_data()
 
         # Load hero image for admin template
@@ -1346,7 +1346,7 @@ def manage_categories():
     """Manage categories - add/delete"""
     if request.method == 'POST':
         action = request.form.get('action')
-        categories = load_categories()
+        categories = sorted(load_categories())
         
         if action == 'add':
             new_category = request.form.get('category_name', '').strip().lower()
@@ -1384,7 +1384,7 @@ def manage_categories():
         return redirect(url_for('manage_categories'))
     
     # GET request - show categories management page
-    categories = load_categories()
+    categories = sorted(load_categories())
     return render_template('admin_categories.html', categories=categories)
 
 @app.route('/admin/assign_category/<filename>', methods=['POST'])
@@ -1427,7 +1427,7 @@ def edit_image(filename):
         if not image:
             return "Image not found", 404
         
-        all_categories = load_categories()
+        all_categories = sorted(load_categories())
         
         # Generate category options HTML
         category_options = ""
