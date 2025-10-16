@@ -61,9 +61,33 @@
                 </div>
             </div>
 
-            <!-- Featured Image Section -->
-            <div class="featured-section">
-                <h2 class="featured-title">FEATURED IMAGE OF THE WEEK</h2>
+            <!-- Gallery Section -->
+            <div class="gallery-section">
+                <h2 class="gallery-title">GALLERY</h2>
+                <div class="gallery-grid">
+                    <!-- Gallery images will be populated here -->
+                    <div class="gallery-item">
+                        <img src="{{ url_for('static', filename='images/placeholder-featured.jpg') }}" alt="Gallery Image 1" class="gallery-image">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="{{ url_for('static', filename='images/placeholder-hero.jpg') }}" alt="Gallery Image 2" class="gallery-image">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="{{ url_for('static', filename='images/placeholder-featured.jpg') }}" alt="Gallery Image 3" class="gallery-image">
+                    </div>
+                    <div class="gallery-item">
+                        <img src="{{ url_for('static', filename='images/placeholder-hero.jpg') }}" alt="Gallery Image 4" class="gallery-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Image Page Section -->
+        <section id="featured" class="mobile-section">
+            <div class="page-header">
+                <h1>FEATURED IMAGE OF THE WEEK</h1>
+            </div>
+            <div class="featured-page-content">
                 <div class="featured-image-container">
                     <img src="{{ url_for('static', filename='images/placeholder-featured.jpg') }}" alt="Featured Image" class="featured-image">
                 </div>
@@ -87,17 +111,6 @@
                         <button class="action-btn tertiary">SHARE ON SOCIAL MEDIA</button>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Featured Image Page Section -->
-        <section id="featured" class="mobile-section">
-            <div class="page-header">
-                <h1>Featured Image</h1>
-            </div>
-            <div class="featured-page-content">
-                <!-- Content will be populated from admin -->
-                <p>Featured image page content goes here...</p>
             </div>
         </section>
 

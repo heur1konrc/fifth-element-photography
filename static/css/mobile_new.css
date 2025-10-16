@@ -144,7 +144,7 @@ body {
 
 .social-title {
     color: #6799c2;
-    font-size: 1.2rem;
+    font-size: 1rem;
     margin-bottom: 15px;
     font-weight: bold;
 }
@@ -159,11 +159,11 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     text-decoration: none;
-    font-size: 1.2rem;
+    font-size: 1rem;
     transition: transform 0.3s ease;
 }
 
@@ -377,5 +377,63 @@ body {
     
     .action-buttons {
         gap: 10px;
+    }
+}
+
+/* Gallery Section */
+.gallery-section {
+    margin-bottom: 40px;
+}
+
+.gallery-title {
+    color: #6799c2;
+    font-size: 1.3rem;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 0 5px;
+}
+
+.gallery-item {
+    aspect-ratio: 3/2;
+    overflow: hidden;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover {
+    transform: scale(1.02);
+}
+
+.gallery-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Update responsive design for smaller social icons */
+@media (max-width: 360px) {
+    .social-icons {
+        gap: 15px;
+    }
+    
+    .social-link {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+    
+    .gallery-grid {
+        gap: 8px;
+        padding: 0 3px;
     }
 }
