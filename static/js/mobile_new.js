@@ -157,3 +157,94 @@ function handleSwipe() {
         }
     }
 }
+
+// Mobile Contact Form Handling
+function initMobileContactForm() {
+    const mobileContactForm = document.getElementById('mobileContactForm');
+    if (mobileContactForm) {
+        mobileContactForm.addEventListener('submit', handleMobileContactSubmit);
+    }
+}
+
+async function handleMobileContactSubmit(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('.action-btn');
+    const originalText = submitBtn.textContent;
+    
+    // Show loading state
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+    
+    try {
+        // Collect form data
+        const formData = new FormData(form);
+        const data = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone'),
+            shoot_type: formData.get('shoot_type'),
+            budget: formData.get('budget'),
+            how_heard: formData.get('how_heard'),
+            message: formData.get('message')
+        };
+        
+        // Send to server
+        const response = await fetch('/contact', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Show success message
+            showMobileMessage('Thank you for your message! We will get back to you soon.', 'success');
+            form.reset();
+        } else {
+            // Show error message
+            showMobileMessage(result.error || 'Failed to send message. Please try again.', 'error');
+        }
+        
+    } catch (error) {
+        console.error('Error sending message:', error);
+        showMobileMessage('An error occurred. Please try again later.', 'error');
+    } finally {
+        // Restore button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+function showMobileMessage(message, type) {
+    // Remove any existing message
+    const existingMessage = document.querySelector('.mobile-message');
+    if (existingMessage) {
+        existingMessage.remove();
+    }
+    
+    // Create message element
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `mobile-message ${type}`;
+    messageDiv.textContent = message;
+    
+    // Insert message at top of contact form
+    const contactForm = document.querySelector('.contact-form');
+    contactForm.insertBefore(messageDiv, contactForm.firstChild);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (messageDiv.parentNode) {
+            messageDiv.remove();
+        }
+    }, 5000);
+}
+
+// Initialize contact form when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initMobileContactForm();
+});

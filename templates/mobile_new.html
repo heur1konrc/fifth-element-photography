@@ -54,7 +54,13 @@
             <!-- Hero Image Section -->
             <div class="hero-section">
                 <div class="hero-image-container">
-                    <img src="{{ url_for('static', filename='images/{{ images[0].filename if images else "placeholder-hero.jpg" }}') }}" alt="Hero Image" class="hero-image">
+                    {% if hero_image and hero_image.filename %}
+                    <img src="{{ url_for('serve_image', filename=hero_image.filename) }}" alt="{{ hero_image.title or 'Hero Image' }}" class="hero-image">
+                    {% elif images %}
+                    <img src="{{ url_for('serve_image', filename=images[0].filename) }}" alt="{{ images[0].title or 'Hero Image' }}" class="hero-image">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/placeholder-hero.jpg') }}" alt="Hero Image" class="hero-image">
+                    {% endif %}
                 </div>
             </div>
 
@@ -88,7 +94,11 @@
             </div>
             <div class="featured-page-content">
                 <div class="featured-image-container">
-                    <img src="{{ url_for('static', filename='images/{{ featured_image.filename if featured_image else "placeholder-featured.jpg" }}') }}" alt="Featured Image" class="featured-image">
+                    {% if featured_image and featured_image.filename %}
+                    <img src="{{ url_for('serve_image', filename=featured_image.filename) }}" alt="{{ featured_image.title or 'Featured Image' }}" class="featured-image">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/placeholder-featured.jpg') }}" alt="Featured Image" class="featured-image">
+                    {% endif %}
                 </div>
                 
                 <div class="featured-content">
@@ -113,24 +123,19 @@
                 <h1>About</h1>
             </div>
             <div class="about-content">
-                <!-- Content will be populated from admin -->
-                <p>About page content goes here...</p>
+                {% if about_data and about_data.filename %}
+                <div class="about-image-container">
+                    <img src="/about/{{ about_data.filename }}" alt="About Fifth Element Photography" class="about-image">
+                </div>
+                {% endif %}
+                
+                <div class="about-text">
+                    {% if about_data and about_data.bio %}
+                        <p>{{ about_data.bio|safe }}</p>
+                    {% else %}
+                        <p>Welcome to Fifth Element Photography. Add your bio in the admin panel to personalize this section.</p>
+                    {% endif %}
+                </div>
             </div>
         </section>
 
-        <!-- Contact Section -->
-        <section id="contact" class="mobile-section">
-            <div class="page-header">
-                <h1>Contact</h1>
-            </div>
-            <div class="contact-content">
-                <!-- Content will be populated from admin -->
-                <p>Contact page content goes here...</p>
-            </div>
-        </section>
-
-    </main>
-
-    <script src="{{ url_for('static', filename='js/mobile_new.js') }}"></script>
-</body>
-</html>

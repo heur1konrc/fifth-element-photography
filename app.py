@@ -613,9 +613,30 @@ def mobile_new():
             featured_image = image
             break
     
+    # Get hero image data
+    hero_image = None
+    hero_file_path = os.path.join('/data', 'hero_image.json')
+    if os.path.exists(hero_file_path):
+        try:
+            with open(hero_file_path, 'r') as f:
+                hero_data = json.load(f)
+                if hero_data.get('filename'):
+                    # Find the hero image in the images list
+                    for image in images:
+                        if image.get('filename') == hero_data.get('filename'):
+                            hero_image = image
+                            break
+        except Exception:
+            pass
+    
+    # Get about data
+    about_data = load_about_data()
+    
     return render_template("mobile_new.html", 
                          images=images,
-                         featured_image=featured_image)
+                         featured_image=featured_image,
+                         hero_image=hero_image,
+                         about_data=about_data)
 
 @app.route('/featured')
 def featured():
