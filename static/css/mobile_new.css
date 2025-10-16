@@ -465,3 +465,16 @@ body {
         width: 180px;
     }
 }
+
+/* Remove rounded corners from gallery images - make them sharp and squared */
+.gallery-item img,
+.gallery-grid img,
+.mobile-section img {
+    border-radius: 0 !important;
+}
+
+/* Ensure hero and featured images are also sharp */
+.hero-image img,
+.featured-image img {
+    border-radius: 0 !important;
+}
