@@ -478,3 +478,27 @@ body {
 .featured-image img {
     border-radius: 0 !important;
 }
+
+/* Fix image containers - remove ALL rounded corners */
+.gallery-item,
+.gallery-grid .gallery-item,
+.hero-image,
+.featured-image,
+.hero-section,
+.featured-section .image-container {
+    border-radius: 0 !important;
+}
+
+/* Fix logo display issues */
+.mobile-logo {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Ensure all placeholder containers are squared */
+.image-placeholder,
+.hero-placeholder,
+.featured-placeholder {
+    border-radius: 0 !important;
+}
