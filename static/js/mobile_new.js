@@ -248,3 +248,134 @@ function showMobileMessage(message, type) {
 document.addEventListener('DOMContentLoaded', function() {
     initMobileContactForm();
 });
+
+// Categories Dropdown Functionality
+function initCategoriesDropdown() {
+    const categoriesBtn = document.getElementById('mobileCategoriesBtn');
+    const categoriesDropdown = document.getElementById('mobileCategoriesDropdown');
+    const categoryLinks = document.querySelectorAll('.category-link');
+    
+    if (categoriesBtn && categoriesDropdown) {
+        categoriesBtn.addEventListener('click', function() {
+            categoriesDropdown.classList.toggle('active');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!categoriesBtn.contains(e.target) && !categoriesDropdown.contains(e.target)) {
+                categoriesDropdown.classList.remove('active');
+            }
+        });
+    }
+    
+    // Category filtering
+    categoryLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const category = this.getAttribute('data-category');
+            
+            // Update active state
+            categoryLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Filter gallery
+            filterGalleryByCategory(category);
+            
+            // Close dropdown
+            if (categoriesDropdown) {
+                categoriesDropdown.classList.remove('active');
+            }
+        });
+    });
+}
+
+// Gallery Filtering
+function filterGalleryByCategory(category) {
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    
+    galleryItems.forEach(item => {
+        const itemCategory = item.getAttribute('data-image-category');
+        
+        if (category === 'all' || itemCategory === category) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// Image Modal Functionality
+let currentImageCategory = '';
+
+function openImageModal(galleryItem) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalCategory = document.getElementById('modalCategory');
+    
+    // Get image data
+    const img = galleryItem.querySelector('.gallery-image');
+    const title = galleryItem.getAttribute('data-image-title');
+    const category = galleryItem.getAttribute('data-image-category');
+    
+    // Store current category for filtering
+    currentImageCategory = category;
+    
+    // Update modal content
+    modalImage.src = img.src;
+    modalImage.alt = img.alt;
+    modalTitle.textContent = title || 'Untitled';
+    modalCategory.textContent = category || 'Uncategorized';
+    
+    // Show modal
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto'; // Restore scrolling
+}
+
+function filterByModalCategory() {
+    // Close modal
+    closeImageModal();
+    
+    // Filter gallery by the category from the modal
+    if (currentImageCategory) {
+        // Update category dropdown selection
+        const categoryLinks = document.querySelectorAll('.category-link');
+        categoryLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('data-category') === currentImageCategory) {
+                link.classList.add('active');
+            }
+        });
+        
+        // Filter gallery
+        filterGalleryByCategory(currentImageCategory);
+        
+        // Navigate to home section if not already there
+        const homeSection = document.getElementById('home');
+        const sections = document.querySelectorAll('.mobile-section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        if (homeSection) {
+            sections.forEach(s => s.classList.remove('active'));
+            navLinks.forEach(l => l.classList.remove('active'));
+            
+            homeSection.classList.add('active');
+            const homeLink = document.querySelector('.nav-link[href="#home"]');
+            if (homeLink) homeLink.classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+    }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initCategoriesDropdown();
+});

@@ -18,6 +18,17 @@
         
         <!-- Menu Button -->
         <div class="menu-section">
+        
+        <!-- Categories Dropdown -->
+        <div class="categories-section">
+            <button class="categories-btn" id="mobileCategoriesBtn">CATEGORIES</button>
+            <div class="categories-dropdown" id="mobileCategoriesDropdown">
+                <a href="#" class="category-link active" data-category="all">ALL</a>
+                {% for category in categories %}
+                <a href="#" class="category-link" data-category="{{ category }}">{{ category.upper() }}</a>
+                {% endfor %}
+            </div>
+        </div>
             <button class="menu-btn" id="mobileMenuBtn">MENU</button>
         </div>
     </header>
@@ -79,17 +90,17 @@
                 <div class="gallery-grid">
                     <!-- Gallery images from admin -->
                     {% for image in images[:8] %}
-                    <div class="gallery-item">
+                    <div class="gallery-item" data-image-id="{{ loop.index0 }}" data-image-title="{{ image.title or image.filename }}" data-image-category="{{ image.category or 'Uncategorized' }}" onclick="openImageModal(this)">
                         <img src="{{ url_for("serve_image", filename=image.filename) }}" alt="{{ image.title or image.filename }}" class="gallery-image">
                     </div>
                     {% endfor %}
-                    <div class="gallery-item">
+                    <div class="gallery-item" data-image-id="{{ loop.index0 }}" data-image-title="{{ image.title or image.filename }}" data-image-category="{{ image.category or 'Uncategorized' }}" onclick="openImageModal(this)">
                         <img src="{{ url_for('static', filename='images/placeholder-gallery-2.jpg') }}" alt="Gallery Image 2" class="gallery-image">
                     </div>
-                    <div class="gallery-item">
+                    <div class="gallery-item" data-image-id="{{ loop.index0 }}" data-image-title="{{ image.title or image.filename }}" data-image-category="{{ image.category or 'Uncategorized' }}" onclick="openImageModal(this)">
                         <img src="{{ url_for('static', filename='images/placeholder-gallery-3.jpg') }}" alt="Gallery Image 3" class="gallery-image">
                     </div>
-                    <div class="gallery-item">
+                    <div class="gallery-item" data-image-id="{{ loop.index0 }}" data-image-title="{{ image.title or image.filename }}" data-image-category="{{ image.category or 'Uncategorized' }}" onclick="openImageModal(this)">
                         <img src="{{ url_for('static', filename='images/placeholder-gallery-4.jpg') }}" alt="Gallery Image 4" class="gallery-image">
                     </div>
                 </div>
@@ -237,3 +248,19 @@
     <script src="{{ url_for('static', filename='js/mobile_new.js') }}"></script>
 </body>
 </html>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="image-modal" onclick="closeImageModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeImageModal()">&times;</span>
+            <div class="modal-image-container">
+                <img id="modalImage" src="" alt="" class="modal-image">
+            </div>
+            <div class="modal-info">
+                <h3 id="modalTitle">Image Title</h3>
+                <p id="modalCategory" class="modal-category-link" onclick="filterByModalCategory()">Category</p>
+                <a href="https://fifthelement.photos/test_order_form" target="_blank" class="order-prints-btn">Order Prints</a>
+            </div>
+        </div>
+    </div>
+

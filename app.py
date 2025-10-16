@@ -632,11 +632,12 @@ def mobile_new():
     # Get about data
     about_data = load_about_data()
     
-    return render_template("mobile_new.html", 
+    return render_template("mobile_new.html",
                          images=images,
                          featured_image=featured_image,
                          hero_image=hero_image,
-                         about_data=about_data)
+                         about_data=about_data,
+                         categories=categories)
 
 @app.route('/featured')
 def featured():
