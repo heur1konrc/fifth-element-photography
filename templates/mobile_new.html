@@ -54,7 +54,7 @@
             <!-- Hero Image Section -->
             <div class="hero-section">
                 <div class="hero-image-container">
-                    <img src="{{ url_for('static', filename='images/placeholder-hero.jpg') }}" alt="Hero Image" class="hero-image">
+                    <img src="{{ url_for('static', filename='images/{{ images[0].filename if images else "placeholder-hero.jpg" }}') }}" alt="Hero Image" class="hero-image">
                 </div>
             </div>
 
@@ -62,10 +62,12 @@
             <div class="gallery-section">
                 <h2 class="gallery-title">GALLERY</h2>
                 <div class="gallery-grid">
-                    <!-- Gallery images will be populated here -->
+                    <!-- Gallery images from admin -->
+                    {% for image in images[:8] %}
                     <div class="gallery-item">
-                        <img src="{{ url_for('static', filename='images/placeholder-gallery-1.jpg') }}" alt="Gallery Image 1" class="gallery-image">
+                        <img src="/data/{{ image.filename }}" alt="{{ image.title or image.filename }}" class="gallery-image">
                     </div>
+                    {% endfor %}
                     <div class="gallery-item">
                         <img src="{{ url_for('static', filename='images/placeholder-gallery-2.jpg') }}" alt="Gallery Image 2" class="gallery-image">
                     </div>
@@ -86,19 +88,13 @@
             </div>
             <div class="featured-page-content">
                 <div class="featured-image-container">
-                    <img src="{{ url_for('static', filename='images/placeholder-featured.jpg') }}" alt="Featured Image" class="featured-image">
+                    <img src="{{ url_for('static', filename='images/{{ featured_image.filename if featured_image else "placeholder-featured.jpg" }}') }}" alt="Featured Image" class="featured-image">
                 </div>
                 
                 <div class="featured-content">
                     <h3 class="story-title">The Story Behind this Image</h3>
                     <div class="story-text">
-                        <p>While the term "seagull" is widely used, the birds commonly seen in Wisconsin are gulls, and two species are most prevalent: the Ring-billed Gull and the Herring Gull.</p>
-                        
-                        <p>The Ring-billed Gull is the most common and is frequently found in urban and inland areas, often scavenging for food in parking lots, farmlands, and landfills. It is a smaller gull with yellow legs and, as its name suggests, a black ring around its bill.</p>
-                        
-                        <p>The Herring Gull is larger than the Ring-billed Gull and is more typically found near large bodies of water, such as the Great Lakes. They are recognizable by their larger size, pinkish legs, and a red spot on the lower part of their bill.</p>
-                        
-                        <p>These gulls are resourceful and adaptable, thriving on a diverse diet that includes fish, insects, worms, and discarded human food.</p>
+                <p>{{ featured_image.story if featured_image and featured_image.story else "No featured image story available." }}</p>
                     </div>
                     
                     <!-- Action Buttons -->

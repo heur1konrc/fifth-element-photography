@@ -603,8 +603,19 @@ def mobile_gallery():
 
 @app.route('/mobile-new')
 def mobile_new():
-    """New mobile layout for testing"""
-    return render_template('mobile_new.html')
+    """Mobile layout with admin data"""
+    images = scan_images()
+    
+    # Find the featured image
+    featured_image = None
+    for image in images:
+        if image.get("is_featured"):
+            featured_image = image
+            break
+    
+    return render_template("mobile_new.html", 
+                         images=images,
+                         featured_image=featured_image)
 
 @app.route('/featured')
 def featured():
