@@ -65,7 +65,7 @@
                     <!-- Gallery images from admin -->
                     {% for image in images[:8] %}
                     <div class="gallery-item">
-                        <img src="/data/{{ image.filename }}" alt="{{ image.title or image.filename }}" class="gallery-image">
+                        <img src="{{ url_for("serve_image", filename=image.filename) }}" alt="{{ image.title or image.filename }}" class="gallery-image">
                     </div>
                     {% endfor %}
                     <div class="gallery-item">
