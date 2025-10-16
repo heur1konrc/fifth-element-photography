@@ -1,6 +1,6 @@
-// Mobile New Layout JavaScript - Fifth Element Photography
-
+// Mobile Navigation and Section Switching
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing mobile navigation...');
     initMobileNavigation();
     initSectionSwitching();
     initActionButtons();
@@ -8,26 +8,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Mobile Navigation Toggle
 function initMobileNavigation() {
+    console.log('Initializing mobile navigation...');
     const menuBtn = document.getElementById('mobileMenuBtn');
     const mobileNav = document.getElementById('mobileNav');
     
+    console.log('Menu button:', menuBtn);
+    console.log('Mobile nav:', mobileNav);
+    
     if (menuBtn && mobileNav) {
         menuBtn.addEventListener('click', function() {
+            console.log('Menu button clicked');
             mobileNav.classList.toggle('active');
-            
         });
+        console.log('Menu event listener attached');
+    } else {
+        console.error('Menu elements not found');
     }
 }
 
 // Section Switching
 function initSectionSwitching() {
+    console.log('Initializing section switching...');
     const navLinks = document.querySelectorAll('.nav-link');
     const sections = document.querySelectorAll('.mobile-section');
     const mobileNav = document.getElementById('mobileNav');
     const menuBtn = document.getElementById('mobileMenuBtn');
     
-    navLinks.forEach(link => {
+    console.log('Nav links found:', navLinks.length);
+    console.log('Sections found:', sections.length);
+    
+    navLinks.forEach((link, index) => {
         link.addEventListener('click', function(e) {
+            console.log('Nav link clicked:', this.getAttribute('href'));
             e.preventDefault();
             
             const targetId = this.getAttribute('href').substring(1);
@@ -41,87 +53,76 @@ function initSectionSwitching() {
             const targetSection = document.getElementById(targetId);
             if (targetSection) {
                 targetSection.classList.add('active');
+                console.log('Activated section:', targetId);
             }
             
             // Close mobile menu
             if (mobileNav) {
                 mobileNav.classList.remove('active');
-            }
-            if (menuBtn) {
-                
+                console.log('Menu closed');
             }
             
             // Scroll to top
             window.scrollTo(0, 0);
         });
+        console.log('Event listener attached to nav link', index);
     });
 }
 
 // Action Buttons Functionality
 function initActionButtons() {
+    console.log('Initializing action buttons...');
     const actionButtons = document.querySelectorAll('.action-btn');
     
     actionButtons.forEach(button => {
         button.addEventListener('click', function() {
             const buttonText = this.textContent.trim();
+            console.log('Action button clicked:', buttonText);
             
             switch(buttonText) {
                 case 'VIEW HIGH RESOLUTION':
-                    handleViewHighRes();
+                    // Handle high resolution view
+                    alert('High resolution view functionality will be implemented');
                     break;
                 case 'DOWNLOAD FULL SIZE':
-                    handleDownloadFullSize();
+                    // Handle download
+                    alert('Download functionality will be implemented');
                     break;
                 case 'SHARE ON SOCIAL MEDIA':
-                    handleShareSocial();
+                    // Handle social sharing
+                    alert('Social sharing functionality will be implemented');
                     break;
             }
         });
     });
 }
 
-// Action Button Handlers (placeholder functions)
-function handleViewHighRes() {
-    // Placeholder for high resolution view
-    console.log('View High Resolution clicked');
-    // Will be connected to admin functionality later
-}
-
-function handleDownloadFullSize() {
-    // Placeholder for download functionality
-    console.log('Download Full Size clicked');
-    // Will be connected to admin functionality later
-}
-
-function handleShareSocial() {
-    // Placeholder for social sharing
-    console.log('Share on Social Media clicked');
-    // Will be connected to admin functionality later
-}
-
-// Logo Click Handler (return to home)
+// Logo Click Handler
 document.addEventListener('DOMContentLoaded', function() {
-    const logoContainer = document.querySelector('.logo-container');
+    const logoSection = document.querySelector('.logo-section');
     
-    if (logoContainer) {
-        logoContainer.addEventListener('click', function() {
-            // Remove active from all sections and links
-            document.querySelectorAll('.mobile-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    if (logoSection) {
+        logoSection.addEventListener('click', function() {
+            console.log('Logo clicked - returning to home');
+            
+            // Remove active from all sections and nav links
+            const sections = document.querySelectorAll('.mobile-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            sections.forEach(s => s.classList.remove('active'));
+            navLinks.forEach(l => l.classList.remove('active'));
             
             // Activate home section and link
             const homeSection = document.getElementById('home');
-            const homeLink = document.querySelector('a[href="#home"]');
+            const homeLink = document.querySelector('.nav-link[href="#home"]');
             
             if (homeSection) homeSection.classList.add('active');
             if (homeLink) homeLink.classList.add('active');
             
             // Close mobile menu if open
             const mobileNav = document.getElementById('mobileNav');
-            const menuBtn = document.getElementById('mobileMenuBtn');
             
             if (mobileNav) mobileNav.classList.remove('active');
-            if (menuBtn) 
             
             // Scroll to top
             window.scrollTo(0, 0);
@@ -149,11 +150,10 @@ function handleSwipe() {
     // Swipe up to close menu
     if (swipeDistance > swipeThreshold) {
         const mobileNav = document.getElementById('mobileNav');
-        const menuBtn = document.getElementById('mobileMenuBtn');
         
         if (mobileNav && mobileNav.classList.contains('active')) {
             mobileNav.classList.remove('active');
-            if (menuBtn) 
+            console.log('Menu closed by swipe');
         }
     }
 }
