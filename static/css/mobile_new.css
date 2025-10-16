@@ -190,7 +190,7 @@ body {
     width: 100%;
     aspect-ratio: 16/9;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 0;
 }
 
 .hero-image {
@@ -218,7 +218,7 @@ body {
     width: 100%;
     aspect-ratio: 3/2;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 0;
     margin-bottom: 20px;
 }
 
@@ -470,13 +470,11 @@ body {
 .gallery-item img,
 .gallery-grid img,
 .mobile-section img {
-    border-radius: 0 !important;
 }
 
 /* Ensure hero and featured images are also sharp */
 .hero-image img,
 .featured-image img {
-    border-radius: 0 !important;
 }
 
 /* Fix image containers - remove ALL rounded corners */
@@ -486,7 +484,6 @@ body {
 .featured-image,
 .hero-section,
 .featured-section .image-container {
-    border-radius: 0 !important;
 }
 
 /* Fix logo display issues */
@@ -500,7 +497,6 @@ body {
 .image-placeholder,
 .hero-placeholder,
 .featured-placeholder {
-    border-radius: 0 !important;
 }
 /* Specific fix for hero image rounded corners */
 .hero-section,
@@ -508,7 +504,6 @@ body {
 .hero-section img,
 #home .hero-image,
 #home .hero-section {
-    border-radius: 0 !important;
 }
 
 /* Force logo to display properly */
@@ -531,25 +526,3 @@ body {
     text-align: center !important;
 }
 
-/* FINAL OVERRIDES - Force hero image to be squared */
-* {
-    border-radius: 0 !important;
-}
-
-.hero-image,
-.hero-section,
-.hero-section > *,
-#home .hero-image,
-#home .hero-section,
-div[class*="hero"] {
-    border-radius: 0 !important;
-}
-
-/* FINAL LOGO FIX - Force logo to display */
-.mobile-logo {
-    content: url('/static/images/logo.png') !important;
-    display: block !important;
-    width: 200px !important;
-    height: auto !important;
-    background: transparent !important;
-}
