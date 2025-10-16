@@ -15,12 +15,6 @@ function initMobileNavigation() {
         menuBtn.addEventListener('click', function() {
             mobileNav.classList.toggle('active');
             
-            // Update button text
-            if (mobileNav.classList.contains('active')) {
-                menuBtn.textContent = 'CLOSE';
-            } else {
-                menuBtn.textContent = 'MENU';
-            }
         });
     }
 }
@@ -54,7 +48,7 @@ function initSectionSwitching() {
                 mobileNav.classList.remove('active');
             }
             if (menuBtn) {
-                menuBtn.textContent = 'MENU';
+                
             }
             
             // Scroll to top
@@ -127,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const menuBtn = document.getElementById('mobileMenuBtn');
             
             if (mobileNav) mobileNav.classList.remove('active');
-            if (menuBtn) menuBtn.textContent = 'MENU';
+            if (menuBtn) 
             
             // Scroll to top
             window.scrollTo(0, 0);
@@ -159,7 +153,7 @@ function handleSwipe() {
         
         if (mobileNav && mobileNav.classList.contains('active')) {
             mobileNav.classList.remove('active');
-            if (menuBtn) menuBtn.textContent = 'MENU';
+            if (menuBtn) 
         }
     }
 }
