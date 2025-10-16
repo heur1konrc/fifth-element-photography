@@ -235,7 +235,7 @@ body {
 
 .swipe-container {
     display: flex;
-    gap: 15px;
+    gap: 10px;
     overflow-x: auto;
     padding: 20px;
     -webkit-overflow-scrolling: touch;
@@ -247,7 +247,7 @@ body {
 }
 
 .swipe-item {
-    flex: 0 0 280px;
+    flex: 0 0 calc(100vw - 40px);
     height: 200px;
     position: relative;
     border-radius: 12px;
@@ -424,7 +424,7 @@ body {
 .contact-item {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
     margin-bottom: 15px;
     padding: 10px;
     background: rgba(255, 255, 255, 0.05);
@@ -586,7 +586,7 @@ body {
 /* Responsive adjustments */
 @media (max-width: 480px) {
     .swipe-item {
-        flex: 0 0 250px;
+        flex: 0 0 calc(100vw - 30px);
         height: 180px;
     }
     
@@ -605,7 +605,7 @@ body {
 
 @media (max-width: 360px) {
     .swipe-item {
-        flex: 0 0 220px;
+        flex: 0 0 calc(100vw - 24px);
         height: 160px;
     }
     
