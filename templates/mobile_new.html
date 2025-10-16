@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fifth Element Photography - Mobile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile_new.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -53,13 +55,22 @@
 
             <!-- Hero Image Section -->
             <div class="hero-section">
-                <div class="hero-image-container">
+                <div class="hero-image-container hero-container">
                     {% if hero_image and hero_image.filename %}
                     <img src="{{ url_for('serve_image', filename=hero_image.filename) }}" alt="{{ hero_image.title or 'Hero Image' }}" class="hero-image">
+                    <div class="hero-overlay">
+                        <h2 class="hero-text">Capturing the Quintessence</h2>
+                    </div>
                     {% elif images %}
                     <img src="{{ url_for('serve_image', filename=images[0].filename) }}" alt="{{ images[0].title or 'Hero Image' }}" class="hero-image">
+                    <div class="hero-overlay">
+                        <h2 class="hero-text">Capturing the Quintessence</h2>
+                    </div>
                     {% else %}
                     <img src="{{ url_for('static', filename='images/placeholder-hero.jpg') }}" alt="Hero Image" class="hero-image">
+                    <div class="hero-overlay">
+                        <h2 class="hero-text">Capturing the Quintessence</h2>
+                    </div>
                     {% endif %}
                 </div>
             </div>
@@ -157,6 +168,10 @@
                     </div>
                     <div class="contact-item">
                         <h4>Location</h4>
+                    <div class="contact-item">
+                        <h4>Phone</h4>
+                        <p>(608) 219-6066</p>
+                    </div>
                         <p>Madison, Wisconsin</p>
                     </div>
                 </div>
@@ -181,12 +196,10 @@
                                 <option value="public-event">Public Event</option>
                                 <option value="corporate-event">Corporate Event</option>
                                 <option value="business-headshots">Business Headshots</option>
-                                <option value="wedding">Wedding</option>
-                                <option value="engagement">Engagement</option>
-                                <option value="family">Family</option>
-                                <option value="maternity">Maternity</option>
-                                <option value="newborn">Newborn</option>
-                                <option value="senior">Senior</option>
+                                <option value="promotional-headshots">Promotional Headshots</option>
+                                <option value="band-promotion">Band Promotion</option>
+                                <option value="product-promotion">Product Promotion</option>
+                                <option value="graduation">Graduation</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>
@@ -194,10 +207,10 @@
                             <label for="mobile-budget">What is your budget range?</label>
                             <select id="mobile-budget" name="budget">
                                 <option value="" disabled selected>Select a range</option>
-                                <option value="under-500">Under $500</option>
-                                <option value="500-1000">$500 - $1,000</option>
-                                <option value="1000-2000">$1,000 - $2,000</option>
-                                <option value="2000-plus">$2,000+</option>
+                                <option value="up-to-500">Up to $500</option>
+                                <option value="550-750">$550 - $750</option>
+                                <option value="800-1000">$800 - $1,000</option>
+                                <option value="not-sure">I am not sure, looking for a quote</option>
                                 <option value="discuss">Let's discuss</option>
                             </select>
                         </div>
