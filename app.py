@@ -599,7 +599,7 @@ def index():
 def mobile_gallery():
 
     """Mobile-optimized gallery page"""
-    return render_template('mobile_gallery.html')
+    return render_template('mobile.html')
 
 @app.route('/mobile-new')
 def mobile_new():
