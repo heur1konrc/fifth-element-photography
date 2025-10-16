@@ -133,17 +133,21 @@ body {
     display: block;
 }
 
-/* Social Media Section */
+/* Social Media Section - Updated to put title and icons on same line */
 .social-section {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
     margin-bottom: 30px;
 }
 
 .social-title {
     color: #6799c2;
     font-size: 1rem;
-    margin-bottom: 15px;
+    margin: 0;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .social-icons {
