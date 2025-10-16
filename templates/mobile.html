@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fifth Element Photography - Mobile</title>
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Fifth Element Photography - Mobile">
+    <meta property="og:description" content="Professional photography with artistic vision and technical excellence">
+    <meta property="og:type" content="website">
+    {% set featured_image = images|selectattr('is_featured')|first %}
+    {% if featured_image %}
+    <meta property="og:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url }}">
+    <meta property="og:image:alt" content="{{ featured_image.title }}">
+    {% endif %}
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Fifth Element Photography" class="mobile-logo">
+                <div class="logo-text">
+                    <h1>Fifth Element Photography</h1>
+                    <p>Madison, WI</p>
+                </div>
+            </div>
+            <button class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <nav class="mobile-menu" id="mobileMenu">
+        <ul>
+            <li><a href="#home" class="nav-link active">Home</a></li>
+            <li><a href="#featured" class="nav-link">Featured</a></li>
+            <li><a href="#about" class="nav-link">About</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
+            <li><a href="https://buymeacoffee.com/fifthelementphotography" target="_blank">Buy Me A Coffee</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="mobile-main">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <!-- Hero Image (from admin variable - same as desktop) -->
+            <div class="hero-section">
+                {% if hero_image %}
+                <div class="hero-image" style="background-image: url('{{ hero_image.url }}');">
+                {% else %}
+                <div class="hero-image" style="background-image: url('{{ url_for('static', filename='images/hero-default.jpg') }}');">
+                {% endif %}
+                    <div class="hero-overlay">
+                        <img src="{{ url_for('static', filename='images/TaglineWhite.png') }}" alt="Capturing the Quintessence" class="hero-tagline">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="categories-section">
+                <div class="categories-scroll">
+                    <button class="category-btn active" data-category="all">ALL</button>
+                    {% for category in categories %}
+                    <button class="category-btn" data-category="{{ category.lower() }}">{{ category.upper() }}</button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Image Count -->
+            <div class="image-count">
+                <span id="imageCount">{{ images|length }} images</span>
+            </div>
+
+            <!-- Horizontal Swipe Gallery - ONE ROW -->
+            <div class="swipe-gallery">
+                <div class="swipe-container" id="swipeContainer">
+                    {% for image in images %}
+                    <div class="swipe-item" data-category="{{ image.category.lower() }}" onclick="openImageModal('{{ image.url }}', '{{ image.title }}', '{{ image.category }}')">
+                        <img src="{{ image.url }}" alt="{{ image.title }}" loading="lazy">
+                        <div class="image-overlay">
+                            <h3>{{ image.title }}</h3>
+                            <p>{{ image.category.upper() }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Order Prints Button -->
+            <div class="order-section">
+                <button class="order-btn" onclick="openOrderModal()">
+                    <i class="fas fa-shopping-cart"></i>
+                    ORDER PRINTS
+                </button>
+            </div>
+        </section>
+
+        <!-- Featured Section -->
+        <section id="featured" class="section">
+            <div class="section-header">
+                <h2>Featured Image of the Week</h2>
+            </div>
+            {% if featured_image %}
+            <div class="featured-content">
+                <div class="featured-image">
+                    <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
+                </div>
+                <div class="featured-info">
+                    <h3>{{ featured_image.title }}</h3>
+                    <p class="featured-category">{{ featured_image.category.upper() }}</p>
+                    
+                    <!-- EXIF Data -->
+                    {% if featured_exif %}
+                    <div class="exif-data">
+                        <div class="exif-item">
+                            <span class="label">Camera:</span>
+                            <span class="value">{{ featured_exif.Model or 'N/A' }}</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="label">Lens:</span>
+                            <span class="value">{{ featured_exif.LensModel or 'N/A' }}</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="label">Aperture:</span>
+                            <span class="value">{{ featured_exif.FNumber or 'N/A' }}</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="label">Shutter:</span>
+                            <span class="value">{{ featured_exif.ExposureTime|exposure_fraction if featured_exif.ExposureTime else 'N/A' }}</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="label">ISO:</span>
+                            <span class="value">{{ featured_exif.ISOSpeedRatings or 'N/A' }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <button class="order-btn" onclick="openOrderModal('{{ featured_image.url }}', '{{ featured_image.title }}')">
+                        <i class="fas fa-shopping-cart"></i>
+                        ORDER THIS PRINT
+                    </button>
+                </div>
+            </div>
+            {% else %}
+            <p>No featured image selected.</p>
+            {% endif %}
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section">
+            <div class="section-header">
+                <h2>About</h2>
+            </div>
+            <div class="about-content">
+                <div class="about-image">
+                    {% if about_data and about_data.filename %}
+                    <img src="/about/{{ about_data.filename }}" alt="About Fifth Element Photography">
+                    {% else %}
+                    <div class="placeholder-image">
+                        <p>Upload an About image in the admin panel</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="about-text">
+                    {% if about_data and about_data.bio %}
+                    <p>{{ about_data.bio|safe }}</p>
+                    {% else %}
+                    <p>Add your bio in the admin panel</p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section">
+            <div class="section-header">
+                <h2>Contact</h2>
+            </div>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Get In Touch</h3>
+                    <p>Ready to capture your special moments? Let's discuss your photography needs.</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:info@fifthelement.photos">info@fifthelement.photos</a>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:+16082196066">(608) 219-6066</a>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Madison, Wisconsin</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Functional Contact Form -->
+                <div class="contact-form">
+                    <h3>Send a Message</h3>
+                    <form id="contactForm" action="/contact" method="POST">
+                        <div class="form-group">
+                            <input type="text" name="name" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" name="email" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" name="phone" placeholder="Your Phone Number">
+                        </div>
+                        <div class="form-group">
+                            <select name="shoot_type" required>
+                                <option value="" disabled selected>Type of shoot?</option>
+                                <option value="portrait">Portrait</option>
+                                <option value="public-event">Public Event</option>
+                                <option value="corporate-event">Corporate Event</option>
+                                <option value="business-headshots">Business Headshots</option>
+                                <option value="promotional-headshots">Promotional Headshots</option>
+                                <option value="band-promotion">Band Promotion</option>
+                                <option value="product-promotion">Product Promotion</option>
+                                <option value="graduation">Graduation</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <select name="budget">
+                                <option value="" disabled selected>Budget range?</option>
+                                <option value="500">Up to $500</option>
+                                <option value="550-750">$550 - $750</option>
+                                <option value="800-1000">$800 - $1,000</option>
+                                <option value="not-sure">Looking for a quote</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" name="how_heard" placeholder="How did you hear about us?">
+                        </div>
+                        <div class="form-group">
+                            <textarea name="message" placeholder="Your Message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeImageModal()">&times;</button>
+            <img id="modalImage" src="" alt="">
+            <div class="modal-info">
+                <h3 id="modalTitle"></h3>
+                <p id="modalCategory"></p>
+                <button class="order-btn" onclick="openOrderModal()">
+                    <i class="fas fa-shopping-cart"></i>
+                    ORDER THIS PRINT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Modal (Same PayPal system as desktop) -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content order-modal-content">
+            <button class="modal-close" onclick="closeOrderModal()">&times;</button>
+            <h2>Order Print</h2>
+            
+            <!-- Order form will be loaded here from desktop system -->
+            <div id="orderFormContainer">
+                <p>Loading order form...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/mobile.js') }}"></script>
+</body>
+</html>

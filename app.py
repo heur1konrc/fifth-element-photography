@@ -554,15 +554,26 @@ def index():
     
     about_data = load_about_data()
     
+    # Load hero image for mobile template
+    hero_image_data = load_hero_image()
+    hero_image = None
+    if hero_image_data and hero_image_data.get('filename'):
+        # Find the hero image in the images list
+        for image in images:
+            if image['filename'] == hero_image_data['filename']:
+                hero_image = image
+                break
+    
     # Mobile detection - serve different template based on device
     if is_mobile_device():
-        return render_template('index_mobile.html', 
+        return render_template('mobile.html', 
                              images=images, 
                              categories=categories,
                              category_counts=category_counts,
                              featured_image=featured_image,
                              featured_exif=featured_exif,
-                             about_data=about_data)
+                             about_data=about_data,
+                             hero_image=hero_image)
     else:
         # Desktop users get the original template (unchanged)
         return render_template('index.html', 
@@ -571,7 +582,8 @@ def index():
                              category_counts=category_counts,
                              featured_image=featured_image,
                              featured_exif=featured_exif,
-                             about_data=about_data)
+                             about_data=about_data,
+                             hero_image=hero_image)
 
 @app.route('/mobile')
 def mobile_gallery():
@@ -956,7 +968,8 @@ def admin():
         images = scan_images()
         all_categories = load_categories()
         about_data = load_about_data()
-        return render_template('admin_new.html', images=images, all_categories=all_categories, about_data=about_data)
+        return render_template('admin_new.html', images=images, all_categories=all_categories, about_data=about_data,
+                             hero_image=hero_image)
     except Exception as e:
         return f"Admin Error: {str(e)}", 500
 
