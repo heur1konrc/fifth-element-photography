@@ -554,15 +554,15 @@ def index():
     
     about_data = load_about_data()
 
-        # Load hero image for admin template
-        hero_image_data = load_hero_image()
-        hero_image = None
-        if hero_image_data and hero_image_data.get("filename"):
-            # Find the hero image in the images list
-            for image in images:
-                if image["filename"] == hero_image_data["filename"]:
-                    hero_image = image
-                    break
+    # Load hero image for admin template
+    hero_image_data = load_hero_image()
+    hero_image = None
+    if hero_image_data and hero_image_data.get("filename"):
+        # Find the hero image in the images list
+        for image in images:
+            if image["filename"] == hero_image_data["filename"]:
+                hero_image = image
+                break
     
     # Load hero image for mobile template
     hero_image_data = load_hero_image()
@@ -1752,15 +1752,15 @@ def debug_about():
     """Debug about data"""
     about_data = load_about_data()
 
-        # Load hero image for admin template
-        hero_image_data = load_hero_image()
-        hero_image = None
-        if hero_image_data and hero_image_data.get("filename"):
-            # Find the hero image in the images list
-            for image in images:
-                if image["filename"] == hero_image_data["filename"]:
-                    hero_image = image
-                    break
+    # Load hero image for admin template
+    hero_image_data = load_hero_image()
+    hero_image = None
+    if hero_image_data and hero_image_data.get("filename"):
+        # Find the hero image in the images list
+        for image in images:
+            if image["filename"] == hero_image_data["filename"]:
+                hero_image = image
+                break
     return jsonify({
         'about_data': about_data,
         'about_data_exists': bool(about_data),
