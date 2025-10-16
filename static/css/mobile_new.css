@@ -1,0 +1,381 @@
+/* Mobile New Layout CSS - Fifth Element Photography */
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #000;
+    color: #fff;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Header Section */
+.mobile-header {
+    background-color: #000;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.logo-section {
+    margin-bottom: 20px;
+}
+
+.logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.mobile-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+    filter: brightness(0) invert(1);
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 2px;
+    letter-spacing: 2px;
+}
+
+.brand-subtitle {
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.brand-tagline {
+    font-size: 0.8rem;
+    color: #ccc;
+    font-style: italic;
+    margin-bottom: 20px;
+}
+
+/* Menu Section */
+.menu-section {
+    margin-top: 10px;
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    color: #6799c2;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 20px;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+.menu-btn:hover {
+    color: #fff;
+}
+
+/* Navigation Menu */
+.mobile-nav {
+    background-color: #111;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.mobile-nav.active {
+    max-height: 300px;
+    padding: 20px 0;
+}
+
+.nav-list {
+    list-style: none;
+    text-align: center;
+}
+
+.nav-list li {
+    margin-bottom: 15px;
+}
+
+.nav-link {
+    color: #6799c2;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+    display: block;
+    padding: 10px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #fff;
+}
+
+/* Main Content */
+.mobile-main {
+    padding: 0;
+}
+
+.mobile-section {
+    display: none;
+    padding: 20px;
+}
+
+.mobile-section.active {
+    display: block;
+}
+
+/* Social Media Section */
+.social-section {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.social-title {
+    color: #6799c2;
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.social-link.facebook {
+    background-color: #1877f2;
+    color: #fff;
+}
+
+.social-link.twitter {
+    background-color: #1da1f2;
+    color: #fff;
+}
+
+.social-link:hover {
+    transform: scale(1.1);
+}
+
+/* Hero Image Section */
+.hero-section {
+    margin-bottom: 30px;
+}
+
+.hero-image-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Featured Section */
+.featured-section {
+    margin-bottom: 40px;
+}
+
+.featured-title {
+    color: #6799c2;
+    font-size: 1.3rem;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.featured-image-container {
+    width: 100%;
+    aspect-ratio: 3/2;
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.featured-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+/* Featured Content */
+.featured-content {
+    padding: 0 10px;
+}
+
+.story-title {
+    color: #6799c2;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.story-text {
+    color: #ccc;
+    line-height: 1.7;
+    margin-bottom: 25px;
+}
+
+.story-text p {
+    margin-bottom: 15px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.action-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.action-btn.primary {
+    background-color: #6799c2;
+    color: #fff;
+}
+
+.action-btn.primary:hover {
+    background-color: #5a8ab0;
+    transform: translateY(-2px);
+}
+
+.action-btn.secondary {
+    background-color: transparent;
+    color: #6799c2;
+    border: 2px solid #6799c2;
+}
+
+.action-btn.secondary:hover {
+    background-color: #6799c2;
+    color: #fff;
+}
+
+.action-btn.tertiary {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+.action-btn.tertiary:hover {
+    background-color: #444;
+    border-color: #6799c2;
+}
+
+/* Page Headers */
+.page-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #6799c2;
+}
+
+.page-header h1 {
+    color: #6799c2;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Content Sections */
+.featured-page-content,
+.about-content,
+.contact-content {
+    color: #ccc;
+    line-height: 1.7;
+    padding: 0 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .mobile-header {
+        padding: 15px;
+    }
+    
+    .mobile-logo {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .brand-name {
+        font-size: 1.3rem;
+    }
+    
+    .brand-subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .brand-tagline {
+        font-size: 0.7rem;
+    }
+    
+    .mobile-section {
+        padding: 15px;
+    }
+    
+    .featured-title {
+        font-size: 1.1rem;
+    }
+    
+    .action-btn {
+        padding: 10px 15px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .social-icons {
+        gap: 15px;
+    }
+    
+    .social-link {
+        width: 45px;
+        height: 45px;
+        font-size: 1rem;
+    }
+    
+    .action-buttons {
+        gap: 10px;
+    }
+}

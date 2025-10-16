@@ -110,3 +110,21 @@ static/
 - Test thoroughly in Staging before Main deployment
 - Keep desktop and mobile completely separate
 - Document everything for continuity
+
+
+## Visual References
+All mobile layout reference materials are saved in `/mobile-references/` folder:
+
+### Screen Recording Frames (from user's mobile layout example):
+- `frame_001.png` - Initial mobile layout with logo and menu
+- `frame_002.png` - Expanded menu showing navigation items
+- `frame_003.png` - Menu interaction and layout structure
+- `frame_004.png` - Featured image section layout
+- `frame_005.png` - Complete mobile layout with content
+
+### Screenshots (detailed mobile layout requirements):
+- `Screenshot2025-10-15212822.png` - Featured image layout with story section
+- `Screenshot2025-10-15212844.png` - Detailed content layout and text formatting
+- `Screenshot2025-10-15212859.png` - Action buttons (VIEW HIGH RESOLUTION, DOWNLOAD FULL SIZE, SHARE ON SOCIAL MEDIA)
+
+These files show the exact mobile layout structure, navigation behavior, content organization, and visual design that needs to be implemented.

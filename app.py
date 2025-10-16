@@ -597,8 +597,14 @@ def index():
 
 @app.route('/mobile')
 def mobile_gallery():
+
     """Mobile-optimized gallery page"""
     return render_template('mobile_gallery.html')
+
+@app.route('/mobile-new')
+def mobile_new():
+    """New mobile layout for testing"""
+    return render_template('mobile_new.html')
 
 @app.route('/featured')
 def featured():

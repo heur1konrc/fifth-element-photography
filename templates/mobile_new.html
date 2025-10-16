@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fifth Element Photography - Mobile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile_new.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="mobile-header">
+        <div class="logo-section">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Fifth Element Photography" class="mobile-logo">
+                <h1 class="brand-name">FIFTH ELEMENT</h1>
+                <p class="brand-subtitle">PHOTOGRAPHY</p>
+                <p class="brand-tagline">Capturing the Quintessence</p>
+            </div>
+        </div>
+        
+        <!-- Menu Button -->
+        <div class="menu-section">
+            <button class="menu-btn" id="mobileMenuBtn">MENU</button>
+        </div>
+    </header>
+
+    <!-- Navigation Menu (Hidden by default) -->
+    <nav class="mobile-nav" id="mobileNav">
+        <ul class="nav-list">
+            <li><a href="#home" class="nav-link active">HOME</a></li>
+            <li><a href="#featured" class="nav-link">FEATURED IMAGE</a></li>
+            <li><a href="#about" class="nav-link">ABOUT</a></li>
+            <li><a href="#contact" class="nav-link">CONTACT</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="mobile-main">
+        
+        <!-- Home Section -->
+        <section id="home" class="mobile-section active">
+            
+            <!-- Social Media Section -->
+            <div class="social-section">
+                <h2 class="social-title">Follow Us</h2>
+                <div class="social-icons">
+                    <a href="#" class="social-link facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href="#" class="social-link twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Hero Image Section -->
+            <div class="hero-section">
+                <div class="hero-image-container">
+                    <img src="{{ url_for('static', filename='images/placeholder-hero.jpg') }}" alt="Hero Image" class="hero-image">
+                </div>
+            </div>
+
+            <!-- Featured Image Section -->
+            <div class="featured-section">
+                <h2 class="featured-title">FEATURED IMAGE OF THE WEEK</h2>
+                <div class="featured-image-container">
+                    <img src="{{ url_for('static', filename='images/placeholder-featured.jpg') }}" alt="Featured Image" class="featured-image">
+                </div>
+                
+                <div class="featured-content">
+                    <h3 class="story-title">The Story Behind this Image</h3>
+                    <div class="story-text">
+                        <p>While the term "seagull" is widely used, the birds commonly seen in Wisconsin are gulls, and two species are most prevalent: the Ring-billed Gull and the Herring Gull.</p>
+                        
+                        <p>The Ring-billed Gull is the most common and is frequently found in urban and inland areas, often scavenging for food in parking lots, farmlands, and landfills. It is a smaller gull with yellow legs and, as its name suggests, a black ring around its bill.</p>
+                        
+                        <p>The Herring Gull is larger than the Ring-billed Gull and is more typically found near large bodies of water, such as the Great Lakes. They are recognizable by their larger size, pinkish legs, and a red spot on the lower part of their bill.</p>
+                        
+                        <p>These gulls are resourceful and adaptable, thriving on a diverse diet that includes fish, insects, worms, and discarded human food.</p>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="action-btn primary">VIEW HIGH RESOLUTION</button>
+                        <button class="action-btn secondary">DOWNLOAD FULL SIZE</button>
+                        <button class="action-btn tertiary">SHARE ON SOCIAL MEDIA</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Image Page Section -->
+        <section id="featured" class="mobile-section">
+            <div class="page-header">
+                <h1>Featured Image</h1>
+            </div>
+            <div class="featured-page-content">
+                <!-- Content will be populated from admin -->
+                <p>Featured image page content goes here...</p>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="mobile-section">
+            <div class="page-header">
+                <h1>About</h1>
+            </div>
+            <div class="about-content">
+                <!-- Content will be populated from admin -->
+                <p>About page content goes here...</p>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="mobile-section">
+            <div class="page-header">
+                <h1>Contact</h1>
+            </div>
+            <div class="contact-content">
+                <!-- Content will be populated from admin -->
+                <p>Contact page content goes here...</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='js/mobile_new.js') }}"></script>
+</body>
+</html>
