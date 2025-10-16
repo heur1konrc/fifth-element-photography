@@ -641,3 +641,13 @@ body {
     font-size: 0.8rem !important;
     margin-right: 6px !important;
 }
+
+/* Make logo clickable to go home */
+.logo {
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.logo:hover {
+    opacity: 0.8;
+}

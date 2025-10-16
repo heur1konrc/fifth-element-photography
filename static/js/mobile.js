@@ -7,6 +7,28 @@ document.addEventListener('DOMContentLoaded', function() {
     initSwipeGallery();
     initContactForm();
     initModals();
+
+    // Make logo clickable to go home
+    const logo = document.querySelector(".logo");
+    if (logo) {
+        logo.addEventListener("click", function() {
+            // Remove active from all sections and links
+            document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+            document.querySelectorAll(".nav-link").forEach(l => l.classList.remove("active"));
+            
+            // Activate home section and link
+            const homeSection = document.getElementById("home");
+            const homeLink = document.querySelector("a[href=\"#home\"]");
+            if (homeSection) homeSection.classList.add("active");
+            if (homeLink) homeLink.classList.add("active");
+            
+            // Close mobile menu if open
+            const menuToggle = document.getElementById("menuToggle");
+            const mobileMenu = document.getElementById("mobileMenu");
+            if (menuToggle) menuToggle.classList.remove("active");
+            if (mobileMenu) mobileMenu.classList.remove("active");
+        });
+    }
 });
 
 // Mobile Menu Toggle
