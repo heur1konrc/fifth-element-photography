@@ -100,20 +100,11 @@
             <div class="gallery-section">
                 <div class="gallery-grid">
                     <!-- Gallery images from admin -->
-                    {% for image in images[:8] %}
+                    {% for image in images %}
                     <div class="gallery-item" data-image-id="{{ loop.index0 }}" data-image-title="{{ image.title or image.filename }}" data-image-category="{{ image.category or 'Uncategorized' }}" onclick="openImageModal(this)">
                         <img src="{{ url_for("serve_image", filename=image.filename) }}" alt="{{ image.title or image.filename }}" class="gallery-image">
                     </div>
                     {% endfor %}
-                    <div class="gallery-item" data-image-id="placeholder" data-image-title="Gallery Image 2" data-image-category="Other" onclick="openImageModal(this)">
-                        <img src="{{ url_for('static', filename='images/placeholder-gallery-2.jpg') }}" alt="Gallery Image 2" class="gallery-image">
-                    </div>
-                    <div class="gallery-item" data-image-id="placeholder" data-image-title="Gallery Image 3" data-image-category="Other" onclick="openImageModal(this)">
-                        <img src="{{ url_for('static', filename='images/placeholder-gallery-3.jpg') }}" alt="Gallery Image 3" class="gallery-image">
-                    </div>
-                    <div class="gallery-item" data-image-id="placeholder" data-image-title="Gallery Image 4" data-image-category="Other" onclick="openImageModal(this)">
-                        <img src="{{ url_for('static', filename='images/placeholder-gallery-4.jpg') }}" alt="Gallery Image 4" class="gallery-image">
-                    </div>
                 </div>
             </div>
         </section>
