@@ -16,12 +16,18 @@
     <h1>Test Order Form - OrderDesk Integration</h1>
     
     <div class="product-info">
+        {% if no_image_selected %}
+        <h3 style="color: #d9534f;">No Image Selected</h3>
+        <p style="color: #d9534f; font-weight: bold;">Please go to the <a href="/" style="color: #007cba;">gallery</a> and select an image first, then click ORDER PRINTS.</p>
+    {% else %}
         <h3>Image Name: {{ image }}</h3>
+    {% endif %}
         <p><strong>Product:</strong> Canvas Print 12x12</p>
         <p><strong>Price:</strong> $25.00</p>
         <p><strong>Image:</strong> https://fifthelement.photos/images/12x12_Sparrow.jpg</p>
     </div>
 
+    {% if not no_image_selected %}
     <form action="/test_order_submit" method="POST">
         <h3>Customer Information</h3>
         
@@ -105,6 +111,7 @@
         <!-- Hidden submit for after payment -->
         <button type="submit" id="submit-order" style="display: none;">Submit Order to OrderDesk</button>
     </form>
+{% endif %}
 
     <!-- PayPal SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=AVE6LeJKagwJXHf2BPamlaDQghtNBoRmRU8j5KK7wi7wDN61Ufm2dGZFi_CFH5L4MuKjh8KLhHLVwP5w&currency=USD&disable-funding=paylater"></script>

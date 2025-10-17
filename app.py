@@ -3693,9 +3693,9 @@ def test_order_form():
     # Pass all query parameters to template
     params = request.args.to_dict()
     
-    # Set defaults if not provided
-    if "image" not in params:
-        params["image"] = "Sparrow"
+    # Check if image parameter is provided
+    if "image" not in params or not params["image"]:
+        params["no_image_selected"] = True
     
     return render_template("test_order_form.html", **params)
 
