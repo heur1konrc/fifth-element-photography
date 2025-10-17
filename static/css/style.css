@@ -1837,9 +1837,11 @@ textarea {
 }
 
 .order-image-preview img,
-#orderImagePreview img {
+#orderImagePreview img,
+.modal-order-form img {
     max-width: 400px !important;
-    height: auto;
+    width: 400px !important;
+    height: auto !important;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
