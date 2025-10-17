@@ -576,7 +576,7 @@ def index():
     
     # Mobile detection - serve different template based on device
     if is_mobile_device():
-        return render_template('mobile.html', 
+        return render_template('mobile_new.html', 
                              images=images, 
                              categories=categories,
                              category_counts=category_counts,
@@ -599,7 +599,7 @@ def index():
 def mobile_gallery():
 
     """Mobile-optimized gallery page"""
-    return render_template('mobile.html')
+    return render_template('mobile_new.html')
 
 @app.route('/mobile-new')
 @app.route('/mobile-new')
