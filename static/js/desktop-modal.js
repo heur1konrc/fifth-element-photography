@@ -63,6 +63,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const paginationContainer = document.getElementById('paginationContainer');
         if (paginationContainer) {
             paginationContainer.style.display = 'none';
+        // Hide loading text
+        const loadingDiv = document.querySelector(".loading");
+        if (loadingDiv) {
+            loadingDiv.style.display = "none";
+        }
+        
+        // Update image count
+        const imageCount = document.getElementById("imageCount");
+        if (imageCount) {
+            imageCount.textContent = `${images.length} image${images.length !== 1 ? "s" : ""}`;
+        }
         }
     }
     
