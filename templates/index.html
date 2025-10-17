@@ -360,6 +360,49 @@
 
     <script>
         // Desktop order form function - matches mobile functionality
+
+        // Essential modal functionality - inline to bypass script loading issues
+        function openModal(imageUrl, title, category) {
+            const modal = document.getElementById("imageModal");
+            const modalImage = document.getElementById("modalImage");
+            const modalTitle = document.getElementById("modalTitle");
+            const modalCategory = document.getElementById("modalCategory");
+            
+            if (modal && modalImage && modalTitle && modalCategory) {
+                modalImage.src = imageUrl;
+                modalTitle.textContent = title;
+                modalCategory.innerHTML = "<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>";
+                modal.classList.add("show");
+                document.body.style.overflow = "hidden";
+            }
+        }
+        
+        function closeImageModal() {
+            const modal = document.getElementById("imageModal");
+            if (modal) {
+                modal.classList.remove("show");
+                document.body.style.overflow = "auto";
+            }
+        }
+        
+        // Setup modal close events
+        document.addEventListener("DOMContentLoaded", function() {
+            const closeModal = document.querySelector(".close");
+            const modal = document.getElementById("imageModal");
+            
+            if (closeModal) {
+                closeModal.addEventListener("click", closeImageModal);
+            }
+            
+            if (modal) {
+                window.addEventListener("click", function(e) {
+                    if (e.target === modal) {
+                        closeImageModal();
+                    }
+                });
+            }
+        });
+
         function openDesktopOrderForm() {
             const modalTitle = document.getElementById("modalTitle");
             if (modalTitle && modalTitle.textContent) {
