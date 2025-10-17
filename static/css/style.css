@@ -1905,6 +1905,26 @@ textarea {
     background: #3367d6;
 }
 
+.order-photos-btn {
+    display: inline-block;
+    background: #4285f4 !important;
+    color: white !important;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: background-color 0.3s ease;
+}
+
+.order-photos-btn:hover {
+    background: #3367d6 !important;
+}
+
 /* Responsive Design for Order Form */
 @media (max-width: 768px) {
     .order-content {
