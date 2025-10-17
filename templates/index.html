@@ -321,26 +321,27 @@
             
             <!-- Main Image View -->
             <div class="modal-main-view" id="modalMainView">
+            <div class="modal-main-view" id="modalMainView">
                 <img class="modal-image" id="modalImage">
-                <div class="modal-info">
-                    <h4 id="modalTitle"></h4>
-                    <p id="modalCategory"></p>
-                    <div style="text-align: center; margin-top: 20px; padding: 20px;">
-                        <a onclick="openDesktopOrderForm(); return false;" href="#" id="orderPrintBtn" target="_blank" style="
-                            display: inline-block;
-                            background: #6799c2;
+                <div class="modal-info" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); color: white; padding: 20px; text-align: left;">
+                    <h3 id="modalTitle" style="margin: 0 0 10px 0; color: white; font-size: 1.5rem;"></h3>
+                    <span id="modalCategory" style="background: #4a90e2; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; text-transform: uppercase;"></span>
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="openDesktopOrderForm(); return false;" id="orderPrintBtn" style="
+                            background: #4a90e2;
                             color: white;
-                            padding: 15px 30px;
-                            border-radius: 8px;
-                            text-decoration: none;
-                            font-family: Arial, sans-serif;
+                            padding: 12px 30px;
+                            border: 2px solid #4a90e2;
+                            border-radius: 25px;
                             font-weight: bold;
-                            font-size: 16px;
+                            font-size: 1rem;
                             text-transform: uppercase;
-                            letter-spacing: 1px;
-                            border: 2px solid white;
-                            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-                        ">🖼️ ORDER PRINT</a>
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                        ">ORDER PRINTS</button>
+                    </div>
+                </div>
+            </div>
                     </div>
                 </div>
             </div>

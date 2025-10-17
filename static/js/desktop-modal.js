@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const imageHTML = images.map(image => {
             return `
-                <div class="image-item" onclick="openImageModal('${image.url}', '${image.title}')">
+                <div class="image-item" onclick="openImageModal('${image.url}', '${image.title}', '${image.category}')">
                     <img src="${image.url}" alt="${image.title}" loading="lazy">
                     <div class="image-overlay">
                         <div class="image-title">${image.title}</div>
