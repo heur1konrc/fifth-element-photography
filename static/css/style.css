@@ -430,8 +430,8 @@ textarea {
     position: relative;
     margin: auto;
     padding: 10px;
-    width: 90vw;
-    max-width: 90vw; max-height: 60vw;
+    width: 95vw;
+    max-width: 95vw; max-height: 60vw;
     top: 50%; aspect-ratio: 3/2;
     transform: translateY(-50%);
     text-align: center;
@@ -453,8 +453,8 @@ textarea {
 }
 
 .modal-image {
-    width: 80vw; height: 53.33vw;
-    max-height: 80vh; aspect-ratio: 3/2;
+    width: 90vw; height: 85vh;
+    max-height: 85vh;
     border-radius: 8px;
     background: transparent;
     object-fit: cover;
