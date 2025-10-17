@@ -262,11 +262,100 @@
                         <span id="modalCategory" class="category-badge" onclick="filterByModalCategory()">Category</span>
                     </div>
                 </div>
-                <div class="modal-actions">
-                    <a href="#" onclick="openOrderForm(); return false;" class="order-prints-btn">ORDER PRINTS</a>
+            <div class="modal-actions">
+                <button onclick="showMobileOrderForm()" class="order-prints-btn">ORDER PRINTS</button>
+            </div>
+        </div>
+        
+        <!-- Mobile Order Form Section (initially hidden) -->
+        <div class="mobile-order-form" id="mobileOrderForm" style="display: none;">
+            <div class="order-form-header">
+                <button class="btn-back" onclick="showMobileImageView()">
+                    <span class="btn-icon">←</span>
+                    Back to Image
+                </button>
+                <h2 class="order-form-title">ORDER FORM</h2>
+            </div>
+            
+            <div class="mobile-order-content">
+                <!-- Image Details Section -->
+                <div class="mobile-order-info">
+                    <h3>Image Details</h3>
+                    <div id="mobileOrderImageDetails">
+                        <!-- Image details will be populated dynamically -->
+                    </div>
+                    <div class="mobile-order-image-preview" id="mobileOrderImagePreview">
+                        <!-- Image thumbnail will be shown here -->
+                    </div>
+                </div>
+                
+                <!-- Order Form Section -->
+                <div class="mobile-order-form-fields">
+                    <h3>Place Order</h3>
+                    <form id="mobileOrderForm" action="/test_order_submit" method="POST">
+                        <div class="form-group">
+                            <input type="email" id="mobile_order_email" name="email" placeholder="Your Email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="mobile_order_first_name" name="first_name" placeholder="First Name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="mobile_order_last_name" name="last_name" placeholder="Last Name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="mobile_order_address" name="address" placeholder="Address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="mobile_order_city" name="city" placeholder="City" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="mobile_order_state" name="state" placeholder="State" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="text" id="mobile_order_zip" name="zip_code" placeholder="Zip Code" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <select id="mobile_order_country" name="country" required>
+                                <option value="">Select Country</option>
+                                <option value="United States">United States</option>
+                                <option value="Canada">Canada</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="tel" id="mobile_order_phone" name="phone" placeholder="Phone Number">
+                        </div>
+                        
+                        <div class="form-group">
+                            <select id="mobile_order_product_type" name="product_type" required>
+                                <option value="">Select a product...</option>
+                                <option value="canvas|12x12_075" data-sku="101001" data-options="1,5">Canvas Print 0.75" (12x12) - Loading...</option>
+                                <option value="canvas|12x12_125" data-sku="101002" data-options="2,5">Canvas Print 1.25" (12x12) - Loading...</option>
+                                <option value="metal|12x12" data-sku="106001" data-options="29,31">Metal Print (12x12) - Loading...</option>
+                                <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - Loading...</option>
+                            </select>
+                        </div>
+
+                        <!-- PayPal Payment Section -->
+                        <div class="payment-section">
+                            <p class="total-price"><strong>Total: <span id="mobile-order-total-price">$0.00</span></strong></p>
+                            <div id="mobile-order-paypal-button-container"></div>
+                        </div>
+
+                        <!-- Submit button -->
+                        <button type="submit" id="mobile-order-submit-order">Submit Order to OrderDesk</button>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/mobile_new.js') }}"></script>

@@ -997,3 +997,147 @@ body {
         font-size: 0.8rem;
     }
 }
+
+/* Mobile Order Form Styles */
+.mobile-order-form {
+    padding: 20px;
+    background: #000;
+    color: #fff;
+}
+
+.order-form-header {
+    margin-bottom: 20px;
+}
+
+.btn-back {
+    background: #4285f4;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.btn-back:hover {
+    background: #3367d6;
+}
+
+.order-form-title {
+    text-align: center;
+    color: #fff;
+    font-size: 1.5rem;
+    margin: 0;
+}
+
+.mobile-order-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.mobile-order-info h3,
+.mobile-order-form-fields h3 {
+    color: #fff;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.mobile-order-info p {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.mobile-order-image-preview {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.mobile-order-image-preview img {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.mobile-order-form-fields .form-group {
+    margin-bottom: 15px;
+}
+
+.mobile-order-form-fields .form-group input,
+.mobile-order-form-fields .form-group select,
+.mobile-order-form-fields .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 16px; /* Prevents zoom on iOS */
+    font-family: 'Arial', sans-serif;
+}
+
+.mobile-order-form-fields .form-group input::placeholder {
+    color: #888;
+}
+
+.mobile-order-form-fields .form-group input:focus,
+.mobile-order-form-fields .form-group select:focus,
+.mobile-order-form-fields .form-group textarea:focus {
+    outline: none;
+    border-color: #4285f4;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+}
+
+.payment-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #444;
+}
+
+.total-price {
+    font-size: 1.1rem;
+    color: #6799c2;
+    margin-bottom: 15px;
+}
+
+#mobile-order-submit-order {
+    background: #4285f4;
+    color: #ffffff;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+#mobile-order-submit-order:hover {
+    background: #3367d6;
+}
+
+/* Update ORDER PRINTS button styling */
+.order-prints-btn {
+    background: #4285f4 !important;
+    color: white !important;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.order-prints-btn:hover {
+    background: #3367d6 !important;
+}

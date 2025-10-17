@@ -564,15 +564,80 @@ function getItemsPerView() {
     return 4;
 }
 
-// Function to open order form with selected image
-function openOrderForm() {
-    const modalTitle = document.getElementById('modalTitle');
-    if (modalTitle && modalTitle.textContent) {
-        const imageName = encodeURIComponent(modalTitle.textContent.trim());
-        const orderFormUrl = '/test_order_form?image=' + imageName;
-        window.open(orderFormUrl, '_blank');
-    } else {
-        // Fallback - open form without image parameter
-        window.open('/test_order_form', '_blank');
+// Mobile Order Form Functions
+function showMobileOrderForm() {
+    // Hide the image view
+    document.querySelector('.modal-content > .modal-image-container').style.display = 'none';
+    document.querySelector('.modal-content > .modal-info').style.display = 'none';
+    
+    // Show the order form
+    document.getElementById('mobileOrderForm').style.display = 'block';
+    
+    // Get image info from the modal
+    const imageName = document.getElementById('modalTitle').textContent;
+    const imageElement = document.getElementById('modalImage');
+    
+    // Populate order form with image details
+    const orderImageDetails = document.getElementById('mobileOrderImageDetails');
+    const orderImagePreview = document.getElementById('mobileOrderImagePreview');
+    
+    if (orderImageDetails && imageName && imageElement && imageElement.src) {
+        const img = new Image();
+        img.onload = function() {
+            const width = this.naturalWidth;
+            const height = this.naturalHeight;
+            
+            // Calculate DPI for 12x12 print
+            const printSize = 12; // inches
+            const dpi = Math.round(Math.min(width, height) / printSize);
+            
+            // Populate image details
+            orderImageDetails.innerHTML = `
+                <p><strong>Image Name:</strong> ${imageName}</p>
+                <p><strong>Image Size:</strong> ${width}x${height} pixels, DPI: ${dpi}</p>
+                <p><strong>Product:</strong> Canvas Print 12x12</p>
+                <p><strong>Image:</strong> ${imageElement.src}</p>
+            `;
+            
+            // Add image thumbnail
+            if (orderImagePreview) {
+                orderImagePreview.innerHTML = `
+                    <img src="${imageElement.src}" alt="${imageName}">
+                `;
+            }
+        };
+        img.src = imageElement.src;
     }
+}
+
+function showMobileImageView() {
+    // Hide the order form
+    document.getElementById('mobileOrderForm').style.display = 'none';
+    
+    // Show the image view
+    document.querySelector('.modal-content > .modal-image-container').style.display = 'block';
+    document.querySelector('.modal-content > .modal-info').style.display = 'block';
+}
+
+// Update closeImageModal to reset mobile form
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.style.display = 'none';
+        
+        // Reset to image view
+        showMobileImageView();
+        
+        // Clear any previous order form data
+        const orderImageDetails = document.getElementById('mobileOrderImageDetails');
+        if (orderImageDetails) orderImageDetails.innerHTML = '';
+        
+        const orderImagePreview = document.getElementById('mobileOrderImagePreview');
+        if (orderImagePreview) orderImagePreview.innerHTML = '';
+    }
+}
+
+// Legacy function for compatibility
+function openOrderForm() {
+    showMobileOrderForm();
 }
