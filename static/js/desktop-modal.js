@@ -1,20 +1,43 @@
-// Desktop Modal Script - Fixed Version
+// Desktop Modal Script - Complete Version
 let allImages = [];
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Reset body overflow in case it's stuck
     document.body.style.overflow = 'auto';
-    
     loadImages();
     
     async function loadImages() {
         try {
             const response = await fetch('/api/images');
             allImages = await response.json();
-            displayImages(allImages);
+            
+            if (allImages.length > 0) {
+                setHeroImage();
+                displayImages(allImages);
+            }
         } catch (error) {
             console.error('Error loading images:', error);
-            document.getElementById('imageGrid').innerHTML = '<div class="loading">Error loading images</div>';
+        }
+    }
+    
+    async function setHeroImage() {
+        const heroImage = document.getElementById('heroImage');
+        if (!heroImage) return;
+        
+        try {
+            const heroResponse = await fetch('/api/hero_image');
+            const heroData = await heroResponse.json();
+            
+            if (heroData.filename) {
+                heroImage.style.backgroundImage = `url('/images/${heroData.filename}')`;
+            } else if (allImages.length > 0) {
+                const randomImage = allImages[Math.floor(Math.random() * allImages.length)];
+                heroImage.style.backgroundImage = `url('${randomImage.url}')`;
+            }
+        } catch (error) {
+            if (allImages.length > 0) {
+                const randomImage = allImages[Math.floor(Math.random() * allImages.length)];
+                heroImage.style.backgroundImage = `url('${randomImage.url}')`;
+            }
         }
     }
     
@@ -36,38 +59,40 @@ document.addEventListener('DOMContentLoaded', function() {
         
         imageGrid.innerHTML = imageHTML;
         
-        // Hide pagination
+        // Hide pagination container
         const paginationContainer = document.getElementById('paginationContainer');
         if (paginationContainer) {
             paginationContainer.style.display = 'none';
         }
     }
     
-    // Make openImageModal global
     window.openImageModal = function(imageUrl, title) {
+        console.log('Opening modal for:', title);
         const modal = document.getElementById('imageModal');
         const modalImage = document.getElementById('modalImage');
         const modalTitle = document.getElementById('modalTitle');
         const modalCategory = document.getElementById('modalCategory');
         
+        console.log('Modal elements:', modal, modalImage, modalTitle, modalCategory);
+        
         if (modal && modalImage && modalTitle && modalCategory) {
             modalImage.src = imageUrl;
             modalTitle.textContent = title;
             modalCategory.innerHTML = '<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>';
+            modal.style.display = 'flex';
             modal.classList.add('show');
         }
     };
     
-    // Make closeModal global
     window.closeImageModal = function() {
         const modal = document.getElementById('imageModal');
         if (modal) {
+            modal.style.display = 'none';
             modal.classList.remove('show');
             document.body.style.overflow = 'auto';
         }
     };
     
-    // ORDER PRINTS functionality
     window.openDesktopOrderForm = function() {
         const modalTitle = document.getElementById('modalTitle');
         if (modalTitle && modalTitle.textContent) {
