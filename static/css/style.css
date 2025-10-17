@@ -430,9 +430,9 @@ textarea {
     position: relative;
     margin: auto;
     padding: 10px;
-    width: 95%;
-    max-width: 1400px;
-    top: 50%;
+    width: 90vw;
+    max-width: 90vw; max-height: 60vw;
+    top: 50%; aspect-ratio: 3/2;
     transform: translateY(-50%);
     text-align: center;
 }
@@ -453,11 +453,11 @@ textarea {
 }
 
 .modal-image {
-    max-width: 100%;
-    max-height: 80vh;
+    width: 80vw; height: 53.33vw;
+    max-height: 80vh; aspect-ratio: 3/2;
     border-radius: 8px;
     background: transparent;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 .modal-info {
@@ -1542,7 +1542,7 @@ textarea {
     
     .modal-image {
         max-height: 70vh; /* Reduced to ensure button is visible */
-        object-fit: contain;
+        object-fit: cover;
     }
     
     .close {
