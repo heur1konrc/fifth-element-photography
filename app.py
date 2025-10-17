@@ -3690,8 +3690,14 @@ ORDERDESK_PRODUCT_MAPPING = {
 @app.route('/test_order_form')
 def test_order_form():
     """Display the test order form for OrderDesk integration"""
-    # PayPal integration added - force staging redeploy
-    return render_template('test_order_form.html')
+    # Pass all query parameters to template
+    params = request.args.to_dict()
+    
+    # Set defaults if not provided
+    if "image" not in params:
+        params["image"] = "Sparrow"
+    
+    return render_template("test_order_form.html", **params)
 
 @app.route('/test_order_submit', methods=['POST'])
 def test_order_submit():
