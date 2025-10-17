@@ -10,24 +10,24 @@
     <meta property="og:description" content="Professional photography with artistic vision and technical excellence">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://fifth-element-photography-production.up.railway.app/#featured">
-    {% set featured_image = images|selectattr('is_featured')|first %}
-    {% if featured_image %}
-    <meta property="og:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url }}">
-    <meta property="og:image:alt" content="{{ featured_image.title }}">
-    {% else %}
-    <meta property="og:image" content="https://fifth-element-photography-production.up.railway.app/static/images/default-og.jpg">
-    {% endif %}
+    
+    
+    <meta property="og:image" content="https://fifth-element-photography-production.up.railway.app/images/IMG_8653_2_1.jpg">
+    <meta property="og:image:alt" content="Gull in Flight">
+    
     <meta property="og:site_name" content="Fifth Element Photography">
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Fifth Element Photography - Featured Image of the Week">
     <meta name="twitter:description" content="Professional photography with artistic vision and technical excellence">
-    {% if featured_image %}
-    <meta name="twitter:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url }}">
-    {% endif %}
     
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20241008-001">
+    <meta name="twitter:image" content="https://fifth-element-photography-production.up.railway.app/images/IMG_8653_2_1.jpg">
+    
+    
+    <link rel="stylesheet" href="/static/css/style.css?v=20241008-001">
+    <link rel="stylesheet" href="/static/css/lumaprints_styles.css">
+    <link rel="stylesheet" href="/static/css/lumaprints_interface.css">
 </head>
 <body>
     <!-- Mobile Menu Button -->
@@ -46,7 +46,7 @@
             <!--<br>ADDED PAGE BREAK TO LOWER LOGO DISPLAY -->
             <div class="logo">
                 <div class="logo-icon">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Fifth Element Photography Logo">
+                    <img src="/static/images/logo.png" alt="Fifth Element Photography Logo">
                 </div>
                 <!--<h1>FIFTH ELEMENT</h1>
                 <p>PHOTOGRAPHY</p>-->
@@ -76,7 +76,7 @@
                 <div class="hero">
                     <div class="hero-image" id="heroImage">
                         <div class="hero-overlay">
-                            <img src="{{ url_for('static', filename='images/TaglineWhite.png') }}" alt="Tagline" class="hero-tagline-image">
+                            <img src="/static/images/TaglineWhite.png" alt="Tagline" class="hero-tagline-image">
                         </div>
                     </div>
                 </div>
@@ -87,9 +87,25 @@
                         <p class="gallery-subtitle">Click any image to view details and order prints</p>
                         <div class="category-filters">
                             <a href="#" class="category-link active" data-category="all">ALL</a>
-                            {% for category in categories %}
-                            <a href="#" class="category-link" data-category="{{ category }}">{{ category.upper() }}</a>
-                            {% endfor %}
+                            
+                            <a href="#" class="category-link" data-category="portrait">PORTRAIT</a>
+                            
+                            <a href="#" class="category-link" data-category="landscape">LANDSCAPE</a>
+                            
+                            <a href="#" class="category-link" data-category="wildlife">WILDLIFE</a>
+                            
+                            <a href="#" class="category-link" data-category="wedding">WEDDING</a>
+                            
+                            <a href="#" class="category-link" data-category="commercial">COMMERCIAL</a>
+                            
+                            <a href="#" class="category-link" data-category="street">STREET</a>
+                            
+                            <a href="#" class="category-link" data-category="other">OTHER</a>
+                            
+                            <a href="#" class="category-link" data-category="birds">BIRDS</a>
+                            
+                            <a href="#" class="category-link" data-category="testing manus">TESTING MANUS</a>
+                            
                         </div>
                         <div class="image-count" id="imageCount">Loading...</div>
                     </div>
@@ -116,13 +132,13 @@
             <section class="content-section" id="featured-section">
                 <div class="featured-container">
                     <h2 class="section-title featured-title">FEATURED IMAGE OF THE WEEK</h2>
-                    {% set featured_image = images|selectattr('is_featured')|first %}
-                    {% if featured_image %}
+                    
+                    
                         <div class="featured-content">
                             <div class="featured-image-container">
-                                <h3>{{ featured_image.title }}</h3>
+                                <h3>Gull in Flight</h3>
                                 <div class="featured-image">
-                                    <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
+                                    <img src="/images/IMG_8653_2_1.jpg" alt="Gull in Flight">
                                 </div>
                             </div>
                             
@@ -130,55 +146,51 @@
                             <div class="featured-exif-horizontal">
                                 <div class="exif-item">
                                     <span class="exif-label">Model:</span>
-                                    <span class="exif-value">{{ featured_exif.Model if featured_exif else 'Unavailable' }}</span>
+                                    <span class="exif-value">Canon EOS R8</span>
                                 </div>
                                 <div class="exif-item">
                                     <span class="exif-label">Lens:</span>
-                                    <span class="exif-value">{{ featured_exif.LensModel if featured_exif else 'Unavailable' }}</span>
+                                    <span class="exif-value">150-600mm F5-6.3 DG OS HSM | Sports 014</span>
                                 </div>
                                 <div class="exif-item">
                                     <span class="exif-label">Aperture:</span>
-                                    <span class="exif-value">{{ featured_exif.FNumber if featured_exif else 'Unavailable' }}</span>
+                                    <span class="exif-value">f/8.0</span>
                                 </div>
                                 <div class="exif-item">
                                     <span class="exif-label">Shutter Speed:</span>
-                                    <span class="exif-value">{{ featured_exif.ExposureTime|exposure_fraction if featured_exif else 'Unavailable' }}</span>
+                                    <span class="exif-value">1/2000s</span>
                                 </div>
                                 <div class="exif-item">
                                     <span class="exif-label">ISO:</span>
-                                    <span class="exif-value">{{ featured_exif.ISOSpeedRatings if featured_exif else 'Unavailable' }}</span>
+                                    <span class="exif-value">1000</span>
                                 </div>
                                 <div class="exif-item">
                                     <span class="exif-label">Focal Length:</span>
-                                    <span class="exif-value">{{ featured_exif.FocalLength if featured_exif else 'Unavailable' }}</span>
+                                    <span class="exif-value">600mm</span>
                                 </div>
                             </div>
                             
                             <!-- Action Buttons -->
                             <div class="image-actions">
-                                <button class="action-btn" onclick="viewFullscreen('{{ featured_image.url }}', '{{ featured_image.title }}')">
+                                <button class="action-btn" onclick="viewFullscreen('/images/IMG_8653_2_1.jpg', 'Gull in Flight')">
                                     <span></span> View High Resolution (New Window)
                                 </button>
-                                <button class="action-btn" onclick="downloadImage('{{ featured_image.url }}', '{{ featured_image.filename }}')">
+                                <button class="action-btn" onclick="downloadImage('/images/IMG_8653_2_1.jpg', 'IMG_8653_2_1.jpg')">
                                     <span></span> Download Full Size Image
                                 </button>
-                                <button class="action-btn" onclick="shareOnSocial('{{ featured_image.title }}', '{{ featured_image.url }}')">
+                                <button class="action-btn" onclick="shareOnSocial('Gull in Flight', '/images/IMG_8653_2_1.jpg')">
                                     <span></span> Share on Social Media
                                 </button>
                             </div>
                         </div>
                         
-                        {% if featured_image.story %}
+                        
                         <div class="featured-story-section">
                             <h4>The Story Behind this Image</h4>
-                            <p>{{ featured_image.story|safe }}</p>
+                            <p>This was taken with the Canon R8 and a Sigma 100-600mm Contemporary lens. </p>
                         </div>
-                        {% endif %}
-                    {% else %}
-                        <div class="no-featured">
-                            <p>No featured image selected. Use the admin panel to set a featured image.</p>
-                        </div>
-                    {% endif %}
+                        
+                    
                 </div>
             </section>
 
@@ -193,20 +205,23 @@
                     
                     <div class="about-content">
                         <div class="about-image">
-                            {% if about_data and about_data.filename %}
-                                <img src="/about/{{ about_data.filename }}" alt="About Fifth Element Photography">
-                            {% else %}
-                                <div class="placeholder-image">
-                                    <p>Upload an About image in the admin panel</p>
-                                </div>
-                            {% endif %}
+                            
+                                <img src="/about/Parfreys.png" alt="About Fifth Element Photography">
+                            
                         </div>
                         <div class="about-text">
-                            {% if about_data and about_data.bio %}
-                                <p>{{ about_data.bio|safe }}</p>
-                            {% else %}
-                                <p>Add your bio in the admin panel</p>
-                            {% endif %}
+                            
+                                <p><h3>The Art of the Unseen</h3>
+<br><br>
+<p>Born under the wide skies of South Central Wisconsin, my life has been a canvas of different hues and disciplines. A musician's ear for harmony and feel for rhythm, a teacher's patience, and a business owner's drive have all shaped the artist and the person I am today. Yet, it is through the lens of a camera that my spirit finds its truest voice. My camera is not just a tool; it's a silent partner on a constant expedition, always in search of the next story to tell.
+<br><br>
+I chase the unseen, the fleeting moments hidden within the commonplace. My eye is captivated by the elegant geometry and stark lines of architectural design, and I find a profound truth in the timeless beauty of black and white. I am just as comfortable in the hushed stillness of my studio as I am out in the elements, where the pursuit of the perfect shot might mean getting soaked or muddy. I have learned to embrace the quiet hours of waiting, when a subject may never appear, because the simple act of being present in nature is a gift for the soul.
+<br><br>
+My greatest joy lies not only in my own creations but in the act of collaborating. If you have a dream, a vision that yearns to be captured, let's embark on that journey together. Every image in my portfolio is available for purchase, and your support through tips and donations helps sustain this creative expedition, allowing me to continue to seek and capture these moments.
+<br>
+<em>Rick</em>
+</p></p>
+                            
                         </div>
                     </div>
                 </div>
@@ -321,34 +336,346 @@
             
             <!-- Main Image View -->
             <div class="modal-main-view" id="modalMainView">
-            <div class="modal-main-view" id="modalMainView">
                 <img class="modal-image" id="modalImage">
                 <div class="modal-info">
                     <h4 id="modalTitle"></h4>
                     <p id="modalCategory"></p>
-                    <button onclick="openDesktopOrderForm()" class="order-btn">ORDER PRINTS</button>
-                </div>
-            </div>
-                            padding: 12px 30px;
-                            border: 2px solid #4a90e2;
-                            border-radius: 25px;
+                    <div style="text-align: center; margin-top: 20px; padding: 20px;">
+                        <a href="/test_order_form" id="orderPrintBtn" target="_blank" style="
+                            display: inline-block;
+                            background: #6799c2;
+                            color: white;
+                            padding: 15px 30px;
+                            border-radius: 8px;
+                            text-decoration: none;
+                            font-family: Arial, sans-serif;
                             font-weight: bold;
-                            font-size: 1rem;
+                            font-size: 16px;
                             text-transform: uppercase;
-                            cursor: pointer;
-                            transition: all 0.3s ease;
-                        ">ORDER PRINTS</button>
-                    </div>
-                </div>
-            </div>
+                            letter-spacing: 1px;
+                            border: 2px solid white;
+                            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                        ">🖼️ ORDER PRINT</a>
                     </div>
                 </div>
             </div>
             
             <!-- Print Ordering Interface (initially hidden) -->
+            <div class="modal-print-order" id="modalPrintOrder" style="display: none;">
+                <div class="print-order-header">
+                    <button class="btn-back" id="backToImageBtn">
+                        <span class="btn-icon">←</span>
+                        Back to Image
+                    </button>
+                    <h3>Order Print</h3>
+                </div>
+                
+                <div class="print-order-content">
+                    <div class="order-image-preview">
+                        <img id="orderPreviewImage" class="order-preview-img" alt="Print Preview">
+                        <div class="order-image-info">
+                            <h4 id="orderImageTitle"></h4>
+                        </div>
+                    </div>
+                    
+                    <!-- Lumaprints-Style Interface: Left Sidebar + Right Panel -->
+                    <div class="lumaprints-interface">
+                        <!-- Left Sidebar - Categories (Lumaprints Style) -->
+                        <div class="lumaprints-sidebar">
+                            <div class="lumaprints-categories">
+                                <h4>Product Categories</h4>
+                                <div class="category-list">
+                                    <div class="category-item active" data-category="canvas">
+                                        <div class="category-icon">🖼️</div>
+                                        <span class="category-name">Canvas</span>
+                                    </div>
+                                    <div class="category-item" data-category="framed-canvas">
+                                        <div class="category-icon">🖼️</div>
+                                        <span class="category-name">Framed Canvas</span>
+                                    </div>
+                                    <div class="category-item" data-category="fine-art-paper">
+                                        <div class="category-icon">📄</div>
+                                        <span class="category-name">Fine Art Paper</span>
+                                    </div>
+                                    <div class="category-item" data-category="foam-mounted-print">
+                                        <div class="category-icon">📋</div>
+                                        <span class="category-name">Foam Mounted Print</span>
+                                    </div>
+                                    <div class="category-item" data-category="framed-fine-art-paper">
+                                        <div class="category-icon">🖼️</div>
+                                        <span class="category-name">Framed Fine Art Paper</span>
+                                    </div>
+                                    <div class="category-item" data-category="metal">
+                                        <div class="category-icon">⚡</div>
+                                        <span class="category-name">Metal</span>
+                                    </div>
+                                    <div class="category-item" data-category="peel-and-stick">
+                                        <div class="category-icon">📌</div>
+                                        <span class="category-name">Peel and Stick</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Panel - Product Options (Lumaprints Style) -->
+                        <div class="lumaprints-main-panel">
+                            <!-- Product Selection Grid -->
+                            <div class="products-section">
+                                <!-- Canvas Products -->
+                                <div class="product-category-section active" data-category="canvas">
+                                    <h4>Canvas Products</h4>
+                                    <div class="products-grid">
+                                        <div class="product-option" data-product="101001">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview canvas-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Canvas Print (0.75")</h5>
+                                                <p>Gallery wrapped canvas</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="101002">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview canvas-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Canvas Print (1.25")</h5>
+                                                <p>Thick gallery wrapped canvas</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="101003">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview canvas-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Canvas Print (1.50")</h5>
+                                                <p>Extra thick gallery wrapped canvas</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="101004">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview canvas-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Rolled Canvas</h5>
+                                                <p>Canvas print without frame</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Framed Canvas Products -->
+                                <div class="product-category-section" data-category="framed-canvas">
+                                    <h4>Framed Canvas Products</h4>
+                                    <div class="products-grid">
+                                        <div class="product-option" data-product="102001">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview framed-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>1.50in Maple Wood Floating Frame</h5>
+                                                <p>Canvas with maple wood frame</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="102002">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview framed-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>1.50in Espresso Floating Frame</h5>
+                                                <p>Canvas with espresso wood frame</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="102003">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview framed-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>1.50in Natural Wood Floating Frame</h5>
+                                                <p>Canvas with natural wood frame</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="102008">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview framed-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>1.50in Black Floating Frame</h5>
+                                                <p>Canvas with black frame</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Fine Art Paper Products -->
+                                <div class="product-category-section" data-category="fine-art-paper">
+                                    <h4>Fine Art Paper Products</h4>
+                                    <div class="products-grid">
+                                        <div class="product-option" data-product="103001">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview paper-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Fine Art Paper</h5>
+                                                <p>Premium matte paper</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Metal Products -->
+                                <div class="product-category-section" data-category="metal">
+                                    <h4>Metal Products</h4>
+                                    <div class="products-grid">
+                                        <div class="product-option" data-product="106001">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview metal-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Metal Print - Glossy</h5>
+                                                <p>Vibrant glossy aluminum print</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                        <div class="product-option" data-product="106002">
+                                            <div class="product-thumbnail">
+                                                <div class="product-preview metal-preview"></div>
+                                            </div>
+                                            <div class="product-info">
+                                                <h5>Metal Print - Matte</h5>
+                                                <p>Elegant matte aluminum print</p>
+                                            </div>
+                                            <button class="btn-select-product">Select Product</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Other categories would follow the same pattern -->
+                            </div>
+                            
+                            <!-- Size Selection -->
+                            <div class="size-selection-section" id="sizeSelectionSection" style="display: none;">
+                                <h4>Select Size</h4>
+                                <div class="sizes-grid" id="sizesGrid">
+                                    <!-- Sizes will be populated dynamically -->
+                                </div>
+                            </div>
+                            
+                            <!-- Order Summary Panel -->
+                            <div class="order-summary-panel">
+                                <div class="quantity-section">
+                                    <h4>Quantity</h4>
+                                    <div class="quantity-controls">
+                                        <button class="qty-btn" id="qtyMinus">-</button>
+                                        <input type="number" id="quantity" value="1" min="1" max="10">
+                                        <button class="qty-btn" id="qtyPlus">+</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="price-display" id="priceDisplay">
+                                    <div class="price-info">
+                                        <span>Select product and size to see pricing</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="order-actions">
+                                    <button class="btn-proceed-order" id="continueOrderBtn" disabled>
+                                        Proceed to Order
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Form Interface (initially hidden) -->
+            <div class="modal-order-form" id="modalOrderForm" style="display: none;">
+                <div class="order-form-header">
+                    <button class="btn-back" id="backToPrintOrderBtn">
+                        <span class="btn-icon">←</span>
+                        Back to Options
+                    </button>
+                    <h3>Complete Your Order</h3>
+                </div>
+                
+                <div class="order-form-content">
+                    <div class="order-summary" id="orderSummary">
+                        <!-- Order summary will be populated dynamically -->
+                    </div>
+                    
+                    <form id="orderForm" class="customer-form">
+                        <h4>Shipping Information</h4>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name *</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name *</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone</label>
+                            <input type="tel" id="phone" name="phone">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address">Address *</label>
+                            <input type="text" id="address" name="address" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City *</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State *</label>
+                                <input type="text" id="state" name="state" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="zipCode">ZIP Code *</label>
+                                <input type="text" id="zipCode" name="zipCode" required>
+                            </div>
+                        </div>
+                        
+                        <div class="payment-section">
+                            <h4>Payment</h4>
+                            <div class="payment-total" id="paymentTotal">
+                                <!-- Total will be populated dynamically -->
+                            </div>
+                            
+                            <div class="payment-options">
+                                <button type="button" class="btn-paypal" id="paypalBtn">
+                                    Pay with PayPal
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- Print Order Modal will be dynamically created by lumaprints_ordering.js -->
     
     <!-- Mobile Cart Floating Action Button -->
     <a href="/checkout" class="mobile-cart-fab" id="mobileCartFab">
@@ -356,65 +683,67 @@
         <span id="mobileCartCount" class="cart-count">0</span>
     </a>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
+    <script src="/static/js/script.js?v=20241008-001"></script>
+    <script src="/static/js/lumaprints_pricing.js"></script>
+    <script src="/static/js/lumaprints_inline_ordering.js"></script>
+    
     <script>
-        // Desktop order form function - matches mobile functionality
-
-        // Essential modal functionality - inline to bypass script loading issues
-        function openModal(imageUrl, title, category) {
-            const modal = document.getElementById("imageModal");
-            const modalImage = document.getElementById("modalImage");
-            const modalTitle = document.getElementById("modalTitle");
-            const modalCategory = document.getElementById("modalCategory");
+        // Update cart count in navigation
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('lumaprintsCart') || '[]');
+            const cartCount = document.getElementById('cartCount');
+            const cartLink = document.getElementById('cartLink');
+            const mobileCartCount = document.getElementById('mobileCartCount');
+            const mobileCartFab = document.getElementById('mobileCartFab');
             
-            if (modal && modalImage && modalTitle && modalCategory) {
-                modalImage.src = imageUrl;
-                modalTitle.textContent = title;
-                modalCategory.innerHTML = "<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>";
-                modal.classList.add("show");
-                document.body.style.overflow = "hidden";
-            }
-        }
-        
-        function closeImageModal() {
-            const modal = document.getElementById("imageModal");
-            if (modal) {
-                modal.classList.remove("show");
-                document.body.style.overflow = "auto";
-            }
-        }
-        
-        // Setup modal close events
-        document.addEventListener("DOMContentLoaded", function() {
-            const closeModal = document.querySelector(".close");
-            const modal = document.getElementById("imageModal");
-            
-            if (closeModal) {
-                closeModal.addEventListener("click", closeImageModal);
-            }
-            
-            if (modal) {
-                window.addEventListener("click", function(e) {
-                    if (e.target === modal) {
-                        closeImageModal();
-                    }
-                });
-            }
-        });
-
-        function openDesktopOrderForm() {
-            const modalTitle = document.getElementById("modalTitle");
-            if (modalTitle && modalTitle.textContent) {
-                const imageName = encodeURIComponent(modalTitle.textContent.trim());
-                const orderFormUrl = "/test_order_form?image=" + imageName;
-                window.open(orderFormUrl, "_blank");
+            if (cart.length > 0) {
+                // Update sidebar cart
+                if (cartCount) {
+                    cartCount.textContent = cart.length;
+                    cartCount.style.display = 'inline';
+                }
+                if (cartLink) {
+                    cartLink.style.opacity = '1';
+                }
+                
+                // Update mobile floating cart
+                if (mobileCartCount) {
+                    mobileCartCount.textContent = cart.length;
+                    mobileCartCount.style.display = 'flex';
+                }
+                if (mobileCartFab) {
+                    mobileCartFab.style.display = 'flex';
+                }
             } else {
-                // Fallback - open form without image parameter
-                window.open("/test_order_form", "_blank");
+                // Hide sidebar cart count
+                if (cartCount) {
+                    cartCount.style.display = 'none';
+                }
+                if (cartLink) {
+                    cartLink.style.opacity = '0.6';
+                }
+                
+                // Hide mobile cart count but keep button visible
+                if (mobileCartCount) {
+                    mobileCartCount.style.display = 'none';
+                }
             }
+        }
+        
+        // Update cart count on page load and when localStorage changes
+        document.addEventListener('DOMContentLoaded', updateCartCount);
+        window.addEventListener('storage', updateCartCount);
+        
+        // Update cart count periodically in case of same-page updates
+        setInterval(updateCartCount, 1000);
+        
+        // Handle order print click
+        function handleOrderClick() {
+            // Redirect to new PayPal-integrated order form
+            window.open('/test_order_form', '_blank');
         }
     </script>
+    <script src="/static/js/mobile-enhanced.js?v=20241015-002"></script>
+    <script src="/static/js/mobile-image-modal.js?v=20241015-002"></script>
 </body>
 </html>
-
