@@ -581,3 +581,34 @@ function openNewOrderForm() {
         window.open("/test_order_form", "_blank");
     }
 }
+
+
+// Modal Order Form Functions
+function showOrderForm() {
+    // Hide the image view
+    document.getElementById('modalMainView').style.display = 'none';
+    
+    // Show the order form
+    document.getElementById('modalOrderForm').style.display = 'block';
+    
+    // Get image info from the modal
+    const imageName = document.getElementById('modalTitle').textContent;
+    const imageElement = document.getElementById('modalImage');
+    
+    // Populate product info
+    const productInfo = document.getElementById('orderProductInfo');
+    if (productInfo && imageName) {
+        productInfo.innerHTML = `
+            <h4>Image: ${imageName}</h4>
+            <p>Product: Canvas Print 12x12</p>
+        `;
+    }
+}
+
+function showImageView() {
+    // Hide the order form
+    document.getElementById('modalOrderForm').style.display = 'none';
+    
+    // Show the image view
+    document.getElementById('modalMainView').style.display = 'block';
+}
