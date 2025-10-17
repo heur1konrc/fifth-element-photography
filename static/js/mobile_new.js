@@ -566,22 +566,26 @@ function getItemsPerView() {
 
 // Mobile Order Form Functions
 function showMobileOrderForm() {
+    console.log('showMobileOrderForm called');
+    
     // Prevent body scroll
     document.body.classList.add('modal-open');
     
-    // Use setTimeout to ensure proper rendering
-    setTimeout(() => {
-        // Hide the image view
-        const imageContainer = document.querySelector('.modal-content > .modal-image-container');
-        const modalInfo = document.querySelector('.modal-content > .modal-info');
-        const orderForm = document.getElementById('mobileOrderForm');
-        
-        if (imageContainer) imageContainer.style.display = 'none';
-        if (modalInfo) modalInfo.style.display = 'none';
-        
-        // Show the order form
-        if (orderForm) orderForm.style.display = 'block';
-    }, 10);
+    // Hide the image view immediately
+    const imageContainer = document.querySelector('.modal-content > .modal-image-container');
+    const modalInfo = document.querySelector('.modal-content > .modal-info');
+    const orderForm = document.getElementById('mobileOrderForm');
+    
+    console.log('Elements found:', { imageContainer, modalInfo, orderForm });
+    
+    if (imageContainer) imageContainer.style.display = 'none';
+    if (modalInfo) modalInfo.style.display = 'none';
+    
+    // Show the order form
+    if (orderForm) {
+        orderForm.style.display = 'block';
+        console.log('Order form displayed');
+    }
     
     // Get image info from the modal
     const imageName = document.getElementById('modalTitle').textContent;
@@ -621,8 +625,12 @@ function showMobileOrderForm() {
 }
 
 function showMobileImageView() {
-    // Allow body scroll
+    console.log('showMobileImageView called');
+    
+    // Allow body scroll - multiple methods to ensure it works
     document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.position = '';
     
     // Hide the order form
     const orderForm = document.getElementById('mobileOrderForm');
@@ -634,18 +642,23 @@ function showMobileImageView() {
     
     if (imageContainer) imageContainer.style.display = 'block';
     if (modalInfo) modalInfo.style.display = 'block';
+    
+    console.log('Image view restored, scroll enabled');
 }
 
 // Update closeImageModal to reset mobile form
 function closeImageModal() {
+    console.log('closeImageModal called');
     const modal = document.getElementById('imageModal');
     if (modal) {
         modal.style.display = 'none';
         
-        // Allow body scroll
+        // Always ensure body scroll is restored
         document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.position = '';
         
-        // Reset to image view
+        // Reset to image view (this also removes modal-open class)
         showMobileImageView();
         
         // Clear any previous order form data
@@ -654,6 +667,8 @@ function closeImageModal() {
         
         const orderImagePreview = document.getElementById('mobileOrderImagePreview');
         if (orderImagePreview) orderImagePreview.innerHTML = '';
+        
+        console.log('Modal closed and scroll restored');
     }
 }
 
