@@ -359,323 +359,115 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
                 </div>
             </div>
             
-            <!-- Print Ordering Interface (initially hidden) -->
-            <div class="modal-print-order" id="modalPrintOrder" style="display: none;">
-                <div class="print-order-header">
-                    <button class="btn-back" id="backToImageBtn">
+            <!-- Order Form Section (initially hidden) -->
+            <div class="modal-order-form" id="modalOrderForm" style="display: none;">
+                <div class="order-form-header">
+                    <button class="btn-back" id="backToImageBtn" onclick="showImageView()">
                         <span class="btn-icon">←</span>
                         Back to Image
                     </button>
                     <h3>Order Print</h3>
                 </div>
                 
-                <div class="print-order-content">
-                    <div class="order-image-preview">
-                        <img id="orderPreviewImage" class="order-preview-img" alt="Print Preview">
-                        <div class="order-image-info">
-                            <h4 id="orderImageTitle"></h4>
-                        </div>
+                <div class="order-form-content">
+                    <div class="product-info" id="orderProductInfo">
+                        <!-- Product info will be populated dynamically -->
                     </div>
-                    
-                    <!-- Lumaprints-Style Interface: Left Sidebar + Right Panel -->
-<!--                     <div class="lumaprints-interface">
-<!--                         <!-- Left Sidebar - Categories (Lumaprints Style) -->
-<!--                         <div class="lumaprints-sidebar">
-<!--                             <div class="lumaprints-categories">
-<!--                                 <h4>Product Categories</h4>
-<!--                                 <div class="category-list">
-<!--                                     <div class="category-item active" data-category="canvas">
-<!--                                         <div class="category-icon">🖼️</div>
-<!--                                         <span class="category-name">Canvas</span>
-<!--                                     </div>
-<!--                                     <div class="category-item" data-category="framed-canvas">
-<!--                                         <div class="category-icon">🖼️</div>
-<!--                                         <span class="category-name">Framed Canvas</span>
-<!--                                     </div>
-<!--                                     <div class="category-item" data-category="fine-art-paper">
-<!--                                         <div class="category-icon">📄</div>
-<!--                                         <span class="category-name">Fine Art Paper</span>
-<!--                                     </div>
-<!--                                     <div class="category-item" data-category="foam-mounted-print">
-<!--                                         <div class="category-icon">📋</div>
-<!--                                         <span class="category-name">Foam Mounted Print</span>
-<!--                                     </div>
-<!--                                     <div class="category-item" data-category="framed-fine-art-paper">
-<!--                                         <div class="category-icon">🖼️</div>
-<!--                                         <span class="category-name">Framed Fine Art Paper</span>
-<!--                                     </div>
-<!--                                     <div class="category-item" data-category="metal">
-<!--                                         <div class="category-icon">⚡</div>
-<!--                                         <span class="category-name">Metal</span>
-<!--                                     </div>
-<!--                                     <div class="category-item" data-category="peel-and-stick">
-<!--                                         <div class="category-icon">📌</div>
-<!--                                         <span class="category-name">Peel and Stick</span>
-<!--                                     </div>
-<!--                                 </div>
-<!--                             </div>
-<!--                         </div>
-<!--                         
-<!--                         <!-- Right Panel - Product Options (Lumaprints Style) -->
-<!--                         <div class="lumaprints-main-panel">
-<!--                             <!-- Product Selection Grid -->
-<!--                             <div class="products-section">
-<!--                                 <!-- Canvas Products -->
-<!--                                 <div class="product-category-section active" data-category="canvas">
-<!--                                     <h4>Canvas Products</h4>
-<!--                                     <div class="products-grid">
-<!--                                         <div class="product-option" data-product="101001">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview canvas-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>Canvas Print (0.75")</h5>
-<!--                                                 <p>Gallery wrapped canvas</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                         <div class="product-option" data-product="101002">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview canvas-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>Canvas Print (1.25")</h5>
-<!--                                                 <p>Thick gallery wrapped canvas</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                         <div class="product-option" data-product="101003">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview canvas-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>Canvas Print (1.50")</h5>
-<!--                                                 <p>Extra thick gallery wrapped canvas</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                         <div class="product-option" data-product="101004">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview canvas-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>Rolled Canvas</h5>
-<!--                                                 <p>Canvas print without frame</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                     </div>
-<!--                                 </div>
-<!--                                 
-<!--                                 <!-- Framed Canvas Products -->
-<!--                                 <div class="product-category-section" data-category="framed-canvas">
-<!--                                     <h4>Framed Canvas Products</h4>
-<!--                                     <div class="products-grid">
-<!--                                         <div class="product-option" data-product="102001">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview framed-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>1.50in Maple Wood Floating Frame</h5>
-<!--                                                 <p>Canvas with maple wood frame</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                         <div class="product-option" data-product="102002">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview framed-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>1.50in Espresso Floating Frame</h5>
-<!--                                                 <p>Canvas with espresso wood frame</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                         <div class="product-option" data-product="102003">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview framed-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>1.50in Natural Wood Floating Frame</h5>
-<!--                                                 <p>Canvas with natural wood frame</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                         <div class="product-option" data-product="102008">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview framed-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>1.50in Black Floating Frame</h5>
-<!--                                                 <p>Canvas with black frame</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                     </div>
-<!--                                 </div>
-<!--                                 
-<!--                                 <!-- Fine Art Paper Products -->
-<!--                                 <div class="product-category-section" data-category="fine-art-paper">
-<!--                                     <h4>Fine Art Paper Products</h4>
-<!--                                     <div class="products-grid">
-<!--                                         <div class="product-option" data-product="103001">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview paper-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>Fine Art Paper</h5>
-<!--                                                 <p>Premium matte paper</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                     </div>
-<!--                                 </div>
-<!--                                 
-<!--                                 <!-- Metal Products -->
-<!--                                 <div class="product-category-section" data-category="metal">
-<!--                                     <h4>Metal Products</h4>
-<!--                                     <div class="products-grid">
-<!--                                         <div class="product-option" data-product="106001">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview metal-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>Metal Print - Glossy</h5>
-<!--                                                 <p>Vibrant glossy aluminum print</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                         <div class="product-option" data-product="106002">
-<!--                                             <div class="product-thumbnail">
-<!--                                                 <div class="product-preview metal-preview"></div>
-<!--                                             </div>
-<!--                                             <div class="product-info">
-<!--                                                 <h5>Metal Print - Matte</h5>
-<!--                                                 <p>Elegant matte aluminum print</p>
-<!--                                             </div>
-<!--                                             <button class="btn-select-product">Select Product</button>
-<!--                                         </div>
-<!--                                     </div>
-<!--                                 </div>
-<!--                                 
-<!--                                 <!-- Other categories would follow the same pattern -->
-<!--                             </div>
-<!--                             
-<!--                             <!-- Size Selection -->
-<!--                             <div class="size-selection-section" id="sizeSelectionSection" style="display: none;">
-<!--                                 <h4>Select Size</h4>
-<!--                                 <div class="sizes-grid" id="sizesGrid">
-<!--                                     <!-- Sizes will be populated dynamically -->
-<!--                                 </div>
-<!--                             </div>
-<!--                             
-<!--                             <!-- Order Summary Panel -->
-<!--                             <div class="order-summary-panel">
-<!--                                 <div class="quantity-section">
-<!--                                     <h4>Quantity</h4>
-<!--                                     <div class="quantity-controls">
-<!--                                         <button class="qty-btn" id="qtyMinus">-</button>
-<!--                                         <input type="number" id="quantity" value="1" min="1" max="10">
-<!--                                         <button class="qty-btn" id="qtyPlus">+</button>
-<!--                                     </div>
-<!--                                 </div>
-<!--                                 
-<!--                                 <div class="price-display" id="priceDisplay">
-<!--                                     <div class="price-info">
-<!--                                         <span>Select product and size to see pricing</span>
-<!--                                     </div>
-<!--                                 </div>
-<!--                                 
-<!--                                 <div class="order-actions">
-<!--                                     <button class="btn-proceed-order" id="continueOrderBtn" disabled>
-<!--                                         Proceed to Order
-<!--                                     </button>
-<!--                                 </div>
-<!--                             </div>
-<!--                         </div>
-<!--                     </div>
-<!--                 </div>
-<!--             </div>
-<!--             
-<!--             <!-- Order Form Interface (initially hidden) -->
-<!--             <div class="modal-order-form" id="modalOrderForm" style="display: none;">
-<!--                 <div class="order-form-header">
-<!--                     <button class="btn-back" id="backToPrintOrderBtn">
-<!--                         <span class="btn-icon">←</span>
-<!--                         Back to Options
-<!--                     </button>
-<!--                     <h3>Complete Your Order</h3>
-<!--                 </div>
-<!--                 
-<!--                 <div class="order-form-content">
-<!--                     <div class="order-summary" id="orderSummary">
-<!--                         <!-- Order summary will be populated dynamically -->
-<!--                     </div>
-<!--                     
-<!--                     <form id="orderForm" class="customer-form">
-<!--                         <h4>Shipping Information</h4>
-<!--                         
-<!--                         <div class="form-row">
-<!--                             <div class="form-group">
-<!--                                 <label for="firstName">First Name *</label>
-<!--                                 <input type="text" id="firstName" name="firstName" required>
-<!--                             </div>
-<!--                             <div class="form-group">
-<!--                                 <label for="lastName">Last Name *</label>
-<!--                                 <input type="text" id="lastName" name="lastName" required>
-<!--                             </div>
-<!--                         </div>
-<!--                         
-<!--                         <div class="form-group">
-<!--                             <label for="email">Email *</label>
-<!--                             <input type="email" id="email" name="email" required>
-<!--                         </div>
-<!--                         
-<!--                         <div class="form-group">
-<!--                             <label for="phone">Phone</label>
-<!--                             <input type="tel" id="phone" name="phone">
-<!--                         </div>
-<!--                         
-<!--                         <div class="form-group">
-<!--                             <label for="address">Address *</label>
-<!--                             <input type="text" id="address" name="address" required>
-<!--                         </div>
-<!--                         
-<!--                         <div class="form-row">
-<!--                             <div class="form-group">
-<!--                                 <label for="city">City *</label>
-<!--                                 <input type="text" id="city" name="city" required>
-<!--                             </div>
-<!--                             <div class="form-group">
-<!--                                 <label for="state">State *</label>
-<!--                                 <input type="text" id="state" name="state" required>
-<!--                             </div>
-<!--                             <div class="form-group">
-<!--                                 <label for="zipCode">ZIP Code *</label>
-<!--                                 <input type="text" id="zipCode" name="zipCode" required>
-<!--                             </div>
-<!--                         </div>
-<!--                         
-<!--                         <div class="payment-section">
-<!--                             <h4>Payment</h4>
-<!--                             <div class="payment-total" id="paymentTotal">
-<!--                                 <!-- Total will be populated dynamically -->
-<!--                             </div>
-<!--                             
-<!--                             <div class="payment-options">
-<!--                                 <button type="button" class="btn-paypal" id="paypalBtn">
-<!--                                     Pay with PayPal
-<!--                                 </button>
-<!--                             </div>
-<!--                         </div>
-<!--                     </form>
-<!--                 </div>
-<!--             </div>
-<!--         </div>
-<!--     </div>
-<!-- 
-<!--     <!-- Print Order Modal will be dynamically created by lumaprints_ordering.js -->
-<!--      -->
+
+                    <form id="orderForm" action="/test_order_submit" method="POST">
+                        <div class="form-section">
+                            <h3>Customer Information</h3>
+                            
+                            <div class="form-group">
+                                <label for="order_email">Email:</label>
+                                <input type="email" id="order_email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Shipping Address</h3>
+                            
+                            <div class="form-group">
+                                <label for="order_first_name">First Name:</label>
+                                <input type="text" id="order_first_name" name="first_name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="order_last_name">Last Name:</label>
+                                <input type="text" id="order_last_name" name="last_name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="order_address1">Address:</label>
+                                <input type="text" id="order_address1" name="address1" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="order_city">City:</label>
+                                <input type="text" id="order_city" name="city" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="order_state">State:</label>
+                                <input type="text" id="order_state" name="state" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="order_postal_code">Zip Code:</label>
+                                <input type="text" id="order_postal_code" name="postal_code" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="order_country">Country:</label>
+                                <select id="order_country" name="country" required>
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="order_phone">Phone:</label>
+                                <input type="tel" id="order_phone" name="phone">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h3>Product Selection</h3>
+                            
+                            <div class="form-group">
+                                <label for="order_product_type">Product Type:</label>
+                                <select id="order_product_type" name="product_type" required onchange="updateOrderPricing()">
+                                    <option value="">Select a product...</option>
+                                    <option value="canvas|12x12_075" data-sku="101001" data-options="1,5">Canvas Print 0.75" (12x12) - Loading...</option>
+                                    <option value="canvas|12x12_125" data-sku="101002" data-options="2,5">Canvas Print 1.25" (12x12) - Loading...</option>
+                                    <option value="metal|12x12" data-sku="106001" data-options="29,31">Metal Print (12x12) - Loading...</option>
+                                    <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - Loading...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- PayPal Payment Section -->
+                        <div class="form-section payment-section">
+                            <h3>Payment</h3>
+                            <p class="total-price"><strong>Total: <span id="order-total-price">$0.00</span></strong></p>
+                            <div id="order-pricing-breakdown" class="pricing-breakdown">
+                                <div>Base Cost: <span id="order-base-cost">$0.00</span></div>
+                                <div>Margin: <span id="order-margin-percent">0</span>%</div>
+                            </div>
+                            <div id="order-paypal-button-container"></div>
+                            <div id="order-payment-message" class="payment-message">
+                                Please select a product to see pricing
+                            </div>
+                        </div>
+
+                        <!-- Hidden submit for after payment -->
+                        <button type="submit" id="order-submit-order" style="display: none;">Submit Order to OrderDesk</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Mobile Cart Floating Action Button -->
     <a href="/checkout" class="mobile-cart-fab" id="mobileCartFab">
         <i class="fas fa-shopping-cart"></i>
