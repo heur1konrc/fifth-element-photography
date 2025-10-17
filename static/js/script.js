@@ -1,3 +1,4 @@
+// Global variables
 let allImages = [];
 let currentCategory = 'all';
 
@@ -47,359 +48,505 @@ async function loadImages() {
 async function setHeroImage() {
     try {
         // First, try to get the selected hero image from API
-        const response = await fetch('/api/hero-image');
-        const heroData = await response.json();
+        const heroResponse = await fetch('/api/hero_image');
+        const heroData = await heroResponse.json();
         
-        if (heroData.success && heroData.hero_image) {
+        if (heroData.filename) {
             // Use the selected hero image
-            const heroImageName = heroData.hero_image;
-            const heroImagePath = `/images/${heroImageName}.jpg`;
-            heroImage.src = heroImagePath;
-            heroImage.alt = heroImageName;
-            
-            // Add click handler to open modal
-            heroImage.onclick = () => openModal(heroImageName, getImageCategory(heroImageName));
+            heroImage.style.backgroundImage = `url('/images/${heroData.filename}')`;
         } else {
-            // Fallback to random image if no hero image is set
-            const randomImage = allImages[Math.floor(Math.random() * allImages.length)];
-            const heroImagePath = `/images/${randomImage.name}.jpg`;
-            heroImage.src = heroImagePath;
-            heroImage.alt = randomImage.name;
-            
-            // Add click handler to open modal
-            heroImage.onclick = () => openModal(randomImage.name, randomImage.category);
+            // Fallback to random hero image
+            setRandomHeroImage();
         }
     } catch (error) {
-        console.error('Error setting hero image:', error);
-        // Fallback to first image
-        if (allImages.length > 0) {
-            const firstImage = allImages[0];
-            const heroImagePath = `/images/${firstImage.name}.jpg`;
-            heroImage.src = heroImagePath;
-            heroImage.alt = firstImage.name;
-            
-            // Add click handler to open modal
-            heroImage.onclick = () => openModal(firstImage.name, firstImage.category);
-        }
+        console.error('Error loading hero image selection:', error);
+        // Fallback to random hero image
+        setRandomHeroImage();
     }
 }
 
-// Get image category by name
-function getImageCategory(imageName) {
-    const image = allImages.find(img => img.name === imageName);
-    return image ? image.category : 'Other';
+// Set random hero image (fallback)
+function setRandomHeroImage() {
+    if (allImages.length > 0) {
+        const randomImage = allImages[Math.floor(Math.random() * allImages.length)];
+        heroImage.style.backgroundImage = `url('${randomImage.url}')`;
+    }
 }
 
 // Pagination variables
 let currentPage = 1;
-let imagesPerPage = 12;
+let imagesPerPage = 18;
 let totalPages = 1;
+let currentImages = [];
 
-// Initialize pagination
-function initPagination() {
-    imagesPerPage = 12; // Default images per page
-    currentPage = 1;
-}
-
-// Display images with pagination
-function displayImagesWithPagination(images) {
-    totalPages = Math.ceil(images.length / imagesPerPage);
-    const startIndex = (currentPage - 1) * imagesPerPage;
-    const endIndex = startIndex + imagesPerPage;
-    const imagesToShow = images.slice(startIndex, endIndex);
-    
-    displayImages(imagesToShow);
-    updatePaginationControls(images.length);
-}
-
-// Display images in grid
+// Display images in masonry grid (for current page)
 function displayImages(images) {
     if (images.length === 0) {
         imageGrid.innerHTML = '<div class="loading">No images found for this category</div>';
         return;
     }
+
+    // Size classes for varied masonry layout
+    const sizeClasses = ['size-small', 'size-medium', 'size-large', 'size-wide'];
+    const sizeWeights = [0.3, 0.4, 0.2, 0.1]; // Probability weights for each size
     
-    imageGrid.innerHTML = images.map(image => `
-        <div class="image-item" onclick="openModal('${image.name}', '${image.category}')">
-            <img src="/images/${image.name}.jpg" alt="${image.name}" loading="lazy">
-            <div class="image-overlay">
-                <div class="image-title">${image.name}</div>
-                <div class="image-category">${image.category}</div>
+    function getRandomSize() {
+        const random = Math.random();
+        let cumulative = 0;
+        for (let i = 0; i < sizeWeights.length; i++) {
+            cumulative += sizeWeights[i];
+            if (random < cumulative) {
+                return sizeClasses[i];
+            }
+        }
+        return sizeClasses[0]; // fallback
+    }
+
+    const imageHTML = images.map(image => {
+        const sizeClass = getRandomSize();
+        return `
+            <div class="image-item ${sizeClass}" onclick="openModal('${image.url}', '${image.title}', '${image.category}')">
+                <img src="${image.url}" alt="${image.title}" loading="lazy">
+                <div class="image-overlay">
+                    <div class="image-title">${image.title}</div>
+                    <div class="image-category">${image.category.toUpperCase()}</div>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
+
+    imageGrid.innerHTML = imageHTML;
+}
+
+// Display images with pagination
+function displayImagesWithPagination(images) {
+    currentImages = images;
+    totalPages = Math.ceil(images.length / imagesPerPage);
+    currentPage = 1;
+    
+    if (totalPages <= 1) {
+        document.getElementById('paginationContainer').style.display = 'none';
+    } else {
+        document.getElementById('paginationContainer').style.display = 'block';
+    }
+    
+    displayCurrentPage();
+    updatePaginationControls();
+}
+
+// Display current page of images
+function displayCurrentPage() {
+    const startIndex = (currentPage - 1) * imagesPerPage;
+    const endIndex = startIndex + imagesPerPage;
+    const pageImages = currentImages.slice(startIndex, endIndex);
+    
+    displayImages(pageImages);
+}
+
+// Change page with slide animation
+function changePage(newPage) {
+    if (newPage < 1 || newPage > totalPages || newPage === currentPage) {
+        return;
+    }
+    
+    const grid = document.getElementById('imageGrid');
+    
+    // Add slide-out animation
+    grid.classList.add('sliding-out');
+    
+    setTimeout(() => {
+        currentPage = newPage;
+        displayCurrentPage();
+        updatePaginationControls();
+        
+        // Add slide-in animation
+        grid.classList.remove('sliding-out');
+        grid.classList.add('sliding-in');
+        
+        setTimeout(() => {
+            grid.classList.remove('sliding-in');
+        }, 50);
+    }, 300);
 }
 
 // Update pagination controls
-function updatePaginationControls(totalImages) {
-    const paginationContainer = document.getElementById('paginationControls');
-    if (!paginationContainer) return;
+function updatePaginationControls() {
+    const paginationInfo = document.getElementById('paginationInfo');
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+    const pageNumbers = document.getElementById('pageNumbers');
     
-    let paginationHTML = '';
+    // Update info
+    if (paginationInfo) {
+        paginationInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    }
     
-    if (totalPages > 1) {
-        paginationHTML = '<div class="pagination">';
+    // Update buttons
+    if (prevBtn) {
+        prevBtn.disabled = currentPage === 1;
+    }
+    
+    if (nextBtn) {
+        nextBtn.disabled = currentPage === totalPages;
+    }
+    
+    // Update page numbers
+    if (pageNumbers) {
+        pageNumbers.innerHTML = '';
         
-        // Previous button
-        if (currentPage > 1) {
-            paginationHTML += `<button onclick="changePage(${currentPage - 1})" class="pagination-btn">Previous</button>`;
-        }
+        // Show max 5 page numbers
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, startPage + 4);
         
-        // Page numbers (show max 5 pages around current page)
-        const startPage = Math.max(1, currentPage - 2);
-        const endPage = Math.min(totalPages, currentPage + 2);
-        
-        if (startPage > 1) {
-            paginationHTML += `<button onclick="changePage(1)" class="pagination-btn">1</button>`;
-            if (startPage > 2) {
-                paginationHTML += '<span class="pagination-ellipsis">...</span>';
-            }
+        if (endPage - startPage < 4) {
+            startPage = Math.max(1, endPage - 4);
         }
         
         for (let i = startPage; i <= endPage; i++) {
-            const activeClass = i === currentPage ? 'active' : '';
-            paginationHTML += `<button onclick="changePage(${i})" class="pagination-btn ${activeClass}">${i}</button>`;
+            const pageBtn = document.createElement('button');
+            pageBtn.className = `page-number ${i === currentPage ? 'active' : ''}`;
+            pageBtn.textContent = i;
+            pageBtn.addEventListener('click', () => changePage(i));
+            pageNumbers.appendChild(pageBtn);
         }
-        
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                paginationHTML += '<span class="pagination-ellipsis">...</span>';
-            }
-            paginationHTML += `<button onclick="changePage(${totalPages})" class="pagination-btn">${totalPages}</button>`;
-        }
-        
-        // Next button
-        if (currentPage < totalPages) {
-            paginationHTML += `<button onclick="changePage(${currentPage + 1})" class="pagination-btn">Next</button>`;
-        }
-        
-        paginationHTML += '</div>';
-        
-        // Add page info
-        const startItem = (currentPage - 1) * imagesPerPage + 1;
-        const endItem = Math.min(currentPage * imagesPerPage, totalImages);
-        paginationHTML += `<div class="pagination-info">Showing ${startItem}-${endItem} of ${totalImages} images</div>`;
+    }
+}
+
+// Initialize pagination
+function initPagination() {
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+    
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => changePage(currentPage - 1));
     }
     
-    paginationContainer.innerHTML = paginationHTML;
-}
-
-// Change page
-function changePage(page) {
-    if (page >= 1 && page <= totalPages) {
-        currentPage = page;
-        const filteredImages = getFilteredImages();
-        displayImagesWithPagination(filteredImages);
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => changePage(currentPage + 1));
     }
-}
-
-// Get filtered images based on current category
-function getFilteredImages() {
-    if (currentCategory === 'all') {
-        return allImages;
-    }
-    return allImages.filter(image => image.category === currentCategory);
 }
 
 // Filter images by category
 function filterImages(category) {
-    currentCategory = category;
-    currentPage = 1; // Reset to first page when filtering
+    const galleryTitle = document.getElementById('galleryTitle');
+    let filteredImages;
     
-    const filteredImages = getFilteredImages();
-    displayImagesWithPagination(filteredImages);
-    updateImageCount(filteredImages.length);
-    
-    // Update gallery title
     if (category === 'all') {
-        galleryTitle.textContent = 'All Images';
+        filteredImages = allImages;
+        galleryTitle.textContent = 'Portfolio Gallery';
     } else {
-        galleryTitle.textContent = category;
+        // Filter images by exact category match
+        filteredImages = allImages.filter(image => image.category === category);
+        galleryTitle.textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Gallery`;
     }
     
-    // Update active category button
-    document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    document.querySelector(`[onclick="filterImages('${category}')"]`).classList.add('active');
+    // Update current category
+    currentCategory = category;
+    
+    // Display filtered images with pagination
+    displayImagesWithPagination(filteredImages);
+    updateImageCount(filteredImages.length);
 }
 
 // Update image count display
 function updateImageCount(count) {
-    if (imageCount) {
-        imageCount.textContent = `${count} image${count !== 1 ? 's' : ''}`;
-    }
-}
-
-// Open modal
-function openModal(imageName, category) {
-    const imagePath = `/images/${imageName}.jpg`;
-    modalImage.src = imagePath;
-    modalTitle.textContent = imageName;
-    modalCategory.textContent = category;
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
-}
-
-// Close modal
-function closeModalFunc() {
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto'; // Restore scrolling
+    imageCount.textContent = `${count} image${count !== 1 ? 's' : ''}`;
 }
 
 // Setup event listeners
 function setupEventListeners() {
-    // Close modal when clicking the X
+    // Navigation links for sections
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Skip cart link - let it navigate normally
+            if (this.classList.contains('cart-link')) {
+                return; // Don't prevent default, let the link navigate to /checkout
+            }
+            
+            e.preventDefault();
+            
+            const section = this.getAttribute('data-section');
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Show corresponding section
+            showSection(section);
+        });
+    });
+    
+    // Modal close events
     if (closeModal) {
-        closeModal.onclick = closeModalFunc;
+        closeModal.addEventListener('click', closeImageModal);
     }
     
-    // Close modal when clicking outside the image
-    window.onclick = function(event) {
-        if (event.target === modal) {
-            closeModalFunc();
-        }
-    }
-    
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeModalFunc();
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeImageModal();
         }
     });
 }
 
-// Search functionality
-function searchImages() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+// Show specific section
+function showSection(sectionName) {
+    // Hide all sections
+    document.querySelectorAll('.content-section').forEach(section => {
+        section.classList.remove('active');
+    });
     
-    if (searchTerm === '') {
-        // If search is empty, show all images for current category
-        const filteredImages = getFilteredImages();
-        displayImagesWithPagination(filteredImages);
-        updateImageCount(filteredImages.length);
-        return;
-    }
-    
-    // Filter images based on search term
-    const baseImages = getFilteredImages();
-    const searchResults = baseImages.filter(image => 
-        image.name.toLowerCase().includes(searchTerm) ||
-        image.category.toLowerCase().includes(searchTerm)
-    );
-    
-    currentPage = 1; // Reset to first page
-    displayImagesWithPagination(searchResults);
-    updateImageCount(searchResults.length);
-}
-
-// Clear search
-function clearSearch() {
-    document.getElementById('searchInput').value = '';
-    searchImages();
-}
-
-// Handle Enter key in search
-function handleSearchKeyPress(event) {
-    if (event.key === 'Enter') {
-        searchImages();
+    // Show selected section
+    const targetSection = document.getElementById(`${sectionName}-section`);
+    if (targetSection) {
+        targetSection.classList.add('active');
     }
 }
 
-// Mobile menu toggle
-function toggleMobileMenu() {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const hamburger = document.querySelector('.hamburger');
-    
-    mobileMenu.classList.toggle('active');
-    hamburger.classList.toggle('active');
+// Open image modal
+function openModal(imageUrl, title, category) {
+    modalImage.src = imageUrl;
+    modalTitle.textContent = title;
+    modalCategory.innerHTML = '<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>';
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
 }
 
-// Close mobile menu when clicking outside
-document.addEventListener('click', function(event) {
-    const mobileMenu = document.getElementById('mobileMenu');
-    const hamburger = document.querySelector('.hamburger');
+// Close modal
+function closeImageModal() {
+    modal.classList.remove('show');
+    document.body.style.overflow = 'auto';
+}
+
+
+// Featured Image Action Functions
+function viewFullscreen(imageUrl, imageTitle) {
+    // Open image in new window/tab - original behavior
+    window.open(imageUrl, '_blank');
+}
+
+function downloadImage(imageUrl, filename) {
+    // Create a temporary link element
+    const link = document.createElement('a');
+    link.href = imageUrl;
+    link.download = filename || 'featured-image.jpg';
     
-    if (mobileMenu && mobileMenu.classList.contains('active')) {
-        if (!mobileMenu.contains(event.target) && !hamburger.contains(event.target)) {
-            mobileMenu.classList.remove('active');
-            hamburger.classList.remove('active');
+    // Append to body, click, and remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function shareOnSocial(imageTitle, imageUrl) {
+    const shareUrl = 'https://fifth-element-photography-production.up.railway.app/#featured';
+    const shareText = `Check out this amazing photograph: "${imageTitle}" by Fifth Element Photography`;
+    
+    // Check if Web Share API is supported
+    if (navigator.share) {
+        navigator.share({
+            title: 'Fifth Element Photography - Featured Image',
+            text: shareText,
+            url: shareUrl
+        }).catch(console.error);
+    } else {
+        // Fallback: Copy link to clipboard and show options
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            const shareOptions = `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                           background: #1a1a1a; padding: 2rem; border-radius: 8px; z-index: 1000;
+                           border: 1px solid #333; color: white; font-family: Poppins, sans-serif;">
+                    <h3 style="margin-top: 0;">Share Featured Image</h3>
+                    <p>Link copied to clipboard!</p>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}" 
+                           target="_blank" style="color: #1da1f2; text-decoration: none;">Twitter</a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}" 
+                           target="_blank" style="color: #4267b2; text-decoration: none;">Facebook</a>
+                        <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}" 
+                           target="_blank" style="color: #0077b5; text-decoration: none;">LinkedIn</a>
+                    </div>
+                    <button onclick="this.parentElement.remove()" 
+                            style="margin-top: 1rem; background: #333; color: white; border: none; 
+                                   padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">Close</button>
+                </div>
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                           background: rgba(0,0,0,0.5); z-index: 999;" onclick="this.nextElementSibling.remove(); this.remove();"></div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', shareOptions);
+        }).catch(() => {
+            alert('Unable to copy link. Please manually copy: ' + shareUrl);
+        });
+    }
+}
+
+
+
+// Mobile Navigation
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    // Toggle mobile menu
+    function toggleMobileMenu() {
+        mobileMenuBtn.classList.toggle('active');
+        sidebar.classList.toggle('active');
+        mobileOverlay.classList.toggle('active');
+        document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+    }
+
+    // Close mobile menu
+    function closeMobileMenu() {
+        mobileMenuBtn.classList.remove('active');
+        sidebar.classList.remove('active');
+        mobileOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Event listeners
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    }
+
+    if (mobileOverlay) {
+        mobileOverlay.addEventListener('click', closeMobileMenu);
+    }
+
+    // Close menu when nav link is clicked
+    navLinks.forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+    });
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeMobileMenu();
         }
-    }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            closeMobileMenu();
+        }
+    });
 });
 
-// Smooth scrolling for anchor links
+
+// Category Filtering
 document.addEventListener('DOMContentLoaded', function() {
-    const links = document.querySelectorAll('a[href^="#"]');
+    const categoryLinks = document.querySelectorAll('.category-link');
     
-    links.forEach(link => {
+    // Add click event listeners to category links
+    categoryLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            e.preventDefault();
+            e.preventDefault(); // Prevent default link behavior
+            const category = this.getAttribute('data-category');
             
-            const targetId = this.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
+            // Update active link
+            categoryLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
             
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+            // Filter images using the correct function
+            filterImages(category);
         });
     });
 });
 
-// Initialize category buttons
-function initializeCategoryButtons() {
-    // Get unique categories from all images
-    const categories = ['all', ...new Set(allImages.map(img => img.category))];
-    
-    const categoryContainer = document.getElementById('categoryButtons');
-    if (categoryContainer) {
-        categoryContainer.innerHTML = categories.map(category => {
-            const displayName = category === 'all' ? 'All Images' : category;
-            const activeClass = category === 'all' ? 'active' : '';
-            return `<button class="category-btn ${activeClass}" onclick="filterImages('${category}')">${displayName}</button>`;
-        }).join('');
+
+
+// Desktop Contact Form
+function initDesktopContactForm() {
+    const desktopContactForm = document.querySelector('#contact-section form');
+    if (desktopContactForm) {
+        desktopContactForm.addEventListener('submit', handleDesktopContactSubmit);
     }
 }
 
-// Call this after images are loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait for images to load, then initialize category buttons
-    setTimeout(() => {
-        if (allImages.length > 0) {
-            initializeCategoryButtons();
+async function handleDesktopContactSubmit(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitBtn = form.querySelector('.btn-primary');
+    const originalText = submitBtn.textContent;
+    
+    // Get form data
+    const formData = {
+        name: form.querySelector('input[placeholder="Your Name"]').value,
+        email: form.querySelector('input[placeholder="Your Email"]').value,
+        phone: form.querySelector('input[placeholder="Your Phone Number"]').value,
+        shoot_type: form.querySelector('#shoot-type').value,
+        budget: form.querySelector('#budget').value,
+        how_heard: form.querySelector('#how-heard').value,
+        message: form.querySelector('textarea').value
+    };
+    
+    // Validate required fields
+    if (!formData.name || !formData.email || !formData.message) {
+        alert('Please fill in all required fields (Name, Email, and Message).');
+        return;
+    }
+    
+    // Show loading state
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch('/contact', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(result.message);
+            form.reset();
+        } else {
+            alert(result.error || 'Failed to send message. Please try again.');
         }
-    }, 1000);
-});
-
-// Lazy loading intersection observer
-const imageObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const img = entry.target;
-            img.src = img.dataset.src;
-            img.classList.remove('lazy');
-            observer.unobserve(img);
-        }
-    });
-});
-
-// Apply lazy loading to images
-function applyLazyLoading() {
-    const lazyImages = document.querySelectorAll('img[data-src]');
-    lazyImages.forEach(img => {
-        imageObserver.observe(img);
-    });
+    } catch (error) {
+        console.error('Error sending message:', error);
+        alert('An error occurred. Please try again later.');
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
 }
 
-// Order Print Functions
+// Initialize contact form when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    initDesktopContactForm();
+});
 
-// Original order print function (kept for compatibility)
-function orderPrint(imageName) {
-    if (imageName) {
-        window.open('/test_order_form?image=' + encodeURIComponent(imageName), '_blank');
+
+
+// Initialize Lumaprints functionality
+let lumaprintsPricing = null;
+let lumaprintsOrdering = null;
+
+// Initialize Lumaprints when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle Order Print button clicks - redirect to new PayPal form
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('#orderPrintBtn')) {
+            e.preventDefault();
+            
+            // Redirect to new PayPal-integrated order form
+            window.open('/test_order_form', '_blank');
+        }
+    });
+});
+// Desktop Order Form Function
+function openDesktopOrderForm() {
+    const modalTitle = document.getElementById('modalTitle');
+    if (modalTitle && modalTitle.textContent) {
+        const imageName = encodeURIComponent(modalTitle.textContent.trim());
+        const orderFormUrl = '/test_order_form?image=' + imageName;
+        window.open(orderFormUrl, '_blank');
     } else {
         window.open('/test_order_form', '_blank');
     }
@@ -407,8 +554,8 @@ function orderPrint(imageName) {
 
 // New Order System Function - Bypasses all old Lumaprints code
 function openNewOrderForm() {
-    const modalTitle = document.getElementById('modalTitle');
-    const modalImage = document.getElementById('modalImage');
+    const modalTitle = document.getElementById("modalTitle");
+    const modalImage = document.getElementById("modalImage");
     
     if (modalTitle && modalTitle.textContent && modalImage) {
         const imageName = encodeURIComponent(modalTitle.textContent.trim());
@@ -422,15 +569,15 @@ function openNewOrderForm() {
             
             const imageSize = encodeURIComponent(`${width}x${height} pixels, DPI: ${dpi}`);
             const orderFormUrl = `/test_order_form?image=${imageName}&imageSize=${imageSize}`;
-            window.open(orderFormUrl, '_blank');
+            window.open(orderFormUrl, "_blank");
         };
         tempImg.onerror = function() {
             // If image fails to load, still open form but without size info
-            const orderFormUrl = '/test_order_form?image=' + imageName;
-            window.open(orderFormUrl, '_blank');
+            const orderFormUrl = "/test_order_form?image=" + imageName;
+            window.open(orderFormUrl, "_blank");
         };
         tempImg.src = modalImage.src;
     } else {
-        window.open('/test_order_form', '_blank');
+        window.open("/test_order_form", "_blank");
     }
 }
