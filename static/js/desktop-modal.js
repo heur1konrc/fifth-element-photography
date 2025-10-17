@@ -131,3 +131,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Menu functionality
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const section = this.getAttribute('data-section');
+        
+        // Remove active class from all links
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Hide all sections
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        
+        // Show target section
+        const targetSection = document.getElementById(section);
+        if (targetSection) {
+            targetSection.style.display = 'block';
+        }
+    });
+});
