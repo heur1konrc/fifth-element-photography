@@ -1,10 +1,12 @@
-// Desktop Modal Script - Simple and Clean
+// Desktop Modal Script - Fixed Version
 let allImages = [];
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Reset body overflow in case it's stuck
+    document.body.style.overflow = 'auto';
+    
     loadImages();
     
-    // Load and display images
     async function loadImages() {
         try {
             const response = await fetch('/api/images');
@@ -16,14 +18,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Display images in grid
     function displayImages(images) {
         const imageGrid = document.getElementById('imageGrid');
         if (!imageGrid) return;
         
         const imageHTML = images.map(image => {
             return `
-                <div class="image-item" data-url="${image.url}" data-title="${image.title}">
+                <div class="image-item" onclick="openImageModal('${image.url}', '${image.title}')">
                     <img src="${image.url}" alt="${image.title}" loading="lazy">
                     <div class="image-overlay">
                         <div class="image-title">${image.title}</div>
@@ -34,26 +35,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }).join('');
         
         imageGrid.innerHTML = imageHTML;
-        setupImageClicks();
+        
+        // Hide pagination
+        const paginationContainer = document.getElementById('paginationContainer');
+        if (paginationContainer) {
+            paginationContainer.style.display = 'none';
+        }
     }
     
-    // Add click handlers to all gallery images
-    function setupImageClicks() {
-        const imageItems = document.querySelectorAll('.image-item');
-        imageItems.forEach(item => {
-            item.addEventListener('click', function() {
-                const imageUrl = this.dataset.url;
-                const imageTitle = this.dataset.title;
-                
-                if (imageUrl && imageTitle) {
-                    openImageModal(imageUrl, imageTitle);
-                }
-            });
-        });
-    }
-    
-    // Open modal with image
-    function openImageModal(imageUrl, title) {
+    // Make openImageModal global
+    window.openImageModal = function(imageUrl, title) {
         const modal = document.getElementById('imageModal');
         const modalImage = document.getElementById('modalImage');
         const modalTitle = document.getElementById('modalTitle');
@@ -66,18 +57,18 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
         }
-    }
+    };
     
-    // Close modal
-    function closeModal() {
+    // Make closeModal global
+    window.closeImageModal = function() {
         const modal = document.getElementById('imageModal');
         if (modal) {
             modal.classList.remove('show');
             document.body.style.overflow = 'auto';
         }
-    }
+    };
     
-    // ORDER PRINTS functionality (same as mobile)
+    // ORDER PRINTS functionality
     window.openDesktopOrderForm = function() {
         const modalTitle = document.getElementById('modalTitle');
         if (modalTitle && modalTitle.textContent) {
@@ -94,13 +85,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const modal = document.getElementById('imageModal');
     
     if (closeBtn) {
-        closeBtn.addEventListener('click', closeModal);
+        closeBtn.addEventListener('click', window.closeImageModal);
     }
     
     if (modal) {
         window.addEventListener('click', function(e) {
             if (e.target === modal) {
-                closeModal();
+                window.closeImageModal();
             }
         });
     }
