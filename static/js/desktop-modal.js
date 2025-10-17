@@ -55,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
             modalTitle.textContent = title;
             modalCategory.innerHTML = '<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>';
             modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
         }
     };
     
