@@ -1784,14 +1784,14 @@ textarea {
 
 
 /* Order Form Modal Styling - Based on Contact Form */
-.modal-order-form {
+.modal-new-order-form {
     color: #ffffff;
     padding: 20px;
-    max-height: 80vh;
-    overflow-y: auto;
+    background: #000;
+    border-radius: 8px;
 }
 
-.order-form-header {
+.new-order-form-header {
     text-align: center;
     margin-bottom: 2rem;
 }
