@@ -496,6 +496,8 @@ body {
     display: flex;
     flex-direction: column;
     background: #000;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-close {
@@ -998,11 +1000,21 @@ body {
     }
 }
 
+/* Prevent body scroll when modal is open */
+body.modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
 /* Mobile Order Form Styles */
 .mobile-order-form {
     padding: 20px;
     background: #000;
     color: #fff;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .order-form-header {

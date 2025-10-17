@@ -566,6 +566,9 @@ function getItemsPerView() {
 
 // Mobile Order Form Functions
 function showMobileOrderForm() {
+    // Prevent body scroll
+    document.body.classList.add('modal-open');
+    
     // Hide the image view
     document.querySelector('.modal-content > .modal-image-container').style.display = 'none';
     document.querySelector('.modal-content > .modal-info').style.display = 'none';
@@ -611,6 +614,9 @@ function showMobileOrderForm() {
 }
 
 function showMobileImageView() {
+    // Allow body scroll
+    document.body.classList.remove('modal-open');
+    
     // Hide the order form
     document.getElementById('mobileOrderForm').style.display = 'none';
     
@@ -624,6 +630,9 @@ function closeImageModal() {
     const modal = document.getElementById('imageModal');
     if (modal) {
         modal.style.display = 'none';
+        
+        // Allow body scroll
+        document.body.classList.remove('modal-open');
         
         // Reset to image view
         showMobileImageView();
