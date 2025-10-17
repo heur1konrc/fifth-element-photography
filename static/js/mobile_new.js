@@ -569,12 +569,19 @@ function showMobileOrderForm() {
     // Prevent body scroll
     document.body.classList.add('modal-open');
     
-    // Hide the image view
-    document.querySelector('.modal-content > .modal-image-container').style.display = 'none';
-    document.querySelector('.modal-content > .modal-info').style.display = 'none';
-    
-    // Show the order form
-    document.getElementById('mobileOrderForm').style.display = 'block';
+    // Use setTimeout to ensure proper rendering
+    setTimeout(() => {
+        // Hide the image view
+        const imageContainer = document.querySelector('.modal-content > .modal-image-container');
+        const modalInfo = document.querySelector('.modal-content > .modal-info');
+        const orderForm = document.getElementById('mobileOrderForm');
+        
+        if (imageContainer) imageContainer.style.display = 'none';
+        if (modalInfo) modalInfo.style.display = 'none';
+        
+        // Show the order form
+        if (orderForm) orderForm.style.display = 'block';
+    }, 10);
     
     // Get image info from the modal
     const imageName = document.getElementById('modalTitle').textContent;
@@ -618,11 +625,15 @@ function showMobileImageView() {
     document.body.classList.remove('modal-open');
     
     // Hide the order form
-    document.getElementById('mobileOrderForm').style.display = 'none';
+    const orderForm = document.getElementById('mobileOrderForm');
+    if (orderForm) orderForm.style.display = 'none';
     
     // Show the image view
-    document.querySelector('.modal-content > .modal-image-container').style.display = 'block';
-    document.querySelector('.modal-content > .modal-info').style.display = 'block';
+    const imageContainer = document.querySelector('.modal-content > .modal-image-container');
+    const modalInfo = document.querySelector('.modal-content > .modal-info');
+    
+    if (imageContainer) imageContainer.style.display = 'block';
+    if (modalInfo) modalInfo.style.display = 'block';
 }
 
 // Update closeImageModal to reset mobile form
