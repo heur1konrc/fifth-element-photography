@@ -1836,8 +1836,9 @@ textarea {
     margin-top: 2rem;
 }
 
-.order-image-preview img {
-    max-width: 400px;
+.order-image-preview img,
+#orderImagePreview img {
+    max-width: 400px !important;
     height: auto;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
