@@ -313,6 +313,17 @@ function openModal(imageUrl, title, category) {
 
 // Close modal
 function closeImageModal() {
+    // Reset modal to image view (in case order form was showing)
+    const modalMainView = document.getElementById('modalMainView');
+    const modalOrderForm = document.getElementById('modalOrderForm');
+    
+    if (modalMainView) modalMainView.style.display = 'block';
+    if (modalOrderForm) modalOrderForm.style.display = 'none';
+    
+    // Clear any previous order form data
+    const productInfo = document.getElementById('orderProductInfo');
+    if (productInfo) productInfo.innerHTML = '';
+    
     modal.classList.remove('show');
     document.body.style.overflow = 'auto';
 }
