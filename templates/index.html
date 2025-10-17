@@ -328,7 +328,7 @@
                     <h4 id="modalTitle"></h4>
                     <p id="modalCategory"></p>
                     <div style="text-align: center; margin-top: 20px; padding: 20px;">
-                        <a href="/test_order_form" id="orderPrintBtn" target="_blank" style="
+                        <a onclick="openDesktopOrderForm(); return false;" href="#" id="orderPrintBtn" target="_blank" style="
                             display: inline-block;
                             background: #6799c2;
                             color: white;
@@ -725,7 +725,15 @@
         setInterval(updateCartCount, 1000);
         
         // Handle order print click
-        function handleOrderClick() {
+        function getCurrentImageName() {
+            const modalTitle = document.querySelector("#imageModal .modal-title");
+            if (modalTitle && modalTitle.textContent) {
+                return modalTitle.textContent.trim();
+            }
+            return null;
+        }
+
+        function openDesktopOrderForm() {
             // Redirect to new PayPal-integrated order form
             window.open('/test_order_form', '_blank');
         }
