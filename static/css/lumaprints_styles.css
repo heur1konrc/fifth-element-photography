@@ -65,11 +65,13 @@
     margin: 5vh auto;
 }
 
-/* Ensure all text in ordering sections is readable */
+/* Ensure all text in ordering sections is readable - DISABLED FOR DARK THEME */
+/*
 .modal-print-order *,
 .modal-order-form * {
     color: #333 !important;
 }
+*/
 
 .modal-print-order h3,
 .modal-print-order h4,
@@ -796,6 +798,8 @@
     color: #333 !important;
 }
 
+/* DISABLED FOR DARK THEME */
+/*
 .modal-print-order input,
 .modal-order-form input,
 .modal-print-order select,
@@ -803,6 +807,7 @@
     color: #333 !important;
     background: white !important;
 }
+*/
 
 .modal-print-order .product-category,
 .modal-print-order .size-option {
