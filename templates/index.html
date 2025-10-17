@@ -360,109 +360,94 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
             </div>
             
             <!-- Order Form Section (initially hidden) -->
+            <!-- Order Form Section (initially hidden) -->
             <div class="modal-order-form" id="modalOrderForm" style="display: none;">
                 <div class="order-form-header">
                     <button class="btn-back" id="backToImageBtn" onclick="showImageView()">
                         <span class="btn-icon">←</span>
                         Back to Image
                     </button>
-                    <h3>Order Print</h3>
+                    <h2 class="section-title" style="text-align: center; margin: 20px 0;">ORDER FORM</h2>
                 </div>
                 
                 <div class="order-form-content">
-                    <div class="product-info" id="orderProductInfo">
-                        <!-- Product info will be populated dynamically -->
+                    <div class="order-content">
+                        <!-- Left Column: Image Details -->
+                        <div class="order-info">
+                            <h3>Image Details</h3>
+                            <div id="orderImageDetails">
+                                <!-- Image details will be populated dynamically -->
+                            </div>
+                            <div class="order-image-preview" id="orderImagePreview">
+                                <!-- Image thumbnail will be shown here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column: Order Form -->
+                        <div class="order-form">
+                            <h3>Place Order</h3>
+                            <form id="orderForm" action="/test_order_submit" method="POST">
+                                <div class="form-group">
+                                    <input type="email" id="order_email" name="email" placeholder="Your Email" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_first_name" name="first_name" placeholder="First Name" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_last_name" name="last_name" placeholder="Last Name" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_address" name="address" placeholder="Address" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_city" name="city" placeholder="City" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_state" name="state" placeholder="State" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_zip" name="zip_code" placeholder="Zip Code" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <select id="order_country" name="country" required>
+                                        <option value="">Select Country</option>
+                                        <option value="United States">United States</option>
+                                        <option value="Canada">Canada</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="tel" id="order_phone" name="phone" placeholder="Phone Number">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <select id="order_product_type" name="product_type" required onchange="updateOrderPricing()">
+                                        <option value="">Select a product...</option>
+                                        <option value="canvas|12x12_075" data-sku="101001" data-options="1,5">Canvas Print 0.75" (12x12) - Loading...</option>
+                                        <option value="canvas|12x12_125" data-sku="101002" data-options="2,5">Canvas Print 1.25" (12x12) - Loading...</option>
+                                        <option value="metal|12x12" data-sku="106001" data-options="29,31">Metal Print (12x12) - Loading...</option>
+                                        <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - Loading...</option>
+                                    </select>
+                                </div>
+
+                                <!-- PayPal Payment Section -->
+                                <div class="payment-section">
+                                    <p class="total-price"><strong>Total: <span id="order-total-price">$0.00</span></strong></p>
+                                    <div id="order-paypal-button-container"></div>
+                                </div>
+
+                                <!-- Hidden submit for after payment -->
+                                <button type="submit" id="order-submit-order" style="display: none;">Submit Order to OrderDesk</button>
+                            </form>
+                        </div>
                     </div>
-
-                    <form id="orderForm" action="/test_order_submit" method="POST">
-                        <div class="form-section">
-                            <h3>Customer Information</h3>
-                            
-                            <div class="form-group">
-                                <label for="order_email">Email:</label>
-                                <input type="email" id="order_email" name="email" required>
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h3>Shipping Address</h3>
-                            
-                            <div class="form-group">
-                                <label for="order_first_name">First Name:</label>
-                                <input type="text" id="order_first_name" name="first_name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="order_last_name">Last Name:</label>
-                                <input type="text" id="order_last_name" name="last_name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="order_address1">Address:</label>
-                                <input type="text" id="order_address1" name="address1" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="order_city">City:</label>
-                                <input type="text" id="order_city" name="city" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="order_state">State:</label>
-                                <input type="text" id="order_state" name="state" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="order_postal_code">Zip Code:</label>
-                                <input type="text" id="order_postal_code" name="postal_code" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="order_country">Country:</label>
-                                <select id="order_country" name="country" required>
-                                    <option value="US">United States</option>
-                                    <option value="CA">Canada</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="order_phone">Phone:</label>
-                                <input type="tel" id="order_phone" name="phone">
-                            </div>
-                        </div>
-
-                        <div class="form-section">
-                            <h3>Product Selection</h3>
-                            
-                            <div class="form-group">
-                                <label for="order_product_type">Product Type:</label>
-                                <select id="order_product_type" name="product_type" required onchange="updateOrderPricing()">
-                                    <option value="">Select a product...</option>
-                                    <option value="canvas|12x12_075" data-sku="101001" data-options="1,5">Canvas Print 0.75" (12x12) - Loading...</option>
-                                    <option value="canvas|12x12_125" data-sku="101002" data-options="2,5">Canvas Print 1.25" (12x12) - Loading...</option>
-                                    <option value="metal|12x12" data-sku="106001" data-options="29,31">Metal Print (12x12) - Loading...</option>
-                                    <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - Loading...</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- PayPal Payment Section -->
-                        <div class="form-section payment-section">
-                            <h3>Payment</h3>
-                            <p class="total-price"><strong>Total: <span id="order-total-price">$0.00</span></strong></p>
-                            <div id="order-pricing-breakdown" class="pricing-breakdown">
-                                <div>Base Cost: <span id="order-base-cost">$0.00</span></div>
-                                <div>Margin: <span id="order-margin-percent">0</span>%</div>
-                            </div>
-                            <div id="order-paypal-button-container"></div>
-                            <div id="order-payment-message" class="payment-message">
-                                Please select a product to see pricing
-                            </div>
-                        </div>
-
-                        <!-- Hidden submit for after payment -->
-                        <button type="submit" id="order-submit-order" style="display: none;">Submit Order to OrderDesk</button>
-                    </form>
                 </div>
             </div>
         </div>

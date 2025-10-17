@@ -1781,3 +1781,117 @@ textarea {
 
 
 
+
+
+/* Order Form Modal Styling - Based on Contact Form */
+.modal-order-form {
+    color: #ffffff;
+    padding: 20px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.order-form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.btn-back {
+    background: #6799c2;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.btn-back:hover {
+    background: #5a87a8;
+}
+
+.order-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.order-info h3,
+.order-form h3 {
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.order-info {
+    color: #ccc;
+}
+
+.order-image-preview {
+    margin-top: 2rem;
+}
+
+.order-image-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.order-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.order-form .form-group input,
+.order-form .form-group select,
+.order-form .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: #2a2a2a;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+}
+
+.order-form .form-group input:focus,
+.order-form .form-group select:focus,
+.order-form .form-group textarea:focus {
+    outline: none;
+    border-color: #6799c2;
+}
+
+.order-form .form-group input::placeholder {
+    color: #888;
+}
+
+.payment-section {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #444;
+}
+
+.total-price {
+    font-size: 1.2rem;
+    color: #6799c2;
+    margin-bottom: 1rem;
+}
+
+/* Responsive Design for Order Form */
+@media (max-width: 768px) {
+    .order-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .order-form .form-group input,
+    .order-form .form-group select {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
