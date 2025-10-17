@@ -595,13 +595,29 @@ function showOrderForm() {
     const imageName = document.getElementById('modalTitle').textContent;
     const imageElement = document.getElementById('modalImage');
     
-    // Populate product info
+    // Get image dimensions and populate product info
     const productInfo = document.getElementById('orderProductInfo');
-    if (productInfo && imageName) {
-        productInfo.innerHTML = `
-            <h4>Image: ${imageName}</h4>
-            <p>Product: Canvas Print 12x12</p>
-        `;
+    if (productInfo && imageName && imageElement && imageElement.src) {
+        const img = new Image();
+        img.onload = function() {
+            const width = this.naturalWidth;
+            const height = this.naturalHeight;
+            
+            // Calculate DPI for 12x12 print
+            const printSize = 12; // inches
+            const dpi = Math.round(Math.min(width, height) / printSize);
+            
+            // Populate product info with correct format matching test form
+            productInfo.innerHTML = `
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                    <p><strong>Image Name:</strong> ${imageName}</p>
+                    <p><strong>Image Size:</strong> ${width}x${height} pixels, DPI: ${dpi}</p>
+                    <p><strong>Product:</strong> Canvas Print 12x12</p>
+                    <p><strong>Image:</strong> ${imageElement.src}</p>
+                </div>
+            `;
+        };
+        img.src = imageElement.src;
     }
 }
 
