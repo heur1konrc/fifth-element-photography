@@ -12,8 +12,8 @@
     <meta property="og:url" content="https://fifth-element-photography-production.up.railway.app/#featured">
     
     
-    <meta property="og:image" content="https://fifth-element-photography-production.up.railway.app/images/IMG_8653_2_1.jpg">
-    <meta property="og:image:alt" content="Gull in Flight">
+    <meta property="og:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}">
+    <meta property="og:image:alt" content="{{ featured_image.title if featured_image else "No Featured Image" }}">
     
     <meta property="og:site_name" content="Fifth Element Photography">
     
@@ -22,7 +22,7 @@
     <meta name="twitter:title" content="Fifth Element Photography - Featured Image of the Week">
     <meta name="twitter:description" content="Professional photography with artistic vision and technical excellence">
     
-    <meta name="twitter:image" content="https://fifth-element-photography-production.up.railway.app/images/IMG_8653_2_1.jpg">
+    <meta name="twitter:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}">
     
     
     <link rel="stylesheet" href="/static/css/style.css?v=20241008-001">
@@ -136,9 +136,9 @@
                     
                         <div class="featured-content">
                             <div class="featured-image-container">
-                                <h3>Gull in Flight</h3>
+                                <h3>{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
                                 <div class="featured-image">
-                                    <img src="/images/IMG_8653_2_1.jpg" alt="Gull in Flight">
+                                    <img src="{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}" alt="{{ featured_image.title if featured_image else "No Featured Image" }}">
                                 </div>
                             </div>
                             
@@ -172,13 +172,13 @@
                             
                             <!-- Action Buttons -->
                             <div class="image-actions">
-                                <button class="action-btn" onclick="viewFullscreen('/images/IMG_8653_2_1.jpg', 'Gull in Flight')">
+                                <button class="action-btn" onclick="viewFullscreen('{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}', '{{ featured_image.title if featured_image else "No Featured Image" }}')">
                                     <span></span> View High Resolution (New Window)
                                 </button>
-                                <button class="action-btn" onclick="downloadImage('/images/IMG_8653_2_1.jpg', 'IMG_8653_2_1.jpg')">
+                                <button class="action-btn" onclick="downloadImage('{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}', 'IMG_8653_2_1.jpg')">
                                     <span></span> Download Full Size Image
                                 </button>
-                                <button class="action-btn" onclick="shareOnSocial('Gull in Flight', '/images/IMG_8653_2_1.jpg')">
+                                <button class="action-btn" onclick="shareOnSocial('{{ featured_image.title if featured_image else "No Featured Image" }}', '{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}')">
                                     <span></span> Share on Social Media
                                 </button>
                             </div>
