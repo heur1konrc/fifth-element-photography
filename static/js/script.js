@@ -551,3 +551,15 @@ function openDesktopOrderForm() {
         window.open('/test_order_form', '_blank');
     }
 }
+
+// New Order System Function - Bypasses all old Lumaprints code
+function openNewOrderForm() {
+    const modalTitle = document.getElementById('modalTitle');
+    if (modalTitle && modalTitle.textContent) {
+        const imageName = encodeURIComponent(modalTitle.textContent.trim());
+        const orderFormUrl = '/test_order_form?image=' + imageName;
+        window.open(orderFormUrl, '_blank');
+    } else {
+        window.open('/test_order_form', '_blank');
+    }
+}
