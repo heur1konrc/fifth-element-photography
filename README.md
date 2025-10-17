@@ -10,8 +10,9 @@ A professional photography portfolio website with comprehensive admin management
 - **Advanced Image Modal** - Detailed view with EXIF data and ordering capabilities
 - **Featured Image System** - Weekly featured image with story integration
 - **Hero Image Management** - Dynamic hero image with overlay tagline
+- **Unified Order System** - Streamlined ordering process with proper image name passing ✨ *FIXED*
 
-### Mobile Experience ✨ *NEW*
+### Mobile Experience ✨ *COMPLETE*
 - **Touch-Friendly Categories Carousel** - Horizontal scrollable category navigation
 - **Redesigned Image Modal** - Full-width layout optimized for mobile viewing
 - **Automatic Mobile Detection** - Seamless redirection to mobile-optimized interface
@@ -28,12 +29,33 @@ A professional photography portfolio website with comprehensive admin management
 - **Password Recovery** - Secure password reset functionality
 
 ### E-Commerce Integration
-- **Lumaprints Integration** - Professional print ordering system
-- **Dynamic Pricing** - Real-time pricing calculations
-- **Shopping Cart** - Full cart management with order processing
+- **Unified Order Form** - Single order form system for both desktop and mobile
+- **Dynamic Image Selection** - Proper image name passing from gallery to order form
 - **Print Size Options** - Multiple format and size selections
+- **PayPal Integration** - Secure payment processing
 
 ## 🚀 Recent Updates (October 2024)
+
+### Desktop Order System Fix - COMPLETE ✅
+1. **Old System Removal**
+   - Commented out legacy Lumaprints modal order system
+   - Eliminated interference between old and new order systems
+   - Preserved old code for reference (lines 382-679 in index.html)
+
+2. **New Order Button Implementation**
+   - Created distinctive orange "🛒 NEW ORDER SYSTEM" button
+   - Bypasses all legacy Lumaprints event handlers
+   - Direct integration with unified test_order_form.html
+
+3. **Image Name Passing Fix**
+   - Implemented `openNewOrderForm()` function
+   - Dynamically captures modal title for proper image identification
+   - URL parameter passing: `/test_order_form?image=[ImageName]`
+
+4. **System Integration**
+   - Both desktop and mobile now use identical order form system
+   - Eliminated dual form conflicts and interference
+   - Clean separation between old and new ordering systems
 
 ### Mobile Improvements - Phase Complete ✅
 1. **Categories Carousel Implementation**
@@ -79,27 +101,36 @@ The mobile experience has been completely redesigned for optimal touch interacti
 ### Completed Features
 - ✅ Core portfolio functionality
 - ✅ Admin management system
-- ✅ Lumaprints e-commerce integration
 - ✅ Mobile-optimized interface
 - ✅ Automatic mobile detection
 - ✅ Data synchronization between platforms
 - ✅ Alphabetical category sorting
+- ✅ **Unified order system with proper image name passing**
+- ✅ **Desktop order system conflicts resolved**
 
 ### Architecture
 - **Production**: https://fifth-element-photography-production.up.railway.app/
 - **Admin Panel**: https://fifthelement.photos/admin
 - **Mobile Interface**: Automatic detection and redirection
+- **Order System**: Unified test_order_form.html for both desktop and mobile
 
 ## 📋 Deployment Notes
 
 The application uses Railway for production deployment with automatic builds triggered by GitHub commits. The mobile interface is seamlessly integrated and requires no separate deployment process.
 
+### Order System Architecture
+- **Desktop**: Orange "🛒 NEW ORDER SYSTEM" button → `openNewOrderForm()` → `/test_order_form?image=[name]`
+- **Mobile**: Blue "ORDER PRINTS" button → `openOrderForm()` → `/test_order_form?image=[name]`
+- **Legacy System**: Commented out but preserved in codebase for reference
+
 ### Version History
 - **v1.1**: Base functionality with desktop interface
 - **v1.2**: Mobile improvements with carousel and modal redesign
-- **v1.3**: Data synchronization and alphabetical sorting (Current)
+- **v1.3**: Data synchronization and alphabetical sorting
+- **v1.4**: Desktop order system fix and unified ordering (Current)
 
 ---
 
-*Last Updated: October 16, 2024*
+*Last Updated: October 17, 2024*
+*Desktop Order System: Fixed ✅*
 *Mobile Phase: Complete ✅*
