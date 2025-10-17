@@ -21,6 +21,7 @@
         <p style="color: #d9534f; font-weight: bold;">Please go to the <a href="/" style="color: #007cba;">gallery</a> and select an image first, then click ORDER PRINTS.</p>
     {% else %}
         <h3>Image Name: {{ image }}</h3>
+        {% if imageSize %}<p><strong>Image Size:</strong> {{ imageSize }}</p>{% endif %}
     {% endif %}
         <p><strong>Product:</strong> Canvas Print 12x12</p>
         {% if image %}<p><strong>Image:</strong> https://fifthelement.photos/images/{{ image }}.jpg</p>{% endif %}
