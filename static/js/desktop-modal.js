@@ -1,17 +1,51 @@
 // Desktop Modal Script - Simple and Clean
+let allImages = [];
+
 document.addEventListener('DOMContentLoaded', function() {
+    loadImages();
+    
+    // Load and display images
+    async function loadImages() {
+        try {
+            const response = await fetch('/api/images');
+            allImages = await response.json();
+            displayImages(allImages);
+        } catch (error) {
+            console.error('Error loading images:', error);
+            document.getElementById('imageGrid').innerHTML = '<div class="loading">Error loading images</div>';
+        }
+    }
+    
+    // Display images in grid
+    function displayImages(images) {
+        const imageGrid = document.getElementById('imageGrid');
+        if (!imageGrid) return;
+        
+        const imageHTML = images.map(image => {
+            return `
+                <div class="image-item" data-url="${image.url}" data-title="${image.title}">
+                    <img src="${image.url}" alt="${image.title}" loading="lazy">
+                    <div class="image-overlay">
+                        <div class="image-title">${image.title}</div>
+                        <div class="image-category">${image.category.toUpperCase()}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        imageGrid.innerHTML = imageHTML;
+        setupImageClicks();
+    }
     
     // Add click handlers to all gallery images
     function setupImageClicks() {
         const imageItems = document.querySelectorAll('.image-item');
         imageItems.forEach(item => {
             item.addEventListener('click', function() {
-                const img = this.querySelector('img');
-                const titleDiv = this.querySelector('.image-title');
+                const imageUrl = this.dataset.url;
+                const imageTitle = this.dataset.title;
                 
-                if (img && titleDiv) {
-                    const imageUrl = img.src;
-                    const imageTitle = titleDiv.textContent;
+                if (imageUrl && imageTitle) {
                     openImageModal(imageUrl, imageTitle);
                 }
             });
@@ -69,22 +103,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 closeModal();
             }
         });
-    }
-    
-    // Initialize
-    setupImageClicks();
-    
-    // Re-setup clicks when new images load (for pagination/filtering)
-    const observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.type === 'childList') {
-                setupImageClicks();
-            }
-        });
-    });
-    
-    const imageGrid = document.getElementById('imageGrid');
-    if (imageGrid) {
-        observer.observe(imageGrid, { childList: true });
     }
 });
