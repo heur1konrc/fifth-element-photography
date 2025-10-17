@@ -540,3 +540,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+// Desktop Order Form Function
+function openDesktopOrderForm() {
+    const modalTitle = document.getElementById('modalTitle');
+    if (modalTitle && modalTitle.textContent) {
+        const imageName = encodeURIComponent(modalTitle.textContent.trim());
+        const orderFormUrl = '/test_order_form?image=' + imageName;
+        window.open(orderFormUrl, '_blank');
+    } else {
+        window.open('/test_order_form', '_blank');
+    }
+}
