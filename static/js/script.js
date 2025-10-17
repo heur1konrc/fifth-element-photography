@@ -631,7 +631,7 @@ function showOrderForm() {
             // Add image thumbnail
             if (orderImagePreview) {
                 orderImagePreview.innerHTML = `
-                    <img src="${imageElement.src}" alt="${imageName}" style="max-width: 200px; height: auto; border-radius: 8px;">
+                    <img src="${imageElement.src}" alt="${imageName}" style="max-width: 300px; height: auto; border-radius: 8px;">
                 `;
             }
         };
