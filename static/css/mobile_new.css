@@ -292,7 +292,7 @@ body {
 
 .category-btn:hover,
 .category-btn.active {
-    background: transparent;
+    background: #4a9eff;
     color: #000;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
@@ -574,7 +574,7 @@ body {
 }
 
 .category-badge {
-    background: transparent;
+    background: #4a9eff;
     color: #000;
     padding: 6px 16px;
     border-radius: 20px;
