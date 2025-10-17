@@ -563,3 +563,16 @@ function getItemsPerView() {
     if (screenWidth < 480) return 3;
     return 4;
 }
+
+// Function to open order form with selected image
+function openOrderForm() {
+    const modalTitle = document.getElementById('modalTitle');
+    if (modalTitle && modalTitle.textContent) {
+        const imageName = encodeURIComponent(modalTitle.textContent.trim());
+        const orderFormUrl = '/test_order_form?image=' + imageName;
+        window.open(orderFormUrl, '_blank');
+    } else {
+        // Fallback - open form without image parameter
+        window.open('/test_order_form', '_blank');
+    }
+}
