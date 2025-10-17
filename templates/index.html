@@ -323,13 +323,12 @@
             <div class="modal-main-view" id="modalMainView">
             <div class="modal-main-view" id="modalMainView">
                 <img class="modal-image" id="modalImage">
-                <div class="modal-info" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); color: white; padding: 20px; text-align: left;">
-                    <h3 id="modalTitle" style="margin: 0 0 10px 0; color: white; font-size: 1.5rem;"></h3>
-                    <span id="modalCategory" style="background: #4a90e2; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; text-transform: uppercase;"></span>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button onclick="openDesktopOrderForm(); return false;" id="orderPrintBtn" style="
-                            background: #4a90e2;
-                            color: white;
+                <div class="modal-info">
+                    <h4 id="modalTitle"></h4>
+                    <p id="modalCategory"></p>
+                    <button onclick="openDesktopOrderForm()" class="order-btn">ORDER PRINTS</button>
+                </div>
+            </div>
                             padding: 12px 30px;
                             border: 2px solid #4a90e2;
                             border-radius: 25px;
@@ -357,7 +356,7 @@
         <span id="mobileCartCount" class="cart-count">0</span>
     </a>
 
-    <script src="{{ url_for('static', filename='js/desktop-modal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
     <script>
         // Desktop order form function - matches mobile functionality
