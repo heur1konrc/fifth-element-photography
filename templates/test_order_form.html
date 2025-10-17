@@ -23,8 +23,7 @@
         <h3>Image Name: {{ image }}</h3>
     {% endif %}
         <p><strong>Product:</strong> Canvas Print 12x12</p>
-        <p><strong>Price:</strong> $25.00</p>
-        <p><strong>Image:</strong> https://fifthelement.photos/images/12x12_Sparrow.jpg</p>
+        {% if image %}<p><strong>Image:</strong> https://fifthelement.photos/images/{{ image }}.jpg</p>{% endif %}
     </div>
 
     {% if not no_image_selected %}
