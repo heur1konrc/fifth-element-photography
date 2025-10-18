@@ -3817,12 +3817,13 @@ def test_order_submit():
             return jsonify({
                 "status": "success",
                 "message": "Order submitted to OrderDesk successfully",
-                "orderdesk_order_id": order_response.get("id"),
+                "orderdesk_order_id": order_response.get("order", {}).get("id") if order_response.get("order") else order_response.get("id"),
                 "debug_info": {
                     "response_keys": list(order_response.keys()) if isinstance(order_response, dict) else "Not a dict",
                     "id_field": order_response.get("id"),
                     "order_id_field": order_response.get("order_id"),
-                    "order_number_field": order_response.get("order_number")
+                    "order_number_field": order_response.get("order_number"),
+                    "order_object_id": order_response.get("order", {}).get("id") if order_response.get("order") else None
                 },
                 "response": order_response
             })
