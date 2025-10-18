@@ -317,13 +317,13 @@ textarea {
 
 /* Different heights for varied layout */
 .image-item.size-small img {
-    height: 200px;
+    height: 250px;
     object-fit: cover;
     aspect-ratio: 3/2;
 }
 
 .image-item.size-medium img {
-    height: 300px;
+    height: 350px;
     object-fit: cover;
     aspect-ratio: 3/2;
 }
