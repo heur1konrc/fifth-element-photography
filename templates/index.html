@@ -415,12 +415,13 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
                                 </div>
                                 
                                 <div class="form-group">
-                                    <select id="order_product_type" name="product_type" required onchange="updateOrderPricing()" style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important;">
+                                               <select id="order-product" name="product" required style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important; padding: 10px !important;">
                                         <option value="">Select a product...</option>
-                                        <option value="canvas|12x12_075" data-sku="101001" data-options="1,5">Canvas Print 0.75" (12x12) - Loading...</option>
-                                        <option value="canvas|12x12_125" data-sku="101002" data-options="2,5">Canvas Print 1.25" (12x12) - Loading...</option>
-                                        <option value="metal|12x12" data-sku="106001" data-options="29,31">Metal Print (12x12) - Loading...</option>
-                                        <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - Loading...</option>
+                                        <option value="canvas_075|12x12" data-sku="101001" data-options="1,5">Canvas Print 0.75" (12x12) - $1.00</option>
+                                        <option value="canvas_125|12x12" data-sku="101002" data-options="1,5">Canvas Print 1.25" (12x12) - $1.00</option>
+                                        <option value="metal|12x12" data-sku="106001" data-options="1">Metal Print (12x12) - $1.00</option>
+                                        <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - $1.00</option>
+                                        <option value="framed_canvas|12x12" data-sku="102001" data-options="1,5">Framed Canvas (12x12) - $1.00</option>
                                     </select>
                                 </div>
 
@@ -473,12 +474,19 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
                 orderForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     
+                    // Get selected product data
+                    const productSelect = document.getElementById('order-product');
+                    const selectedOption = productSelect.selectedOptions[0];
+                    const productSku = selectedOption ? selectedOption.dataset.sku : staticSku;
+                    const productOptions = selectedOption ? selectedOption.dataset.options : staticLumaprintsOptions;
+                    const productName = selectedOption ? selectedOption.textContent.split(' - ')[0] : staticProduct;
+                    
                     // Add Lumaprints product data for OrderDesk
                     const formData = new FormData(orderForm);
-                    formData.append('product_sku', staticSku);
-                    formData.append('lumaprints_options', staticLumaprintsOptions);
+                    formData.append('product_sku', productSku);
+                    formData.append('lumaprints_options', productOptions);
                     formData.append('product_price', staticPrice.toFixed(2));
-                    formData.append('product_name', staticProduct);
+                    formData.append('product_name', productName);
                     formData.append('image_url', staticImage);
                     
                     // Submit via AJAX
