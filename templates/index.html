@@ -425,9 +425,17 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
                                 </div>
 
                                 <!-- PayPal Payment Section -->
-                                <div class="payment-section">
-                                    <p class="total-price"><strong>Total: <span id="order-total-price">$0.00</span></strong></p>
+                                <div class="payment-section" style="margin-top: 20px; padding: 20px; border: 2px solid #4285f4; border-radius: 8px;">
+                                    <h3 style="color: #fff;">Payment</h3>
+                                    <p class="total-price"><strong>Total: <span id="order-total-price">$1.00</span></strong></p>
+                                    <div id="pricing-breakdown" style="font-size: 0.9em; color: #ccc; margin-bottom: 15px;">
+                                        <div>Product: 12x12 Canvas Print</div>
+                                        <div>Image: MG_0010.jpg</div>
+                                    </div>
                                     <div id="order-paypal-button-container"></div>
+                                    <div id="payment-message" style="color: #ccc; font-size: 0.9em; margin-top: 10px;">
+                                        Ready for payment
+                                    </div>
                                 </div>
 
                 <!-- Submit button -->
@@ -446,11 +454,89 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
         <span id="mobileCartCount" class="cart-count">0</span>
     </a>
 
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=AVE6LeJKagwJXHf2BPamlaDQghtNBoRmRU8j5KK7wi7wDN61Ufm2dGZFi_CFH5L4MuKjh8KLhHLVwP5w&currency=USD&disable-funding=paylater"></script>
+    
     <script src="/static/js/script.js?v=20241008-001"></script>
     <script src="/static/js/lumaprints_pricing.js"></script>
     <script src="/static/js/lumaprints_inline_ordering.js"></script>
     
     <script>
+        // PayPal Integration for Order Form
+        let orderPaypalButtonsInstance = null;
+        const staticPrice = 1.00;
+        const staticProduct = '12x12 Canvas Print';
+        const staticImage = 'https://fifthelement.photos/images/MG_0010.jpg';
+        
+        // Initialize PayPal when order form is shown
+        function initializeOrderPayPal() {
+            if (orderPaypalButtonsInstance) {
+                document.getElementById('order-paypal-button-container').innerHTML = '';
+            }
+            
+            orderPaypalButtonsInstance = paypal.Buttons({
+                style: {
+                    layout: 'vertical',
+                    color: 'blue',
+                    shape: 'rect',
+                    label: 'paypal'
+                },
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: staticPrice.toFixed(2)
+                            },
+                            description: `${staticProduct} - MG_0010.jpg`
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        // Payment successful
+                        alert('Payment completed by ' + details.payer.name.given_name);
+                        
+                        // Add payment info to form
+                        const form = document.getElementById('orderForm');
+                        
+                        // Add PayPal payment info
+                        const paymentInput = document.createElement('input');
+                        paymentInput.type = 'hidden';
+                        paymentInput.name = 'paypal_order_id';
+                        paymentInput.value = data.orderID;
+                        form.appendChild(paymentInput);
+                        
+                        // Add static product info
+                        const productInput = document.createElement('input');
+                        productInput.type = 'hidden';
+                        productInput.name = 'product_info';
+                        productInput.value = JSON.stringify({
+                            product: staticProduct,
+                            price: staticPrice,
+                            image: staticImage
+                        });
+                        form.appendChild(productInput);
+                        
+                        // Submit the form
+                        document.getElementById('order-submit-order').click();
+                    });
+                },
+                onError: function(err) {
+                    console.error('PayPal error:', err);
+                    alert('Payment failed. Please try again.');
+                }
+            });
+            
+            orderPaypalButtonsInstance.render('#order-paypal-button-container');
+        }
+        
+        // Initialize PayPal when order form is displayed
+        const originalShowOrderForm = window.showOrderForm;
+        window.showOrderForm = function() {
+            if (originalShowOrderForm) originalShowOrderForm();
+            setTimeout(initializeOrderPayPal, 500);
+        };
+        
         // Update cart count in navigation
         function updateCartCount() {
             const cart = JSON.parse(localStorage.getItem('lumaprintsCart') || '[]');
