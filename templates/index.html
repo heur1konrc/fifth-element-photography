@@ -467,6 +467,8 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
         const staticPrice = 1.00;
         const staticProduct = '12x12 Canvas Print';
         const staticImage = 'https://fifthelement.photos/images/MG_0010.jpg';
+        const staticSku = '101001';  // Canvas Print 0.75" SKU
+        const staticLumaprintsOptions = '1,5';  // Lumaprints option IDs
         
         // Initialize PayPal when order form is shown
         function initializeOrderPayPal() {
@@ -506,16 +508,30 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
                         paymentInput.value = data.orderID;
                         form.appendChild(paymentInput);
                         
-                        // Add static product info
-                        const productInput = document.createElement('input');
-                        productInput.type = 'hidden';
-                        productInput.name = 'product_info';
-                        productInput.value = JSON.stringify({
-                            product: staticProduct,
-                            price: staticPrice,
-                            image: staticImage
-                        });
-                        form.appendChild(productInput);
+                        // Add Lumaprints product data for OrderDesk
+                        const productSkuInput = document.createElement('input');
+                        productSkuInput.type = 'hidden';
+                        productSkuInput.name = 'product_sku';
+                        productSkuInput.value = staticSku;
+                        form.appendChild(productSkuInput);
+                        
+                        const lumaprintsOptionsInput = document.createElement('input');
+                        lumaprintsOptionsInput.type = 'hidden';
+                        lumaprintsOptionsInput.name = 'lumaprints_options';
+                        lumaprintsOptionsInput.value = staticLumaprintsOptions;
+                        form.appendChild(lumaprintsOptionsInput);
+                        
+                        const productPriceInput = document.createElement('input');
+                        productPriceInput.type = 'hidden';
+                        productPriceInput.name = 'product_price';
+                        productPriceInput.value = staticPrice.toFixed(2);
+                        form.appendChild(productPriceInput);
+                        
+                        const payerIdInput = document.createElement('input');
+                        payerIdInput.type = 'hidden';
+                        payerIdInput.name = 'paypal_payer_id';
+                        payerIdInput.value = details.payer.payer_id;
+                        form.appendChild(payerIdInput);
                         
                         // Submit the form
                         document.getElementById('order-submit-order').click();
