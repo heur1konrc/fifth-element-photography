@@ -430,7 +430,7 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
                                     <p class="total-price"><strong>Total: <span id="order-total-price">$1.00</span></strong></p>
                                     <div id="order-breakdown" style="font-size: 0.9em; color: #ccc; margin-bottom: 15px;">
                                         <div>Product: 12x12 Canvas Print</div>
-                                        <div>Image: MG_0010.jpg</div>
+                                        <div>Image: 12x12_Sparrow.jpg</div>
                                     </div>
                                     <div style="color: #ccc; font-size: 0.9em; margin-top: 10px;">
                                         Payment will be processed separately
@@ -462,7 +462,7 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
         // Order Form Integration for OrderDesk
         const staticPrice = 1.00;
         const staticProduct = '12x12 Canvas Print';
-        const staticImage = 'https://fifthelement.photos/images/MG_0010.jpg';
+        const staticImage = 'https://fifthelement.photos/images/12x12_Sparrow.jpg';
         const staticSku = '101001';  // Canvas Print 0.75" SKU
         const staticLumaprintsOptions = '1,5';  // Lumaprints option IDs
         
@@ -471,36 +471,36 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
             const orderForm = document.getElementById('orderForm');
             if (orderForm) {
                 orderForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
                     // Add Lumaprints product data for OrderDesk
-                    const productSkuInput = document.createElement('input');
-                    productSkuInput.type = 'hidden';
-                    productSkuInput.name = 'product_sku';
-                    productSkuInput.value = staticSku;
-                    orderForm.appendChild(productSkuInput);
+                    const formData = new FormData(orderForm);
+                    formData.append('product_sku', staticSku);
+                    formData.append('lumaprints_options', staticLumaprintsOptions);
+                    formData.append('product_price', staticPrice.toFixed(2));
+                    formData.append('product_name', staticProduct);
+                    formData.append('image_url', staticImage);
                     
-                    const lumaprintsOptionsInput = document.createElement('input');
-                    lumaprintsOptionsInput.type = 'hidden';
-                    lumaprintsOptionsInput.name = 'lumaprints_options';
-                    lumaprintsOptionsInput.value = staticLumaprintsOptions;
-                    orderForm.appendChild(lumaprintsOptionsInput);
-                    
-                    const productPriceInput = document.createElement('input');
-                    productPriceInput.type = 'hidden';
-                    productPriceInput.name = 'product_price';
-                    productPriceInput.value = staticPrice.toFixed(2);
-                    orderForm.appendChild(productPriceInput);
-                    
-                    const productNameInput = document.createElement('input');
-                    productNameInput.type = 'hidden';
-                    productNameInput.name = 'product_name';
-                    productNameInput.value = staticProduct;
-                    orderForm.appendChild(productNameInput);
-                    
-                    const imageUrlInput = document.createElement('input');
-                    imageUrlInput.type = 'hidden';
-                    imageUrlInput.name = 'image_url';
-                    imageUrlInput.value = staticImage;
-                    orderForm.appendChild(imageUrlInput);
+                    // Submit via AJAX
+                    fetch('/test_order_submit', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Show success message
+                            alert(`Order submitted successfully!\nOrderDesk Order ID: ${data.orderdesk_order_id}\n\nThank you for your order. You will receive a confirmation email shortly.`);
+                            // Close the modal
+                            closeModal();
+                        } else {
+                            alert(`Order submission failed: ${data.message}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while submitting your order. Please try again.');
+                    });
                 });
             }
         });
