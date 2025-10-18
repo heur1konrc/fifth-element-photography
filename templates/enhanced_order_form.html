@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Prints - Fifth Element Photography</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .left-panel {
+            space-y: 30px;
+        }
+
+        .right-panel {
+            space-y: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+        }
+
+        .section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .image-preview-card {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .image-preview-card img {
+            border: 3px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-info h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .image-specs {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .product-details-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .product-details-card h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .product-specs p {
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .order-summary-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .order-summary-card h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .summary-line.subtotal {
+            border-top: 2px solid #ddd;
+            margin-top: 10px;
+            padding-top: 15px;
+        }
+
+        .summary-line.total {
+            border-top: 2px solid #2c3e50;
+            margin-top: 10px;
+            padding-top: 15px;
+            font-size: 1.1rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #2980b9 0%, #1f6391 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .image-preview-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Order Your Print</h1>
+            <p>Professional quality prints delivered to your door</p>
+        </div>
+
+        <div class="content">
+            <!-- Left Panel: Image & Product Selection -->
+            <div class="left-panel">
+                <!-- Image Preview Section -->
+                <div class="section">
+                    <h3>Selected Image</h3>
+                    <div id="imagePreview">
+                        <p>Loading image preview...</p>
+                    </div>
+                </div>
+
+                <!-- Product Selection Section -->
+                <div class="section">
+                    <h3>Choose Your Product</h3>
+                    <div class="form-group">
+                        <label for="productSelect">Product & Size:</label>
+                        <select id="productSelect" required>
+                            <option value="">Select a product...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantityInput">Quantity:</label>
+                        <input type="number" id="quantityInput" min="1" max="10" value="1" required>
+                    </div>
+
+                    <div id="productDetails">
+                        <p>Select a product to see details.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Customer Info & Order Summary -->
+            <div class="right-panel">
+                <!-- Customer Information Section -->
+                <div class="section">
+                    <h3>Shipping Information</h3>
+                    <form id="orderForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name:</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name:</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address:</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Phone Number:</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Street Address:</label>
+                            <input type="text" id="address" name="address" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City:</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State:</label>
+                                <input type="text" id="state" name="state" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="zipCode">ZIP Code:</label>
+                            <input type="text" id="zipCode" name="zipCode" required>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Order Summary Section -->
+                <div class="section">
+                    <h3>Order Summary</h3>
+                    <div id="orderSummary">
+                        <p>Please select a product to see order summary.</p>
+                    </div>
+
+                    <button type="submit" id="submitOrderBtn" class="submit-btn" form="orderForm" disabled>
+                        Select Product to Continue
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Phase 1 Product Data -->
+    <script src="/static/js/product_data_phase1.js"></script>
+    
+    <!-- Include Enhanced Ordering System -->
+    <script src="/static/js/enhanced_ordering_system.js"></script>
+
+    <script>
+        // Additional initialization if needed
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Enhanced Order Form loaded successfully');
+            
+            // Check if we have the required functions
+            if (typeof getAllProducts !== 'function') {
+                console.error('Product data not loaded properly');
+                alert('Error loading product data. Please refresh the page.');
+            }
+        });
+    </script>
+</body>
+</html>

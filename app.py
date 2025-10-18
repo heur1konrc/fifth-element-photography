@@ -3839,3 +3839,10 @@ def test_order_submit():
             "status": "error",
             "message": str(e)
         }), 500
+
+
+@app.route('/enhanced_order_form')
+def enhanced_order_form():
+    """Enhanced order form with Phase 1 product integration"""
+    return render_template('enhanced_order_form.html')
+
