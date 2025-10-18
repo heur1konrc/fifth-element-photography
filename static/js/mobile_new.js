@@ -571,21 +571,26 @@ function showMobileOrderForm() {
     // Prevent body scroll
     document.body.classList.add('modal-open');
     
-    // Hide the image view immediately
-    const imageContainer = document.querySelector('.modal-content > .modal-image-container');
-    const modalInfo = document.querySelector('.modal-content > .modal-info');
-    const orderForm = document.getElementById('mobileOrderForm');
-    
-    console.log('Elements found:', { imageContainer, modalInfo, orderForm });
-    
-    if (imageContainer) imageContainer.style.display = 'none';
-    if (modalInfo) modalInfo.style.display = 'none';
-    
-    // Show the order form
-    if (orderForm) {
-        orderForm.style.display = 'block';
-        console.log('Order form displayed');
-    }
+    // Use requestAnimationFrame for Safari compatibility
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            // Hide the image view
+            const imageContainer = document.querySelector('.modal-content > .modal-image-container');
+            const modalInfo = document.querySelector('.modal-content > .modal-info');
+            const orderForm = document.getElementById('mobileOrderForm');
+            
+            console.log('Elements found:', { imageContainer, modalInfo, orderForm });
+            
+            if (imageContainer) imageContainer.style.display = 'none';
+            if (modalInfo) modalInfo.style.display = 'none';
+            
+            // Show the order form
+            if (orderForm) {
+                orderForm.style.display = 'block';
+                console.log('Order form displayed');
+            }
+        });
+    });
     
     // Get image info from the modal
     const imageName = document.getElementById('modalTitle').textContent;
