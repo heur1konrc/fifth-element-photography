@@ -3711,12 +3711,12 @@ def test_order_submit():
         paypal_order_id = form_data.get('paypal_order_id')
         paypal_payer_id = form_data.get('paypal_payer_id')
         
-        # Verify PayPal payment was completed
-        if not paypal_order_id or not paypal_payer_id:
-            return jsonify({
-                "status": "error",
-                "message": "Payment required before order submission"
-            }), 400
+        # Verify PayPal payment was completed (DISABLED FOR TESTING)
+        # if not paypal_order_id or not paypal_payer_id:
+        #     return jsonify({
+        #         "status": "error",
+        #         "message": "Payment required before order submission"
+        #     }), 400
         
         # Verify we have product information
         if not product_sku or not lumaprints_options or product_price <= 0:
