@@ -187,7 +187,8 @@ textarea {
 
 /* Hero Section */
 .hero {
-    height: 60vh;
+    /*height: 60vh;*/
+    height: 45vh;
     position: relative;
     overflow: hidden;
 }
