@@ -10,6 +10,9 @@
         button { background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; }
         button:hover { background: #005a87; }
         .product-info { background: #f5f5f5; padding: 15px; margin: 15px 0; border-radius: 4px; }
+        .order-summary { margin-top: 20px; padding: 20px; border: 2px solid #28a745; border-radius: 8px; }
+        .success-message { background: #d4edda; color: #155724; padding: 15px; border-radius: 4px; margin: 20px 0; }
+        .error-message { background: #f8d7da; color: #721c24; padding: 15px; border-radius: 4px; margin: 20px 0; }
     </style>
 </head>
 <body>
@@ -28,281 +31,175 @@
     </div>
 
     {% if not no_image_selected %}
-    <form action="/test_order_submit" method="POST">
+    <form action="/test_order_submit" method="POST" id="orderForm">
         <h3>Customer Information</h3>
         
         <div class="form-group">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" value="test@example.com" required>
         </div>
 
         <h3>Shipping Address</h3>
         
         <div class="form-group">
             <label for="first_name">First Name:</label>
-            <input type="text" id="first_name" name="first_name" required>
+            <input type="text" id="first_name" name="first_name" value="Test" required>
         </div>
         
         <div class="form-group">
             <label for="last_name">Last Name:</label>
-            <input type="text" id="last_name" name="last_name" required>
+            <input type="text" id="last_name" name="last_name" value="Customer" required>
         </div>
         
         <div class="form-group">
             <label for="address1">Address:</label>
-            <input type="text" id="address1" name="address1" required>
+            <input type="text" id="address1" name="address1" value="123 Test Street" required>
         </div>
         
         <div class="form-group">
             <label for="city">City:</label>
-            <input type="text" id="city" name="city" required>
+            <input type="text" id="city" name="city" value="Test City" required>
         </div>
         
         <div class="form-group">
             <label for="state">State:</label>
-            <input type="text" id="state" name="state" required>
+            <input type="text" id="state" name="state" value="CA" required>
         </div>
         
         <div class="form-group">
             <label for="postal_code">Zip Code:</label>
-            <input type="text" id="postal_code" name="postal_code" required>
+            <input type="text" id="postal_code" name="postal_code" value="90210" required>
         </div>
         
         <div class="form-group">
             <label for="country">Country:</label>
             <select id="country" name="country" required>
-                <option value="US">United States</option>
+                <option value="US" selected>United States</option>
                 <option value="CA">Canada</option>
             </select>
         </div>
         
         <div class="form-group">
             <label for="phone">Phone:</label>
-            <input type="tel" id="phone" name="phone">
+            <input type="tel" id="phone" name="phone" value="555-123-4567">
         </div>
 
         <h3>Product Selection</h3>
         
         <div class="form-group">
             <label for="product_type">Product Type:</label>
-            <select id="product_type" name="product_type" required onchange="updatePricing()">
-                <option value="">Select a product...</option>
-                <option value="canvas|12x12_075" data-sku="101001" data-options="1,5">Canvas Print 0.75" (12x12) - Loading...</option>
-                <option value="canvas|12x12_125" data-sku="101002" data-options="2,5">Canvas Print 1.25" (12x12) - Loading...</option>
-                <option value="metal|12x12" data-sku="106001" data-options="29,31">Metal Print (12x12) - Loading...</option>
-                <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - Loading...</option>
+            <select id="product_type" name="product_type" required onchange="updateProductInfo()">
+                <option value="canvas|12x12_075" data-sku="101001" data-options="1,5" selected>Canvas Print 0.75" (12x12) - $25.00</option>
+                <option value="canvas|12x12_125" data-sku="101002" data-options="2,5">Canvas Print 1.25" (12x12) - $30.00</option>
+                <option value="metal|12x12" data-sku="106001" data-options="29,31">Metal Print (12x12) - $35.00</option>
+                <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - $20.00</option>
             </select>
         </div>
 
-        <!-- PayPal Payment Section -->
-        <div class="payment-section" style="margin-top: 20px; padding: 20px; border: 2px solid #0070ba; border-radius: 8px;">
-            <h3>Payment</h3>
-            <p><strong>Total: <span id="total-price">$0.00</span></strong></p>
-            <div id="pricing-breakdown" style="font-size: 0.9em; color: #666; margin-bottom: 15px;">
-                <div>Base Cost: <span id="base-cost">$0.00</span></div>
-                <div>Margin: <span id="margin-percent">0</span>%</div>
-            </div>
-            <div id="paypal-button-container"></div>
-            <div id="payment-message" style="color: #666; font-size: 0.9em; margin-top: 10px;">
-                Please select a product to see pricing
+        <!-- Hidden fields for OrderDesk -->
+        <input type="hidden" id="product_sku" name="product_sku" value="101001">
+        <input type="hidden" id="lumaprints_options" name="lumaprints_options" value="1,5">
+        <input type="hidden" id="product_price" name="product_price" value="25.00">
+
+        <!-- Order Summary Section -->
+        <div class="order-summary">
+            <h3>Order Summary</h3>
+            <p><strong>Product:</strong> <span id="product-display">Canvas Print 0.75" (12x12)</span></p>
+            <p><strong>Total: <span id="total-price">$25.00</span></strong></p>
+            <div style="font-size: 0.9em; color: #666; margin-bottom: 15px;">
+                <div>Test Order - No Payment Required</div>
             </div>
         </div>
 
-        <!-- Hidden submit for after payment -->
-        <button type="submit" id="submit-order" style="display: none;">Submit Order to OrderDesk</button>
+        <!-- Submit Button -->
+        <button type="submit" id="submit-order" style="margin-top: 20px;">Submit Test Order to OrderDesk</button>
     </form>
-{% endif %}
+    {% endif %}
 
-    <!-- PayPal SDK -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AVE6LeJKagwJXHf2BPamlaDQghtNBoRmRU8j5KK7wi7wDN61Ufm2dGZFi_CFH5L4MuKjh8KLhHLVwP5w&currency=USD&disable-funding=paylater"></script>
+    <!-- Success/Error Messages -->
+    <div id="message-container"></div>
     
     <script>
-        let currentPrice = 0;
-        let currentProductInfo = null;
-        let paypalButtonsInstance = null;
-
-        // Load pricing on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadInitialPricing();
-        });
-
-        // Load pricing for all products and update the dropdown
-        function loadInitialPricing() {
-            const options = document.querySelectorAll('#product_type option[value]');
-            
-            options.forEach(option => {
-                if (option.value === '') return; // Skip the "Select a product..." option
-                
-                const [productType, variantKey] = option.value.split('|');
-                
-                fetch('/api/pricing/calculate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        product_type: productType,
-                        variant_key: variantKey
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const displayName = option.textContent.split(' - ')[0];
-                        option.textContent = `${displayName} - $${data.final_price.toFixed(2)}`;
-                    } else {
-                        option.textContent = option.textContent.replace('Loading...', 'Price Error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading price:', error);
-                    option.textContent = option.textContent.replace('Loading...', 'Price Error');
-                });
-            });
-        }
-
-        // Update pricing when product selection changes
-        function updatePricing() {
+        // Update product info when selection changes
+        function updateProductInfo() {
             const select = document.getElementById('product_type');
             const selectedOption = select.options[select.selectedIndex];
             
-            if (!selectedOption.value) {
-                // No product selected
-                currentPrice = 0;
-                currentProductInfo = null;
-                updatePriceDisplay(0, 0, 0);
-                document.getElementById('payment-message').textContent = 'Please select a product to see pricing';
-                if (paypalButtonsInstance) {
-                    document.getElementById('paypal-button-container').innerHTML = '';
-                    paypalButtonsInstance = null;
-                }
-                return;
+            if (selectedOption.value) {
+                const [productType, variantKey] = selectedOption.value.split('|');
+                const sku = selectedOption.getAttribute('data-sku');
+                const options = selectedOption.getAttribute('data-options');
+                const displayName = selectedOption.textContent.split(' - ')[0];
+                const price = selectedOption.textContent.split('$')[1];
+                
+                // Update hidden fields
+                document.getElementById('product_sku').value = sku;
+                document.getElementById('lumaprints_options').value = options;
+                document.getElementById('product_price').value = price;
+                
+                // Update display
+                document.getElementById('product-display').textContent = displayName;
+                document.getElementById('total-price').textContent = '$' + price;
             }
+        }
 
-            const [productType, variantKey] = selectedOption.value.split('|');
+        // Handle form submission
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            fetch('/api/pricing/calculate', {
+            const submitButton = document.getElementById('submit-order');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting Order...';
+            
+            const formData = new FormData(this);
+            
+            fetch('/test_order_submit', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    product_type: productType,
-                    variant_key: variantKey
-                })
+                body: formData
             })
             .then(response => response.json())
             .then(data => {
+                const messageContainer = document.getElementById('message-container');
+                
                 if (data.success) {
-                    currentPrice = data.final_price;
-                    currentProductInfo = {
-                        productType: productType,
-                        variantKey: variantKey,
-                        sku: selectedOption.getAttribute('data-sku'),
-                        options: selectedOption.getAttribute('data-options'),
-                        displayName: selectedOption.textContent.split(' - ')[0]
-                    };
-                    
-                    updatePriceDisplay(data.final_price, data.base_cost, data.margin_percent);
-                    initializePayPal();
+                    messageContainer.innerHTML = `
+                        <div class="success-message">
+                            <h4>Order Submitted Successfully!</h4>
+                            <p><strong>OrderDesk Order ID:</strong> ${data.order_id}</p>
+                            <p>Your test order has been submitted to OrderDesk. Check the OrderDesk dashboard to see if it forwards to Lumaprints.</p>
+                        </div>
+                    `;
                 } else {
-                    console.error('Pricing error:', data.message);
-                    document.getElementById('payment-message').textContent = 'Error loading pricing';
+                    messageContainer.innerHTML = `
+                        <div class="error-message">
+                            <h4>Order Submission Failed</h4>
+                            <p><strong>Error:</strong> ${data.message}</p>
+                        </div>
+                    `;
                 }
+                
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Test Order to OrderDesk';
             })
             .catch(error => {
                 console.error('Error:', error);
-                document.getElementById('payment-message').textContent = 'Error loading pricing';
+                const messageContainer = document.getElementById('message-container');
+                messageContainer.innerHTML = `
+                    <div class="error-message">
+                        <h4>Network Error</h4>
+                        <p>Failed to submit order. Please check the console for details.</p>
+                    </div>
+                `;
+                
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Test Order to OrderDesk';
             });
-        }
+        });
 
-        // Update price display elements
-        function updatePriceDisplay(finalPrice, baseCost, marginPercent) {
-            document.getElementById('total-price').textContent = `$${finalPrice.toFixed(2)}`;
-            document.getElementById('base-cost').textContent = `$${baseCost.toFixed(2)}`;
-            document.getElementById('margin-percent').textContent = marginPercent;
-            
-            if (finalPrice > 0) {
-                document.getElementById('payment-message').textContent = 'Ready for payment';
-            }
-        }
-
-        // Initialize PayPal buttons with current price
-        function initializePayPal() {
-            if (currentPrice <= 0 || !currentProductInfo) return;
-
-            // Clear existing PayPal buttons
-            document.getElementById('paypal-button-container').innerHTML = '';
-            
-            paypalButtonsInstance = paypal.Buttons({
-                style: {
-                    layout: 'vertical',
-                    color: 'blue',
-                    shape: 'rect',
-                    label: 'paypal'
-                },
-                createOrder: function(data, actions) {
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: {
-                                value: currentPrice.toFixed(2)
-                            },
-                            description: `${currentProductInfo.displayName} - Sparrow 12x12`
-                        }]
-                    });
-                },
-                onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        // Payment successful
-                        alert('Payment completed by ' + details.payer.name.given_name);
-                        
-                        // Add payment info to form
-                        const form = document.querySelector('form');
-                        
-                        // Add PayPal payment info
-                        const paymentInput = document.createElement('input');
-                        paymentInput.type = 'hidden';
-                        paymentInput.name = 'paypal_order_id';
-                        paymentInput.value = data.orderID;
-                        form.appendChild(paymentInput);
-                        
-                        const payerInput = document.createElement('input');
-                        payerInput.type = 'hidden';
-                        payerInput.name = 'paypal_payer_id';
-                        payerInput.value = details.payer.payer_id;
-                        form.appendChild(payerInput);
-                        
-                        // Add product info for OrderDesk
-                        const productSkuInput = document.createElement('input');
-                        productSkuInput.type = 'hidden';
-                        productSkuInput.name = 'product_sku';
-                        productSkuInput.value = currentProductInfo.sku;
-                        form.appendChild(productSkuInput);
-                        
-                        const productOptionsInput = document.createElement('input');
-                        productOptionsInput.type = 'hidden';
-                        productOptionsInput.name = 'lumaprints_options';
-                        productOptionsInput.value = currentProductInfo.options;
-                        form.appendChild(productOptionsInput);
-                        
-                        const productPriceInput = document.createElement('input');
-                        productPriceInput.type = 'hidden';
-                        productPriceInput.name = 'product_price';
-                        productPriceInput.value = currentPrice.toFixed(2);
-                        form.appendChild(productPriceInput);
-                        
-                        // Submit order to OrderDesk
-                        document.getElementById('submit-order').click();
-                    });
-                },
-                onError: function(err) {
-                    console.error('PayPal error:', err);
-                    alert('Payment failed. Please try again.');
-                }
-            });
-            
-            paypalButtonsInstance.render('#paypal-button-container');
-        }
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProductInfo();
+        });
     </script>
 </body>
 </html>
