@@ -3809,6 +3809,10 @@ def test_order_submit():
         if response.status_code == 201:
             # Success
             order_response = response.json()
+            print("=== ORDERDESK RESPONSE DEBUG ===")
+            print("Full response:", json.dumps(order_response, indent=2))
+            print("Order ID:", order_response.get("id"))
+            print("Response keys:", list(order_response.keys()) if isinstance(order_response, dict) else "Not a dict")
             # flash(f'Order submitted successfully! OrderDesk Order ID: {order_response.get("id")}', 'success')  # Removed to clean up admin
             return jsonify({
                 "status": "success",
