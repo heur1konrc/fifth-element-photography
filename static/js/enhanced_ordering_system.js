@@ -20,6 +20,7 @@ class EnhancedOrderingSystem {
 
     init() {
         this.loadProductData();
+        this.populateProductDropdown();
         this.setupEventListeners();
         this.checkForImageParameter();
     }
@@ -28,9 +29,18 @@ class EnhancedOrderingSystem {
         // Load Phase 1 product data
         if (typeof getAllProducts === 'function') {
             this.allProducts = getAllProducts();
+            console.log('Product data loaded:', this.allProducts.length, 'products');
         } else {
             console.error('Product data not loaded. Make sure product_data_phase1.js is included.');
             this.allProducts = [];
+            // Try again after a short delay
+            setTimeout(() => {
+                if (typeof getAllProducts === 'function') {
+                    this.allProducts = getAllProducts();
+                    this.populateProductDropdown();
+                    console.log('Product data loaded on retry:', this.allProducts.length, 'products');
+                }
+            }, 100);
         }
     }
 
@@ -128,7 +138,17 @@ class EnhancedOrderingSystem {
 
     populateProductDropdown() {
         const productSelect = document.getElementById('productSelect');
-        if (!productSelect || !this.allProducts) return;
+        if (!productSelect) {
+            console.error('Product select element not found');
+            return;
+        }
+        
+        if (!this.allProducts || this.allProducts.length === 0) {
+            console.error('No products available to populate dropdown');
+            return;
+        }
+
+        console.log('Populating dropdown with', this.allProducts.length, 'products');
 
         // Clear existing options
         productSelect.innerHTML = '<option value="">Select a product...</option>';
