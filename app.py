@@ -3762,11 +3762,7 @@ def test_order_submit():
                         "print_url": "https://fifthelement.photos/images/12x12_Sparrow.jpg",
                         "print_width": "12",
                         "print_height": "12",
-                        "lumaprints_options": lumaprints_options,  # Use dynamic options
-                        "paypal_order_id": paypal_order_id,
-                        "paypal_payer_id": paypal_payer_id,
-                        "payment_status": "COMPLETED",
-                        "dynamic_pricing": True  # Flag to indicate this uses new pricing system
+                        "lumaprints_options": lumaprints_options
                     }
                 }
             ]
