@@ -50,8 +50,18 @@ class EnhancedOrderingSystem {
         const imageUrl = urlParams.get('image');
         const imageName = urlParams.get('name');
         
+        console.log('Checking for image parameter:', imageUrl);
+        
         if (imageUrl) {
+            console.log('Setting current image:', imageUrl);
             this.setCurrentImage(imageUrl, imageName);
+        } else {
+            console.log('No image parameter found in URL');
+            // Show a message that no image was selected
+            const previewContainer = document.getElementById('imagePreview');
+            if (previewContainer) {
+                previewContainer.innerHTML = '<p>No image selected. Please select an image first.</p>';
+            }
         }
     }
 
@@ -66,7 +76,10 @@ class EnhancedOrderingSystem {
     }
 
     displayImagePreview() {
+        console.log('Displaying image preview for:', this.currentImage);
         const previewContainer = document.getElementById('imagePreview');
+        console.log('Preview container found:', !!previewContainer);
+        
         if (previewContainer && this.currentImage) {
             previewContainer.innerHTML = `
                 <div class="image-preview-card">
