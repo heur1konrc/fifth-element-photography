@@ -476,73 +476,72 @@ class LumaprintsInlineOrdering {
         }
 
         const formData = new FormData(form);
-        const paypalBtn = document.getElementById('paypalBtn');
+        const submitBtn = document.getElementById('paypalBtn'); // Repurposing the PayPal button
         
-        if (paypalBtn) {
-            paypalBtn.textContent = 'Processing...';
-            paypalBtn.disabled = true;
+        if (submitBtn) {
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
         }
 
         try {
-            // Prepare order data to match backend API
-            const orderData = {
-                subcategoryId: parseInt(this.selectedProduct),
-                width: this.selectedSize.width,
-                height: this.selectedSize.height,
-                quantity: this.quantity,
-                imageUrl: this.currentImage,
-                price: this.orderDetails.totalPrice,
-                shipping: {
-                    firstName: formData.get('firstName'),
-                    lastName: formData.get('lastName'),
-                    addressLine1: formData.get('address'),
-                    city: formData.get('city'),
-                    state: formData.get('state'),
-                    zipCode: formData.get('zipCode'),
-                    country: 'US',
-                    phone: formData.get('phone')
-                },
-                payment: {
-                    method: 'paypal',
-                    email: formData.get('email'),
-                    amount: this.orderDetails.totalPrice
-                },
-                options: []
-            };
+            // Create FormData to send to the OrderDesk endpoint
+            const orderDeskFormData = new FormData();
 
-            // Submit order to backend
-            const response = await fetch('/api/lumaprints/submit-order', {
+            // Append customer and shipping info from the form
+            orderDeskFormData.append('email', formData.get('email'));
+            orderDeskFormData.append('first_name', formData.get('firstName'));
+            orderDeskFormData.append('last_name', formData.get('lastName'));
+            orderDeskFormData.append('address1', formData.get('address'));
+            orderDeskFormData.append('city', formData.get('city'));
+            orderDeskFormData.append('state', formData.get('state'));
+            orderDeskFormData.append('postal_code', formData.get('zipCode'));
+            orderDeskFormData.append('country', 'US'); // Assuming US for now
+            orderDeskFormData.append('phone', formData.get('phone'));
+
+            // Append product info. This requires that this.currentPricing contains sku and lumaprints_options
+            if (!this.currentPricing || !this.currentPricing.sku || !this.currentPricing.lumaprints_options) {
+                alert('Critical error: Pricing information is missing SKU or options. Cannot submit order.');
+                if (submitBtn) {
+                    submitBtn.textContent = 'Submit Order';
+                    submitBtn.disabled = false;
+                }
+                return;
+            }
+            
+            orderDeskFormData.append('product_sku', this.currentPricing.sku);
+            orderDeskFormData.append('lumaprints_options', this.currentPricing.lumaprints_options);
+            orderDeskFormData.append('product_price', this.currentPricing.retail_price);
+            orderDeskFormData.append('print_url', this.currentImage);
+            orderDeskFormData.append('product_type', this.currentPricing.sku); // The backend route uses this
+
+            // Submit order to the working OrderDesk endpoint
+            const response = await fetch('/test_order_submit', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orderData)
+                body: orderDeskFormData // No 'Content-Type' header needed for FormData
             });
 
             const result = await response.json();
 
-            if (result.success) {
-                alert('Order submitted successfully! You will receive a confirmation email shortly.');
+            if (result.success || result.status === 'success') {
+                alert(`Order submitted successfully to OrderDesk! Order ID: ${result.order_id || result.orderdesk_order_id}`);
                 
-                // Close modal
+                // Close modal and reset
                 const modal = document.getElementById('imageModal');
                 if (modal) modal.style.display = 'none';
-                
-                // Reset everything
                 this.resetSelections();
                 this.showMainView();
             } else {
-                alert(`Error submitting order: ${result.error}`);
+                alert(`Error submitting order: ${result.message || result.error || 'Unknown error'}`);
             }
 
         } catch (error) {
             console.error('Order submission error:', error);
-            alert('Error submitting order. Please try again.');
+            alert('An error occurred while submitting the order. Please try again.');
         } finally {
             // Re-enable button
-            if (paypalBtn) {
-                paypalBtn.textContent = `Pay with PayPal - $${this.orderDetails.totalPrice.toFixed(2)}`;
-                paypalBtn.disabled = false;
+            if (submitBtn) {
+                submitBtn.textContent = 'Submit Order';
+                submitBtn.disabled = false;
             }
         }
     }
