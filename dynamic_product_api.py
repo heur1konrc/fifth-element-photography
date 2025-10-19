@@ -15,19 +15,15 @@ def get_products_for_frontend():
     try:
         conn = get_db_connection()
         
-        # Check what tables exist and adapt accordingly
         cursor = conn.cursor()
         
-        # Check if we have the new pricing tables or old structure
-        tables = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
-        table_names = [table[0] for table in tables]
+        # Use the same database structure as pricing admin
+        # Get global markup from settings table
+        cursor.execute("SELECT value FROM settings WHERE key_name = 'global_markup_percentage'")
+        markup_result = cursor.fetchone()
+        markup_percentage = float(markup_result['value']) if markup_result else 123.0
         
-        # If we don't have the new tables, return sample products for now
-        if 'global_settings' not in table_names or 'products' not in table_names or 'categories' not in table_names:
-            conn.close()
-            return get_fallback_products()
-        
-        # Get all products with category info, pricing, and variant counts
+        # Get all products with category info (same as pricing admin)
         products_query = '''
             SELECT 
                 p.id,
@@ -36,13 +32,12 @@ def get_products_for_frontend():
                 p.cost_price,
                 c.name as category_name,
                 c.id as category_id,
-                COUNT(pv.id) as variant_count,
-                COALESCE(gs.markup_percentage, 123.0) as markup_percentage
+                COUNT(pv.id) as variant_count
             FROM products p
             JOIN categories c ON p.category_id = c.id
             LEFT JOIN product_variants pv ON p.id = pv.product_id
-            LEFT JOIN global_settings gs ON 1=1
-            WHERE c.name IN (
+            WHERE p.active = 1 AND c.active = 1
+            AND c.name IN (
                 'Canvas - 0.75" Stretched',
                 'Canvas - 1.25" Stretched', 
                 'Canvas - 1.5" Stretched',
@@ -50,8 +45,8 @@ def get_products_for_frontend():
                 'Framed Canvas - 1.25"',
                 'Framed Canvas - 1.5"'
             )
-            GROUP BY p.id, p.name, p.size, p.cost_price, c.name, c.id, gs.markup_percentage
-            ORDER BY c.name, p.name, p.size
+            GROUP BY p.id, p.name, p.size, p.cost_price, c.name, c.id
+            ORDER BY c.display_order, c.name, p.name, p.size
         '''
         
         products = conn.execute(products_query).fetchall()
@@ -60,8 +55,9 @@ def get_products_for_frontend():
         formatted_products = []
         for product in products:
             cost_price = float(product['cost_price'])
-            markup_percentage = float(product['markup_percentage'])
-            customer_price = cost_price * (1 + markup_percentage / 100)
+            # Use the markup from settings table (same as pricing admin)
+            multiplier = (markup_percentage / 100) + 1
+            customer_price = cost_price * multiplier
             
             # Determine product type and thickness from category
             category_name = product['category_name']
