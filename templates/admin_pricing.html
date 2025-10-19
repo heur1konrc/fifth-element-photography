@@ -29,6 +29,24 @@
             border-left: 4px solid #007bff;
             padding: 1rem;
             margin: 1rem 0;
+            transition: background-color 0.2s;
+        }
+        
+        .category-header:hover {
+            background: #e9ecef;
+        }
+        
+        .category-chevron {
+            transition: transform 0.3s ease;
+        }
+        
+        .category-chevron.rotated {
+            transform: rotate(180deg);
+        }
+        
+        .category-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
         }
         
         .product-row {
@@ -189,6 +207,12 @@
                         <h4 class="mb-0"><i class="fas fa-list me-2"></i>Products & Pricing</h4>
                     </div>
                     <div class="col-auto">
+                        <button class="btn btn-outline-secondary btn-sm me-2" onclick="expandAllCategories()">
+                            <i class="fas fa-expand-alt me-1"></i>Expand All
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm me-2" onclick="collapseAllCategories()">
+                            <i class="fas fa-compress-alt me-1"></i>Collapse All
+                        </button>
                         <button class="btn btn-success" onclick="toggleAddProductForm()">
                             <i class="fas fa-plus me-2"></i>Add Product
                         </button>
@@ -226,10 +250,13 @@
 
                 {% for category in categories %}
                 <div class="category-section" data-category-id="{{ category.id }}">
-                    <div class="category-header">
+                    <div class="category-header" style="cursor: pointer;" onclick="toggleCategory({{ category.id }})">
                         <div class="row align-items-center">
                             <div class="col">
-                                <h5 class="mb-0">{{ category.name }}</h5>
+                                <h5 class="mb-0">
+                                    <i class="fas fa-chevron-down me-2 category-chevron" id="chevron{{ category.id }}"></i>
+                                    {{ category.name }}
+                                </h5>
                                 <small class="text-muted">{{ category.description }}</small>
                             </div>
                             <div class="col-auto">
@@ -238,50 +265,52 @@
                         </div>
                     </div>
                     
-                    {% if category.products %}
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Size</th>
-                                    <th width="120">Cost</th>
-                                    <th width="120">Customer Price</th>
-                                    <th width="100">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for product in category.products %}
-                                <tr class="product-row" data-product-id="{{ product.id }}">
-                                    <td>{{ product.name }}</td>
-                                    <td><code>{{ product.size }}</code></td>
-                                    <td>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text">$</span>
-                                            <input type="number" class="form-control cost-input" 
-                                                   value="{{ "%.2f"|format(product.cost_price) }}" 
-                                                   step="0.01" min="0"
-                                                   onchange="updateProductCost({{ product.id }}, this.value)">
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="customer-price" id="customerPrice{{ product.id }}">
-                                            ${{ "%.2f"|format(product.customer_price) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <button class="btn btn-delete btn-sm" onclick="deleteProduct({{ product.id }})">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="category-content" id="categoryContent{{ category.id }}" style="display: none;">
+                        {% if category.products %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Size</th>
+                                        <th width="120">Cost</th>
+                                        <th width="120">Customer Price</th>
+                                        <th width="100">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in category.products %}
+                                    <tr class="product-row" data-product-id="{{ product.id }}">
+                                        <td>{{ product.name }}</td>
+                                        <td><code>{{ product.size }}</code></td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control cost-input" 
+                                                       value="{{ "%.2f"|format(product.cost_price) }}" 
+                                                       step="0.01" min="0"
+                                                       onchange="updateProductCost({{ product.id }}, this.value)">
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="customer-price" id="customerPrice{{ product.id }}">
+                                                ${{ "%.2f"|format(product.customer_price) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-delete btn-sm" onclick="deleteProduct({{ product.id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-muted text-center py-3">No products in this category</p>
+                        {% endif %}
                     </div>
-                    {% else %}
-                    <p class="text-muted text-center py-3">No products in this category</p>
-                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
@@ -447,6 +476,37 @@
                 const customerPrice = cost * ((globalMarkupValue / 100) + 1);
                 document.getElementById('customerPrice' + productId).textContent = 
                     '$' + customerPrice.toFixed(2);
+            });
+        }
+
+        function toggleCategory(categoryId) {
+            const content = document.getElementById('categoryContent' + categoryId);
+            const chevron = document.getElementById('chevron' + categoryId);
+            
+            if (content.style.display === 'none' || content.style.display === '') {
+                content.style.display = 'block';
+                chevron.classList.add('rotated');
+            } else {
+                content.style.display = 'none';
+                chevron.classList.remove('rotated');
+            }
+        }
+        
+        function expandAllCategories() {
+            document.querySelectorAll('.category-content').forEach(content => {
+                content.style.display = 'block';
+            });
+            document.querySelectorAll('.category-chevron').forEach(chevron => {
+                chevron.classList.add('rotated');
+            });
+        }
+        
+        function collapseAllCategories() {
+            document.querySelectorAll('.category-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.querySelectorAll('.category-chevron').forEach(chevron => {
+                chevron.classList.remove('rotated');
             });
         }
 
