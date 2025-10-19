@@ -3452,6 +3452,12 @@ from pricing_admin import (
 from category_admin import (
     add_category_route, delete_category_route, get_categories_route
 )
+from variant_routes import (
+    get_product_variants_route, get_variant_price_route, get_products_with_variants_route
+)
+from dynamic_product_api import (
+    get_products_for_frontend, get_product_details_api
+)
 
 @app.route('/admin/pricing')
 @require_admin_auth
@@ -3500,6 +3506,33 @@ def delete_category():
 def get_categories():
     """Get all categories for dropdown refresh"""
     return get_categories_route()
+
+# Variant management routes
+@app.route('/api/product-variants', methods=['GET'])
+def get_product_variants():
+    """Get variants for a specific product"""
+    return get_product_variants_route()
+
+@app.route('/api/variant-price', methods=['GET'])
+def get_variant_price():
+    """Get price for a specific variant"""
+    return get_variant_price_route()
+
+@app.route('/api/products-with-variants', methods=['GET'])
+def get_products_with_variants():
+    """Get all products with variant information"""
+    return get_products_with_variants_route()
+
+# Dynamic product API for frontend
+@app.route('/api/products', methods=['GET'])
+def get_frontend_products():
+    """Get all products for frontend order form (no auth required)"""
+    return get_products_for_frontend()
+
+@app.route('/api/product-details', methods=['GET'])
+def get_product_details():
+    """Get detailed product information (no auth required)"""
+    return get_product_details_api()
 
 @app.route('/admin/pricing/update-variant', methods=['POST'])
 @require_admin_auth

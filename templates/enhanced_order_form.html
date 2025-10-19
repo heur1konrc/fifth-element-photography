@@ -369,22 +369,16 @@
         </div>
     </div>
 
-    <!-- Include Phase 1 Product Data -->
-    <script src="/static/js/product_data_phase1.js"></script>
-    
-    <!-- Include Enhanced Ordering System -->
-    <script src="/static/js/enhanced_ordering_system.js"></script>
+    <!-- Include Dynamic Ordering System (uses database instead of hardcoded data) -->
+    <script src="/static/js/dynamic_ordering_system.js"></script>
 
     <script>
         // Additional initialization if needed
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Enhanced Order Form loaded successfully');
+            console.log('Enhanced Order Form with Dynamic Product Loading');
             
-            // Check if we have the required functions
-            if (typeof getAllProducts !== 'function') {
-                console.error('Product data not loaded properly');
-                alert('Error loading product data. Please refresh the page.');
-            }
+            // The dynamic ordering system will handle all product loading
+            // No need to check for hardcoded functions anymore
         });
     </script>
 </body>

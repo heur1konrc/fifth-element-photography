@@ -199,38 +199,49 @@ const PHASE1_PRODUCTS = {
     "framed_canvas_150": {
         name: "1.50\" Framed Canvas",
         subcategoryId: 102003,
-        lumaprints_options: "1,16,23,9", // Image Wrap + Hanging Wire + Black Frame + No Underlayer
+        lumaprints_options: "1,16,9", // Image Wrap + Hanging Wire + No Underlayer (frame color varies)
         type: "framed_canvas",
         thickness: "1.50\"",
-        frame_style: "Black Floating Frame",
+        has_variants: true,
+        frame_variants: {
+            "maple": { name: "Maple Wood", description: "Maple Wood Floating Frame", lumaprints_option: "23" },
+            "espresso": { name: "Espresso", description: "Espresso Floating Frame", lumaprints_option: "24" },
+            "natural": { name: "Natural Wood", description: "Natural Wood Floating Frame", lumaprints_option: "25" },
+            "oak": { name: "Oak", description: "Oak Floating Frame", lumaprints_option: "26" },
+            "gold": { name: "Gold", description: "Gold Floating Frame", lumaprints_option: "27" },
+            "silver": { name: "Silver", description: "Silver Floating Frame", lumaprints_option: "28" },
+            "white": { name: "White", description: "White Floating Frame", lumaprints_option: "29" },
+            "black": { name: "Black", description: "Black Floating Frame", lumaprints_option: "30" }
+        },
+        default_variant: "maple",
         sizes: {
             "8x12": {
                 width: 8,
                 height: 12,
                 lumaprints_cost: 31.25, // Estimated based on framed pricing
                 customer_price: 78.13, // 31.25 * 2.5
-                title: "8×12 1.50\" Framed Canvas (Black Frame)"
+                title: "8×12 1.50\" Framed Canvas"
             },
             "12x18": {
                 width: 12,
                 height: 18,
                 lumaprints_cost: 42.80, // Estimated based on framed pricing
                 customer_price: 107.00, // 42.80 * 2.5
-                title: "12×18 1.50\" Framed Canvas (Black Frame)"
+                title: "12×18 1.50\" Framed Canvas"
             },
             "16x24": {
                 width: 16,
                 height: 24,
                 lumaprints_cost: 54.50, // Estimated based on framed pricing
                 customer_price: 136.25, // 54.50 * 2.5
-                title: "16×24 1.50\" Framed Canvas (Black Frame)"
+                title: "16×24 1.50\" Framed Canvas"
             },
             "20x30": {
                 width: 20,
                 height: 30,
                 lumaprints_cost: 79.90, // Estimated based on framed pricing
                 customer_price: 199.75, // 79.90 * 2.5
-                title: "20×30 1.50\" Framed Canvas (Black Frame)"
+                title: "20×30 1.50\" Framed Canvas"
             }
         }
     }

@@ -1,0 +1,208 @@
+"""
+Dynamic Product API - Serves products from database instead of hardcoded data
+"""
+import sqlite3
+from flask import jsonify
+
+def get_db_connection():
+    """Get database connection"""
+    conn = sqlite3.connect('lumaprints_pricing.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def get_products_for_frontend():
+    """Get all products with variants for frontend order form"""
+    try:
+        conn = get_db_connection()
+        
+        # Get all products with category info, pricing, and variant counts
+        products_query = '''
+            SELECT 
+                p.id,
+                p.name,
+                p.size,
+                p.cost_price,
+                c.name as category_name,
+                c.id as category_id,
+                COUNT(pv.id) as variant_count,
+                gs.markup_percentage
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            LEFT JOIN product_variants pv ON p.id = pv.product_id
+            CROSS JOIN global_settings gs
+            WHERE c.name IN (
+                'Canvas - 0.75" Stretched',
+                'Canvas - 1.25" Stretched', 
+                'Canvas - 1.5" Stretched',
+                'Framed Canvas - 0.75"',
+                'Framed Canvas - 1.25"',
+                'Framed Canvas - 1.5"'
+            )
+            GROUP BY p.id, p.name, p.size, p.cost_price, c.name, c.id, gs.markup_percentage
+            ORDER BY c.name, p.name, p.size
+        '''
+        
+        products = conn.execute(products_query).fetchall()
+        
+        # Format products for frontend
+        formatted_products = []
+        for product in products:
+            cost_price = float(product['cost_price'])
+            markup_percentage = float(product['markup_percentage'])
+            customer_price = cost_price * (1 + markup_percentage / 100)
+            
+            # Determine product type and thickness from category
+            category_name = product['category_name']
+            if 'Stretched' in category_name:
+                product_type = 'stretched_canvas'
+                thickness = category_name.split(' - ')[1].replace(' Stretched', '')
+            elif 'Framed Canvas' in category_name:
+                product_type = 'framed_canvas'
+                thickness = category_name.split(' - ')[1].replace('"', '')
+            else:
+                product_type = 'other'
+                thickness = 'Unknown'
+            
+            formatted_product = {
+                'id': f"product_{product['id']}",
+                'database_id': product['id'],
+                'name': product['name'],
+                'size': product['size'],
+                'cost_price': cost_price,
+                'customer_price': round(customer_price, 2),
+                'category_name': category_name,
+                'category_id': product['category_id'],
+                'product_type': product_type,
+                'thickness': thickness,
+                'has_variants': product['variant_count'] > 0,
+                'variant_count': product['variant_count']
+            }
+            
+            # If product has variants, get them
+            if product['variant_count'] > 0:
+                variants_query = '''
+                    SELECT id, variant_name, variant_description, price_modifier, is_default
+                    FROM product_variants
+                    WHERE product_id = ?
+                    ORDER BY is_default DESC, variant_name
+                '''
+                variants = conn.execute(variants_query, (product['id'],)).fetchall()
+                
+                formatted_product['variants'] = []
+                for variant in variants:
+                    formatted_product['variants'].append({
+                        'id': variant['id'],
+                        'name': variant['variant_name'],
+                        'description': variant['variant_description'],
+                        'price_modifier': float(variant['price_modifier']),
+                        'is_default': bool(variant['is_default'])
+                    })
+            
+            formatted_products.append(formatted_product)
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'products': formatted_products,
+            'total_count': len(formatted_products)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error fetching products: {str(e)}',
+            'products': []
+        })
+
+def get_product_details_api():
+    """Get detailed product information including variants"""
+    from flask import request
+    
+    try:
+        product_id = request.args.get('id')
+        
+        if not product_id:
+            return jsonify({'success': False, 'message': 'Product ID is required'})
+        
+        # Extract database ID from frontend ID
+        if product_id.startswith('product_'):
+            db_id = product_id.replace('product_', '')
+        else:
+            db_id = product_id
+        
+        conn = get_db_connection()
+        
+        # Get product with category and pricing info
+        product_query = '''
+            SELECT 
+                p.id,
+                p.name,
+                p.size,
+                p.cost_price,
+                c.name as category_name,
+                c.id as category_id,
+                gs.markup_percentage
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            CROSS JOIN global_settings gs
+            WHERE p.id = ?
+        '''
+        
+        product = conn.execute(product_query, (db_id,)).fetchone()
+        
+        if not product:
+            conn.close()
+            return jsonify({'success': False, 'message': 'Product not found'})
+        
+        # Get variants if any
+        variants_query = '''
+            SELECT id, variant_name, variant_description, price_modifier, is_default
+            FROM product_variants
+            WHERE product_id = ?
+            ORDER BY is_default DESC, variant_name
+        '''
+        variants = conn.execute(variants_query, (db_id,)).fetchall()
+        
+        conn.close()
+        
+        # Calculate pricing
+        cost_price = float(product['cost_price'])
+        markup_percentage = float(product['markup_percentage'])
+        customer_price = cost_price * (1 + markup_percentage / 100)
+        
+        # Format response
+        response_data = {
+            'success': True,
+            'product': {
+                'id': f"product_{product['id']}",
+                'database_id': product['id'],
+                'name': product['name'],
+                'size': product['size'],
+                'cost_price': cost_price,
+                'customer_price': round(customer_price, 2),
+                'category_name': product['category_name'],
+                'category_id': product['category_id'],
+                'markup_percentage': markup_percentage
+            }
+        }
+        
+        # Add variants if any
+        if variants:
+            response_data['product']['variants'] = []
+            for variant in variants:
+                response_data['product']['variants'].append({
+                    'id': variant['id'],
+                    'name': variant['variant_name'],
+                    'description': variant['variant_description'],
+                    'price_modifier': float(variant['price_modifier']),
+                    'is_default': bool(variant['is_default'])
+                })
+        
+        return jsonify(response_data)
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error fetching product details: {str(e)}'
+        })

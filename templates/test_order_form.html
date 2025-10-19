@@ -93,6 +93,22 @@
                 <option value="canvas|12x12_125" data-sku="101002" data-options="2,5">Canvas Print 1.25" (12x12) - $30.00</option>
                 <option value="metal|12x12" data-sku="106001" data-options="29,31">Metal Print (12x12) - $35.00</option>
                 <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - $20.00</option>
+                <option value="framed_canvas_15|12x12" data-sku="102001" data-options="1,5" data-has-variants="true">Framed Canvas 1.5" (12x12) - $45.00</option>
+            </select>
+        </div>
+        
+        <!-- Frame Selection (only shows for framed canvas products) -->
+        <div class="form-group" id="frame-selection" style="display: none;">
+            <label for="frame_type">Frame Type:</label>
+            <select id="frame_type" name="frame_type" onchange="updateFrameSelection()">
+                <option value="maple" selected>Maple Wood Floating Frame</option>
+                <option value="espresso">Espresso Floating Frame</option>
+                <option value="natural">Natural Wood Floating Frame</option>
+                <option value="oak">Oak Floating Frame</option>
+                <option value="gold">Gold Floating Frame</option>
+                <option value="silver">Silver Floating Frame</option>
+                <option value="white">White Floating Frame</option>
+                <option value="black">Black Floating Frame</option>
             </select>
         </div>
 
@@ -129,13 +145,48 @@
                 const [productType, variantKey] = selectedOption.value.split('|');
                 const sku = selectedOption.getAttribute('data-sku');
                 const options = selectedOption.getAttribute('data-options');
+                const hasVariants = selectedOption.getAttribute('data-has-variants') === 'true';
                 const displayName = selectedOption.textContent.split(' - ')[0];
                 const price = selectedOption.textContent.split('$')[1];
+                
+                // Show/hide frame selection based on product type
+                const frameSelection = document.getElementById('frame-selection');
+                if (hasVariants && productType === 'framed_canvas_15') {
+                    frameSelection.style.display = 'block';
+                } else {
+                    frameSelection.style.display = 'none';
+                }
                 
                 // Update hidden fields
                 document.getElementById('product_sku').value = sku;
                 document.getElementById('lumaprints_options').value = options;
                 document.getElementById('product_price').value = price;
+                
+                // Update display
+                updateProductDisplay();
+            }
+        }
+        
+        function updateFrameSelection() {
+            // Update display when frame type changes
+            updateProductDisplay();
+        }
+        
+        function updateProductDisplay() {
+            const productSelect = document.getElementById('product_type');
+            const frameSelect = document.getElementById('frame_type');
+            const selectedProduct = productSelect.options[productSelect.selectedIndex];
+            
+            if (selectedProduct.value) {
+                let displayName = selectedProduct.textContent.split(' - ')[0];
+                const price = selectedProduct.textContent.split('$')[1];
+                
+                // If frame selection is visible, append frame type to display name
+                const frameSelection = document.getElementById('frame-selection');
+                if (frameSelection.style.display !== 'none') {
+                    const selectedFrame = frameSelect.options[frameSelect.selectedIndex];
+                    displayName += ' - ' + selectedFrame.textContent;
+                }
                 
                 // Update display
                 document.getElementById('product-display').textContent = displayName;
