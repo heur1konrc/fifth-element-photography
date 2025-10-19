@@ -177,7 +177,10 @@ class DynamicOrderingSystem {
             groupedProducts[category].forEach(product => {
                 const option = document.createElement('option');
                 option.value = product.id;
-                option.textContent = `${product.name} ${product.size} - $${product.customer_price.toFixed(2)}`;
+                // Don't duplicate size if it's already in the product name
+                const displayName = product.name.includes(product.size) ? 
+                    product.name : `${product.name} ${product.size}`;
+                option.textContent = `${displayName} - $${product.customer_price.toFixed(2)}`;
                 optgroup.appendChild(option);
             });
 
@@ -227,38 +230,64 @@ class DynamicOrderingSystem {
     }
 
     showVariantSelection() {
-        let variantContainer = document.getElementById('variantSelection');
+        console.log('showVariantSelection called for product:', this.selectedProduct.name);
+        console.log('Product has variants:', this.selectedProduct.has_variants);
+        console.log('Variants array:', this.selectedProduct.variants);
         
-        if (!variantContainer) {
-            // Create variant selection container
-            const productDetails = document.getElementById('productDetails');
-            if (productDetails) {
-                variantContainer = document.createElement('div');
-                variantContainer.id = 'variantSelection';
-                variantContainer.className = 'form-group';
-                productDetails.appendChild(variantContainer);
-            }
+        // Remove existing variant container first
+        this.hideVariantSelection();
+        
+        const productDetails = document.getElementById('productDetails');
+        if (!productDetails) {
+            console.error('productDetails container not found');
+            return;
+        }
+        
+        if (!this.selectedProduct.variants || this.selectedProduct.variants.length === 0) {
+            console.log('No variants available for this product');
+            return;
         }
 
-        if (variantContainer && this.selectedProduct.variants) {
-            variantContainer.innerHTML = `
-                <label for="variantSelect">Frame Type:</label>
-                <select id="variantSelect" required>
-                    <option value="">Select frame type...</option>
-                    ${this.selectedProduct.variants.map(variant => 
-                        `<option value="${variant.id}" ${variant.is_default ? 'selected' : ''}>
-                            ${variant.description}
-                        </option>`
-                    ).join('')}
-                </select>
-            `;
+        // Create variant selection container
+        const variantContainer = document.createElement('div');
+        variantContainer.id = 'variantSelection';
+        variantContainer.className = 'form-group';
+        variantContainer.style.marginTop = '15px';
+        variantContainer.style.padding = '15px';
+        variantContainer.style.backgroundColor = '#f8f9fa';
+        variantContainer.style.borderRadius = '8px';
+        variantContainer.style.border = '1px solid #dee2e6';
+        
+        variantContainer.innerHTML = `
+            <label for="variantSelect" style="font-weight: bold; margin-bottom: 8px; display: block;">Frame Type:</label>
+            <select id="variantSelect" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                <option value="">Select frame type...</option>
+                ${this.selectedProduct.variants.map(variant => 
+                    `<option value="${variant.id}" ${variant.is_default ? 'selected' : ''}>
+                        ${variant.description}
+                    </option>`
+                ).join('')}
+            </select>
+        `;
+        
+        productDetails.appendChild(variantContainer);
+        console.log('Variant container added to productDetails');
 
-            // Auto-select default variant
-            const defaultVariant = this.selectedProduct.variants.find(v => v.is_default);
-            if (defaultVariant) {
-                this.selectVariant(defaultVariant.id);
-            }
+        // Add event listener for variant selection
+        const variantSelect = document.getElementById('variantSelect');
+        if (variantSelect) {
+            variantSelect.addEventListener('change', (e) => {
+                this.selectVariant(e.target.value);
+            });
         }
+
+        // Auto-select default variant
+        const defaultVariant = this.selectedProduct.variants.find(v => v.is_default);
+        if (defaultVariant) {
+            console.log('Auto-selecting default variant:', defaultVariant.description);
+            this.selectVariant(defaultVariant.id);
+        }
+    }
     }
 
     hideVariantSelection() {
