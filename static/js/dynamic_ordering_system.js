@@ -288,7 +288,6 @@ class DynamicOrderingSystem {
             this.selectVariant(defaultVariant.id);
         }
     }
-    }
 
     hideVariantSelection() {
         const variantContainer = document.getElementById('variantSelection');
