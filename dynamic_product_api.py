@@ -46,7 +46,32 @@ def get_products_for_frontend():
                 'Framed Canvas - 1.5"'
             )
             GROUP BY p.id, p.name, p.size, p.cost_price, c.name, c.id
-            ORDER BY c.display_order, c.name, p.name, p.size
+            ORDER BY 
+                CASE 
+                    WHEN c.name LIKE '%0.75%' THEN 1
+                    WHEN c.name LIKE '%1.25%' THEN 2  
+                    WHEN c.name LIKE '%1.5%' THEN 3
+                    ELSE 4
+                END,
+                c.name,
+                CASE 
+                    WHEN p.size LIKE '8%10%' THEN 1
+                    WHEN p.size LIKE '10%12%' THEN 2
+                    WHEN p.size LIKE '11%14%' THEN 3
+                    WHEN p.size LIKE '12%16%' THEN 4
+                    WHEN p.size LIKE '12%18%' THEN 5
+                    WHEN p.size LIKE '16%20%' THEN 6
+                    WHEN p.size LIKE '16%24%' THEN 7
+                    WHEN p.size LIKE '18%24%' THEN 8
+                    WHEN p.size LIKE '20%24%' THEN 9
+                    WHEN p.size LIKE '20%30%' THEN 10
+                    WHEN p.size LIKE '24%30%' THEN 11
+                    WHEN p.size LIKE '24%36%' THEN 12
+                    WHEN p.size LIKE '30%40%' THEN 13
+                    WHEN p.size LIKE '36%48%' THEN 14
+                    ELSE 99
+                END,
+                p.size
         '''
         
         products = conn.execute(products_query).fetchall()
