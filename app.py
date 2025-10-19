@@ -3451,31 +3451,31 @@ from pricing_admin import (
 )
 
 @app.route('/admin/pricing')
-# @require_admin_auth  # Temporarily disabled for testing
+@require_admin_auth
 def admin_pricing():
     """Pricing management admin page"""
     return admin_pricing_route()
 
 @app.route('/admin/pricing/update-markup', methods=['POST'])
-# @require_admin_auth  # Temporarily disabled for testing
+@require_admin_auth
 def update_global_markup():
     """Update global markup percentage"""
     return update_global_markup_route()
 
 @app.route('/admin/pricing/update-product', methods=['POST'])
-# @require_admin_auth  # Temporarily disabled for testing
+@require_admin_auth
 def update_product_cost():
     """Update individual product cost"""
     return update_product_cost_route()
 
 @app.route('/admin/pricing/add-product', methods=['POST'])
-# @require_admin_auth  # Temporarily disabled for testing
+@require_admin_auth
 def add_product():
     """Add new product"""
     return add_product_route()
 
 @app.route('/admin/pricing/delete-product', methods=['POST'])
-# @require_admin_auth  # Temporarily disabled for testing
+@require_admin_auth
 def delete_pricing_product():
     """Delete product from pricing system"""
     return delete_product_route()
