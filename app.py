@@ -3458,6 +3458,7 @@ from variant_routes import (
 from dynamic_product_api import (
     get_products_for_frontend, get_product_details_api
 )
+from database_setup_route import setup_database_route
 
 @app.route('/admin/pricing')
 @require_admin_auth
@@ -3533,6 +3534,12 @@ def get_frontend_products():
 def get_product_details():
     """Get detailed product information (no auth required)"""
     return get_product_details_api()
+
+# Database setup route (for initializing live database)
+@app.route('/setup-database', methods=['GET'])
+def setup_database():
+    """Initialize database with required tables and sample data"""
+    return setup_database_route()
 
 @app.route('/admin/pricing/update-variant', methods=['POST'])
 @require_admin_auth
