@@ -466,6 +466,29 @@ class ThreeDropdownOrderingSystem {
         }
     }
 
+    enableDropdown(stepId, dropdown) {
+        const step = document.getElementById(stepId);
+        if (step) {
+            step.classList.remove('disabled');
+        }
+        if (dropdown) {
+            dropdown.disabled = false;
+        }
+        console.log('Enabled dropdown:', stepId);
+    }
+
+    disableDropdown(stepId, dropdown) {
+        const step = document.getElementById(stepId);
+        if (step) {
+            step.classList.add('disabled');
+            step.classList.remove('completed');
+        }
+        if (dropdown) {
+            dropdown.disabled = true;
+        }
+        console.log('Disabled dropdown:', stepId);
+    }
+
     // Public method to get current selection for form submission
     getCurrentSelection() {
         if (!this.selectedProduct) return null;
