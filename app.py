@@ -3449,6 +3449,9 @@ from pricing_admin import (
     admin_pricing_route, update_global_markup_route, update_product_cost_route,
     add_product_route, delete_product_route
 )
+from category_admin import (
+    add_category_route, delete_category_route, get_categories_route
+)
 
 @app.route('/admin/pricing')
 @require_admin_auth
@@ -3479,6 +3482,24 @@ def add_product():
 def delete_pricing_product():
     """Delete product from pricing system"""
     return delete_product_route()
+
+@app.route('/admin/pricing/add-category', methods=['POST'])
+@require_admin_auth
+def add_category():
+    """Add new category"""
+    return add_category_route()
+
+@app.route('/admin/pricing/delete-category', methods=['POST'])
+@require_admin_auth
+def delete_category():
+    """Delete category (if empty)"""
+    return delete_category_route()
+
+@app.route('/admin/pricing/categories', methods=['GET'])
+@require_admin_auth
+def get_categories():
+    """Get all categories for dropdown refresh"""
+    return get_categories_route()
 
 @app.route('/admin/pricing/update-variant', methods=['POST'])
 @require_admin_auth

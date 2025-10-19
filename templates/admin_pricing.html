@@ -213,6 +213,9 @@
                         <button class="btn btn-outline-secondary btn-sm me-2" onclick="collapseAllCategories()">
                             <i class="fas fa-compress-alt me-1"></i>Collapse All
                         </button>
+                        <button class="btn btn-info me-2" onclick="toggleAddCategoryForm()">
+                            <i class="fas fa-folder-plus me-2"></i>Add Category
+                        </button>
                         <button class="btn btn-success" onclick="toggleAddProductForm()">
                             <i class="fas fa-plus me-2"></i>Add Product
                         </button>
@@ -220,12 +223,29 @@
                 </div>
             </div>
             <div class="card-body">
+                <!-- Add Category Form -->
+                <div id="addCategoryForm" class="add-product-form">
+                    <h5><i class="fas fa-folder-plus me-2"></i>Add New Category</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="newCategoryName" placeholder="Category Name (e.g., Coffee Mugs)">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="newCategoryDescription" placeholder="Description (e.g., Custom printed coffee mugs)">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-info me-2" onclick="addCategory()">Add</button>
+                            <button class="btn btn-secondary" onclick="toggleAddCategoryForm()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Add Product Form -->
                 <div id="addProductForm" class="add-product-form">
-                    <h5>Add New Product</h5>
+                    <h5><i class="fas fa-plus me-2"></i>Add New Product</h5>
                     <div class="row">
                         <div class="col-md-3">
-                            <select id="newProductCategory" class="form-select">
+                            <select class="form-select" id="newProductCategory">
                                 <option value="">Select Category</option>
                                 {% for category in categories %}
                                 <option value="{{ category.id }}">{{ category.name }}</option>
@@ -233,13 +253,13 @@
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <input type="text" id="newProductName" class="form-control" placeholder="Product Name">
+                            <input type="text" class="form-control" id="newProductName" placeholder="Product Name">
                         </div>
                         <div class="col-md-2">
-                            <input type="text" id="newProductSize" class="form-control" placeholder="Size (e.g., 8×10")">
+                            <input type="text" class="form-control" id="newProductSize" placeholder="Size (e.g., 8×10"">
                         </div>
                         <div class="col-md-2">
-                            <input type="number" id="newProductCost" class="form-control" placeholder="Cost" step="0.01" min="0">
+                            <input type="number" class="form-control" id="newProductCost" placeholder="Cost" step="0.01" min="0">
                         </div>
                         <div class="col-md-2">
                             <button class="btn btn-success me-2" onclick="addProduct()">Add</button>
@@ -427,9 +447,73 @@
             });
         }
 
+        function toggleAddCategoryForm() {
+            const categoryForm = document.getElementById('addCategoryForm');
+            const productForm = document.getElementById('addProductForm');
+            
+            if (categoryForm.style.display === 'none' || categoryForm.style.display === '') {
+                categoryForm.style.display = 'block';
+                productForm.style.display = 'none'; // Hide product form
+                // Clear form
+                document.getElementById('newCategoryName').value = '';
+                document.getElementById('newCategoryDescription').value = '';
+            } else {
+                categoryForm.style.display = 'none';
+            }
+        }
+
         function toggleAddProductForm() {
-            const form = document.getElementById('addProductForm');
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            const productForm = document.getElementById('addProductForm');
+            const categoryForm = document.getElementById('addCategoryForm');
+            
+            if (productForm.style.display === 'none' || productForm.style.display === '') {
+                productForm.style.display = 'block';
+                categoryForm.style.display = 'none'; // Hide category form
+                // Clear form
+                document.getElementById('newProductCategory').value = '';
+                document.getElementById('newProductName').value = '';
+                document.getElementById('newProductSize').value = '';
+                document.getElementById('newProductCost').value = '';
+            } else {
+                productForm.style.display = 'none';
+            }
+        }
+
+        function addCategory() {
+            const name = document.getElementById('newCategoryName').value.trim();
+            const description = document.getElementById('newCategoryDescription').value.trim();
+            
+            if (!name) {
+                showAlert('Please enter a category name', 'danger');
+                return;
+            }
+            
+            fetch('/admin/pricing/add-category', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: name,
+                    description: description
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    toggleAddCategoryForm();
+                    // Refresh the page to show new category
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                showAlert('Error adding category: ' + error.message, 'danger');
+            });
         }
 
         function addProduct() {
