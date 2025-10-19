@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Your Print - Fifth Element Photography</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .left-panel, .right-panel {
+            padding: 40px;
+        }
+
+        .left-panel {
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h3 {
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #4299e1;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+
+        .form-group select:hover,
+        .form-group input:hover {
+            border-color: #cbd5e0;
+        }
+
+        /* Three Dropdown Specific Styling */
+        .dropdown-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .dropdown-step {
+            position: relative;
+        }
+
+        .dropdown-step .step-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            background: #4299e1;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .dropdown-step.completed .step-number {
+            background: #48bb78;
+        }
+
+        .dropdown-step.disabled select {
+            background: #f7fafc;
+            color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        /* Product Details Card */
+        .product-details-card,
+        .image-preview-card,
+        .order-summary-card {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .product-details-card h4,
+        .image-preview-card h4,
+        .order-summary-card h4 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .detail-row,
+        .info-row,
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .detail-row:not(:last-child),
+        .info-row:not(:last-child),
+        .summary-row:not(:last-child) {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .detail-row .label,
+        .info-row .label,
+        .summary-row .label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .detail-row .value,
+        .info-row .value,
+        .summary-row .value {
+            color: #2d3748;
+        }
+
+        .detail-row .price,
+        .summary-row .value {
+            font-weight: bold;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid #4299e1;
+            margin-top: 10px;
+            padding-top: 15px;
+            font-size: 1.1rem;
+        }
+
+        .summary-row.total .value {
+            color: #4299e1;
+            font-size: 1.2rem;
+        }
+
+        /* Image Preview */
+        .preview-image {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Customer Info Form */
+        .customer-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-row.single {
+            grid-template-columns: 1fr;
+        }
+
+        /* Submit Button */
+        .submit-button {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(66, 153, 225, 0.3);
+        }
+
+        .submit-button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Error Messages */
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #feb2b2;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .left-panel {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .dropdown-step .step-number {
+                position: static;
+                margin-bottom: 10px;
+                align-self: flex-start;
+            }
+
+            .dropdown-container {
+                padding-left: 0;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid #4299e1;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Order Your Print</h1>
+            <p>Professional quality prints delivered to your door</p>
+        </div>
+
+        <div class="content">
+            <!-- Left Panel: Image & Product Selection -->
+            <div class="left-panel">
+                <div class="section">
+                    <h3>Selected Image</h3>
+                    <div id="imagePreview">
+                        <p>Loading image preview...</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Choose Your Product</h3>
+                    <div id="errorMessage" style="display: none;"></div>
+                    
+                    <div class="dropdown-container">
+                        <!-- Step 1: Product Type -->
+                        <div class="dropdown-step" id="step1">
+                            <div class="step-number">1</div>
+                            <div class="form-group">
+                                <label for="productTypeSelect">Product Type:</label>
+                                <select id="productTypeSelect" required>
+                                    <option value="">Loading product types...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Modifier/Color -->
+                        <div class="dropdown-step disabled" id="step2">
+                            <div class="step-number">2</div>
+                            <div class="form-group">
+                                <label for="modifierSelect">Color/Frame Option:</label>
+                                <select id="modifierSelect" disabled>
+                                    <option value="">Select product type first...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Size & Price -->
+                        <div class="dropdown-step disabled" id="step3">
+                            <div class="step-number">3</div>
+                            <div class="form-group">
+                                <label for="sizeSelect">Size & Price:</label>
+                                <select id="sizeSelect" disabled>
+                                    <option value="">Select options above first...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="quantityInput">Quantity:</label>
+                        <input type="number" id="quantityInput" min="1" max="10" value="1" required>
+                    </div>
+
+                    <div id="productDetails">
+                        <p>Select a product to see details.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Customer Info & Order Summary -->
+            <div class="right-panel">
+                <div class="section">
+                    <h3>Shipping Information</h3>
+                    <form id="orderForm" class="customer-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name:</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name:</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row single">
+                            <div class="form-group">
+                                <label for="email">Email Address:</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row single">
+                            <div class="form-group">
+                                <label for="phone">Phone Number:</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row single">
+                            <div class="form-group">
+                                <label for="address">Street Address:</label>
+                                <input type="text" id="address" name="address" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">City:</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="state">State:</label>
+                                <input type="text" id="state" name="state" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row single">
+                            <div class="form-group">
+                                <label for="zipCode">ZIP Code:</label>
+                                <input type="text" id="zipCode" name="zipCode" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-button" id="submitButton" disabled>
+                            Complete Order
+                        </button>
+                    </form>
+                </div>
+
+                <div class="section">
+                    <h3>Order Summary</h3>
+                    <div id="orderSummary">
+                        <p>Complete your selection to see order summary.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/three_dropdown_system.js"></script>
+    <script>
+        // Additional form handling
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const selection = window.orderingSystem?.getCurrentSelection();
+            if (!selection) {
+                alert('Please complete your product selection first.');
+                return;
+            }
+
+            // Here you would normally submit the order
+            console.log('Order submitted:', {
+                product: selection,
+                customer: new FormData(this)
+            });
+            
+            alert('Order functionality would be implemented here. Selection captured successfully!');
+        });
+
+        // Enable/disable submit button based on product selection
+        function updateSubmitButton() {
+            const submitButton = document.getElementById('submitButton');
+            const selection = window.orderingSystem?.getCurrentSelection();
+            
+            if (selection && submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Complete Order';
+            } else if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Complete Selection First';
+            }
+        }
+
+        // Check submit button state periodically
+        setInterval(updateSubmitButton, 1000);
+    </script>
+</body>
+</html>

@@ -3894,6 +3894,6 @@ def test_order_submit():
 
 @app.route('/enhanced_order_form')
 def enhanced_order_form():
-    """Enhanced order form with Phase 1 product integration"""
-    return render_template('enhanced_order_form.html')
+    """Enhanced order form with 3-dropdown product selection system"""
+    return render_template('enhanced_order_form_v2.html')
 
