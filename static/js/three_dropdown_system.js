@@ -59,8 +59,12 @@ class ThreeDropdownOrderingSystem {
     extractProductTypes() {
         const typeMap = new Map();
         
-        this.allProducts.forEach(product => {
+        console.log('Processing', this.allProducts.length, 'products for type extraction');
+        
+        this.allProducts.forEach((product, index) => {
             const categoryName = product.category_name;
+            console.log(`Product ${index + 1}: ${product.name} - Category: ${categoryName}`);
+            
             if (!typeMap.has(categoryName)) {
                 typeMap.set(categoryName, {
                     name: categoryName,
@@ -143,6 +147,8 @@ class ThreeDropdownOrderingSystem {
 
     onTypeChange() {
         const typeDropdown = document.getElementById('productTypeSelect');
+        const modifierDropdown = document.getElementById('modifierSelect');
+        const sizeDropdown = document.getElementById('sizeSelect');
         const selectedTypeName = typeDropdown.value;
         
         console.log('Product type changed to:', selectedTypeName);
@@ -152,6 +158,8 @@ class ThreeDropdownOrderingSystem {
             this.clearModifierDropdown();
             this.clearSizeDropdown();
             this.clearProductDetails();
+            this.disableDropdown('step2', modifierDropdown);
+            this.disableDropdown('step3', sizeDropdown);
             return;
         }
 
@@ -159,7 +167,9 @@ class ThreeDropdownOrderingSystem {
         this.selectedType = this.productTypes.find(type => type.name === selectedTypeName);
         
         if (this.selectedType) {
+            this.enableDropdown('step2', modifierDropdown);
             this.populateModifierDropdown();
+            document.getElementById('step1').classList.add('completed');
         }
     }
 
@@ -220,12 +230,23 @@ class ThreeDropdownOrderingSystem {
 
     onModifierChange() {
         const modifierDropdown = document.getElementById('modifierSelect');
+        const sizeDropdown = document.getElementById('sizeSelect');
         const selectedModifier = modifierDropdown.value;
         
         console.log('Modifier changed to:', selectedModifier);
 
+        if (!selectedModifier) {
+            this.selectedModifier = null;
+            this.clearSizeDropdown();
+            this.clearProductDetails();
+            this.disableDropdown('step3', sizeDropdown);
+            return;
+        }
+
         this.selectedModifier = selectedModifier;
+        this.enableDropdown('step3', sizeDropdown);
         this.populateSizeDropdown();
+        document.getElementById('step2').classList.add('completed');
     }
 
     populateSizeDropdown() {
