@@ -15,6 +15,18 @@ def get_products_for_frontend():
     try:
         conn = get_db_connection()
         
+        # Check what tables exist and adapt accordingly
+        cursor = conn.cursor()
+        
+        # Check if we have the new pricing tables or old structure
+        tables = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+        table_names = [table[0] for table in tables]
+        
+        # If we don't have the new tables, return sample products for now
+        if 'global_settings' not in table_names or 'products' not in table_names or 'categories' not in table_names:
+            conn.close()
+            return get_fallback_products()
+        
         # Get all products with category info, pricing, and variant counts
         products_query = '''
             SELECT 
@@ -25,11 +37,11 @@ def get_products_for_frontend():
                 c.name as category_name,
                 c.id as category_id,
                 COUNT(pv.id) as variant_count,
-                gs.markup_percentage
+                COALESCE(gs.markup_percentage, 123.0) as markup_percentage
             FROM products p
             JOIN categories c ON p.category_id = c.id
             LEFT JOIN product_variants pv ON p.id = pv.product_id
-            CROSS JOIN global_settings gs
+            LEFT JOIN global_settings gs ON 1=1
             WHERE c.name IN (
                 'Canvas - 0.75" Stretched',
                 'Canvas - 1.25" Stretched', 
@@ -206,3 +218,68 @@ def get_product_details_api():
             'success': False,
             'message': f'Error fetching product details: {str(e)}'
         })
+
+
+def get_fallback_products():
+    """Return sample products when database tables don't exist"""
+    sample_products = [
+        {
+            'id': 'sample_canvas_075_8x10',
+            'database_id': 1,
+            'name': 'Canvas 0.75"',
+            'size': '8×10"',
+            'cost_price': 15.39,
+            'customer_price': 34.32,
+            'category_name': 'Canvas - 0.75" Stretched',
+            'category_id': 1,
+            'product_type': 'stretched_canvas',
+            'thickness': '0.75"',
+            'has_variants': False,
+            'variant_count': 0
+        },
+        {
+            'id': 'sample_canvas_075_11x14',
+            'database_id': 2,
+            'name': 'Canvas 0.75"',
+            'size': '11×14"',
+            'cost_price': 18.76,
+            'customer_price': 41.85,
+            'category_name': 'Canvas - 0.75" Stretched',
+            'category_id': 1,
+            'product_type': 'stretched_canvas',
+            'thickness': '0.75"',
+            'has_variants': False,
+            'variant_count': 0
+        },
+        {
+            'id': 'sample_framed_15_8x10',
+            'database_id': 3,
+            'name': 'Framed Canvas 1.5"',
+            'size': '8×10"',
+            'cost_price': 31.25,
+            'customer_price': 69.69,
+            'category_name': 'Framed Canvas - 1.5"',
+            'category_id': 6,
+            'product_type': 'framed_canvas',
+            'thickness': '1.5"',
+            'has_variants': True,
+            'variant_count': 8,
+            'variants': [
+                {'id': 1, 'name': 'Maple Wood', 'description': 'Maple Wood Floating Frame', 'price_modifier': 0.0, 'is_default': True},
+                {'id': 2, 'name': 'Espresso', 'description': 'Espresso Floating Frame', 'price_modifier': 0.0, 'is_default': False},
+                {'id': 3, 'name': 'Natural Wood', 'description': 'Natural Wood Floating Frame', 'price_modifier': 0.0, 'is_default': False},
+                {'id': 4, 'name': 'Oak', 'description': 'Oak Floating Frame', 'price_modifier': 0.0, 'is_default': False},
+                {'id': 5, 'name': 'Gold', 'description': 'Gold Floating Frame', 'price_modifier': 0.0, 'is_default': False},
+                {'id': 6, 'name': 'Silver', 'description': 'Silver Floating Frame', 'price_modifier': 0.0, 'is_default': False},
+                {'id': 7, 'name': 'White', 'description': 'White Floating Frame', 'price_modifier': 0.0, 'is_default': False},
+                {'id': 8, 'name': 'Black', 'description': 'Black Floating Frame', 'price_modifier': 0.0, 'is_default': False}
+            ]
+        }
+    ]
+    
+    return jsonify({
+        'success': True,
+        'products': sample_products,
+        'total_count': len(sample_products),
+        'note': 'Using sample products - database tables not fully initialized'
+    })
