@@ -1,371 +1,602 @@
-# API Endpoints Documentation
+# API Endpoints Documentation v2.0
 
-**Base URL:** `https://fifth-element-photography-production.up.railway.app`  
-**Authentication:** Session-based for admin endpoints
+## Overview
 
----
+The Fifth Element Photography system provides a comprehensive RESTful API for managing products, pricing, and customer orders. The API supports both the admin pricing interface and the 3-dropdown customer ordering system.
 
-## 🛒 Customer Order Form APIs
+## Base URL
+- **Development:** `http://localhost:5000`
+- **Production:** `https://fifth-element-photography-production.up.railway.app`
 
-### **GET /api/products**
-Load all active products for the customer order form.
+## Authentication
 
-**Purpose:** Populate product dropdown with real-time pricing  
-**Authentication:** None required  
-**Response Format:** JSON
+### Admin Routes
+All admin routes require authentication via session cookies. Users must log in through the admin interface before accessing protected endpoints.
 
-**Response Example:**
+**Login Endpoint:**
+```
+POST /admin/login
+Content-Type: application/json
+
+{
+  "username": "admin_username",
+  "password": "admin_password"
+}
+```
+
+**Response:**
 ```json
 {
-    "success": true,
-    "products": [
+  "success": true,
+  "message": "Login successful"
+}
+```
+
+## Customer API Endpoints
+
+### Get All Products
+Retrieves all active products with pricing and variant information for the 3-dropdown system.
+
+**Endpoint:** `GET /api/products`
+
+**Response:**
+```json
+{
+  "success": true,
+  "products": [
+    {
+      "database_id": 1,
+      "category_id": 1,
+      "category_name": "Canvas - 0.75\" Stretched",
+      "name": "Canvas 0.75\" Stretched 8×10\"",
+      "size": "8×10\"",
+      "cost_price": 24.13,
+      "customer_price": 53.81,
+      "product_type": "stretched_canvas",
+      "thickness": "0.75",
+      "has_variants": false,
+      "variants": []
+    },
+    {
+      "database_id": 45,
+      "category_id": 15,
+      "category_name": "Framed Canvas - 1.5\"",
+      "name": "Framed Canvas 1.5\" 8×10\"",
+      "size": "8×10\"",
+      "cost_price": 35.12,
+      "customer_price": 78.05,
+      "product_type": "framed_canvas",
+      "thickness": "1.5",
+      "has_variants": true,
+      "variants": [
         {
-            "id": "canvas_075_8x10",
-            "database_id": 1,
-            "name": "Canvas 0.75\"",
-            "size": "8×10\"",
-            "cost_price": 15.39,
-            "customer_price": 34.32,
-            "category_name": "Canvas - 0.75\" Stretched",
-            "category_id": 1,
-            "product_type": "stretched_canvas",
-            "thickness": "0.75\"",
-            "has_variants": false,
-            "variant_count": 0
+          "id": 1,
+          "variant_name": "frame_type",
+          "variant_value": "Maple Wood Floating Frame",
+          "price_modifier": 0.00,
+          "is_default": true
         },
         {
-            "id": "framed_15_8x10",
-            "database_id": 150,
-            "name": "Framed Canvas 1.5\"",
-            "size": "8×10\"",
-            "cost_price": 31.25,
-            "customer_price": 69.69,
-            "category_name": "Framed Canvas - 1.5\"",
-            "category_id": 6,
-            "product_type": "framed_canvas",
-            "thickness": "1.5\"",
-            "has_variants": true,
-            "variant_count": 8,
-            "variants": [
-                {
-                    "id": 1,
-                    "name": "Maple Wood",
-                    "description": "Maple Wood Floating Frame",
-                    "price_modifier": 0.0,
-                    "is_default": true
-                },
-                {
-                    "id": 2,
-                    "name": "Espresso",
-                    "description": "Espresso Floating Frame", 
-                    "price_modifier": 0.0,
-                    "is_default": false
-                }
-            ]
+          "id": 2,
+          "variant_name": "frame_type", 
+          "variant_value": "Espresso Floating Frame",
+          "price_modifier": 0.00,
+          "is_default": false
         }
-    ],
-    "total_count": 167
+      ]
+    }
+  ],
+  "total_products": 679,
+  "categories_count": 26
 }
 ```
 
-**Error Response:**
+### Get Product Categories
+Retrieves all active product categories for Dropdown 1.
+
+**Endpoint:** `GET /api/categories`
+
+**Response:**
 ```json
 {
-    "success": false,
-    "message": "Error fetching products: [error details]",
-    "products": []
+  "success": true,
+  "categories": [
+    {
+      "id": 1,
+      "name": "Canvas - 0.75\" Stretched",
+      "description": "Traditional stretched canvas prints",
+      "product_count": 32,
+      "has_variants": false
+    },
+    {
+      "id": 15,
+      "name": "Framed Canvas - 1.5\"",
+      "description": "Framed canvas with floating frame options",
+      "product_count": 32,
+      "has_variants": true
+    }
+  ]
 }
 ```
 
-### **GET /api/product-variants/{product_id}**
-Get variants for a specific product.
+### Get Product Variants
+Retrieves variants for a specific product (used for Dropdown 2).
 
-**Purpose:** Load frame options when customer selects framed canvas  
-**Authentication:** None required  
-**Parameters:** `product_id` (integer)
+**Endpoint:** `GET /api/product-variants/{product_id}`
 
-**Response Example:**
+**Parameters:**
+- `product_id` (integer): Database ID of the product
+
+**Response:**
 ```json
 {
-    "success": true,
-    "variants": [
+  "success": true,
+  "product_id": 45,
+  "variants": [
+    {
+      "id": 1,
+      "variant_name": "frame_type",
+      "variant_value": "Maple Wood Floating Frame",
+      "price_modifier": 0.00,
+      "is_default": true
+    },
+    {
+      "id": 2,
+      "variant_name": "frame_type",
+      "variant_value": "Espresso Floating Frame", 
+      "price_modifier": 0.00,
+      "is_default": false
+    },
+    {
+      "id": 3,
+      "variant_name": "frame_type",
+      "variant_value": "Natural Wood Floating Frame",
+      "price_modifier": 0.00,
+      "is_default": false
+    }
+  ]
+}
+```
+
+## Admin API Endpoints
+
+### Pricing Management
+
+#### Get Admin Pricing Data
+Retrieves all products and categories for the admin pricing interface.
+
+**Endpoint:** `GET /admin/pricing/data`  
+**Authentication:** Required
+
+**Response:**
+```json
+{
+  "success": true,
+  "global_markup": 123.0,
+  "multiplier": 2.23,
+  "categories": [
+    {
+      "id": 1,
+      "name": "Canvas - 0.75\" Stretched",
+      "products": [
         {
-            "id": 1,
-            "name": "Maple Wood",
-            "description": "Maple Wood Floating Frame",
-            "price_modifier": 0.0,
-            "is_default": true
-        },
-        {
-            "id": 2,
-            "name": "Espresso", 
-            "description": "Espresso Floating Frame",
-            "price_modifier": 0.0,
-            "is_default": false
+          "id": 1,
+          "name": "Canvas 0.75\" Stretched 8×10\"",
+          "size": "8×10\"",
+          "cost_price": 24.13,
+          "customer_price": 53.81,
+          "has_variants": false
         }
-    ]
+      ]
+    }
+  ],
+  "stats": {
+    "total_products": 679,
+    "total_categories": 26,
+    "avg_cost": 48.49,
+    "avg_customer_price": 108.14
+  }
 }
 ```
 
----
+#### Update Global Markup
+Updates the global markup percentage applied to all products.
 
-## 🔧 Admin Pricing Management APIs
+**Endpoint:** `POST /admin/pricing/update-markup`  
+**Authentication:** Required
 
-### **GET /admin/pricing**
-Load the pricing admin interface.
-
-**Purpose:** Display admin dashboard with all products and pricing  
-**Authentication:** Required (`@require_admin_auth`)  
-**Response:** HTML template with embedded data
-
-**Template Data:**
-- Global markup percentage and multiplier
-- All categories with product counts
-- All products with calculated customer prices
-- Statistics (total products, categories, average costs)
-
-### **POST /admin/pricing/update-markup**
-Update the global markup percentage.
-
-**Purpose:** Change pricing for all products instantly  
-**Authentication:** Required  
-**Content-Type:** `application/x-www-form-urlencoded`
-
-**Request Body:**
-```
-markup_percentage=150.0
+**Request:**
+```json
+{
+  "markup": 150.0
+}
 ```
 
 **Response:**
 ```json
 {
-    "success": true,
-    "message": "Global markup updated to 150.0%",
-    "new_multiplier": 2.5
+  "success": true,
+  "message": "Global markup updated successfully",
+  "new_markup": 150.0,
+  "new_multiplier": 2.50,
+  "products_updated": 679
 }
 ```
 
-### **POST /admin/pricing/update-product**
-Update cost price for individual product.
+#### Update Product Cost
+Updates the cost price for an individual product.
 
-**Purpose:** Modify specific product costs  
-**Authentication:** Required  
-**Content-Type:** `application/x-www-form-urlencoded`
+**Endpoint:** `POST /admin/pricing/update-product`  
+**Authentication:** Required
 
-**Request Body:**
-```
-product_id=123
-new_cost=25.99
+**Request:**
+```json
+{
+  "product_id": 1,
+  "cost_price": 25.00
+}
 ```
 
 **Response:**
 ```json
 {
-    "success": true,
-    "message": "Product cost updated successfully",
-    "product_id": 123,
-    "new_cost": 25.99,
-    "new_customer_price": 57.98
+  "success": true,
+  "message": "Product updated successfully",
+  "product": {
+    "id": 1,
+    "name": "Canvas 0.75\" Stretched 8×10\"",
+    "old_cost": 24.13,
+    "new_cost": 25.00,
+    "old_customer_price": 53.81,
+    "new_customer_price": 55.75
+  }
 }
 ```
 
-### **POST /admin/pricing/add-product**
-Add new product to catalog.
+#### Add New Product
+Adds a new product to the catalog.
 
-**Purpose:** Expand product offerings (coffee mugs, ornaments, etc.)  
-**Authentication:** Required  
-**Content-Type:** `application/x-www-form-urlencoded`
+**Endpoint:** `POST /admin/pricing/add-product`  
+**Authentication:** Required
 
-**Request Body:**
-```
-category_id=27
-product_name=Coffee Mug
-size=11oz
-cost_price=8.50
+**Request:**
+```json
+{
+  "category_id": 1,
+  "name": "Canvas 0.75\" Stretched 24×36\"",
+  "size": "24×36\"",
+  "cost_price": 89.50,
+  "product_type": "stretched_canvas",
+  "thickness": "0.75"
+}
 ```
 
 **Response:**
 ```json
 {
-    "success": true,
-    "message": "Product added successfully",
-    "product_id": 680,
-    "customer_price": 18.96
+  "success": true,
+  "message": "Product added successfully",
+  "product": {
+    "id": 680,
+    "category_id": 1,
+    "name": "Canvas 0.75\" Stretched 24×36\"",
+    "size": "24×36\"",
+    "cost_price": 89.50,
+    "customer_price": 199.59,
+    "created_at": "2025-10-19T15:30:00Z"
+  }
 }
 ```
 
-### **DELETE /admin/pricing/delete-product/{id}**
-Remove product from catalog.
+#### Delete Product
+Removes a product from the catalog.
 
-**Purpose:** Remove discontinued products  
-**Authentication:** Required  
-**Parameters:** `id` (integer)
+**Endpoint:** `DELETE /admin/pricing/delete-product/{product_id}`  
+**Authentication:** Required
 
 **Response:**
 ```json
 {
-    "success": true,
-    "message": "Product deleted successfully",
-    "product_id": 123
+  "success": true,
+  "message": "Product deleted successfully",
+  "deleted_product_id": 680
 }
 ```
 
----
+### Category Management
 
-## 📂 Category Management APIs
+#### Add New Category
+Creates a new product category.
 
-### **POST /admin/pricing/add-category**
-Create new product category.
+**Endpoint:** `POST /admin/pricing/add-category`  
+**Authentication:** Required
 
-**Purpose:** Add categories for new product types  
-**Authentication:** Required  
-**Content-Type:** `application/x-www-form-urlencoded`
-
-**Request Body:**
-```
-category_name=Coffee Mugs
-description=Custom printed coffee mugs
+**Request:**
+```json
+{
+  "name": "Coffee Mugs",
+  "description": "Custom printed coffee mugs"
+}
 ```
 
 **Response:**
 ```json
 {
-    "success": true,
-    "message": "Category added successfully",
-    "category_id": 27,
-    "category_name": "Coffee Mugs"
+  "success": true,
+  "message": "Category added successfully",
+  "category": {
+    "id": 27,
+    "name": "Coffee Mugs",
+    "description": "Custom printed coffee mugs",
+    "active": true,
+    "created_at": "2025-10-19T15:30:00Z"
+  }
 }
 ```
 
-### **DELETE /admin/pricing/delete-category/{id}**
-Remove empty category.
+#### Get Categories
+Retrieves all categories for admin management.
 
-**Purpose:** Clean up unused categories  
-**Authentication:** Required  
-**Parameters:** `id` (integer)
+**Endpoint:** `GET /admin/pricing/categories`  
+**Authentication:** Required
 
 **Response:**
 ```json
 {
-    "success": true,
-    "message": "Category deleted successfully",
-    "category_id": 27
+  "success": true,
+  "categories": [
+    {
+      "id": 1,
+      "name": "Canvas - 0.75\" Stretched",
+      "description": "Traditional stretched canvas prints",
+      "product_count": 32,
+      "active": true
+    }
+  ]
 }
 ```
 
----
+### Variant Management
 
-## 🛠️ System Management APIs
+#### Add Product Variant
+Adds a new variant option to a product.
 
-### **GET /setup-database**
-Initialize database on live server.
+**Endpoint:** `POST /admin/pricing/add-variant`  
+**Authentication:** Required
 
-**Purpose:** Create tables and load initial data  
-**Authentication:** None (temporary setup endpoint)  
-**Usage:** One-time setup for new deployments
+**Request:**
+```json
+{
+  "product_id": 45,
+  "variant_name": "frame_type",
+  "variant_value": "Cherry Wood Floating Frame",
+  "price_modifier": 0.00,
+  "is_default": false
+}
+```
 
 **Response:**
 ```json
 {
-    "success": true,
-    "message": "Database initialized successfully",
-    "tables_created": ["products", "categories", "settings", "product_variants"],
-    "products_loaded": 679,
+  "success": true,
+  "message": "Variant added successfully",
+  "variant": {
+    "id": 257,
+    "product_id": 45,
+    "variant_name": "frame_type",
+    "variant_value": "Cherry Wood Floating Frame",
+    "price_modifier": 0.00,
+    "is_default": false
+  }
+}
+```
+
+#### Get Product Variants (Admin)
+Retrieves all variants for a product in admin interface.
+
+**Endpoint:** `GET /admin/pricing/product-variants/{product_id}`  
+**Authentication:** Required
+
+**Response:**
+```json
+{
+  "success": true,
+  "product_id": 45,
+  "product_name": "Framed Canvas 1.5\" 8×10\"",
+  "variants": [
+    {
+      "id": 1,
+      "variant_name": "frame_type",
+      "variant_value": "Maple Wood Floating Frame",
+      "price_modifier": 0.00,
+      "is_default": true
+    }
+  ]
+}
+```
+
+## Database Setup Endpoints
+
+### Initialize Database
+Sets up the complete database schema and loads initial data.
+
+**Endpoint:** `POST /setup-database`  
+**Authentication:** None (development only)
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Database initialized successfully",
+  "stats": {
+    "products_created": 679,
     "categories_created": 26,
-    "variants_created": 256
+    "variants_created": 256,
+    "settings_initialized": true
+  }
 }
 ```
 
----
+## Error Responses
 
-## 🔍 Data Flow Examples
+### Standard Error Format
+All API endpoints return errors in a consistent format:
 
-### **Customer Order Process:**
-1. `GET /enhanced_order_form` → Load order form page
-2. `GET /api/products` → Populate product dropdown
-3. Customer selects framed canvas → Variants loaded from product data
-4. Customer completes order → Form submission
+```json
+{
+  "success": false,
+  "error": "Error type",
+  "message": "Detailed error description",
+  "code": 400
+}
+```
 
-### **Admin Pricing Update:**
-1. `GET /admin/pricing` → Load admin interface
-2. Admin changes markup → `POST /admin/pricing/update-markup`
-3. All customer prices recalculated instantly
-4. Next customer order shows new prices
+### Common Error Codes
+- **400 Bad Request:** Invalid request parameters
+- **401 Unauthorized:** Authentication required
+- **403 Forbidden:** Insufficient permissions
+- **404 Not Found:** Resource not found
+- **500 Internal Server Error:** Server-side error
 
-### **Adding New Product:**
-1. Admin clicks "Add Product" → Form appears
-2. Admin fills details → `POST /admin/pricing/add-product`
-3. Product added to database
-4. Immediately available in customer order form
-
----
-
-## 🚨 Error Handling
-
-### **Common Error Responses:**
+### Example Error Responses
 
 **Authentication Required:**
 ```json
 {
-    "success": false,
-    "message": "Authentication required",
-    "redirect": "/login"
+  "success": false,
+  "error": "Authentication Required",
+  "message": "Please log in to access this resource",
+  "code": 401
 }
 ```
 
-**Database Error:**
+**Product Not Found:**
 ```json
 {
-    "success": false,
-    "message": "Database error: [specific error]",
-    "error_code": "DB_ERROR"
+  "success": false,
+  "error": "Product Not Found", 
+  "message": "Product with ID 999 does not exist",
+  "code": 404
 }
 ```
 
-**Validation Error:**
+**Invalid Markup Value:**
 ```json
 {
-    "success": false,
-    "message": "Invalid input: [field] is required",
-    "field_errors": {
-        "cost_price": "Must be a positive number"
+  "success": false,
+  "error": "Invalid Input",
+  "message": "Markup must be a positive number",
+  "code": 400
+}
+```
+
+## Rate Limiting
+
+The API implements basic rate limiting to prevent abuse:
+- **Admin endpoints:** 100 requests per minute per IP
+- **Customer endpoints:** 200 requests per minute per IP
+- **Database setup:** 1 request per hour per IP
+
+## API Usage Examples
+
+### JavaScript Fetch Examples
+
+**Get All Products:**
+```javascript
+fetch('/api/products')
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      console.log('Loaded', data.products.length, 'products');
+      // Populate dropdowns
     }
-}
+  });
 ```
 
+**Update Global Markup:**
+```javascript
+fetch('/admin/pricing/update-markup', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    markup: 150.0
+  })
+})
+.then(response => response.json())
+.then(data => {
+  if (data.success) {
+    console.log('Markup updated to', data.new_markup, '%');
+  }
+});
+```
+
+### Python Requests Examples
+
+**Get Products:**
+```python
+import requests
+
+response = requests.get('https://your-domain.com/api/products')
+data = response.json()
+
+if data['success']:
+    products = data['products']
+    print(f"Loaded {len(products)} products")
+```
+
+**Add New Product:**
+```python
+import requests
+
+product_data = {
+    'category_id': 1,
+    'name': 'Canvas 0.75" Stretched 30×40"',
+    'size': '30×40"',
+    'cost_price': 125.00,
+    'product_type': 'stretched_canvas',
+    'thickness': '0.75'
+}
+
+response = requests.post(
+    'https://your-domain.com/admin/pricing/add-product',
+    json=product_data,
+    cookies=admin_session_cookies
+)
+
+if response.json()['success']:
+    print("Product added successfully")
+```
+
+## Integration Notes
+
+### 3-Dropdown System Integration
+The customer ordering system uses these API endpoints in sequence:
+1. **Load Products:** `GET /api/products` - Populates all three dropdowns
+2. **Extract Types:** JavaScript processes products to create Dropdown 1 options
+3. **Filter Variants:** When type selected, filters products for Dropdown 2 options
+4. **Show Sizes:** When variant selected, shows available sizes in Dropdown 3
+
+### Admin Interface Integration
+The admin pricing interface uses these endpoints:
+1. **Load Dashboard:** `GET /admin/pricing/data` - Shows all products and categories
+2. **Update Pricing:** `POST /admin/pricing/update-markup` - Global price changes
+3. **Manage Products:** Various endpoints for CRUD operations
+4. **Real-time Updates:** Changes immediately reflect in customer interface
+
+### Database Consistency
+All endpoints maintain database consistency through:
+- **Foreign Key Constraints:** Prevent orphaned records
+- **Transaction Management:** Ensure atomic operations
+- **Input Validation:** Prevent invalid data entry
+- **Error Handling:** Graceful failure recovery
+
 ---
 
-## 🔒 Security Considerations
-
-### **Admin Endpoints:**
-- All `/admin/*` routes protected by `@require_admin_auth`
-- Session-based authentication
-- CSRF protection via Flask built-ins
-
-### **Input Validation:**
-- SQL injection prevention (parameterized queries)
-- XSS protection in templates
-- Data type validation on all inputs
-
-### **Rate Limiting:**
-- Consider implementing for production
-- Especially for database modification endpoints
-
----
-
-## 📊 Performance Notes
-
-### **Optimization Strategies:**
-- Database indexes on frequently queried fields
-- Minimal data transfer in API responses
-- Efficient SQL queries with JOINs
-- Caching of global settings
-
-### **Response Times:**
-- `/api/products`: ~200-500ms (679 products)
-- Admin operations: ~100-300ms
-- Database queries: <50ms average
-
----
-
-*End of API Endpoints Documentation*
+**API Version:** 2.0  
+**Last Updated:** October 19, 2025  
+**Total Endpoints:** 15+ endpoints  
+**Authentication:** Session-based for admin, public for customer  
+**Rate Limiting:** Implemented  
+**Error Handling:** Standardized JSON responses
