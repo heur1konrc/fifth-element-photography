@@ -4331,6 +4331,14 @@ def debug_sizes():
         return f"<h2>Debug Error:</h2><p>{str(e)}</p>"
 
 
+# Import migration function
+from migrate_sub_options import migrate_sub_options_route
+
+@app.route('/migrate-sub-options')
+def migrate_sub_options():
+    """Apply sub-option assignments fix to the live database"""
+    return migrate_sub_options_route()
+
 @app.route('/admin/fix-white-id')
 def fix_white_id():
     """Fix test products to use correct White color ID (14)"""
