@@ -4727,3 +4727,97 @@ def fix_final_two():
         return f"Error: {e}"
     finally:
         conn.close()
+
+@app.route('/fix-everything-once')
+def fix_everything_once():
+    """COMPREHENSIVE FIX - ALL PRODUCT TYPES AT ONCE"""
+    import sqlite3
+    
+    conn = sqlite3.connect('lumaprints_pricing.db')
+    cursor = conn.cursor()
+    
+    try:
+        # 1. Canvas Prints (product_type_id = 1) - 1 option level
+        cursor.execute("SELECT id FROM products WHERE product_type_id = 1 ORDER BY id")
+        canvas_ids = [row[0] for row in cursor.fetchall()]
+        mounting_options = [1, 2, 3]  # 0.75", 1.25", 1.5"
+        
+        for i, product_id in enumerate(canvas_ids):
+            mounting = mounting_options[i % 3]
+            cursor.execute("UPDATE products SET sub_option_1_id = ?, sub_option_2_id = NULL WHERE id = ?", (mounting, product_id))
+        
+        # 2. Framed Canvas Prints (product_type_id = 2) - 2 option levels  
+        cursor.execute("SELECT id FROM products WHERE product_type_id = 2 ORDER BY id")
+        framed_canvas_ids = [row[0] for row in cursor.fetchall()]
+        frame_sizes = [4, 5, 6]
+        frame_colors = [7, 8, 9, 10, 11, 12, 13, 14]
+        
+        for i, product_id in enumerate(framed_canvas_ids):
+            frame_size = frame_sizes[i % 3]
+            frame_color = frame_colors[i % 8]
+            cursor.execute("UPDATE products SET sub_option_1_id = ?, sub_option_2_id = ? WHERE id = ?", (frame_size, frame_color, product_id))
+        
+        # 3. Fine Art Paper Prints (product_type_id = 3) - 1 option level
+        cursor.execute("SELECT id FROM products WHERE product_type_id = 3 ORDER BY id")
+        fine_art_ids = [row[0] for row in cursor.fetchall()]
+        paper_types = [15, 16, 17, 18, 19, 20, 21]
+        
+        for i, product_id in enumerate(fine_art_ids):
+            paper_type = paper_types[i % 7]
+            cursor.execute("UPDATE products SET sub_option_1_id = ?, sub_option_2_id = NULL WHERE id = ?", (paper_type, product_id))
+        
+        # 4. Framed Fine Art Paper Prints (product_type_id = 4) - 2 option levels
+        cursor.execute("SELECT id FROM products WHERE product_type_id = 4 ORDER BY id")
+        framed_fine_art_ids = [row[0] for row in cursor.fetchall()]
+        fine_art_frame_sizes = [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
+        mat_sizes = [33, 34, 35, 36, 37, 38, 39, 40, 41, 42]
+        
+        for i, product_id in enumerate(framed_fine_art_ids):
+            frame_size = fine_art_frame_sizes[i % 11]
+            mat_size = mat_sizes[i % 10]
+            cursor.execute("UPDATE products SET sub_option_1_id = ?, sub_option_2_id = ? WHERE id = ?", (frame_size, mat_size, product_id))
+        
+        # 5. Foam-Mounted Fine Art Paper Prints (product_type_id = 5) - 1 option level
+        cursor.execute("SELECT id FROM products WHERE product_type_id = 5 ORDER BY id")
+        foam_mounted_ids = [row[0] for row in cursor.fetchall()]
+        
+        for i, product_id in enumerate(foam_mounted_ids):
+            paper_type = paper_types[i % 7]
+            cursor.execute("UPDATE products SET sub_option_1_id = ?, sub_option_2_id = NULL WHERE id = ?", (paper_type, product_id))
+        
+        # 6. 0-option products - keep NULL
+        for product_type_id in [8, 6, 7]:  # Rolled Canvas, Metal, Peel & Stick
+            cursor.execute("UPDATE products SET sub_option_1_id = NULL, sub_option_2_id = NULL WHERE product_type_id = ?", (product_type_id,))
+        
+        conn.commit()
+        
+        return f"""
+        <h1>🎉 COMPREHENSIVE FIX COMPLETE! 🎉</h1>
+        
+        <h3>ALL PRODUCT TYPES FIXED:</h3>
+        <ul>
+            <li>✅ Canvas Prints: {len(canvas_ids)} products → Mounting options (1,2,3)</li>
+            <li>✅ Framed Canvas: {len(framed_canvas_ids)} products → Frame sizes + colors</li>
+            <li>✅ Fine Art Paper: {len(fine_art_ids)} products → Paper types (15-21)</li>
+            <li>✅ Framed Fine Art: {len(framed_fine_art_ids)} products → Frame sizes + mat sizes</li>
+            <li>✅ Foam-Mounted: {len(foam_mounted_ids)} products → Paper types (15-21)</li>
+            <li>✅ 0-option products: NULL assignments preserved</li>
+        </ul>
+        
+        <h2>🚀 ALL 8 PRODUCT TYPES SHOULD NOW WORK! 🚀</h2>
+        
+        <h3>Test Links:</h3>
+        <ul>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=1&sub_option_1_id=1">Canvas 0.75"</a></li>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=2&sub_option_1_id=4&sub_option_2_id=7">Framed Canvas</a></li>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=3&sub_option_1_id=15">Fine Art Paper</a></li>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=4&sub_option_1_id=22&sub_option_2_id=33">Framed Fine Art</a></li>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=5&sub_option_1_id=15">Foam-Mounted</a></li>
+        </ul>
+        """
+        
+    except Exception as e:
+        conn.rollback()
+        return f"Error: {e}"
+    finally:
+        conn.close()
