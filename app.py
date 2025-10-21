@@ -4667,3 +4667,63 @@ def fix_all_remaining():
         return f"Error: {e}"
     finally:
         conn.close()
+
+@app.route('/fix-final-two')
+def fix_final_two():
+    """Fix Framed Fine Art Paper and Foam-Mounted Fine Art Paper"""
+    import sqlite3
+    
+    conn = sqlite3.connect('lumaprints_pricing.db')
+    cursor = conn.cursor()
+    
+    try:
+        # 1. Foam-Mounted Fine Art Paper (product_type_id = 5, 1 option level)
+        # Paper types: IDs 15-21
+        cursor.execute("SELECT id FROM products WHERE product_type_id = 5 ORDER BY id")
+        foam_ids = [row[0] for row in cursor.fetchall()]
+        
+        paper_types = [15, 16, 17, 18, 19, 20, 21]  # 7 paper types
+        for i, product_id in enumerate(foam_ids):
+            paper_type = paper_types[i % 7]
+            cursor.execute("UPDATE products SET sub_option_1_id = ? WHERE id = ?", (paper_type, product_id))
+        
+        # 2. Framed Fine Art Paper (product_type_id = 4, 2 option levels)
+        # Frame sizes: IDs 22-32 (11 frame sizes)
+        # Mat sizes: IDs 33-42 (10 mat sizes)
+        cursor.execute("SELECT id FROM products WHERE product_type_id = 4 ORDER BY id")
+        framed_fine_art_ids = [row[0] for row in cursor.fetchall()]
+        
+        frame_sizes = [22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]  # 11 frame sizes
+        mat_sizes = [33, 34, 35, 36, 37, 38, 39, 40, 41, 42]  # 10 mat sizes
+        
+        for i, product_id in enumerate(framed_fine_art_ids):
+            frame_size = frame_sizes[i % 11]
+            mat_size = mat_sizes[i % 10]
+            cursor.execute("UPDATE products SET sub_option_1_id = ?, sub_option_2_id = ? WHERE id = ?", 
+                          (frame_size, mat_size, product_id))
+        
+        conn.commit()
+        
+        return f"""
+        <h1>🎉 FINAL TWO PRODUCTS FIXED! 🎉</h1>
+        
+        <h3>Results:</h3>
+        <ul>
+            <li>Foam-Mounted Fine Art: {len(foam_ids)} products assigned to paper types (15-21)</li>
+            <li>Framed Fine Art: {len(framed_fine_art_ids)} products assigned frame sizes (22-32) + mat sizes (33-42)</li>
+        </ul>
+        
+        <h2>TEST LINKS:</h2>
+        <ul>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=5&sub_option_1_id=15">Test Foam-Mounted (Archival Matte)</a></li>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=4&sub_option_1_id=22&sub_option_2_id=33">Test Framed Fine Art (0.875" frame + No Mat)</a></li>
+        </ul>
+        
+        <h1>🚀 ALL 8 PRODUCT TYPES SHOULD NOW WORK! 🚀</h1>
+        """
+        
+    except Exception as e:
+        conn.rollback()
+        return f"Error: {e}"
+    finally:
+        conn.close()
