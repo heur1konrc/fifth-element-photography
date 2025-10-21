@@ -4858,6 +4858,24 @@ def fix_foam_mounted_final():
 
 
 
+@app.route('/debug-framed-fine-art')
+def debug_framed_fine_art():
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT id, name, sub_option_1_id, sub_option_2_id 
+        FROM products 
+        WHERE product_type_id=4 AND sub_option_1_id=23
+        LIMIT 50
+    """)
+    products = cursor.fetchall()
+    result = "<h1>Framed Fine Art Products with 1.25\" frame (sub_option_1_id=23)</h1>"
+    result += f"<p>Found {len(products)} products</p><ul>"
+    for p in products:
+        result += f"<li>ID: {p[0]}, Name: {p[1]}, sub_option_1_id: {p[2]}, sub_option_2_id: {p[3]}</li>"
+    result += "</ul>"
+    return result
+
 @app.route('/fix-all-product-mappings')
 def fix_all_product_mappings():
     """Fix ALL product sub_option mappings for the hierarchical wizard"""
