@@ -4194,7 +4194,9 @@ def debug_sizes():
     
     try:
         # Get database connection
-        conn = get_db_connection()
+        import sqlite3
+        conn = sqlite3.connect('lumaprints_pricing.db')
+        conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
         # Get the same data as the API
@@ -4213,10 +4215,10 @@ def debug_sizes():
         products = cursor.fetchall()
         
         # Also get markup percentage
-        markup_query = "SELECT markup_percentage FROM settings WHERE id = 1"
+        markup_query = "SELECT value FROM settings WHERE key_name = 'global_markup_percentage'"
         cursor.execute(markup_query)
         markup_result = cursor.fetchone()
-        markup_percentage = markup_result[0] if markup_result else 100.0
+        markup_percentage = float(markup_result['value']) if markup_result else 150.0
         
         cursor.close()
         conn.close()
@@ -4249,16 +4251,18 @@ def debug_sizes():
         """
         
         for product in products:
+            # Calculate customer price like the API does
+            customer_price = product['cost_price'] * (markup_percentage / 100)
             html += f"""
             <tr>
-                <td style="padding: 10px;">{product[0]}</td>
-                <td style="padding: 10px;">{product[1]}</td>
-                <td style="padding: 10px;">{product[2]}</td>
-                <td style="padding: 10px;">${product[3]}</td>
-                <td style="padding: 10px;">${product[4]}</td>
-                <td style="padding: 10px;">{product[5]}</td>
-                <td style="padding: 10px;">{product[6]}</td>
-                <td style="padding: 10px;">{product[7]}</td>
+                <td style="padding: 10px;">{product['id']}</td>
+                <td style="padding: 10px;">{product['name']}</td>
+                <td style="padding: 10px;">{product['size']}</td>
+                <td style="padding: 10px;">${product['cost_price']}</td>
+                <td style="padding: 10px;">${customer_price:.2f}</td>
+                <td style="padding: 10px;">{product['category_name']}</td>
+                <td style="padding: 10px;">{product['sub_option_1_id']}</td>
+                <td style="padding: 10px;">{product['sub_option_2_id']}</td>
             </tr>
             """
         
@@ -4274,12 +4278,12 @@ def debug_sizes():
             "markup_percentage": markup_percentage,
             "products": [
                 {
-                    "id": p[0],
-                    "name": p[1],
-                    "size": p[2],
-                    "cost_price": float(p[3]),
-                    "customer_price": float(p[4]),
-                    "category_name": p[5]
+                    "id": p['id'],
+                    "name": p['name'],
+                    "size": p['size'],
+                    "cost_price": float(p['cost_price']),
+                    "customer_price": float(p['cost_price'] * (markup_percentage / 100)),
+                    "category_name": p['category_name']
                 }
                 for p in products
             ],
