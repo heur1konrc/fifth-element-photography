@@ -556,6 +556,12 @@ class HierarchicalOrderingSystem {
             const container = document.getElementById(containerId);
             if (container) {
                 container.innerHTML = html;
+                container.style.display = 'block';
+                // Hide the loading message
+                const loadingElement = document.getElementById(containerId.replace('-content', '-loading'));
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
             }
         });
     }
@@ -597,6 +603,12 @@ class HierarchicalOrderingSystem {
             const container = document.getElementById(containerId);
             if (container) {
                 container.innerHTML = html;
+                container.style.display = 'block';
+                // Hide the loading message
+                const loadingElement = document.getElementById(containerId.replace('-content', '-loading'));
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
             }
         });
     }
