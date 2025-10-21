@@ -4375,9 +4375,16 @@ def fix_white_id():
         # APPLY SUB-OPTION FIX FOR ALL PRODUCT TYPES
         updates = []
         
-        # Canvas Prints (product_type_id = 1) -> sub_option_1_id = 1
-        cursor.execute("UPDATE products SET sub_option_1_id = 1 WHERE product_type_id = 1 AND active = 1")
-        updates.append(f"Canvas Prints: {cursor.rowcount} products updated")
+        # Canvas Prints (product_type_id = 1) -> Distribute across all mounting options
+        cursor.execute("SELECT id FROM products WHERE product_type_id = 1 AND active = 1 ORDER BY id")
+        canvas_products = cursor.fetchall()
+        canvas_count = 0
+        for i, (product_id,) in enumerate(canvas_products):
+            # Cycle through mounting options: 1, 2, 3, 1, 2, 3, ...
+            sub_option_id = (i % 3) + 1
+            cursor.execute("UPDATE products SET sub_option_1_id = ? WHERE id = ?", (sub_option_id, product_id))
+            canvas_count += 1
+        updates.append(f"Canvas Prints: {canvas_count} products updated")
         
         # Fine Art Paper Prints (product_type_id = 3) -> sub_option_1_id = 49
         cursor.execute("UPDATE products SET sub_option_1_id = 49 WHERE product_type_id = 3 AND active = 1")
