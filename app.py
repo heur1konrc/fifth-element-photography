@@ -4946,35 +4946,39 @@ def fix_all_product_mappings():
         cursor.execute("UPDATE products SET sub_option_1_id=23, sub_option_2_id=33 WHERE product_type_id=4 AND name LIKE '%1.25\" No Mat%'")
         results.append(f"Framed Fine Art 1.25\" No Mat: {cursor.rowcount} products")
         
-        # Import missing Framed Fine Art products (6 frames × 8 papers × 32 sizes)
+        # Import missing Framed Fine Art products (6 frames × 5 mats × 8 papers × sizes)
         FRAME_STYLES = [
             (105001, 22, "Black"), (105002, 22, "White"), (105003, 22, "Oak"),
             (105005, 23, "Black"), (105006, 23, "White"), (105007, 23, "Oak")
+        ]
+        MAT_SIZES = [
+            (64, 33, "No Mat"), (66, 66, "1.5\""), (67, 67, "2.0\""), 
+            (68, 68, "2.5\""), (69, 69, "3.0\"")
         ]
         PAPER_TYPES = [(74, "Archival Matte"), (75, "Hot Press"), (76, "Cold Press"), 
                        (77, "Metallic"), (78, "Semi-Glossy"), (79, "Glossy"), 
                        (80, "Semi-Matte"), (82, "Somerset Velvet")]
         SIZES = ["5×7", "6×6", "8×8", "8×10", "8×12", "10×10", "11×14", "11×17",
                  "12×12", "12×16", "12×24", "12×36", "16×16", "16×20", "16×24", "16×32",
-                 "18×36", "20×20", "20×36", "20×40", "24×24", "24×30", "24×36", "24×40",
-                 "30×30", "30×32", "30×40", "32×48", "36×36", "36×48", "40×40", "40×60"]
+                 "18×36", "20×20", "20×36", "24×24", "24×30", "24×36"]
         
         imported = 0
-        for frame_id, wizard_id, color in FRAME_STYLES:
-            for paper_id, paper_name in PAPER_TYPES:
-                for size in SIZES:
-                    name = f"Framed Fine Art {color} No Mat {paper_name} {size}\""
-                    cursor.execute("SELECT id FROM products WHERE name=?", (name,))
-                    if not cursor.fetchone():
-                        area = int(size.split('×')[0]) * int(size.split('×')[1])
-                        price = 20.0 if area <= 50 else (25.0 if area <= 100 else (35.0 if area <= 200 else (50.0 if area <= 400 else (75.0 if area <= 800 else 100.0))))
-                        cursor.execute("""
-                            INSERT INTO products (name, product_type_id, category_id, size, cost_price,
-                                                sub_option_1_id, sub_option_2_id, lumaprints_subcategory_id,
-                                                lumaprints_options, active)
-                            VALUES (?, 4, 4, ?, ?, ?, 33, ?, ?, 1)
-                        """, (name, size, price, wizard_id, frame_id, json.dumps({"mat_size": 64, "paper_type": paper_id})))
-                        imported += 1
+        for frame_id, wizard_frame_id, color in FRAME_STYLES:
+            for mat_luma_id, wizard_mat_id, mat_name in MAT_SIZES:
+                for paper_id, paper_name in PAPER_TYPES:
+                    for size in SIZES:
+                        name = f"Framed Fine Art {color} {mat_name} Mat {paper_name} {size}\""
+                        cursor.execute("SELECT id FROM products WHERE name=?", (name,))
+                        if not cursor.fetchone():
+                            area = int(size.split('×')[0]) * int(size.split('×')[1])
+                            price = 20.0 if area <= 50 else (25.0 if area <= 100 else (35.0 if area <= 200 else (50.0 if area <= 400 else (75.0 if area <= 800 else 100.0))))
+                            cursor.execute("""
+                                INSERT INTO products (name, product_type_id, category_id, size, cost_price,
+                                                    sub_option_1_id, sub_option_2_id, lumaprints_subcategory_id,
+                                                    lumaprints_options, active)
+                                VALUES (?, 4, 4, ?, ?, ?, ?, ?, ?, 1)
+                            """, (name, size, price, wizard_frame_id, wizard_mat_id, frame_id, json.dumps({"mat_size": mat_luma_id, "paper_type": paper_id})))
+                            imported += 1
         results.append(f"Imported {imported} new Framed Fine Art products")
         
         # Clean up unused Framed Fine Art frame sizes (keep only 0.875" and 1.25")
