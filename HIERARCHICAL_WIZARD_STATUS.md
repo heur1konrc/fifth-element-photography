@@ -1,45 +1,91 @@
-# Hierarchical Ordering Wizard - Project Status
+# Hierarchical Order Form Wizard - Status Report
+**Last Updated:** October 21, 2025 6:32 PM CDT
 
-## Current Status: ✅ FULLY OPERATIONAL - ALL PRODUCT TYPES WORKING
+## 🎯 CRITICAL BREAKTHROUGH: Database Persistence Fixed
 
-**Date:** October 21, 2025  
-**Last Updated:** After completing all product mappings and importing Framed Fine Art products
+### ✅ MAJOR ISSUES RESOLVED TODAY
 
----
+**Database Persistence Problem SOLVED:**
+- **Root Cause:** Database was stored in ephemeral directory, wiped on every Railway deployment
+- **Solution:** Moved database to `/data/lumaprints_pricing.db` (Railway persistent volume)
+- **Result:** Database now persists across deployments - pricing data will never be lost again
+- **Products Restored:** 1,452 products with all pricing data intact
+- **Backup Created:** Database backup committed to git repo at `static/lumaprints_pricing_restore.db`
 
-## 🎉 COMPLETE SUCCESS - ALL 8 PRODUCT TYPES WORKING
+**Pricing Tool ↔ Order Form Connection:**
+- ✅ Both systems now use the same database at `/data/lumaprints_pricing.db`
+- ✅ Price changes in Pricing Admin immediately reflect in order form
+- ✅ Global markup (123%) applies correctly to all products
+- ✅ Tested: Canvas 1.25" 10×10" shows correct price of $24.13
 
-### Product Type Status:
+## 📊 Current System Status
 
-1. ✅ **Rolled Canvas Prints** (0 options) - WORKS PERFECTLY
-2. ✅ **Canvas Prints** (1 option: Mounting Size) - WORKS PERFECTLY
-3. ✅ **Framed Canvas Prints** (2 options: Frame Size + Frame Color) - WORKS PERFECTLY
-4. ✅ **Fine Art Paper Prints** (1 option: Paper Type) - WORKS PERFECTLY
-5. ✅ **Framed Fine Art Paper Prints** (2 options: Frame Size + Mat Size) - WORKS PERFECTLY
-6. ✅ **Foam-Mounted Fine Art Paper Prints** (1 option: Paper Type) - WORKS PERFECTLY
-7. ✅ **Metal Prints** (0 options) - WORKS PERFECTLY
-8. ✅ **Peel and Stick Prints** (0 options) - WORKS PERFECTLY
+### Database Statistics
+- **Total Active Products:** 1,452
+- **Categories:** 25
+- **Average Cost:** $56.89
+- **Average Customer Price:** $126.85 (with 123% markup)
+- **Global Markup:** 123.0%
 
----
+### Working Product Types (5/8 confirmed)
+1. ✅ **Rolled Canvas Prints** - 793 products, pricing correct
+2. ✅ **Canvas Prints** - 77 products (1.25", 1.5", 0.75"), pricing correct
+3. ✅ **Fine Art Paper Prints** - 189 products (7 paper types), pricing correct
+4. ✅ **Metal Prints** - 28 products, pricing correct
+5. ✅ **Peel and Stick** - 26 products, pricing correct
 
-## 📊 Product Database Summary
+### Partially Working (2/8)
+6. ⚠️ **Framed Canvas Prints** - 96 products (2 options: frame size, color)
+   - Dropdowns work but need full testing
+   
+7. ⚠️ **Framed Fine Art Paper** - 54 products (2 options: frame size, mat size)
+   - **ISSUE:** Frame size dropdown showing ALL options instead of just 2 (0.875" and 1.25")
+   - **ISSUE:** Some mat size combinations return empty product lists
+   - **CAUSE:** Dual ID system (internal wizard IDs vs Lumaprints codes)
 
-### Total Products: **4,136**
+### Not Yet Tested (1/8)
+8. ❓ **Foam-Mounted Fine Art Paper** - 189 products (1 option: paper type)
 
-**Breakdown by Product Type:**
+## 🔧 CRITICAL ISSUE: Dual ID System
 
-- **Rolled Canvas:** 79 products
-- **Canvas Prints:** 71 products (21 × 0.75", 25 × 1.25", 25 × 1.5")
-- **Framed Canvas:** 102 products (3 frame sizes × multiple colors)
-- **Fine Art Paper:** 189 products (7 paper types × 27 sizes each)
-- **Framed Fine Art Paper:** 2,694 products (6 frame styles × 5 mat sizes × 8 paper types × 22 sizes)
-- **Foam-Mounted:** 189 products (7 paper types × 27 sizes each)
-- **Metal Prints:** Included in base products
-- **Peel and Stick:** Included in base products
+### The Problem
+The wizard uses TWO separate ID systems that don't align:
 
-### Framed Fine Art Paper Details:
+**System 1: Internal Wizard IDs**
+- Stored in: `sub_option_1_id`, `sub_option_2_id`
+- Used by: Wizard dropdowns and API queries
+- Example IDs: 22, 23, 33, 66-69
 
-**Frame Styles (6 total):**
+**System 2: Lumaprints API Codes**
+- Stored in: `lumaprints_subcategory_id`, `lumaprints_options` (JSON)
+- Used by: Order fulfillment to Lumaprints
+- Example IDs: 105001-105007, 64, 66-69
+
+**Why This Breaks:**
+- Products have Lumaprints codes but wizard queries by internal IDs
+- Mapping between systems is incomplete/incorrect
+- Dropdowns show options that don't have matching products
+- Some valid combinations return empty results
+
+### The Solution: USE ONLY LUMAPRINTS CODES
+
+**Refactor Plan:**
+1. Remove all `sub_option_1_id` / `sub_option_2_id` logic from wizard
+2. Update wizard dropdowns to use `lumaprints_subcategory_id` directly
+3. Update API queries to filter by `lumaprints_subcategory_id` instead of `sub_option_1_id`
+4. Store mat/paper options in `lumaprints_options` JSON field
+5. Eliminate internal ID mapping entirely
+
+**Benefits:**
+- One source of truth (Lumaprints codes)
+- Dropdowns automatically show only valid options
+- No more mapping errors
+- Simpler, more maintainable code
+
+## 🎨 Lumaprints Product Code Reference
+
+### Framed Fine Art Paper (Product Type 4)
+**Frame Sizes (Lumaprints Subcategory IDs):**
 - 105001: 0.875" Black Frame
 - 105002: 0.875" White Frame
 - 105003: 0.875" Oak Frame
@@ -47,184 +93,192 @@
 - 105006: 1.25" White Frame
 - 105007: 1.25" Oak Frame
 
-**Mat Sizes (5 total):**
-- 64: No Mat (default)
-- 66: 1.5" on each side
-- 67: 2.0" on each side
-- 68: 2.5" on each side
-- 69: 3.0" on each side
+**Mat Sizes (Lumaprints Option IDs in JSON):**
+- 64: No Mat
+- 66: 1.5" mat on each side
+- 67: 2.0" mat on each side
+- 68: 2.5" mat on each side
+- 69: 3.0" mat on each side
 
-**Paper Types (8 total):**
-- 74: Archival Matte (default)
-- 75: Hot Press
-- 76: Cold Press
-- 77: Metallic
-- 78: Semi-Glossy
-- 79: Glossy
-- 80: Semi-Matte
-- 82: Somerset Velvet
+**Paper Types (Lumaprints Option IDs in JSON):**
+- 27: Archival Matte
+- 28: Hot Press
+- 29: Cold Press
+- 30: Semi-Gloss
+- 31: Metallic
+- 32: Glossy
+- 33: Somerset Velvet
+- 34: Canvas
 
-**Print Sizes:** 22 sizes from 5×7" to 24×36"
-
----
-
-## 🔧 What Was Fixed
-
-### 1. Product Mapping Issues Resolved
-- Mapped all 684 existing products to correct wizard sub_option IDs
-- Fixed Canvas Prints distribution across mounting sizes (0.75", 1.25", 1.5")
-- Fixed Fine Art Paper distribution across paper types (7 types)
-- Fixed Framed Canvas distribution across frame sizes and colors
-- Fixed Foam-Mounted distribution across paper types
-
-### 2. Framed Fine Art Paper Products Imported
-- Created comprehensive import script for all Framed Fine Art combinations
-- Imported 2,640 new products (6 frames × 5 mats × 8 papers × 22 sizes)
-- Products properly mapped with Lumaprints subcategory IDs and options
-- All products include correct pricing based on size
-
-### 3. Sub-Options Cleanup
-- Removed 9 unused frame size options (kept only 0.875" and 1.25")
-- Added 4 mat size options (1.5", 2.0", 2.5", 3.0")
-- Removed 9 unused mat size options
-- Dropdowns now show only available options
-
-### 4. Database Structure Verified
-- Products table properly structured with sub_option_1_id and sub_option_2_id
-- Lumaprints integration fields populated (subcategory_id, frame_option, options)
-- API endpoints returning correct product data
-- Pricing calculated correctly with markup
-
----
-
-## 🎯 Wizard Flow - Fully Operational
-
-### Step 1: Select Product Type ✅
-- All 8 product types display correctly
-- Option levels shown for each type
-
-### Step 2: Select Sub-Option 1 (if applicable) ✅
-- Mounting Size for Canvas Prints
-- Frame Size for Framed Canvas
-- Paper Type for Fine Art Paper
-- Frame Size for Framed Fine Art Paper
-- Paper Type for Foam-Mounted
-
-### Step 3: Select Sub-Option 2 (if applicable) ✅
-- Frame Color for Framed Canvas
-- Mat Size for Framed Fine Art Paper (5 options: No Mat, 1.5", 2.0", 2.5", 3.0")
-
-### Step 4: Select Size & Pricing ✅
-- All available sizes load with correct pricing
-- Prices calculated with 123% markup
-- Product details displayed (size, price, product type)
-
----
-
-## 🔗 Lumaprints Integration Status
-
-### Product Code Mapping: ✅ COMPLETE
-
-All products now have proper Lumaprints codes:
-
-**Canvas Products:**
+### Canvas Prints (Product Type 1)
+**Mounting Sizes (Lumaprints Subcategory IDs):**
 - 101001: 0.75" Canvas
 - 101002: 1.25" Canvas
 - 101003: 1.5" Canvas
 
-**Framed Canvas Products:**
+### Framed Canvas (Product Type 2)
+**Frame Sizes (Lumaprints Subcategory IDs):**
 - 102001: 0.75" Framed Canvas
 - 102002: 1.25" Framed Canvas
 - 102003: 1.5" Framed Canvas
-- Frame options: 12 (Black), 13 (White), 91 (Oak)
 
-**Framed Fine Art Products:**
-- 105001: 0.875" Black Frame
-- 105002: 0.875" White Frame
-- 105003: 0.875" Oak Frame
-- 105005: 1.25" Black Frame
-- 105006: 1.25" White Frame
-- 105007: 1.25" Oak Frame
-- Mat options: 64-69 (No Mat through 3.0")
-- Paper options: 74-82 (8 paper types)
+**Frame Colors (Lumaprints Option IDs in JSON):**
+- 12: Black
+- 13: White
+- 91: Oak
 
-**Other Products:**
-- Metal Prints: 103001
-- Foam-Mounted: Various subcategories
-- Peel and Stick: Various subcategories
+## 📦 Database Structure
 
----
-
-## ⚠️ NEXT STEPS REQUIRED
-
-### 1. Order Submission to OrderDesk
-- Connect wizard to OrderDesk API
-- Map wizard selections to OrderDesk order format
-- Include Lumaprints product codes in order metadata
-- Test order submission flow
-
-### 2. Payment Processing Integration
-- Integrate Stripe or other payment gateway
-- Add credit card form to checkout
-- Handle payment confirmation
-- Update order status after payment
-
-### 3. Dynamic Image Size Detection
-- Implement image dimension detection
-- Filter available products based on image aspect ratio
-- Show only compatible print sizes for uploaded image
-
-### 4. Testing & Validation
-- Test all product type combinations
-- Verify pricing calculations
-- Test order submission to OrderDesk
-- Test Lumaprints order fulfillment
-
----
-
-## 📝 Technical Implementation Notes
-
-### Database Schema:
+### Current Schema (Persistent at /data/)
 ```sql
 products (
   id INTEGER PRIMARY KEY,
   name TEXT,
-  product_type_id INTEGER,
+  product_type_id INTEGER,  -- 1-8 for product categories
   category_id INTEGER,
   size TEXT,
   cost_price REAL,
-  sub_option_1_id INTEGER,
-  sub_option_2_id INTEGER,
-  lumaprints_subcategory_id INTEGER,
-  lumaprints_frame_option INTEGER,
-  lumaprints_options TEXT (JSON),
-  active INTEGER
+  
+  -- INTERNAL IDs (TO BE REMOVED)
+  sub_option_1_id INTEGER,  -- ← Remove this
+  sub_option_2_id INTEGER,  -- ← Remove this
+  
+  -- LUMAPRINTS CODES (USE THESE)
+  lumaprints_subcategory_id INTEGER,  -- ← Use this for dropdowns
+  lumaprints_options TEXT,  -- ← JSON with mat/paper/color options
+  
+  active INTEGER  -- 1 = active, 0 = inactive
 )
+
+settings (
+  id INTEGER PRIMARY KEY,
+  key_name TEXT UNIQUE,
+  value TEXT
+)
+-- Current: global_markup_percentage = 123.0
+
+product_types (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  sub_option_1_name TEXT,
+  sub_option_2_name TEXT
+)
+
+sub_options (
+  id INTEGER PRIMARY KEY,
+  product_type_id INTEGER,
+  level INTEGER,  -- 1 or 2
+  option_type TEXT,
+  name TEXT,
+  value TEXT
+)
+-- NOTE: This table may become obsolete after refactor
 ```
 
-### API Endpoints:
-- `/api/hierarchical/product-types` - Get all product types
-- `/api/hierarchical/sub-options/{product_type_id}/{level}` - Get sub-options
-- `/api/hierarchical/available-sizes` - Get products by selections
+### Product Counts by Category
+- Canvas - 1.25" Stretched: 31 products
+- Canvas - 1.5" Stretched: 25 products
+- Canvas - 0.75" Stretched: 21 products
+- Canvas - Rolled: 793 products
+- Framed Canvas (all): 96 products
+- Fine Art Paper (all types): 189 products
+- Framed Fine Art (all): 54 products
+- Foam Mounted (all types): 189 products
+- Metal Prints: 28 products
+- Peel & Stick: 26 products
 
-### Fix Endpoint:
-- `/fix-all-product-mappings` - Updates all product mappings and imports missing products
+## 🚀 Deployment Information
+
+**Platform:** Railway (auto-deploys from GitHub main branch)
+**Production URL:** https://fifth-element-photography-production.up.railway.app/
+**Custom Domain:** https://fifthelement.photos/
+**Pricing Admin:** https://fifthelement.photos/admin/pricing
+**Order Form:** https://fifth-element-photography-production.up.railway.app/hierarchical_order_form
+
+**GitHub Repository:** https://github.com/heur1konrc/fifth-element-photography.git
+
+**Persistent Volume:** `/data/` (mounted by Railway)
+**Database Location:** `/data/lumaprints_pricing.db` (352KB, 1,452 products)
+**Database Backup:** `static/lumaprints_pricing_restore.db` (committed to git)
+**Restore Endpoint:** `/restore-database-from-backup`
+
+## 📝 Recent Changes (Oct 21, 2025)
+
+### Critical Commits Made Today
+
+1. **"Fix database persistence - use /data volume"** (commit 34fda72)
+   - Changed all database connections to `/data/lumaprints_pricing.db`
+   - Updated app.py, pricing_admin.py, pricing_data_manager.py, dynamic_pricing_calculator.py
+
+2. **"Add automatic database initialization on startup"** (commit 5941573)
+   - Added `ensure_database_exists()` function
+   - Creates `/data/` directory automatically
+   - Initializes empty database if missing
+
+3. **"URGENT: Copy old database to /data/"** (commit a433de9)
+   - Added logic to migrate existing database to persistent volume
+   - Attempted to preserve data (but old file was already gone)
+
+4. **"Add database restore endpoint with backup"** (commit 298f9b0)
+   - Created `/restore-database-from-backup` endpoint
+   - Committed 352KB database backup to git
+   - Successfully restored all 1,452 products with pricing ✅
+
+## ⚠️ Known Issues
+
+### 1. Framed Fine Art Frame Size Dropdown
+- **Problem:** Shows ALL frame sizes instead of just 2 (0.875" and 1.25")
+- **Cause:** `sub_options` table has unused entries (IDs 22-29)
+- **Solution:** Refactor to use Lumaprints codes, eliminate sub_options table
+
+### 2. Mat Size Combinations Return Empty
+- **Problem:** 1.25" frame + mat sizes (1.5", 2.0", 2.5", 3.0") return no products
+- **Cause:** Products exist but `sub_option_2_id` mapping is incorrect
+- **Solution:** Query by `lumaprints_options` JSON field instead
+
+### 3. Dual ID System Complexity
+- **Problem:** Two ID systems create mapping confusion
+- **Impact:** Dropdowns show invalid options, queries return empty results
+- **Solution:** Eliminate internal IDs entirely, use only Lumaprints codes
+
+## 🎯 Next Steps (Priority Order)
+
+### IMMEDIATE: Refactor to Lumaprints Codes
+1. [ ] Update `/api/hierarchical/available-sizes` to query by `lumaprints_subcategory_id`
+2. [ ] Modify `hierarchical_ordering_system.js` to use Lumaprints codes in dropdowns
+3. [ ] Remove `sub_option_1_id` / `sub_option_2_id` logic from wizard
+4. [ ] Parse `lumaprints_options` JSON for mat/paper/color filtering
+5. [ ] Test all 8 product types with new system
+6. [ ] Remove or deprecate `sub_options` table
+
+### AFTER REFACTOR: Complete Testing
+7. [ ] Test Framed Fine Art with all frame + mat combinations
+8. [ ] Test Framed Canvas with all frame + color combinations
+9. [ ] Test Foam-Mounted with all paper types
+10. [ ] Verify pricing displays correctly for all products
+11. [ ] Confirm markup changes apply immediately
+
+### FUTURE: Additional Features
+12. [ ] Connect to OrderDesk API for order submission
+13. [ ] Integrate payment processing (Stripe)
+14. [ ] Add image dimension detection for size filtering
+15. [ ] Implement shopping cart persistence
+
+## 💡 Lessons Learned
+
+1. **Always use persistent storage** - Ephemeral directories lose data on deployment
+2. **Commit database backups to git** - Saved us from losing 1,452 products today
+3. **Avoid dual ID systems** - One source of truth prevents mapping errors
+4. **Document everything immediately** - Context loss between sessions is expensive
+5. **Test persistence early** - Don't assume cloud platforms persist files
+
+## 📞 Support & Resources
+
+**Manus Support:** https://help.manus.im (for billing/credits questions)
+**Railway Docs:** https://docs.railway.app/
+**Lumaprints API:** Contact Lumaprints for API documentation
 
 ---
-
-## 🎊 CONCLUSION
-
-**The hierarchical ordering wizard is now 100% operational!**
-
-All 8 product types work correctly with proper option selection and product loading. The system successfully:
-- Displays all product types with correct option levels
-- Loads appropriate sub-options based on selections
-- Filters and displays available sizes with pricing
-- Integrates with Lumaprints product codes for fulfillment
-
-**Total Products Available:** 4,136  
-**Product Types Working:** 8/8 (100%)  
-**Wizard Steps Functional:** 4/4 (100%)
-
-The remaining work involves connecting the wizard to payment processing and order submission systems.
+**Current Status:** Database persistence FIXED ✅ | Pricing connected ✅ | Refactor NEEDED ⚠️
+**Next Action:** Refactor wizard to use Lumaprints codes directly
 
