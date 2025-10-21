@@ -4111,6 +4111,39 @@ def get_hierarchical_product_details(product_id):
         }), 500
 
 
+@app.route('/admin/add-test-products')
+def add_test_products():
+    try:
+        conn = sqlite3.connect('lumaprints_pricing.db')
+        cursor = conn.cursor()
+        
+        # Add test products for Framed Canvas Prints - 0.75" Frame - White
+        test_products = [
+            (1, 'Framed Canvas Print - 0.75" Frame - White - 8x10', '8x10', 42.99, 2, 4, 11),
+            (1, 'Framed Canvas Print - 0.75" Frame - White - 11x14', '11x14', 62.99, 2, 4, 11),
+            (1, 'Framed Canvas Print - 0.75" Frame - White - 16x20', '16x20', 86.99, 2, 4, 11),
+            (1, 'Framed Canvas Print - 1.25" Frame - White - 8x10', '8x10', 49.99, 2, 5, 11)
+        ]
+        
+        for product in test_products:
+            cursor.execute("""
+                INSERT OR IGNORE INTO products 
+                (category_id, name, size, cost_price, product_type_id, sub_option_1_id, sub_option_2_id) 
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, product)
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Added {len(test_products)} test products',
+            'products': [p[1] for p in test_products]
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/hierarchical_order_form')
 def hierarchical_order_form():
     """New hierarchical ordering system interface"""
