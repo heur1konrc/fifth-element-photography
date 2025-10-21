@@ -294,8 +294,8 @@ class HierarchicalOrderingSystem {
 
     renderProductTypeDropdown() {
         return `
-            <select class="form-select" id="product-type-select" onchange="orderingSystem.selectProductType(this.value)">
-                <option value="">Choose Product Type...</option>
+            <select class="form-select" id="product-type-select" onchange="orderingSystem.selectProductType(this.value)" style="padding-right: 40px !important; background-position: right 12px center !important;">
+                <option value="">Select Type</option>
                 ${this.productTypes.map(type => `
                     <option value="${type.id}" ${this.currentSelections.productType?.id == type.id ? 'selected' : ''}>
                         ${type.name}
@@ -426,8 +426,8 @@ class HierarchicalOrderingSystem {
         } else {
             // Render as dropdown for technical options
             html = `
-                <select class="form-select" onchange="orderingSystem.selectSubOption1(this.value)">
-                    <option value="">Choose ${subOptions[0]?.name || 'Option'}...</option>
+                <select class="form-select" onchange="orderingSystem.selectSubOption1(this.value)" style="padding-right: 40px !important; background-position: right 12px center !important;">
+                    <option value="">Select ${subOptions[0]?.name || 'Option'}</option>
                     ${subOptions.map(option => `
                         <option value="${option.id}" ${this.currentSelections.subOption1?.id == option.id ? 'selected' : ''}>
                             ${option.value}
@@ -470,8 +470,8 @@ class HierarchicalOrderingSystem {
         } else {
             // Render as dropdown for mat sizes and other technical options
             html = `
-                <select class="form-select" onchange="orderingSystem.selectSubOption2(this.value)">
-                    <option value="">Choose ${subOptions[0]?.name || 'Option'}...</option>
+                <select class="form-select" onchange="orderingSystem.selectSubOption2(this.value)" style="padding-right: 40px !important; background-position: right 12px center !important;">
+                    <option value="">Select ${subOptions[0]?.name || 'Option'}</option>
                     ${subOptions.map(option => `
                         <option value="${option.id}" ${this.currentSelections.subOption2?.id == option.id ? 'selected' : ''}>
                             ${option.value}
