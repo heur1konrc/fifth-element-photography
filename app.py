@@ -4193,6 +4193,10 @@ def debug_sizes():
     sub_option_2_id = request.args.get('sub_option_2_id', 11)  # White
     
     try:
+        # Get database connection
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
         # Get the same data as the API
         query = """
         SELECT p.id, p.name, p.size, p.cost_price, p.customer_price, 
@@ -4205,18 +4209,17 @@ def debug_sizes():
         ORDER BY p.customer_price
         """
         
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute(query, (product_type_id, sub_option_1_id, sub_option_2_id))
         products = cursor.fetchall()
-        cursor.close()
         
         # Also get markup percentage
         markup_query = "SELECT markup_percentage FROM settings WHERE id = 1"
-        cursor = mysql.connection.cursor()
         cursor.execute(markup_query)
         markup_result = cursor.fetchone()
         markup_percentage = markup_result[0] if markup_result else 100.0
+        
         cursor.close()
+        conn.close()
         
         # Format as readable HTML
         html = f"""
@@ -4248,14 +4251,14 @@ def debug_sizes():
         for product in products:
             html += f"""
             <tr>
-                <td style="padding: 10px;">{product['id']}</td>
-                <td style="padding: 10px;">{product['name']}</td>
-                <td style="padding: 10px;">{product['size']}</td>
-                <td style="padding: 10px;">${product['cost_price']}</td>
-                <td style="padding: 10px;">${product['customer_price']}</td>
-                <td style="padding: 10px;">{product['category_name']}</td>
-                <td style="padding: 10px;">{product['sub_option_1_id']}</td>
-                <td style="padding: 10px;">{product['sub_option_2_id']}</td>
+                <td style="padding: 10px;">{product[0]}</td>
+                <td style="padding: 10px;">{product[1]}</td>
+                <td style="padding: 10px;">{product[2]}</td>
+                <td style="padding: 10px;">${product[3]}</td>
+                <td style="padding: 10px;">${product[4]}</td>
+                <td style="padding: 10px;">{product[5]}</td>
+                <td style="padding: 10px;">{product[6]}</td>
+                <td style="padding: 10px;">{product[7]}</td>
             </tr>
             """
         
@@ -4271,12 +4274,12 @@ def debug_sizes():
             "markup_percentage": markup_percentage,
             "products": [
                 {
-                    "id": p['id'],
-                    "name": p['name'],
-                    "size": p['size'],
-                    "cost_price": float(p['cost_price']),
-                    "customer_price": float(p['customer_price']),
-                    "category_name": p['category_name']
+                    "id": p[0],
+                    "name": p[1],
+                    "size": p[2],
+                    "cost_price": float(p[3]),
+                    "customer_price": float(p[4]),
+                    "category_name": p[5]
                 }
                 for p in products
             ],
