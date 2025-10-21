@@ -344,6 +344,11 @@ class HierarchicalOrderingSystem {
         console.log('canShowSizes:', this.canShowSizes());
         console.log('currentSelections:', this.currentSelections);
         
+        // Force load sizes immediately when step 4 renders
+        if (this.canShowSizes()) {
+            setTimeout(() => this.loadAvailableSizes(), 100);
+        }
+        
         // Always show the step, but content depends on canShowSizes
         return `
             <h4>Select Size</h4>
