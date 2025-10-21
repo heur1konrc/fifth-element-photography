@@ -4214,6 +4214,19 @@ def fix_test_products_route():
 
 @app.route('/debug/sizes')
 def debug_sizes():
+    """Debug endpoint to show available sizes data - now includes fix option"""
+    # Check if fix should be applied
+    apply_fix = request.args.get('apply_fix', 'false').lower() == 'true'
+    
+    if apply_fix:
+        from simple_sub_option_fix import apply_simple_sub_option_fix
+        fix_result = apply_simple_sub_option_fix()
+        if fix_result['success']:
+            return f"<h2>Sub-Option Fix Applied!</h2><p>{fix_result['message']}</p><ul>" + "".join([f"<li>{update}</li>" for update in fix_result['updates']]) + "</ul><p><a href='/debug/sizes'>Test sizes now</a></p>"
+        else:
+            return f"<h2>Fix Failed:</h2><p>{fix_result['error']}</p>"
+    
+    # Original debug_sizes function continues below
     """Debug endpoint to show available sizes data"""
     product_type_id = request.args.get('product_type_id', 2)
     sub_option_1_id = request.args.get('sub_option_1_id', 4)  # 0.75" Frame
