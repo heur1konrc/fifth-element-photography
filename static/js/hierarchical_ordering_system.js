@@ -98,11 +98,9 @@ class HierarchicalOrderingSystem {
     renderInterface() {
         const container = document.getElementById('ordering-container');
         
-        if (this.isMobile) {
-            this.renderMobileWizard(container);
-        } else {
-            this.renderDesktopWithCards(container);
-        }
+        // Always use mobile wizard logic for proper step progression
+        // Container width is controlled by CSS instead of browser detection
+        this.renderMobileWizard(container);
         
         // Load data for current selections
         this.loadCurrentStepData();
@@ -381,7 +379,8 @@ class HierarchicalOrderingSystem {
         this.currentSelections.subOption2 = null;
         this.currentSelections.selectedProduct = null;
         
-        if (this.isMobile && productType) {
+        // Always advance to next step when product type is selected
+        if (productType) {
             this.currentStep = 2;
             this.maxSteps = 2 + productType.max_sub_option_levels;
         }
