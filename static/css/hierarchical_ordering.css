@@ -310,11 +310,55 @@
     }
 }
 
-@media (min-width: 769px) {
-    .mobile-wizard {
-        display: none;
-    }
+/* Desktop Card Interface */
+.desktop-card-interface .product-type-grid.desktop-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
+
+.desktop-card-interface .product-type-card {
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 25px 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.desktop-card-interface .product-type-card:hover {
+    border-color: #007bff;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.desktop-card-interface .product-type-card.selected {
+    border-color: #007bff;
+    background: #e3f2fd;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.25);
+}
+
+.desktop-card-interface .product-type-card h6 {
+    margin-bottom: 8px;
+    color: #495057;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.desktop-card-interface .product-type-card small {
+    color: #6c757d;
+    font-size: 13px;
+}
+
+/* Card-based interface is now used for all screen sizes for better UX */
+/* Removed mobile-only restriction to allow cards on desktop */
 
 /* Form Controls */
 .form-select {

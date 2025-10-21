@@ -101,7 +101,7 @@ class HierarchicalOrderingSystem {
         if (this.isMobile) {
             this.renderMobileWizard(container);
         } else {
-            this.renderDesktopHybrid(container);
+            this.renderDesktopWithCards(container);
         }
         
         // Load data for current selections
@@ -212,6 +212,75 @@ class HierarchicalOrderingSystem {
         `;
         
         container.innerHTML = hybridHTML;
+    }
+
+    renderDesktopWithCards(container) {
+        const cardHTML = `
+            <div class="desktop-card-interface">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="selection-panel">
+                            <h5>Select Product Type</h5>
+                            <div class="product-type-grid desktop-cards">
+                                ${this.productTypes.map(type => `
+                                    <div class="product-type-card ${this.currentSelections.productType?.id === type.id ? 'selected' : ''}" 
+                                         onclick="orderingSystem.selectProductType(${type.id})">
+                                        <h6>${type.name}</h6>
+                                        <small class="text-muted">${type.max_sub_option_levels} option levels</small>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                ${this.currentSelections.productType ? `
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="selection-panel">
+                            <h5>Options</h5>
+                            <div id="sub-option-1-container">
+                                ${this.renderSubOption1Panel()}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="selection-panel">
+                            <h5>Additional Options</h5>
+                            <div id="sub-option-2-container">
+                                ${this.shouldShowSubOption2() ? this.renderSubOption2Panel() : '<p class="text-muted">Additional options will appear here</p>'}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="selection-panel">
+                            <h5>Size & Pricing</h5>
+                            <div id="size-selection-container">
+                                ${this.canShowSizes() ? this.renderSizeSelection() : '<p class="text-muted">Complete your selections to see sizes</p>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+                
+                ${this.currentSelections.selectedProduct ? `
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="selection-summary">
+                            ${this.renderSelectionSummary()}
+                            <button class="btn btn-success btn-lg mt-3" onclick="addToCart()">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        `;
+        
+        container.innerHTML = cardHTML;
     }
 
     renderProductTypeStep() {
