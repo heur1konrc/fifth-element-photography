@@ -495,7 +495,13 @@ class HierarchicalOrderingSystem {
         if (!this.currentSelections.productType) return;
         
         try {
-            const url = `/api/hierarchical/available-sizes?product_type_id=${this.currentSelections.productType.id}&sub_option_1_id=${this.currentSelections.subOption1.id}&sub_option_2_id=${this.currentSelections.subOption2.id}`;
+            let url = `/api/hierarchical/available-sizes?product_type_id=${this.currentSelections.productType.id}`;
+            if (this.currentSelections.subOption1) {
+                url += `&sub_option_1_id=${this.currentSelections.subOption1.id}`;
+            }
+            if (this.currentSelections.subOption2) {
+                url += `&sub_option_2_id=${this.currentSelections.subOption2.id}`;
+            }
             console.log('DEBUG: Loading sizes from URL:', url);
             
             const response = await fetch(url);
