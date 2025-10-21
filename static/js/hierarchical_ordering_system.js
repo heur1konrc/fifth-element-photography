@@ -479,19 +479,20 @@ class HierarchicalOrderingSystem {
         try {
             let url = `/api/hierarchical/available-sizes?product_type_id=${this.currentSelections.productType.id}`;
             
-            if (this.currentSelections.subOption1) {
-                url += `&sub_option_1_id=${this.currentSelections.subOption1.id}`;
-            }
-            
-            if (this.currentSelections.subOption2) {
-                url += `&sub_option_2_id=${this.currentSelections.subOption2.id}`;
-            }
+            if (this.currentSelectio    async loadAvailableSizes() {
+        try {
+            const url = `/api/hierarchical/available-sizes?product_type_id=${this.currentSelections.productType.id}&sub_option_1_id=${this.currentSelections.subOption1.id}&sub_option_2_id=${this.currentSelections.subOption2.id}`;
+            console.log('DEBUG: Loading sizes from URL:', url);
             
             const response = await fetch(url);
             const data = await response.json();
+            console.log('DEBUG: API Response:', data);
             
             if (data.success) {
+                console.log('DEBUG: Calling renderSizeSelectionContent with', data.products.length, 'products');
                 this.renderSizeSelectionContent(data.products);
+            } else {
+                console.log('DEBUG: API returned success=false:', data);
             }
         } catch (error) {
             console.error('Error loading available sizes:', error);
@@ -581,7 +582,9 @@ class HierarchicalOrderingSystem {
     }
 
     renderSizeSelectionContent(products) {
+        console.log('DEBUG: renderSizeSelectionContent called with', products.length, 'products');
         const dropdown = document.getElementById('size-dropdown');
+        console.log('DEBUG: Found dropdown element:', dropdown);
         
         if (dropdown) {
             const options = `
@@ -590,7 +593,11 @@ class HierarchicalOrderingSystem {
                     <option value="${product.id}">${product.size} - $${product.customer_price} (${product.category_name})</option>
                 `).join('')}
             `;
+            console.log('DEBUG: Setting dropdown innerHTML to:', options);
             dropdown.innerHTML = options;
+            console.log('DEBUG: Dropdown updated successfully');
+        } else {
+            console.error('DEBUG: size-dropdown element not found!');
         }
     }
 
