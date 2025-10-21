@@ -4366,11 +4366,34 @@ def fix_canvas_sub_options():
 
 @app.route('/admin/fix-white-id')
 def fix_white_id():
-    """Fix test products to use correct White color ID (14)"""
+    """Fix test products to use correct White color ID (14) - NOW INCLUDES SUB-OPTION FIX"""
     try:
         import sqlite3
         conn = sqlite3.connect('lumaprints_pricing.db')
         cursor = conn.cursor()
+        
+        # APPLY SUB-OPTION FIX FOR ALL PRODUCT TYPES
+        updates = []
+        
+        # Canvas Prints (product_type_id = 1) -> sub_option_1_id = 1
+        cursor.execute("UPDATE products SET sub_option_1_id = 1 WHERE product_type_id = 1 AND active = 1")
+        updates.append(f"Canvas Prints: {cursor.rowcount} products updated")
+        
+        # Fine Art Paper Prints (product_type_id = 3) -> sub_option_1_id = 49
+        cursor.execute("UPDATE products SET sub_option_1_id = 49 WHERE product_type_id = 3 AND active = 1")
+        updates.append(f"Fine Art Paper: {cursor.rowcount} products updated")
+        
+        # Foam-Mounted Fine Art Paper Prints (product_type_id = 5) -> sub_option_1_id = 49
+        cursor.execute("UPDATE products SET sub_option_1_id = 49 WHERE product_type_id = 5 AND active = 1")
+        updates.append(f"Foam-Mounted: {cursor.rowcount} products updated")
+        
+        # Framed Canvas Prints (product_type_id = 2) -> both sub-options
+        cursor.execute("UPDATE products SET sub_option_1_id = 32, sub_option_2_id = 14 WHERE product_type_id = 2 AND active = 1")
+        updates.append(f"Framed Canvas: {cursor.rowcount} products updated")
+        
+        # Framed Fine Art Paper Prints (product_type_id = 4) -> both sub-options
+        cursor.execute("UPDATE products SET sub_option_1_id = 32, sub_option_2_id = 42 WHERE product_type_id = 4 AND active = 1")
+        updates.append(f"Framed Fine Art: {cursor.rowcount} products updated")
         
         # Update test products to use correct White ID (14 instead of 11)
         cursor.execute('UPDATE products SET sub_option_2_id = 14 WHERE id IN (681, 682, 683, 684)')
@@ -4383,10 +4406,16 @@ def fix_white_id():
         
         conn.close()
         
-        html = "<h2>Test Products Fixed for Correct White ID!</h2><table border='1'><tr><th>ID</th><th>Name</th><th>Size</th><th>Type</th><th>Sub1</th><th>Sub2</th></tr>"
+        html = "<h2>SUB-OPTION FIX APPLIED SUCCESSFULLY!</h2>"
+        html += "<h3>Updates Applied:</h3><ul>"
+        for update in updates:
+            html += f"<li>{update}</li>"
+        html += "</ul>"
+        html += "<h3>Test Products Fixed:</h3><table border='1'><tr><th>ID</th><th>Name</th><th>Size</th><th>Type</th><th>Sub1</th><th>Sub2</th></tr>"
         for row in results:
             html += f"<tr><td>{row[0]}</td><td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td>{row[4]}</td><td>{row[5]}</td></tr>"
-        html += "</table><p>All products now have sub_option_2_id = 14 (correct White ID)</p>"
+        html += "</table><p><strong>SIZE SELECTION SHOULD NOW WORK!</strong></p>"
+        html += "<p>Test Canvas: <a href='/api/hierarchical/available-sizes?product_type_id=1&sub_option_1_id=1'>Canvas Sizes API</a></p>"
         
         return html
         
