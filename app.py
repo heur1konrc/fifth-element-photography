@@ -4821,3 +4821,37 @@ def fix_everything_once():
         return f"Error: {e}"
     finally:
         conn.close()
+
+@app.route('/fix-foam-mounted-final')
+def fix_foam_mounted_final():
+    """Fix Foam-Mounted with correct sub-option IDs (43-49)"""
+    import sqlite3
+    
+    conn = sqlite3.connect('lumaprints_pricing.db')
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT id FROM products WHERE product_type_id = 5 ORDER BY id")
+        foam_ids = [row[0] for row in cursor.fetchall()]
+        
+        # Correct Foam-Mounted paper type IDs: 43-49
+        foam_paper_types = [43, 44, 45, 46, 47, 48, 49]  # 7 paper types
+        
+        for i, product_id in enumerate(foam_ids):
+            paper_type = foam_paper_types[i % 7]
+            cursor.execute("UPDATE products SET sub_option_1_id = ? WHERE id = ?", (paper_type, product_id))
+        
+        conn.commit()
+        
+        return f"""
+        <h1>🎉 FOAM-MOUNTED FIXED!</h1>
+        <p>Updated {len(foam_ids)} products with correct sub-option IDs (43-49)</p>
+        <h2>Test:</h2>
+        <a href="/api/hierarchical/available-sizes?product_type_id=5&sub_option_1_id=43">Test Foam-Mounted Archival Matte</a>
+        """
+        
+    except Exception as e:
+        conn.rollback()
+        return f"Error: {e}"
+    finally:
+        conn.close()
