@@ -4943,6 +4943,9 @@ def fix_all_product_mappings():
         cursor.execute("UPDATE products SET sub_option_1_id=22, sub_option_2_id=33 WHERE product_type_id=4 AND name LIKE '%0.875\" No Mat%'")
         results.append(f"Framed Fine Art 0.875\" No Mat: {cursor.rowcount} products")
         
+        cursor.execute("UPDATE products SET sub_option_1_id=23, sub_option_2_id=33 WHERE product_type_id=4 AND name LIKE '%1.25\" No Mat%'")
+        results.append(f"Framed Fine Art 1.25\" No Mat: {cursor.rowcount} products")
+        
         conn.commit()
         
         # Verify the fixes
