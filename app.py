@@ -4331,9 +4331,10 @@ def debug_sizes():
         return f"<h2>Debug Error:</h2><p>{str(e)}</p>"
 
 
-# Import migration and debug functions
+# Import migration, debug, and fix functions
 from migrate_sub_options import migrate_sub_options_route
 from debug_sub_options import debug_sub_options_route
+from fix_canvas_sub_options import fix_canvas_sub_options_route
 
 @app.route('/migrate-sub-options')
 def migrate_sub_options():
@@ -4344,6 +4345,11 @@ def migrate_sub_options():
 def debug_sub_options():
     """Debug route to check actual sub-option assignments in database"""
     return debug_sub_options_route()
+
+@app.route('/fix-canvas-sub-options')
+def fix_canvas_sub_options():
+    """Direct fix for Canvas products sub-option assignments"""
+    return fix_canvas_sub_options_route()
 
 @app.route('/admin/fix-white-id')
 def fix_white_id():
