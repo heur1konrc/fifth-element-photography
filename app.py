@@ -4022,11 +4022,19 @@ def get_hierarchical_sub_options(product_type_id, level):
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
+        # Get sub-options that actually have products
+        # This prevents showing options with no available products
         cursor.execute("""
-            SELECT id, option_type, name, value, image_path, display_order
-            FROM sub_options 
-            WHERE product_type_id = ? AND level = ? AND active = 1
-            ORDER BY display_order
+            SELECT DISTINCT so.id, so.option_type, so.name, so.value, so.image_path, so.display_order
+            FROM sub_options so
+            WHERE so.product_type_id = ? AND so.level = ? AND so.active = 1
+              AND EXISTS (
+                SELECT 1 FROM products p 
+                WHERE p.product_type_id = so.product_type_id 
+                  AND p.active = 1
+                  AND (p.sub_option_1_id = so.id OR p.sub_option_2_id = so.id)
+              )
+            ORDER BY so.display_order
         """, (product_type_id, level))
         
         sub_options = []
@@ -4057,8 +4065,12 @@ def get_hierarchical_available_sizes():
     """Get available sizes based on product type and sub-options"""
     try:
         product_type_id = request.args.get('product_type_id', type=int)
+        
+        # Support BOTH old internal IDs and new Lumaprints codes
         sub_option_1_id = request.args.get('sub_option_1_id', type=int)
         sub_option_2_id = request.args.get('sub_option_2_id', type=int)
+        lumaprints_subcategory_id = request.args.get('lumaprints_subcategory_id', type=int)
+        lumaprints_option_id = request.args.get('lumaprints_option_id', type=int)
         
         if not product_type_id:
             return jsonify({
@@ -4075,7 +4087,7 @@ def get_hierarchical_available_sizes():
         markup_row = cursor.fetchone()
         markup_percentage = float(markup_row['value']) if markup_row else 150.0
         
-        # Build query based on available parameters - Include Lumaprints codes
+        # Build query - prefer Lumaprints codes over internal IDs
         query = """
             SELECT p.id, p.name, p.size, p.cost_price, c.name as category_name,
                    p.lumaprints_subcategory_id, p.lumaprints_options, p.lumaprints_frame_option
@@ -4085,11 +4097,20 @@ def get_hierarchical_available_sizes():
         """
         params = [product_type_id]
         
-        if sub_option_1_id:
+        # Use Lumaprints codes if provided, otherwise fall back to internal IDs
+        if lumaprints_subcategory_id:
+            query += " AND p.lumaprints_subcategory_id = ?"
+            params.append(lumaprints_subcategory_id)
+        elif sub_option_1_id:
             query += " AND p.sub_option_1_id = ?"
             params.append(sub_option_1_id)
             
-        if sub_option_2_id:
+        if lumaprints_option_id:
+            # Filter by JSON option - check if option_id exists in lumaprints_options
+            query += " AND (p.lumaprints_options LIKE ? OR p.lumaprints_frame_option = ?)"
+            params.append(f'%{lumaprints_option_id}%')
+            params.append(lumaprints_option_id)
+        elif sub_option_2_id:
             query += " AND p.sub_option_2_id = ?"
             params.append(sub_option_2_id)
             
