@@ -143,6 +143,23 @@ class HierarchicalOrderingSystem {
         `;
         
         container.innerHTML = wizardHTML;
+        
+        // Add event listeners for wizard navigation
+        this.setupWizardNavigation();
+    }
+
+    setupWizardNavigation() {
+        // Add event listeners for wizard navigation buttons
+        const prevBtn = document.querySelector('.wizard-prev');
+        const nextBtn = document.querySelector('.wizard-next');
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => this.prevStep());
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => this.nextStep());
+        }
     }
 
     renderWizardStep() {
@@ -191,7 +208,7 @@ class HierarchicalOrderingSystem {
                     
                     <div class="col-md-3">
                         <div class="selection-panel">
-                            <h5>Size & Pricing</h5>
+                            <h5>Select Size</h5>
                             <div id="size-selection-container">
                                 ${this.canShowSizes() ? this.renderSizeSelection() : '<p class="text-muted">Complete your selections to see sizes</p>'}
                             </div>
@@ -254,7 +271,7 @@ class HierarchicalOrderingSystem {
                     
                     <div class="col-md-4">
                         <div class="selection-panel">
-                            <h5>Size & Pricing</h5>
+                            <h5>Select Size</h5>
                             <div id="size-selection-container">
                                 ${this.canShowSizes() ? this.renderSizeSelection() : '<p class="text-muted">Complete your selections to see sizes</p>'}
                             </div>
@@ -328,7 +345,7 @@ class HierarchicalOrderingSystem {
         }
         
         return `
-            <h4>Select Size & Pricing</h4>
+            <h4>Select Size</h4>
             <div id="size-selection-mobile-content">
                 <div class="loading-spinner">Loading sizes...</div>
             </div>
