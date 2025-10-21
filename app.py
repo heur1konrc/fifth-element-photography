@@ -18,6 +18,65 @@ from lumaprints_api import get_lumaprints_client, get_pricing_calculator
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
+# Initialize database if it doesn't exist
+def ensure_database_exists():
+    """Ensure the database exists and has the required schema"""
+    db_path = '/data/lumaprints_pricing.db'
+    if not os.path.exists(db_path):
+        print(f"Database not found at {db_path}, initializing...")
+        try:
+            from init_pricing_db import init_pricing_database
+            init_pricing_database()
+            print("Database initialized successfully")
+        except Exception as e:
+            print(f"Error initializing database: {e}")
+            # Create minimal schema if init script fails
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute('''CREATE TABLE IF NOT EXISTS settings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                key_name TEXT UNIQUE NOT NULL,
+                value TEXT NOT NULL
+            )''')
+            cursor.execute('''CREATE TABLE IF NOT EXISTS categories (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT UNIQUE NOT NULL
+            )''')
+            cursor.execute('''CREATE TABLE IF NOT EXISTS product_types (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                sub_option_1_name TEXT,
+                sub_option_2_name TEXT
+            )''')
+            cursor.execute('''CREATE TABLE IF NOT EXISTS sub_options (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                product_type_id INTEGER,
+                level INTEGER,
+                option_type TEXT,
+                name TEXT,
+                value TEXT
+            )''')
+            cursor.execute('''CREATE TABLE IF NOT EXISTS products (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category_id INTEGER,
+                name TEXT,
+                size TEXT,
+                cost_price REAL,
+                product_type_id INTEGER,
+                sub_option_1_id INTEGER,
+                sub_option_2_id INTEGER,
+                lumaprints_subcategory_id INTEGER,
+                lumaprints_options TEXT,
+                active INTEGER DEFAULT 1
+            )''')
+            cursor.execute("INSERT OR IGNORE INTO settings (key_name, value) VALUES ('global_markup_percentage', '150.0')")
+            conn.commit()
+            conn.close()
+            print("Minimal database schema created")
+
+# Call initialization on startup
+ensure_database_exists()
+
 # Admin system - Multi-user support (up to 4 users)
 ADMIN_USERS_FILE = "data/admin_users.json"
 ADMIN_CONFIG_FILE = "admin_config.json"

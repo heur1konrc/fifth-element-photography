@@ -12,7 +12,7 @@ def init_pricing_database():
     """Initialize the pricing database with schema and data"""
     
     # Database file path
-    db_path = 'lumaprints_pricing.db'
+    db_path = '/data/lumaprints_pricing.db'
     
     # Remove existing database if it exists
     if os.path.exists(db_path):
