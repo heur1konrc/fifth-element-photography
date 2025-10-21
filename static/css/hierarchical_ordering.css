@@ -127,10 +127,14 @@
     background: white;
     border: 2px solid #dee2e6;
     border-radius: 8px;
-    padding: 20px;
+    padding: 25px 30px;
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .product-type-card:hover {
