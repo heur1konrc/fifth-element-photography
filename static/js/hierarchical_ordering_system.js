@@ -760,19 +760,77 @@ document.addEventListener('DOMContentLoaded', function() {
     orderingSystem = new HierarchicalOrderingSystem();
 });
 
-// Global function for adding to cart (to be implemented)
+// Global function for adding to cart with Lumaprints integration
 function addToCart() {
     if (orderingSystem.currentSelections.selectedProduct) {
-        // Implementation for adding to cart
-        console.log('Adding to cart:', orderingSystem.currentSelections);
+        const product = orderingSystem.currentSelections.selectedProduct;
+        const selections = orderingSystem.currentSelections;
         
-        // Call the cart function from the main page
-        if (typeof window.addToCart === 'function') {
-            window.addToCart();
+        // Prepare order data with Lumaprints codes for OrderDesk
+        const orderData = {
+            // Product information
+            product_id: product.id,
+            product_name: product.name,
+            size: product.size,
+            price: product.customer_price,
+            cost_price: product.cost_price,
+            
+            // Selection details
+            product_type: selections.productType?.name || '',
+            sub_option_1: selections.subOption1?.value || '',
+            sub_option_2: selections.subOption2?.value || '',
+            
+            // LUMAPRINTS INTEGRATION - Critical for OrderDesk
+            lumaprints_subcategory_id: product.lumaprints_subcategory_id,
+            lumaprints_options: product.lumaprints_options || [],
+            lumaprints_frame_option: product.lumaprints_frame_option,
+            
+            // Image information (from URL parameter)
+            image_filename: new URLSearchParams(window.location.search).get('image') || ''
+        };
+        
+        console.log('🛒 Adding to cart with Lumaprints codes:', orderData);
+        
+        // Try to call existing cart system first
+        if (typeof window.addProductToCart === 'function') {
+            window.addProductToCart(orderData);
+        } else if (typeof window.addToCart === 'function') {
+            window.addToCart(orderData);
         } else {
-            alert('Product selected! Cart functionality will be implemented.');
+            // Fallback: Add to local cart or show success message
+            addToLocalCart(orderData);
         }
     } else {
         alert('Please complete your selection first.');
+    }
+}
+
+// Fallback cart function for when main cart system isn't available
+function addToLocalCart(orderData) {
+    // Get existing cart from localStorage
+    let cart = JSON.parse(localStorage.getItem('hierarchical_cart') || '[]');
+    
+    // Add new item to cart
+    const cartItem = {
+        id: Date.now(), // Unique ID for cart item
+        ...orderData,
+        quantity: 1,
+        added_at: new Date().toISOString()
+    };
+    
+    cart.push(cartItem);
+    localStorage.setItem('hierarchical_cart', JSON.stringify(cart));
+    
+    // Show success message
+    const message = `✅ Added to cart: ${orderData.product_name} (${orderData.size}) - $${orderData.price}`;
+    if (orderData.lumaprints_subcategory_id) {
+        console.log(`🏷️ Lumaprints Code: ${orderData.lumaprints_subcategory_id}`);
+    }
+    
+    alert(message);
+    
+    // Optional: Update cart display if function exists
+    if (typeof updateCartDisplay === 'function') {
+        updateCartDisplay();
     }
 }

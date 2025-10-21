@@ -4002,9 +4002,10 @@ def get_hierarchical_available_sizes():
         markup_row = cursor.fetchone()
         markup_percentage = float(markup_row['value']) if markup_row else 150.0
         
-        # Build query based on available parameters
+        # Build query based on available parameters - Include Lumaprints codes
         query = """
-            SELECT p.id, p.name, p.size, p.cost_price, c.name as category_name
+            SELECT p.id, p.name, p.size, p.cost_price, c.name as category_name,
+                   p.lumaprints_subcategory_id, p.lumaprints_options, p.lumaprints_frame_option
             FROM products p
             JOIN categories c ON p.category_id = c.id
             WHERE p.active = 1 AND p.product_type_id = ?
@@ -4028,13 +4029,26 @@ def get_hierarchical_available_sizes():
             # Calculate customer price using global markup
             customer_price = row['cost_price'] * (markup_percentage / 100)
             
+            # Parse Lumaprints options JSON
+            lumaprints_options = []
+            if row['lumaprints_options']:
+                try:
+                    import json
+                    lumaprints_options = json.loads(row['lumaprints_options'])
+                except:
+                    lumaprints_options = []
+            
             products.append({
                 'id': row['id'],
                 'name': row['name'],
                 'size': row['size'],
                 'category_name': row['category_name'],
                 'cost_price': float(row['cost_price']),
-                'customer_price': round(customer_price, 2)
+                'customer_price': round(customer_price, 2),
+                # Lumaprints integration fields for OrderDesk
+                'lumaprints_subcategory_id': row['lumaprints_subcategory_id'],
+                'lumaprints_options': lumaprints_options,
+                'lumaprints_frame_option': row['lumaprints_frame_option']
             })
         
         conn.close()
@@ -4084,6 +4098,15 @@ def get_hierarchical_product_details(product_id):
         # Calculate customer price using global markup
         customer_price = row['cost_price'] * (markup_percentage / 100)
         
+        # Parse Lumaprints options JSON
+        lumaprints_options = []
+        if row['lumaprints_options']:
+            try:
+                import json
+                lumaprints_options = json.loads(row['lumaprints_options'])
+            except:
+                lumaprints_options = []
+        
         product = {
             'id': row['id'],
             'name': row['name'],
@@ -4094,7 +4117,11 @@ def get_hierarchical_product_details(product_id):
             'product_type_name': row['product_type_name'],
             'sub_option_1_value': row['sub_option_1_value'],
             'sub_option_2_value': row['sub_option_2_value'],
-            'description': row['description']
+            'description': row['description'],
+            # Lumaprints integration fields for OrderDesk
+            'lumaprints_subcategory_id': row['lumaprints_subcategory_id'],
+            'lumaprints_options': lumaprints_options,
+            'lumaprints_frame_option': row['lumaprints_frame_option']
         }
         
         conn.close()
