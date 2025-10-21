@@ -4981,6 +4981,32 @@ def fix_all_product_mappings():
                             imported += 1
         results.append(f"Imported {imported} new Framed Fine Art products")
         
+        # Import additional products for 1.25" frames with mats (if missing)
+        FRAME_125_STYLES = [
+            (105005, 23, "Black"), (105006, 23, "White"), (105007, 23, "Oak")
+        ]
+        MAT_SIZES_ONLY = [
+            (66, 66, "1.5\""), (67, 67, "2.0\""), (68, 68, "2.5\""), (69, 69, "3.0\"")
+        ]
+        imported_125 = 0
+        for frame_id, wizard_frame_id, color in FRAME_125_STYLES:
+            for mat_luma_id, wizard_mat_id, mat_name in MAT_SIZES_ONLY:
+                for paper_id, paper_name in PAPER_TYPES:
+                    for size in SIZES:
+                        name = f"Framed Fine Art {color} {mat_name} Mat {paper_name} {size}\""
+                        cursor.execute("SELECT id FROM products WHERE name=?", (name,))
+                        if not cursor.fetchone():
+                            area = int(size.split('×')[0]) * int(size.split('×')[1])
+                            price = 20.0 if area <= 50 else (25.0 if area <= 100 else (35.0 if area <= 200 else (50.0 if area <= 400 else (75.0 if area <= 800 else 100.0))))
+                            cursor.execute("""
+                                INSERT INTO products (name, product_type_id, category_id, size, cost_price,
+                                                    sub_option_1_id, sub_option_2_id, lumaprints_subcategory_id,
+                                                    lumaprints_options, active)
+                                VALUES (?, 4, 4, ?, ?, ?, ?, ?, ?, 1)
+                            """, (name, size, price, wizard_frame_id, wizard_mat_id, frame_id, json.dumps({"mat_size": mat_luma_id, "paper_type": paper_id})))
+                            imported_125 += 1
+        results.append(f"Imported {imported_125} additional 1.25\" frame + mat products")
+        
         # Clean up unused Framed Fine Art frame sizes (keep only 0.875" and 1.25")
         cursor.execute("DELETE FROM sub_options WHERE product_type_id=4 AND level=1 AND id NOT IN (22, 23)")
         results.append(f"Removed {cursor.rowcount} unused frame size options")
