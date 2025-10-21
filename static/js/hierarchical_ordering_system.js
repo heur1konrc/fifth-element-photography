@@ -576,7 +576,7 @@ class HierarchicalOrderingSystem {
     }
 
     renderSizeSelectionContent(products) {
-        const containers = ['size-selection-content', 'size-selection-mobile-content'];
+        const containers = ['size-selection-mobile-content'];
         
         const html = `
             <div class="size-selection-grid">
