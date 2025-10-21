@@ -477,10 +477,6 @@ class HierarchicalOrderingSystem {
         if (!this.currentSelections.productType) return;
         
         try {
-            let url = `/api/hierarchical/available-sizes?product_type_id=${this.currentSelections.productType.id}`;
-            
-            if (this.currentSelectio    async loadAvailableSizes() {
-        try {
             const url = `/api/hierarchical/available-sizes?product_type_id=${this.currentSelections.productType.id}&sub_option_1_id=${this.currentSelections.subOption1.id}&sub_option_2_id=${this.currentSelections.subOption2.id}`;
             console.log('DEBUG: Loading sizes from URL:', url);
             
