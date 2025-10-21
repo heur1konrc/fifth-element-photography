@@ -511,9 +511,6 @@ class HierarchicalOrderingSystem {
                 container.innerHTML = html;
             }
         });
-        
-        // Hide loading, show content
-        this.hideLoading('sub-option-1');
     }
 
     renderSubOption2Content(subOptions) {
@@ -555,9 +552,6 @@ class HierarchicalOrderingSystem {
                 container.innerHTML = html;
             }
         });
-        
-        // Hide loading, show content
-        this.hideLoading('sub-option-2');
     }
 
     renderSizeSelectionContent(products) {
@@ -582,9 +576,6 @@ class HierarchicalOrderingSystem {
                 container.innerHTML = html;
             }
         });
-        
-        // Hide loading, show content
-        this.hideLoading('size-selection');
     }
 
     hideLoading(prefix) {
