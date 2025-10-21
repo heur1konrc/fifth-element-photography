@@ -344,14 +344,14 @@ class HierarchicalOrderingSystem {
         console.log('canShowSizes:', this.canShowSizes());
         console.log('currentSelections:', this.currentSelections);
         
-        if (!this.canShowSizes()) {
-            return '<div class="alert alert-warning">Please complete your selections first</div>';
-        }
-        
+        // Always show the step, but content depends on canShowSizes
         return `
             <h4>Select Size</h4>
             <div id="size-selection-mobile-content">
-                <div class="loading-spinner">Loading sizes...</div>
+                ${this.canShowSizes() ? 
+                    '<div class="loading-spinner">Loading sizes...</div>' : 
+                    '<div class="alert alert-warning">Please complete your selections first</div>'
+                }
             </div>
         `;
     }
