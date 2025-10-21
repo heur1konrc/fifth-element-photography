@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .step { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .result { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 15px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Canvas Prints Debug</h1>
+    
+    <div class="step">
+        <h3>Step 1: Test Product Types API</h3>
+        <button onclick="testProductTypes()">Test Product Types</button>
+        <div id="product-types-result" class="result"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 2: Test Canvas Sub-Options API</h3>
+        <button onclick="testCanvasSubOptions()">Test Canvas Sub-Options</button>
+        <div id="sub-options-result" class="result"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 3: Test Canvas Sizes API (All Sub-Options)</h3>
+        <button onclick="testCanvasSizes(1)">Test with sub_option_1_id=1 (0.75")</button>
+        <button onclick="testCanvasSizes(2)">Test with sub_option_1_id=2 (1.25")</button>
+        <button onclick="testCanvasSizes(3)">Test with sub_option_1_id=3 (1.5")</button>
+        <div id="sizes-result" class="result"></div>
+    </div>
+    
+    <div class="step">
+        <h3>Step 4: Check Database Products</h3>
+        <button onclick="checkDatabase()">Check Canvas Products in Database</button>
+        <div id="database-result" class="result"></div>
+    </div>
+
+    <script>
+        async function testProductTypes() {
+            try {
+                const response = await fetch('/api/hierarchical/product-types');
+                const data = await response.json();
+                document.getElementById('product-types-result').innerHTML = 
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('product-types-result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+
+        async function testCanvasSubOptions() {
+            try {
+                const response = await fetch('/api/hierarchical/sub-options/1/1');
+                const data = await response.json();
+                document.getElementById('sub-options-result').innerHTML = 
+                    '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('sub-options-result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+
+        async function testCanvasSizes(subOptionId) {
+            try {
+                const url = `/api/hierarchical/available-sizes?product_type_id=1&sub_option_1_id=${subOptionId}`;
+                console.log('Testing URL:', url);
+                const response = await fetch(url);
+                const data = await response.json();
+                document.getElementById('sizes-result').innerHTML = 
+                    `<h4>URL: ${url}</h4><pre>` + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('sizes-result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+
+        async function checkDatabase() {
+            try {
+                const response = await fetch('/debug-sub-options');
+                const data = await response.json();
+                
+                // Filter for Canvas products only
+                const canvasProducts = data.sample_products.filter(p => p.product_type_name === 'Canvas Prints');
+                
+                document.getElementById('database-result').innerHTML = 
+                    '<h4>Canvas Products in Database:</h4><pre>' + 
+                    JSON.stringify(canvasProducts.slice(0, 10), null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('database-result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

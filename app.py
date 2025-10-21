@@ -4171,6 +4171,11 @@ def add_test_products():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+@app.route('/debug-canvas')
+def debug_canvas():
+    """Debug page for Canvas Prints workflow"""
+    return send_from_directory('.', 'debug_canvas.html')
+
 @app.route('/hierarchical_order_form')
 def hierarchical_order_form():
     """New hierarchical ordering system interface"""
