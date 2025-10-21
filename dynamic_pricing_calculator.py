@@ -288,7 +288,7 @@ def get_dynamic_pricing_calculator(markup_percentage: float = 150.0, db_path: st
     if db_path is None:
         # Use default path in the same directory as this script
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        db_path = os.path.join(script_dir, 'lumaprints_pricing.db')
+        db_path = os.path.join(script_dir, '/data/lumaprints_pricing.db')
     
     return DynamicPricingCalculator(db_path, markup_percentage)
 

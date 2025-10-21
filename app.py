@@ -3907,7 +3907,7 @@ def enhanced_order_form():
 def get_hierarchical_product_types():
     """Get all product types for hierarchical ordering system"""
     try:
-        conn = sqlite3.connect('lumaprints_pricing.db')
+        conn = sqlite3.connect('/data/lumaprints_pricing.db')
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -3945,7 +3945,7 @@ def get_hierarchical_product_types():
 def get_hierarchical_sub_options(product_type_id, level):
     """Get sub-options for a product type at a specific level"""
     try:
-        conn = sqlite3.connect('lumaprints_pricing.db')
+        conn = sqlite3.connect('/data/lumaprints_pricing.db')
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -3993,7 +3993,7 @@ def get_hierarchical_available_sizes():
                 'error': 'product_type_id is required'
             }), 400
         
-        conn = sqlite3.connect('lumaprints_pricing.db')
+        conn = sqlite3.connect('/data/lumaprints_pricing.db')
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -4068,7 +4068,7 @@ def get_hierarchical_available_sizes():
 def get_hierarchical_product_details(product_id):
     """Get detailed information about a specific product"""
     try:
-        conn = sqlite3.connect('lumaprints_pricing.db')
+        conn = sqlite3.connect('/data/lumaprints_pricing.db')
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -4141,7 +4141,7 @@ def get_hierarchical_product_details(product_id):
 @app.route('/admin/add-test-products')
 def add_test_products():
     try:
-        conn = sqlite3.connect('lumaprints_pricing.db')
+        conn = sqlite3.connect('/data/lumaprints_pricing.db')
         cursor = conn.cursor()
         
         # Add test products for Framed Canvas Prints - 0.75" Frame - White
@@ -4188,7 +4188,7 @@ def fix_test_products_route():
     """Fix test products with correct sub_option IDs"""
     try:
         import sqlite3
-        conn = sqlite3.connect('lumaprints_pricing.db')
+        conn = sqlite3.connect('/data/lumaprints_pricing.db')
         cursor = conn.cursor()
         
         # Update the test products with correct sub_option_1_id and sub_option_2_id
@@ -4239,7 +4239,7 @@ def debug_sizes():
     
     try:
         import sqlite3
-        conn = sqlite3.connect('lumaprints_pricing.db')
+        conn = sqlite3.connect('/data/lumaprints_pricing.db')
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
@@ -4374,7 +4374,7 @@ def fix_white_id():
     """Fix test products to use correct White color ID (14) - NOW INCLUDES SUB-OPTION FIX"""
     try:
         import sqlite3
-        conn = sqlite3.connect('lumaprints_pricing.db')
+        conn = sqlite3.connect('/data/lumaprints_pricing.db')
         cursor = conn.cursor()
         
         # APPLY SUB-OPTION FIX FOR ALL PRODUCT TYPES
@@ -4440,7 +4440,7 @@ def fix_canvas_now():
     """FINAL Canvas fix - distribute products across all mounting options"""
     import sqlite3
     
-    conn = sqlite3.connect('lumaprints_pricing.db')
+    conn = sqlite3.connect('/data/lumaprints_pricing.db')
     cursor = conn.cursor()
     
     try:
@@ -4516,7 +4516,7 @@ def fix_framed_canvas():
     """Fix Framed Canvas - assign both sub-options"""
     import sqlite3
     
-    conn = sqlite3.connect('lumaprints_pricing.db')
+    conn = sqlite3.connect('/data/lumaprints_pricing.db')
     cursor = conn.cursor()
     
     try:
@@ -4584,7 +4584,7 @@ def fix_all_remaining():
     """Fix ALL remaining product types at once"""
     import sqlite3
     
-    conn = sqlite3.connect('lumaprints_pricing.db')
+    conn = sqlite3.connect('/data/lumaprints_pricing.db')
     cursor = conn.cursor()
     
     try:
@@ -4673,7 +4673,7 @@ def fix_final_two():
     """Fix Framed Fine Art Paper and Foam-Mounted Fine Art Paper"""
     import sqlite3
     
-    conn = sqlite3.connect('lumaprints_pricing.db')
+    conn = sqlite3.connect('/data/lumaprints_pricing.db')
     cursor = conn.cursor()
     
     try:
@@ -4733,7 +4733,7 @@ def fix_everything_once():
     """COMPREHENSIVE FIX - ALL PRODUCT TYPES AT ONCE"""
     import sqlite3
     
-    conn = sqlite3.connect('lumaprints_pricing.db')
+    conn = sqlite3.connect('/data/lumaprints_pricing.db')
     cursor = conn.cursor()
     
     try:
@@ -4827,7 +4827,7 @@ def fix_foam_mounted_final():
     """Fix Foam-Mounted with correct sub-option IDs (43-49)"""
     import sqlite3
     
-    conn = sqlite3.connect('lumaprints_pricing.db')
+    conn = sqlite3.connect('/data/lumaprints_pricing.db')
     cursor = conn.cursor()
     
     try:
@@ -4881,7 +4881,7 @@ def fix_all_product_mappings():
     """Fix ALL product sub_option mappings for the hierarchical wizard"""
     import sqlite3
     
-    conn = sqlite3.connect('lumaprints_pricing.db')
+    conn = sqlite3.connect('/data/lumaprints_pricing.db')
     cursor = conn.cursor()
     
     try:
