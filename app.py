@@ -4901,6 +4901,44 @@ def fix_all_product_mappings():
         cursor.execute("UPDATE products SET sub_option_1_id=21 WHERE product_type_id=3 AND name LIKE '%Somerset Velvet%'")
         results.append(f"Fine Art Somerset Velvet: {cursor.rowcount} products")
         
+        # Fix Framed Canvas (product_type_id=2) - map by lumaprints_subcategory_id
+        cursor.execute("UPDATE products SET sub_option_1_id=4, sub_option_2_id=8 WHERE product_type_id=2 AND lumaprints_subcategory_id=102001 AND (lumaprints_frame_option=12 OR lumaprints_frame_option IS NULL)")
+        results.append(f"Framed Canvas 0.75\" Black: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=4, sub_option_2_id=14 WHERE product_type_id=2 AND lumaprints_subcategory_id=102001 AND lumaprints_frame_option=13")
+        results.append(f"Framed Canvas 0.75\" White: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=5, sub_option_2_id=8 WHERE product_type_id=2 AND lumaprints_subcategory_id=102002 AND lumaprints_frame_option=27")
+        results.append(f"Framed Canvas 1.25\" Black: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=5, sub_option_2_id=12 WHERE product_type_id=2 AND lumaprints_subcategory_id=102002 AND lumaprints_frame_option=91")
+        results.append(f"Framed Canvas 1.25\" Oak: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=6, sub_option_2_id=8 WHERE product_type_id=2 AND lumaprints_subcategory_id=102003 AND lumaprints_frame_option=23")
+        results.append(f"Framed Canvas 1.5\" Black: {cursor.rowcount} products")
+        
+        # Fix Foam-Mounted (product_type_id=5) - distribute by paper type
+        cursor.execute("UPDATE products SET sub_option_1_id=43 WHERE product_type_id=5 AND name LIKE '%Archival Matte%'")
+        results.append(f"Foam-Mounted Archival Matte: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=44 WHERE product_type_id=5 AND name LIKE '%Hot Press%'")
+        results.append(f"Foam-Mounted Hot Press: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=45 WHERE product_type_id=5 AND name LIKE '%Cold Press%'")
+        results.append(f"Foam-Mounted Cold Press: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=46 WHERE product_type_id=5 AND name LIKE '%Semi-Gloss%'")
+        results.append(f"Foam-Mounted Semi-Gloss: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=47 WHERE product_type_id=5 AND name LIKE '%Metallic%'")
+        results.append(f"Foam-Mounted Metallic: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=48 WHERE product_type_id=5 AND name LIKE '%Glossy%'")
+        results.append(f"Foam-Mounted Glossy: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=49 WHERE product_type_id=5 AND name LIKE '%Somerset Velvet%'")
+        results.append(f"Foam-Mounted Somerset Velvet: {cursor.rowcount} products")
+        
         conn.commit()
         
         # Verify the fixes
