@@ -265,9 +265,11 @@
 .form-select {
     border-radius: 6px;
     border: 1px solid #ced4da;
-    padding: 10px 15px;
+    padding: 10px 40px 10px 15px;
     font-size: 14px;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    background-position: right 12px center;
+    background-size: 16px;
 }
 
 .form-select:focus {
