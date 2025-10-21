@@ -635,7 +635,7 @@ class HierarchicalOrderingSystem {
                 this.currentSelections.selectedProduct = null;
                 
                 // Always advance to next step when sub-option 1 is selected
-                this.currentStep = this.currentSelections.productType.max_sub_option_levels >= 2 ? 3 : 4;
+                this.currentStep = 3;
                 
                 this.renderInterface();
             }
