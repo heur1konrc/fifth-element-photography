@@ -4855,3 +4855,92 @@ def fix_foam_mounted_final():
         return f"Error: {e}"
     finally:
         conn.close()
+
+
+
+@app.route('/fix-all-product-mappings')
+def fix_all_product_mappings():
+    """Fix ALL product sub_option mappings for the hierarchical wizard"""
+    import sqlite3
+    
+    conn = sqlite3.connect('lumaprints_pricing.db')
+    cursor = conn.cursor()
+    
+    try:
+        results = []
+        
+        # Fix Canvas Prints (product_type_id=1) - distribute by mounting size
+        cursor.execute("UPDATE products SET sub_option_1_id=1 WHERE product_type_id=1 AND name LIKE '%0.75%'")
+        results.append(f"Canvas 0.75\": {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=2 WHERE product_type_id=1 AND name LIKE '%1.25%'")
+        results.append(f"Canvas 1.25\": {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=3 WHERE product_type_id=1 AND name LIKE '%1.5%'")
+        results.append(f"Canvas 1.5\": {cursor.rowcount} products")
+        
+        # Fix Fine Art Paper (product_type_id=3) - distribute by paper type
+        cursor.execute("UPDATE products SET sub_option_1_id=15 WHERE product_type_id=3 AND name LIKE '%Archival Matte%'")
+        results.append(f"Fine Art Archival Matte: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=16 WHERE product_type_id=3 AND name LIKE '%Hot Press%'")
+        results.append(f"Fine Art Hot Press: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=17 WHERE product_type_id=3 AND name LIKE '%Cold Press%'")
+        results.append(f"Fine Art Cold Press: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=18 WHERE product_type_id=3 AND name LIKE '%Semi-Gloss%'")
+        results.append(f"Fine Art Semi-Gloss: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=19 WHERE product_type_id=3 AND name LIKE '%Metallic%'")
+        results.append(f"Fine Art Metallic: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=20 WHERE product_type_id=3 AND name LIKE '%Glossy%'")
+        results.append(f"Fine Art Glossy: {cursor.rowcount} products")
+        
+        cursor.execute("UPDATE products SET sub_option_1_id=21 WHERE product_type_id=3 AND name LIKE '%Somerset Velvet%'")
+        results.append(f"Fine Art Somerset Velvet: {cursor.rowcount} products")
+        
+        conn.commit()
+        
+        # Verify the fixes
+        cursor.execute("SELECT sub_option_1_id, COUNT(*) FROM products WHERE product_type_id=1 GROUP BY sub_option_1_id")
+        canvas_dist = cursor.fetchall()
+        
+        cursor.execute("SELECT sub_option_1_id, COUNT(*) FROM products WHERE product_type_id=3 GROUP BY sub_option_1_id")
+        fine_art_dist = cursor.fetchall()
+        
+        return f"""
+        <h1>🎉 PRODUCT MAPPINGS FIXED!</h1>
+        
+        <h2>Updates Applied:</h2>
+        <ul>
+            {''.join([f'<li>{r}</li>' for r in results])}
+        </ul>
+        
+        <h2>Canvas Distribution:</h2>
+        <ul>
+            {''.join([f'<li>sub_option {row[0]}: {row[1]} products</li>' for row in canvas_dist])}
+        </ul>
+        
+        <h2>Fine Art Paper Distribution:</h2>
+        <ul>
+            {''.join([f'<li>sub_option {row[0]}: {row[1]} products</li>' for row in fine_art_dist])}
+        </ul>
+        
+        <h2>Test Links:</h2>
+        <ul>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=1&sub_option_1_id=1">Canvas 0.75"</a></li>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=1&sub_option_1_id=2">Canvas 1.25"</a></li>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=3&sub_option_1_id=15">Fine Art Archival Matte</a></li>
+        </ul>
+        
+        <h1>✅ WIZARD SHOULD NOW LOAD PRODUCTS!</h1>
+        """
+        
+    except Exception as e:
+        conn.rollback()
+        return f"Error: {e}"
+    finally:
+        conn.close()
+
