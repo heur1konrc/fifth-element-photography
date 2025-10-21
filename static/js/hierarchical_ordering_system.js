@@ -677,10 +677,33 @@ class HierarchicalOrderingSystem {
             
             if (data.success) {
                 this.currentSelections.selectedProduct = data.product;
-                this.renderInterface();
+                // Don't call renderInterface() to avoid infinite loop
+                // Just update the Add to Cart button visibility
+                this.updateAddToCartButton();
             }
         } catch (error) {
             console.error('Error selecting product:', error);
+        }
+    }
+
+    updateAddToCartButton() {
+        // Find existing Add to Cart button and update its visibility
+        const existingButton = document.querySelector('button[onclick="addToCart()"]');
+        const buttonContainer = document.querySelector('.wizard-navigation') || document.querySelector('.text-center');
+        
+        if (this.currentSelections.selectedProduct && buttonContainer) {
+            if (!existingButton) {
+                // Create Add to Cart button if it doesn't exist
+                const addToCartBtn = document.createElement('button');
+                addToCartBtn.className = 'btn btn-success ms-2';
+                addToCartBtn.onclick = () => addToCart();
+                addToCartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+                buttonContainer.appendChild(addToCartBtn);
+            } else {
+                existingButton.style.display = 'inline-block';
+            }
+        } else if (existingButton) {
+            existingButton.style.display = 'none';
         }
     }
 
