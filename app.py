@@ -4995,7 +4995,6 @@ def fix_all_product_mappings():
 @app.route('/import-framed-fine-art')
 def import_framed_fine_art_products():
     """Import all Framed Fine Art products (No Mat only for testing)"""
-    import json
     
     # Lumaprints frame subcategories
     FRAME_STYLES = {
