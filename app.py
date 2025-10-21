@@ -4939,6 +4939,10 @@ def fix_all_product_mappings():
         cursor.execute("UPDATE products SET sub_option_1_id=49 WHERE product_type_id=5 AND name LIKE '%Somerset Velvet%'")
         results.append(f"Foam-Mounted Somerset Velvet: {cursor.rowcount} products")
         
+        # Fix Framed Fine Art Paper (product_type_id=4) - map by frame size and mat
+        cursor.execute("UPDATE products SET sub_option_1_id=22, sub_option_2_id=33 WHERE product_type_id=4 AND name LIKE '%0.875\" No Mat%'")
+        results.append(f"Framed Fine Art 0.875\" No Mat: {cursor.rowcount} products")
+        
         conn.commit()
         
         # Verify the fixes
