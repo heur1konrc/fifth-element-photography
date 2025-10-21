@@ -313,9 +313,12 @@
 /* Desktop Card Interface */
 .desktop-card-interface .product-type-grid.desktop-cards {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 15px;
     margin-top: 20px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .desktop-card-interface .product-type-card {
