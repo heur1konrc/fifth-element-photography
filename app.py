@@ -21,7 +21,21 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 # Initialize database if it doesn't exist
 def ensure_database_exists():
     """Ensure the database exists and has the required schema"""
+    # Ensure /data directory exists
+    os.makedirs('/data', exist_ok=True)
     db_path = '/data/lumaprints_pricing.db'
+    old_db_path = 'lumaprints_pricing.db'
+    
+    # Check if old database exists and copy it to new location
+    if not os.path.exists(db_path) and os.path.exists(old_db_path):
+        print(f"Found old database at {old_db_path}, copying to {db_path}...")
+        try:
+            shutil.copy2(old_db_path, db_path)
+            print(f"Successfully copied database to {db_path}")
+            return
+        except Exception as e:
+            print(f"Error copying database: {e}")
+    
     if not os.path.exists(db_path):
         print(f"Database not found at {db_path}, initializing...")
         try:
