@@ -88,7 +88,8 @@
 /* Mobile Wizard Interface */
 .mobile-wizard {
     max-width: 100%;
-    padding: 15px;
+    padding: 20px;
+    width: 100%;
 }
 
 .wizard-progress .progress {
@@ -245,16 +246,19 @@
     
     /* Mobile-specific card improvements */
     .mobile-wizard {
-        padding: 10px;
+        padding: 20px;
         margin: 0;
+        width: 100%;
     }
     
     .product-type-card {
-        padding: 20px 25px;
-        margin: 0;
+        padding: 25px 30px;
+        margin: 0 auto;
         width: 100%;
-        min-height: 90px;
+        max-width: 100%;
+        min-height: 100px;
         font-size: 16px;
+        box-sizing: border-box;
     }
     
     .product-type-card h6 {
@@ -265,9 +269,10 @@
     }
     
     .product-type-grid {
-        gap: 12px;
+        gap: 15px;
         padding: 0;
         margin: 0;
+        width: 100%;
     }
     
     .visual-options-grid {
@@ -290,7 +295,18 @@
     
     /* Ensure mobile cards use full available width */
     .wizard-content {
-        padding: 15px 0;
+        padding: 20px 0;
+        width: 100%;
+    }
+    
+    /* Make mobile container use full width */
+    .container-fluid {
+        padding: 10px !important;
+    }
+    
+    .main-container {
+        margin: 10px;
+        border-radius: 10px;
     }
 }
 
