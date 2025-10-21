@@ -292,26 +292,13 @@ class HierarchicalOrderingSystem {
         }
     }
 
-    getShortDisplayName(fullName) {
-        const shortNames = {
-            'Canvas Prints': 'Canvas Prints',
-            'Framed Canvas Prints': 'Framed Canvas',
-            'Fine Art Paper Prints': 'Fine Art Paper',
-            'Framed Fine Art Paper Prints': 'Framed Fine Art',
-            'Foam-Mounted Fine Art Paper Prints': 'Foam-Mounted',
-            'Metal Prints': 'Metal Prints',
-            'Peel and Stick Prints': 'Peel & Stick'
-        };
-        return shortNames[fullName] || fullName;
-    }
-
     renderProductTypeDropdown() {
         return `
-            <select class="form-select" id="product-type-select" onchange="orderingSystem.selectProductType(this.value)" style="padding-right: 40px !important; background-position: right 12px center !important;">
-                <option value="">Select Type</option>
+            <select class="form-select" id="product-type-select" onchange="orderingSystem.selectProductType(this.value)" style="padding-right: 45px !important; background-position: right 15px center !important; font-size: 0.9rem !important; width: 100% !important; min-width: 250px !important;">
+                <option value="">Select Product Type</option>
                 ${this.productTypes.map(type => `
                     <option value="${type.id}" ${this.currentSelections.productType?.id == type.id ? 'selected' : ''}>
-                        ${this.getShortDisplayName(type.name)}
+                        ${type.name}
                     </option>
                 `).join('')}
             </select>
