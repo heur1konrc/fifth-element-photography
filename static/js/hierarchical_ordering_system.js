@@ -9,7 +9,7 @@ class HierarchicalOrderingSystem {
         };
         this.isMobile = window.innerWidth <= 768;
         this.currentStep = 1;
-        this.maxSteps = 4;
+        this.maxSteps = 4; // Default, will be updated based on product type selection
         
         this.init();
     }
@@ -163,18 +163,36 @@ class HierarchicalOrderingSystem {
     }
 
     renderWizardStep() {
-        switch (this.currentStep) {
-            case 1:
-                return this.renderProductTypeStep();
-            case 2:
-                return this.renderSubOption1Step();
-            case 3:
-                return this.renderSubOption2Step();
-            case 4:
-                return this.renderSizeSelectionStep();
-            default:
-                return '<div>Invalid step</div>';
+        // Dynamic step routing based on product type option levels
+        if (this.currentStep === 1) {
+            return this.renderProductTypeStep();
         }
+        
+        if (!this.currentSelections.productType) {
+            return '<div class="alert alert-warning">Please select a product type first</div>';
+        }
+        
+        const optionLevels = this.currentSelections.productType.max_sub_option_levels;
+        
+        // For products with 0 option levels (Metal, Rolled Canvas)
+        if (optionLevels === 0 && this.currentStep === 2) {
+            return this.renderSizeSelectionStep();
+        }
+        
+        // For products with 1 option level (Canvas, Fine Art Paper)
+        if (optionLevels === 1) {
+            if (this.currentStep === 2) return this.renderSubOption1Step();
+            if (this.currentStep === 3) return this.renderSizeSelectionStep();
+        }
+        
+        // For products with 2 option levels (Framed Canvas, Framed Fine Art Paper)
+        if (optionLevels === 2) {
+            if (this.currentStep === 2) return this.renderSubOption1Step();
+            if (this.currentStep === 3) return this.renderSubOption2Step();
+            if (this.currentStep === 4) return this.renderSizeSelectionStep();
+        }
+        
+        return '<div class="alert alert-danger">Invalid step configuration</div>';
     }
 
     renderDesktopHybrid(container) {
