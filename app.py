@@ -4184,3 +4184,111 @@ def fix_test_products_route():
     except Exception as e:
         return f"Error fixing test products: {str(e)}", 500
 
+
+@app.route('/debug/sizes')
+def debug_sizes():
+    """Debug endpoint to show available sizes data"""
+    product_type_id = request.args.get('product_type_id', 2)
+    sub_option_1_id = request.args.get('sub_option_1_id', 4)  # 0.75" Frame
+    sub_option_2_id = request.args.get('sub_option_2_id', 11)  # White
+    
+    try:
+        # Get the same data as the API
+        query = """
+        SELECT p.id, p.name, p.size, p.cost_price, p.customer_price, 
+               pc.name as category_name, p.sub_option_1_id, p.sub_option_2_id
+        FROM products p
+        JOIN product_categories pc ON p.category_id = pc.id
+        WHERE p.product_type_id = %s 
+        AND p.sub_option_1_id = %s 
+        AND p.sub_option_2_id = %s
+        ORDER BY p.customer_price
+        """
+        
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(query, (product_type_id, sub_option_1_id, sub_option_2_id))
+        products = cursor.fetchall()
+        cursor.close()
+        
+        # Also get markup percentage
+        markup_query = "SELECT markup_percentage FROM settings WHERE id = 1"
+        cursor = mysql.connection.cursor()
+        cursor.execute(markup_query)
+        markup_result = cursor.fetchone()
+        markup_percentage = markup_result[0] if markup_result else 100.0
+        cursor.close()
+        
+        # Format as readable HTML
+        html = f"""
+        <h2>Debug: Available Sizes API Data</h2>
+        <p><strong>Query Parameters:</strong></p>
+        <ul>
+            <li>product_type_id: {product_type_id}</li>
+            <li>sub_option_1_id: {sub_option_1_id}</li>
+            <li>sub_option_2_id: {sub_option_2_id}</li>
+        </ul>
+        
+        <p><strong>Markup Percentage:</strong> {markup_percentage}%</p>
+        
+        <p><strong>Products Found:</strong> {len(products)}</p>
+        
+        <table border="1" style="border-collapse: collapse; margin: 20px 0;">
+            <tr>
+                <th style="padding: 10px;">ID</th>
+                <th style="padding: 10px;">Name</th>
+                <th style="padding: 10px;">Size</th>
+                <th style="padding: 10px;">Cost Price</th>
+                <th style="padding: 10px;">Customer Price</th>
+                <th style="padding: 10px;">Category</th>
+                <th style="padding: 10px;">Sub Option 1 ID</th>
+                <th style="padding: 10px;">Sub Option 2 ID</th>
+            </tr>
+        """
+        
+        for product in products:
+            html += f"""
+            <tr>
+                <td style="padding: 10px;">{product['id']}</td>
+                <td style="padding: 10px;">{product['name']}</td>
+                <td style="padding: 10px;">{product['size']}</td>
+                <td style="padding: 10px;">${product['cost_price']}</td>
+                <td style="padding: 10px;">${product['customer_price']}</td>
+                <td style="padding: 10px;">{product['category_name']}</td>
+                <td style="padding: 10px;">{product['sub_option_1_id']}</td>
+                <td style="padding: 10px;">{product['sub_option_2_id']}</td>
+            </tr>
+            """
+        
+        html += """
+        </table>
+        
+        <h3>API JSON Response:</h3>
+        <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
+        """
+        
+        # Show the exact JSON that would be returned
+        api_response = {
+            "markup_percentage": markup_percentage,
+            "products": [
+                {
+                    "id": p['id'],
+                    "name": p['name'],
+                    "size": p['size'],
+                    "cost_price": float(p['cost_price']),
+                    "customer_price": float(p['customer_price']),
+                    "category_name": p['category_name']
+                }
+                for p in products
+            ],
+            "success": True
+        }
+        
+        import json
+        html += json.dumps(api_response, indent=2)
+        html += "</pre>"
+        
+        return html
+        
+    except Exception as e:
+        return f"<h2>Debug Error:</h2><p>{str(e)}</p>"
+
