@@ -274,6 +274,8 @@
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     background-position: right 12px center !important;
     background-size: 16px;
+    min-width: 200px; /* Ensure minimum width for long product names */
+    width: 100%; /* Use full available width */
 }
 
 /* Additional Bootstrap override */
@@ -284,12 +286,44 @@ select.form-select {
 /* Specific dropdown fix */
 #productTypeSelect {
     padding-right: 40px !important;
+    min-width: 220px; /* Extra width for product type dropdown */
+}
+
+/* Desktop layout adjustments for better dropdown space */
+@media (min-width: 992px) {
+    .desktop-hybrid .col-md-3:first-child {
+        flex: 0 0 20%; /* Reduce image column */
+        max-width: 20%;
+    }
+    
+    .desktop-hybrid .col-md-3:nth-child(2) {
+        flex: 0 0 30%; /* Expand product type column */
+        max-width: 30%;
+    }
+    
+    .desktop-hybrid .col-md-3:nth-child(3) {
+        flex: 0 0 25%; /* Adjust options column */
+        max-width: 25%;
+    }
+    
+    .desktop-hybrid .col-md-3:nth-child(4) {
+        flex: 0 0 25%; /* Adjust size column */
+        max-width: 25%;
+    }
 }
 
 .form-select:focus {
     border-color: #007bff;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     outline: 0;
+}
+
+/* Dropdown option styling */
+.form-select option {
+    padding: 8px 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Buttons */
