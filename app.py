@@ -4193,34 +4193,38 @@ def debug_sizes():
     sub_option_2_id = request.args.get('sub_option_2_id', 11)  # White
     
     try:
-        # Get database connection
         import sqlite3
         conn = sqlite3.connect('lumaprints_pricing.db')
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
-        # Get the same data as the API
-        query = """
-        SELECT p.id, p.name, p.size, p.cost_price, p.customer_price, 
-               pc.name as category_name, p.sub_option_1_id, p.sub_option_2_id
-        FROM products p
-        JOIN product_categories pc ON p.category_id = pc.id
-        WHERE p.product_type_id = %s 
-        AND p.sub_option_1_id = %s 
-        AND p.sub_option_2_id = %s
-        ORDER BY p.customer_price
-        """
+        # Get global markup percentage
+        cursor.execute("SELECT value FROM settings WHERE key_name = 'global_markup_percentage'")
+        markup_row = cursor.fetchone()
+        markup_percentage = float(markup_row['value']) if markup_row else 150.0
         
-        cursor.execute(query, (product_type_id, sub_option_1_id, sub_option_2_id))
+        # Use the exact same query as the working API
+        query = """
+            SELECT p.id, p.name, p.size, p.cost_price, c.name as category_name, p.sub_option_1_id, p.sub_option_2_id
+            FROM products p
+            JOIN categories c ON p.category_id = c.id
+            WHERE p.active = 1 AND p.product_type_id = ?
+        """
+        params = [product_type_id]
+        
+        if sub_option_1_id:
+            query += " AND p.sub_option_1_id = ?"
+            params.append(sub_option_1_id)
+            
+        if sub_option_2_id:
+            query += " AND p.sub_option_2_id = ?"
+            params.append(sub_option_2_id)
+            
+        query += " ORDER BY p.name, p.size"
+        
+        cursor.execute(query, params)
         products = cursor.fetchall()
         
-        # Also get markup percentage
-        markup_query = "SELECT value FROM settings WHERE key_name = 'global_markup_percentage'"
-        cursor.execute(markup_query)
-        markup_result = cursor.fetchone()
-        markup_percentage = float(markup_result['value']) if markup_result else 150.0
-        
-        cursor.close()
         conn.close()
         
         # Format as readable HTML
