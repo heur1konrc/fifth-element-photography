@@ -4303,3 +4303,32 @@ def debug_sizes():
     except Exception as e:
         return f"<h2>Debug Error:</h2><p>{str(e)}</p>"
 
+
+@app.route('/admin/fix-white-id')
+def fix_white_id():
+    """Fix test products to use correct White color ID (14)"""
+    try:
+        import sqlite3
+        conn = sqlite3.connect('lumaprints_pricing.db')
+        cursor = conn.cursor()
+        
+        # Update test products to use correct White ID (14 instead of 11)
+        cursor.execute('UPDATE products SET sub_option_2_id = 14 WHERE id IN (681, 682, 683, 684)')
+        
+        conn.commit()
+        
+        # Verify the fix
+        cursor.execute('SELECT id, name, size, product_type_id, sub_option_1_id, sub_option_2_id FROM products WHERE id IN (681, 682, 683, 684)')
+        results = cursor.fetchall()
+        
+        conn.close()
+        
+        html = "<h2>Test Products Fixed for Correct White ID!</h2><table border='1'><tr><th>ID</th><th>Name</th><th>Size</th><th>Type</th><th>Sub1</th><th>Sub2</th></tr>"
+        for row in results:
+            html += f"<tr><td>{row[0]}</td><td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td>{row[4]}</td><td>{row[5]}</td></tr>"
+        html += "</table><p>All products now have sub_option_2_id = 14 (correct White ID)</p>"
+        
+        return html
+        
+    except Exception as e:
+        return f"Error fixing White ID: {str(e)}", 500
