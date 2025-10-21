@@ -4989,3 +4989,145 @@ def fix_all_product_mappings():
     finally:
         conn.close()
 
+
+
+
+@app.route('/import-framed-fine-art')
+def import_framed_fine_art_products():
+    """Import all Framed Fine Art products (No Mat only for testing)"""
+    import json
+    
+    # Lumaprints frame subcategories
+    FRAME_STYLES = {
+        105001: {"name": "0.875\" Black Frame", "wizard_id": 22, "color": "Black"},
+        105002: {"name": "0.875\" White Frame", "wizard_id": 22, "color": "White"},
+        105003: {"name": "0.875\" Oak Frame", "wizard_id": 22, "color": "Oak"},
+        105005: {"name": "1.25\" Black Frame", "wizard_id": 23, "color": "Black"},
+        105006: {"name": "1.25\" White Frame", "wizard_id": 23, "color": "White"},
+        105007: {"name": "1.25\" Oak Frame", "wizard_id": 23, "color": "Oak"},
+    }
+    
+    # Lumaprints mat sizes (No Mat only)
+    MAT_SIZES = {
+        64: {"name": "No Mat", "wizard_id": 33},
+    }
+    
+    # Lumaprints paper types
+    PAPER_TYPES = {
+        74: "Archival Matte",
+        75: "Hot Press",
+        76: "Cold Press",
+        77: "Metallic",
+        78: "Semi-Glossy",
+        79: "Glossy",
+        80: "Semi-Matte",
+        82: "Somerset Velvet",
+    }
+    
+    # Standard print sizes
+    PRINT_SIZES = [
+        "5×7", "6×6", "8×8", "8×10", "8×12",
+        "10×10", "11×14", "11×17",
+        "12×12", "12×16", "12×24", "12×36",
+        "16×16", "16×20", "16×24", "16×32",
+        "18×36", "20×20", "20×36", "20×40",
+        "24×24", "24×30", "24×36", "24×40",
+        "30×30", "30×32", "30×40", "32×48",
+        "36×36", "36×48", "40×40", "40×60"
+    ]
+    
+    def get_base_price(size):
+        """Calculate base price based on size"""
+        parts = size.split('×')
+        w, h = int(parts[0]), int(parts[1])
+        area = w * h
+        
+        if area <= 50:
+            return 20.0
+        elif area <= 100:
+            return 25.0
+        elif area <= 200:
+            return 35.0
+        elif area <= 400:
+            return 50.0
+        elif area <= 800:
+            return 75.0
+        else:
+            return 100.0
+    
+    conn = get_db()
+    cursor = conn.cursor()
+    
+    product_count = 0
+    skipped_count = 0
+    
+    for frame_id, frame_info in FRAME_STYLES.items():
+        for mat_id, mat_info in MAT_SIZES.items():
+            for paper_id, paper_name in PAPER_TYPES.items():
+                for size in PRINT_SIZES:
+                    # Create product name
+                    product_name = f"Framed Fine Art {frame_info['color']} {mat_info['name']} {paper_name} {size}\""
+                    
+                    # Calculate pricing
+                    base_price = get_base_price(size)
+                    
+                    # Check if product already exists
+                    cursor.execute("""
+                        SELECT id FROM products 
+                        WHERE name = ? AND product_type_id = 4
+                    """, (product_name,))
+                    
+                    if cursor.fetchone():
+                        skipped_count += 1
+                        continue
+                    
+                    # Store Lumaprints options as JSON
+                    lumaprints_opts = json.dumps({"mat_size": mat_id, "paper_type": paper_id})
+                    
+                    # Insert product
+                    cursor.execute("""
+                        INSERT INTO products (
+                            name, product_type_id, category_id, size, cost_price,
+                            sub_option_1_id, sub_option_2_id,
+                            lumaprints_subcategory_id, lumaprints_options,
+                            active
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        product_name,
+                        4,  # Framed Fine Art Paper
+                        4,  # Category ID
+                        size,
+                        base_price,
+                        frame_info['wizard_id'],
+                        mat_info['wizard_id'],
+                        frame_id,
+                        lumaprints_opts,
+                        1
+                    ))
+                    
+                    product_count += 1
+    
+    conn.commit()
+    
+    return f"""
+    <h1 style="color: green;">✅ FRAMED FINE ART PRODUCTS IMPORTED!</h1>
+    
+    <h2>Summary:</h2>
+    <ul>
+        <li><strong>New products imported:</strong> {product_count}</li>
+        <li><strong>Existing products skipped:</strong> {skipped_count}</li>
+        <li><strong>Total:</strong> {product_count + skipped_count}</li>
+    </ul>
+    
+    <h2>Configuration:</h2>
+    <ul>
+        <li>Frame Styles: 6 (0.875" and 1.25" in Black, White, Oak)</li>
+        <li>Mat Sizes: 1 (No Mat only)</li>
+        <li>Paper Types: 8 (All Lumaprints paper types)</li>
+        <li>Print Sizes: 32 standard sizes</li>
+    </ul>
+    
+    <h2>Test the Form:</h2>
+    <p><a href="/hierarchical_order_form?image=starling.JPG">Test Order Form</a></p>
+    """
+
