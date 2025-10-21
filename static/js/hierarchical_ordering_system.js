@@ -597,9 +597,8 @@ class HierarchicalOrderingSystem {
                 this.currentSelections.subOption2 = null;
                 this.currentSelections.selectedProduct = null;
                 
-                if (this.isMobile) {
-                    this.currentStep = this.currentSelections.productType.max_sub_option_levels >= 2 ? 3 : 4;
-                }
+                // Always advance to next step when sub-option 1 is selected
+                this.currentStep = this.currentSelections.productType.max_sub_option_levels >= 2 ? 3 : 4;
                 
                 this.renderInterface();
             }
@@ -618,9 +617,8 @@ class HierarchicalOrderingSystem {
                 this.currentSelections.subOption2 = subOption;
                 this.currentSelections.selectedProduct = null;
                 
-                if (this.isMobile) {
-                    this.currentStep = 4;
-                }
+                // Always advance to step 4 when sub-option 2 is selected
+                this.currentStep = 4;
                 
                 this.renderInterface();
             }
