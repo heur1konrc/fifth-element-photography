@@ -340,6 +340,10 @@ class HierarchicalOrderingSystem {
     }
 
     renderSizeSelectionStep() {
+        console.log('renderSizeSelectionStep called');
+        console.log('canShowSizes:', this.canShowSizes());
+        console.log('currentSelections:', this.currentSelections);
+        
         if (!this.canShowSizes()) {
             return '<div class="alert alert-warning">Please complete your selections first</div>';
         }
