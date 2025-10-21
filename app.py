@@ -4977,9 +4977,22 @@ def fix_all_product_mappings():
                         imported += 1
         results.append(f"Imported {imported} new Framed Fine Art products")
         
-        # Clean up unused Framed Fine Art sub_options (keep only 0.875", 1.25", and No Mat)
-        cursor.execute("DELETE FROM sub_options WHERE product_type_id=4 AND id NOT IN (22, 23, 33)")
-        results.append(f"Removed {cursor.rowcount} unused Framed Fine Art sub_options")
+        # Clean up unused Framed Fine Art frame sizes (keep only 0.875" and 1.25")
+        cursor.execute("DELETE FROM sub_options WHERE product_type_id=4 AND level=1 AND id NOT IN (22, 23)")
+        results.append(f"Removed {cursor.rowcount} unused frame size options")
+        
+        # Add mat size options (keep No Mat and add 1.5", 2.0", 2.5", 3.0")
+        cursor.execute("""INSERT OR IGNORE INTO sub_options (id, product_type_id, level, option_type, name, value, display_order, active) VALUES
+            (66, 4, 2, 'mat_size', 'Mat Size', '1.5" on each side', 2, 1),
+            (67, 4, 2, 'mat_size', 'Mat Size', '2.0" on each side', 3, 1),
+            (68, 4, 2, 'mat_size', 'Mat Size', '2.5" on each side', 4, 1),
+            (69, 4, 2, 'mat_size', 'Mat Size', '3.0" on each side', 5, 1)
+        """)
+        results.append(f"Added mat size options (1.5\", 2.0\", 2.5\", 3.0\")")
+        
+        # Clean up other unused mat sizes
+        cursor.execute("DELETE FROM sub_options WHERE product_type_id=4 AND level=2 AND id NOT IN (33, 66, 67, 68, 69)")
+        results.append(f"Removed {cursor.rowcount} other unused mat size options")
         
         conn.commit()
         
