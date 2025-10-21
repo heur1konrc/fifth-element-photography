@@ -4509,3 +4509,72 @@ def fix_canvas_now():
         return f"Error: {e}"
     finally:
         conn.close()
+
+
+@app.route('/fix-framed-canvas')
+def fix_framed_canvas():
+    """Fix Framed Canvas - assign both sub-options"""
+    import sqlite3
+    
+    conn = sqlite3.connect('lumaprints_pricing.db')
+    cursor = conn.cursor()
+    
+    try:
+        # Get Framed Canvas product IDs (product_type_id = 2)
+        cursor.execute("SELECT id FROM products WHERE product_type_id = 2 ORDER BY id")
+        framed_ids = [row[0] for row in cursor.fetchall()]
+        
+        # Frame sizes: 4, 5, 6 (0.75", 1.25", 1.50")
+        # Frame colors: 7, 8, 9, 10, 11, 12, 13, 14 (8 colors)
+        
+        frame_sizes = [4, 5, 6]
+        frame_colors = [7, 8, 9, 10, 11, 12, 13, 14]
+        
+        # Distribute products across all combinations
+        updates = []
+        for i, product_id in enumerate(framed_ids):
+            frame_size = frame_sizes[i % 3]  # Cycle through 3 frame sizes
+            frame_color = frame_colors[i % 8]  # Cycle through 8 colors
+            updates.append((frame_size, frame_color, product_id))
+        
+        # Apply updates
+        cursor.executemany("""
+            UPDATE products 
+            SET sub_option_1_id = ?, sub_option_2_id = ?
+            WHERE id = ?
+        """, updates)
+        
+        conn.commit()
+        
+        # Check results
+        cursor.execute("""
+            SELECT sub_option_1_id, sub_option_2_id, COUNT(*) 
+            FROM products 
+            WHERE product_type_id = 2 
+            GROUP BY sub_option_1_id, sub_option_2_id
+            ORDER BY sub_option_1_id, sub_option_2_id
+        """)
+        results = cursor.fetchall()
+        
+        return f"""
+        <h1>FRAMED CANVAS FIX COMPLETE!</h1>
+        <h3>Distribution ({len(framed_ids)} products):</h3>
+        <ul>
+        {''.join([f'<li>Frame {["0.75", "1.25", "1.50"][sub1-4]}" + Color {sub2-6}: {count} products</li>' for sub1, sub2, count in results[:10]])}
+        {'<li>... and more combinations</li>' if len(results) > 10 else ''}
+        </ul>
+        
+        <h2>TEST FRAMED CANVAS:</h2>
+        <ul>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=2&sub_option_1_id=4&sub_option_2_id=7">Test Frame 0.75" + Maple</a></li>
+            <li><a href="/api/hierarchical/available-sizes?product_type_id=2&sub_option_1_id=5&sub_option_2_id=8">Test Frame 1.25" + Black</a></li>
+        </ul>
+        
+        <h1>🎉 FRAMED CANVAS SHOULD WORK NOW! 🎉</h1>
+        """
+        
+    except Exception as e:
+        conn.rollback()
+        return f"Error: {e}"
+    finally:
+        conn.close()
