@@ -349,7 +349,7 @@ class HierarchicalOrderingSystem {
             <h4>Select Size</h4>
             <div id="size-selection-mobile-content">
                 ${this.canShowSizes() ? 
-                    '<div class="loading-spinner">Loading sizes...</div>' : 
+                    '<select class="form-select" id="size-dropdown" onchange="orderingSystem.selectProductFromDropdown(this.value)"><option value="">Loading sizes...</option></select>' : 
                     '<div class="alert alert-warning">Please complete your selections first</div>'
                 }
             </div>
@@ -576,27 +576,17 @@ class HierarchicalOrderingSystem {
     }
 
     renderSizeSelectionContent(products) {
-        const containers = ['size-selection-mobile-content'];
+        const dropdown = document.getElementById('size-dropdown');
         
-        const html = `
-            <div class="size-selection-grid">
+        if (dropdown) {
+            const options = `
+                <option value="">Select Size & Pricing</option>
                 ${products.map(product => `
-                    <div class="size-option-card ${this.currentSelections.selectedProduct?.id === product.id ? 'selected' : ''}"
-                         onclick="orderingSystem.selectProduct(${product.id})">
-                        <div class="size-label">${product.size}</div>
-                        <div class="size-price">$${product.customer_price}</div>
-                        <div class="size-category">${product.category_name}</div>
-                    </div>
+                    <option value="${product.id}">${product.size} - $${product.customer_price} (${product.category_name})</option>
                 `).join('')}
-            </div>
-        `;
-        
-        containers.forEach(containerId => {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = html;
-            }
-        });
+            `;
+            dropdown.innerHTML = options;
+        }
     }
 
     hideLoading(prefix) {
@@ -660,6 +650,16 @@ class HierarchicalOrderingSystem {
         } catch (error) {
             console.error('Error selecting product:', error);
         }
+    }
+
+    selectProductFromDropdown(productId) {
+        if (!productId) {
+            this.currentSelections.selectedProduct = null;
+            return;
+        }
+        
+        // Use the existing selectProduct function
+        this.selectProduct(productId);
     }
 
     shouldShowSubOption2() {
