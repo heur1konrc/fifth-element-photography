@@ -265,11 +265,21 @@
 .form-select {
     border-radius: 6px;
     border: 1px solid #ced4da;
-    padding: 10px 40px 10px 15px;
+    padding: 10px 40px 10px 15px !important;
     font-size: 14px;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    background-position: right 12px center;
+    background-position: right 12px center !important;
     background-size: 16px;
+}
+
+/* Additional Bootstrap override */
+select.form-select {
+    padding-right: 40px !important;
+}
+
+/* Specific dropdown fix */
+#productTypeSelect {
+    padding-right: 40px !important;
 }
 
 .form-select:focus {
