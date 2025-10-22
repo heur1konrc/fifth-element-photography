@@ -721,35 +721,124 @@
             document.getElementById('btn-next').disabled = false;
         }
         
-        function loadSubOptions() {
-            // Get unique categories for selected product type
-            const categories = {};
-            allProducts.forEach(product => {
-                if (product.product_type === selection.productType) {
-                    if (!categories[product.category]) {
-                        categories[product.category] = {
-                            name: product.category,
-                            count: 0
-                        };
-                    }
-                    categories[product.category].count++;
-                }
-            });
+        // Helper functions to parse framed product names
+        function parseFramedCanvas(name) {
+            // Example: "Framed Canvas Print - 0.75" Frame - Black - 11x14"
+            const depthMatch = name.match(/(\d+\.?\d*)" Frame/);
+            const colorMatch = name.match(/Frame - (\w+) -/);
+            return {
+                frameDepth: depthMatch ? depthMatch[1] + '"' : null,
+                frameColor: colorMatch ? colorMatch[1] : null
+            };
+        }
+        
+        function parseFramedFineArt(name) {
+            // Example: "Framed Fine Art Black No Mat Archival Matte 10×10"
+            const parts = name.replace('Framed Fine Art ', '').split(' ');
+            const frameColor = parts[0]; // First word is color
             
-            // Render sub-option cards
+            // Find mat size (contains "Mat")
+            let matSize = 'No Mat';
+            let matIndex = -1;
+            for (let i = 0; i < parts.length; i++) {
+                if (parts[i].includes('Mat')) {
+                    matIndex = i;
+                    if (i > 0 && parts[i-1].match(/^\d/)) {
+                        matSize = parts[i-1] + ' ' + parts[i];
+                    } else {
+                        matSize = parts[i-1] + ' ' + parts[i];
+                    }
+                    break;
+                }
+            }
+            
+            // Paper type is everything after mat size and before size
+            let paperType = '';
+            if (matIndex > 0) {
+                const afterMat = parts.slice(matIndex + 1);
+                // Remove the size (last element with x or ×)
+                const paperParts = afterMat.filter(p => !p.match(/\d+[x×]\d+/));
+                paperType = paperParts.join(' ');
+            }
+            
+            return {
+                frameColor: frameColor,
+                matSize: matSize,
+                paperType: paperType
+            };
+        }
+        
+        function loadSubOptions() {
             const grid = document.getElementById('sub-options-grid');
             grid.innerHTML = '';
             
-            Object.values(categories).forEach(category => {
-                const card = document.createElement('div');
-                card.className = 'option-card';
-                card.onclick = () => selectSubOption(category.name);
-                card.innerHTML = `
-                    <div class="option-title">${category.name}</div>
-                    <div class="option-description">${category.count} sizes</div>
-                `;
-                grid.appendChild(card);
-            });
+            // Handle framed products differently
+            if (selection.productType === 'Framed Canvas Prints') {
+                // Extract unique frame depth + color combinations
+                const options = new Set();
+                allProducts.forEach(product => {
+                    if (product.product_type === selection.productType) {
+                        const parsed = parseFramedCanvas(product.name);
+                        if (parsed.frameDepth && parsed.frameColor) {
+                            options.add(`${parsed.frameDepth} - ${parsed.frameColor}`);
+                        }
+                    }
+                });
+                
+                // Sort and render
+                Array.from(options).sort().forEach(option => {
+                    const card = document.createElement('div');
+                    card.className = 'option-card';
+                    card.onclick = () => selectSubOption(option);
+                    card.innerHTML = `<div class="option-title">${option}</div>`;
+                    grid.appendChild(card);
+                });
+            } else if (selection.productType === 'Framed Fine Art Paper Prints') {
+                // Extract unique paper type + mat size + color combinations
+                const options = new Set();
+                allProducts.forEach(product => {
+                    if (product.product_type === selection.productType) {
+                        const parsed = parseFramedFineArt(product.name);
+                        if (parsed.paperType && parsed.matSize && parsed.frameColor) {
+                            options.add(`${parsed.paperType} - ${parsed.matSize} - ${parsed.frameColor}`);
+                        }
+                    }
+                });
+                
+                // Sort and render
+                Array.from(options).sort().forEach(option => {
+                    const card = document.createElement('div');
+                    card.className = 'option-card';
+                    card.onclick = () => selectSubOption(option);
+                    card.innerHTML = `<div class="option-title">${option}</div>`;
+                    grid.appendChild(card);
+                });
+            } else {
+                // For non-framed products, use categories as before
+                const categories = {};
+                allProducts.forEach(product => {
+                    if (product.product_type === selection.productType) {
+                        if (!categories[product.category]) {
+                            categories[product.category] = {
+                                name: product.category,
+                                count: 0
+                            };
+                        }
+                        categories[product.category].count++;
+                    }
+                });
+                
+                Object.values(categories).forEach(category => {
+                    const card = document.createElement('div');
+                    card.className = 'option-card';
+                    card.onclick = () => selectSubOption(category.name);
+                    card.innerHTML = `
+                        <div class="option-title">${category.name}</div>
+                        <div class="option-description">${category.count} sizes</div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
         }
         
         function selectSubOption(categoryName) {
@@ -769,10 +858,31 @@
         
         function loadSizes() {
             // Get products matching selection
-            const matchingProducts = allProducts.filter(product => 
-                product.product_type === selection.productType &&
-                product.category === selection.subOption
-            );
+            let matchingProducts;
+            
+            if (selection.productType === 'Framed Canvas Prints') {
+                // Match by frame depth and color from parsed name
+                matchingProducts = allProducts.filter(product => {
+                    if (product.product_type !== selection.productType) return false;
+                    const parsed = parseFramedCanvas(product.name);
+                    const optionKey = `${parsed.frameDepth} - ${parsed.frameColor}`;
+                    return optionKey === selection.subOption;
+                });
+            } else if (selection.productType === 'Framed Fine Art Paper Prints') {
+                // Match by paper type, mat size, and color from parsed name
+                matchingProducts = allProducts.filter(product => {
+                    if (product.product_type !== selection.productType) return false;
+                    const parsed = parseFramedFineArt(product.name);
+                    const optionKey = `${parsed.paperType} - ${parsed.matSize} - ${parsed.frameColor}`;
+                    return optionKey === selection.subOption;
+                });
+            } else {
+                // For non-framed products, match by category
+                matchingProducts = allProducts.filter(product => 
+                    product.product_type === selection.productType &&
+                    product.category === selection.subOption
+                );
+            }
             
             // Sort by price
             matchingProducts.sort((a, b) => a.retail_price - b.retail_price);
