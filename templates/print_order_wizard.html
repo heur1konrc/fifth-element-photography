@@ -774,24 +774,86 @@
             
             // Handle framed products differently
             if (selection.productType === 'Framed Canvas Prints') {
-                // Extract unique frame depth + color combinations
-                const options = new Set();
+                // Use cascading dropdowns instead of cards
+                grid.innerHTML = `
+                    <div style="max-width: 600px; margin: 0 auto;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Frame Depth:</label>
+                            <select id="frame-depth-select" style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px;">
+                                <option value="">-- Select Frame Depth --</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Frame Color:</label>
+                            <select id="frame-color-select-canvas" style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px;" disabled>
+                                <option value="">-- Select Frame Color --</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+                
+                // Extract unique frame depths
+                const frameDepths = new Set();
                 allProducts.forEach(product => {
                     if (product.product_type === selection.productType) {
                         const parsed = parseFramedCanvas(product.name);
-                        if (parsed.frameDepth && parsed.frameColor) {
-                            options.add(`${parsed.frameDepth} - ${parsed.frameColor}`);
-                        }
+                        if (parsed.frameDepth) frameDepths.add(parsed.frameDepth);
                     }
                 });
                 
-                // Sort and render
-                Array.from(options).sort().forEach(option => {
-                    const card = document.createElement('div');
-                    card.className = 'option-card';
-                    card.onclick = () => selectSubOption(option);
-                    card.innerHTML = `<div class="option-title">${option}</div>`;
-                    grid.appendChild(card);
+                // Populate frame depth dropdown
+                const depthSelect = document.getElementById('frame-depth-select');
+                Array.from(frameDepths).sort().forEach(depth => {
+                    const option = document.createElement('option');
+                    option.value = depth;
+                    option.textContent = depth;
+                    depthSelect.appendChild(option);
+                });
+                
+                // Handle frame depth selection
+                depthSelect.addEventListener('change', function() {
+                    const colorSelect = document.getElementById('frame-color-select-canvas');
+                    
+                    if (this.value) {
+                        // Extract colors for selected frame depth
+                        const colors = new Set();
+                        allProducts.forEach(product => {
+                            if (product.product_type === selection.productType) {
+                                const parsed = parseFramedCanvas(product.name);
+                                if (parsed.frameDepth === this.value && parsed.frameColor) {
+                                    colors.add(parsed.frameColor);
+                                }
+                            }
+                        });
+                        
+                        // Populate color dropdown
+                        colorSelect.innerHTML = '<option value="">-- Select Frame Color --</option>';
+                        Array.from(colors).sort().forEach(color => {
+                            const option = document.createElement('option');
+                            option.value = color;
+                            option.textContent = color;
+                            colorSelect.appendChild(option);
+                        });
+                        colorSelect.disabled = false;
+                        document.getElementById('btn-next').disabled = true;
+                    } else {
+                        colorSelect.disabled = true;
+                        document.getElementById('btn-next').disabled = true;
+                    }
+                });
+                
+                // Handle color selection
+                document.getElementById('frame-color-select-canvas').addEventListener('change', function() {
+                    if (this.value) {
+                        const frameDepth = document.getElementById('frame-depth-select').value;
+                        const frameColor = this.value;
+                        
+                        // Store selection as combined string
+                        selection.subOption = `${frameDepth} - ${frameColor}`;
+                        document.getElementById('btn-next').disabled = false;
+                    } else {
+                        document.getElementById('btn-next').disabled = true;
+                    }
                 });
             } else if (selection.productType === 'Framed Fine Art Paper Prints') {
                 // Use cascading dropdowns instead of cards
