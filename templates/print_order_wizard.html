@@ -504,6 +504,9 @@
             <div class="wizard-step active" id="step-1">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                     <h2 class="step-title" style="margin: 0;">Choose Your Product Type</h2>
+                    <button class="btn-wizard btn-next" id="btn-next-step1" onclick="nextStep()" disabled style="margin: 0;">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
                 <div class="option-grid" id="product-types-grid">
                     <div class="loading">
@@ -897,133 +900,26 @@
                     }
                 });
             } else if (selection.productType === 'Framed Fine Art Paper Prints') {
-                // Use cascading dropdowns instead of cards
-                grid.innerHTML = `
-                    <div style="max-width: 600px; margin: 0 auto;">
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Paper Type:</label>
-                            <select id="paper-type-select" style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px;">
-                                <option value="">-- Select Paper Type --</option>
-                            </select>
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Mat Size:</label>
-                            <select id="mat-size-select" style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px;" disabled>
-                                <option value="">-- Select Mat Size --</option>
-                            </select>
-                        </div>
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Frame Color:</label>
-                            <select id="frame-color-select" style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px;" disabled>
-                                <option value="">-- Select Frame Color --</option>
-                            </select>
-                        </div>
-                    </div>
-                `;
-                
-                // Extract unique paper types
-                const paperTypes = new Set();
+                // Extract unique paper + mat + color combinations and show as cards
+                const options = new Set();
                 allProducts.forEach(product => {
                     if (product.product_type === selection.productType) {
                         const parsed = parseFramedFineArt(product.name);
-                        if (parsed.paperType) paperTypes.add(parsed.paperType);
+                        if (parsed.paperType && parsed.matSize && parsed.frameColor) {
+                            options.add(`${parsed.paperType} - ${parsed.matSize} - ${parsed.frameColor}`);
+                        }
                     }
                 });
                 
-                // Populate paper type dropdown
-                const paperSelect = document.getElementById('paper-type-select');
-                Array.from(paperTypes).sort().forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type;
-                    option.textContent = type;
-                    paperSelect.appendChild(option);
+                // Sort and render as cards
+                Array.from(options).sort().forEach(option => {
+                    const card = document.createElement('div');
+                    card.className = 'option-card';
+                    card.onclick = () => selectSubOption(option);
+                    card.innerHTML = `<div class="option-title">${option}</div>`;
+                    grid.appendChild(card);
                 });
-                
-                // Handle paper type selection
-                paperSelect.addEventListener('change', function() {
-                    const matSelect = document.getElementById('mat-size-select');
-                    const colorSelect = document.getElementById('frame-color-select');
-                    
-                    if (this.value) {
-                        // Extract mat sizes for selected paper type
-                        const matSizes = new Set();
-                        allProducts.forEach(product => {
-                            if (product.product_type === selection.productType) {
-                                const parsed = parseFramedFineArt(product.name);
-                                if (parsed.paperType === this.value && parsed.matSize) {
-                                    matSizes.add(parsed.matSize);
-                                }
-                            }
-                        });
-                        
-                        // Populate mat size dropdown
-                        matSelect.innerHTML = '<option value="">-- Select Mat Size --</option>';
-                        Array.from(matSizes).sort().forEach(size => {
-                            const option = document.createElement('option');
-                            option.value = size;
-                            option.textContent = size;
-                            matSelect.appendChild(option);
-                        });
-                        matSelect.disabled = false;
-                        
-                        // Reset and disable color select
-                        colorSelect.innerHTML = '<option value="">-- Select Frame Color --</option>';
-                        colorSelect.disabled = true;
-                        document.getElementById('btn-next').disabled = true;
-                    } else {
-                        matSelect.disabled = true;
-                        colorSelect.disabled = true;
-                        document.getElementById('btn-next').disabled = true;
-                    }
-                });
-                
-                // Handle mat size selection
-                document.getElementById('mat-size-select').addEventListener('change', function() {
-                    const paperType = document.getElementById('paper-type-select').value;
-                    const colorSelect = document.getElementById('frame-color-select');
-                    
-                    if (this.value) {
-                        // Extract colors for selected paper type + mat size
-                        const colors = new Set();
-                        allProducts.forEach(product => {
-                            if (product.product_type === selection.productType) {
-                                const parsed = parseFramedFineArt(product.name);
-                                if (parsed.paperType === paperType && parsed.matSize === this.value && parsed.frameColor) {
-                                    colors.add(parsed.frameColor);
-                                }
-                            }
-                        });
-                        
-                        // Populate color dropdown
-                        colorSelect.innerHTML = '<option value="">-- Select Frame Color --</option>';
-                        Array.from(colors).sort().forEach(color => {
-                            const option = document.createElement('option');
-                            option.value = color;
-                            option.textContent = color;
-                            colorSelect.appendChild(option);
-                        });
-                        colorSelect.disabled = false;
-                        document.getElementById('btn-next').disabled = true;
-                    } else {
-                        colorSelect.disabled = true;
-                        document.getElementById('btn-next').disabled = true;
-                    }
-                });
-                
-                // Handle color selection
-                document.getElementById('frame-color-select').addEventListener('change', function() {
-                    if (this.value) {
-                        const paperType = document.getElementById('paper-type-select').value;
-                        const matSize = document.getElementById('mat-size-select').value;
-                        const frameColor = this.value;
-                        
-                        // Store selection as combined string
-                        selection.subOption = `${paperType} - ${matSize} - ${frameColor}`;
-                        document.getElementById('btn-next').disabled = false;
-                    } else {
-                        document.getElementById('btn-next').disabled = true;
-                    }
-                });
+
             } else {
                 // For non-framed products, use categories as before
                 const categories = {};
@@ -1191,6 +1087,9 @@
             document.getElementById('btn-next').disabled = true;
             
             // Update step-specific Next buttons
+            if (document.getElementById('btn-next-step1')) {
+                document.getElementById('btn-next-step1').disabled = true;
+            }
             if (document.getElementById('btn-next-step2')) {
                 document.getElementById('btn-next-step2').disabled = true;
             }
