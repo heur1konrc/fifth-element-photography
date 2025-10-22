@@ -10,6 +10,7 @@ import os
 from PIL import Image
 
 DB_PATH = '/data/lumaprints_pricing.db'
+DEFAULT_MARKUP_PERCENTAGE = 150.0  # 150% markup = 2.5x cost
 
 def connect_to_pricing_database():
     """Get database connection - NEW function name"""
@@ -27,14 +28,19 @@ def fetch_all_available_products():
         conn = connect_to_pricing_database()
         cursor = conn.cursor()
         
+        # Get global markup from settings
+        cursor.execute("SELECT value FROM settings WHERE key_name = 'global_markup_percentage'")
+        markup_row = cursor.fetchone()
+        markup_percentage = float(markup_row[0]) if markup_row else DEFAULT_MARKUP_PERCENTAGE
+        
         # Query ALL products - no filtering for now
+        # NOTE: Database doesn't have retail_price column, calculate from cost_price
         query = '''
             SELECT 
                 p.id,
                 p.name,
                 p.size,
                 p.cost_price,
-                p.retail_price,
                 pt.name as product_type,
                 c.name as category,
                 p.lumaprints_subcategory_id,
@@ -43,7 +49,7 @@ def fetch_all_available_products():
             JOIN product_types pt ON p.product_type_id = pt.id
             JOIN categories c ON p.category_id = c.id
             WHERE p.active = 1
-            ORDER BY pt.display_order, c.display_order, p.size
+            ORDER BY pt.name, c.name, p.size
         '''
         
         cursor.execute(query)
@@ -51,12 +57,16 @@ def fetch_all_available_products():
         
         products = []
         for row in rows:
+            # Calculate retail price from cost price using markup
+            cost_price = row['cost_price']
+            retail_price = cost_price * (1 + markup_percentage / 100.0)
+            
             products.append({
                 'id': row['id'],
                 'name': row['name'],
                 'size': row['size'],
-                'cost_price': row['cost_price'],
-                'retail_price': row['retail_price'],
+                'cost_price': cost_price,
+                'retail_price': round(retail_price, 2),
                 'product_type': row['product_type'],
                 'category': row['category'],
                 'lumaprints_subcategory_id': row['lumaprints_subcategory_id'],
