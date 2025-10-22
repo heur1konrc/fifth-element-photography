@@ -2903,6 +2903,10 @@ register_import_routes(app)
 from order_api_v3 import register_order_routes_v3
 register_order_routes_v3(app)
 
+# Register diagnostic routes
+from diagnostic_api import register_diagnostic_routes
+register_diagnostic_routes(app)
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 # 

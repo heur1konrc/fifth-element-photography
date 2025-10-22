@@ -93,28 +93,14 @@ def get_image_metadata_from_file(image_path):
 
 def get_products_for_image(image_data):
     """
-    Get compatible products from database based on image specifications
+    Get ALL products from database (filtering removed for testing)
     """
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Calculate compatible sizes
-        compatible_sizes = calculate_compatible_sizes(
-            image_data['width'],
-            image_data['height'],
-            image_data['ratio']
-        )
-        
-        if not compatible_sizes:
-            return []
-        
-        # Get size strings for query
-        size_list = [s['size'] for s in compatible_sizes]
-        placeholders = ','.join(['?' for _ in size_list])
-        
-        # Query products
-        query = f'''
+        # Query ALL products (no filtering)
+        query = '''
             SELECT 
                 p.id,
                 p.name,
@@ -128,12 +114,11 @@ def get_products_for_image(image_data):
             FROM products p
             JOIN product_types pt ON p.product_type_id = pt.id
             JOIN categories c ON p.category_id = c.id
-            WHERE p.size IN ({placeholders})
-                AND p.active = 1
+            WHERE p.active = 1
             ORDER BY pt.display_order, c.display_order, p.size
         '''
         
-        cursor.execute(query, size_list)
+        cursor.execute(query)
         rows = cursor.fetchall()
         
         products = []
