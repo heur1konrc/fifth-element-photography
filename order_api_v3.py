@@ -185,6 +185,7 @@ def register_order_routes_v3(app):
             
             # Try to read from local filesystem first
             # Priority: originals (high-res) > web-optimized
+            # Force update: Check /data/originals/ first for true high-res dimensions
             local_paths = [
                 f'/data/originals/{filename}',  # High-res originals
                 f'/data/{filename}',             # Web-optimized fallback
