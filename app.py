@@ -2896,6 +2896,13 @@ register_hierarchical_routes_new(app)
 from admin_import_endpoint import register_import_routes
 register_import_routes(app)
 
+# ============================================================================
+# ORDER FORM V3 - CLEAN IMPLEMENTATION
+# ============================================================================
+
+from order_api_v3 import register_order_routes_v3
+register_order_routes_v3(app)
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 # 
