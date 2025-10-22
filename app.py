@@ -2903,6 +2903,10 @@ register_import_routes(app)
 from order_api_v3 import register_order_routes_v3
 register_order_routes_v3(app)
 
+# NEW: Register fresh print order routes to bypass Railway cache
+from print_order_api import setup_print_order_routes
+setup_print_order_routes(app)
+
 # Register diagnostic routes
 from diagnostic_api import register_diagnostic_routes
 register_diagnostic_routes(app)
