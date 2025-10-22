@@ -377,23 +377,31 @@ def import_framed_fine_art():
                 # Create product for each frame color and paper type
                 for color_name, color_id in FRAME_COLORS.items():
                     for paper_name, paper_type_id in PAPER_TYPES.items():
-                        # Determine subcategory ID based on frame size and color
-                        frame_key = f"{api_code}_{color_name.lower()}"
-                        subcategory_id = LUMAPRINTS_CODES['framed_fine_art'][frame_key]
-                        
-                        name = f"Framed Fine Art {frame_display} {color_name} {paper_name} {mat_display} {clean_size}"
-                        options = json.dumps({
-                            'frame_color': color_id,
-                            'paper_type': paper_type_id,
-                            'mat_size': mat_id
-                        })
-                        
-                        cursor.execute('''
-                            INSERT INTO products (name, product_type_id, category_id, size, cost_price, 
-                                                lumaprints_subcategory_id, lumaprints_options)
-                            VALUES (?, 4, ?, ?, ?, ?, ?)
-                        ''', (name, category_id, clean_size, price, subcategory_id, options))
-                        product_count += 1
+                        try:
+                            # Determine subcategory ID based on frame size and color
+                            frame_key = f"{api_code}_{color_name.lower()}"
+                            subcategory_id = LUMAPRINTS_CODES['framed_fine_art'].get(frame_key)
+                            
+                            if not subcategory_id:
+                                print(f"⚠️  Warning: No subcategory ID for {frame_key}, skipping")
+                                continue
+                            
+                            name = f"Framed Fine Art {frame_display} {color_name} {paper_name} {mat_display} {clean_size}"
+                            options = json.dumps({
+                                'frame_color': color_id,
+                                'paper_type': paper_type_id,
+                                'mat_size': mat_id
+                            })
+                            
+                            cursor.execute('''
+                                INSERT INTO products (name, product_type_id, category_id, size, cost_price, 
+                                                    lumaprints_subcategory_id, lumaprints_options)
+                                VALUES (?, 4, ?, ?, ?, ?, ?)
+                            ''', (name, category_id, clean_size, price, subcategory_id, options))
+                            product_count += 1
+                        except Exception as e:
+                            print(f"⚠️  Error importing {frame_key} {paper_name}: {e}")
+                            continue
         
         category_id += 1
     
