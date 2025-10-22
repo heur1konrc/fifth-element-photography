@@ -138,19 +138,24 @@
         /* Option Cards */
         .option-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
             margin-bottom: 30px;
         }
         
         .option-card {
             border: 2px solid #dee2e6;
             border-radius: 10px;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
             background: white;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
         .option-card:hover {
@@ -173,8 +178,9 @@
         
         .option-title {
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             color: #2c3e50;
+            font-size: 1.1rem;
         }
         
         .option-description {
@@ -183,10 +189,10 @@
         }
         
         .option-price {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             color: #28a745;
-            margin-top: 10px;
+            margin-top: 5px;
         }
         
         /* Navigation Buttons */
@@ -336,6 +342,72 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .wizard-container {
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .progress-steps {
+                padding: 20px 10px;
+            }
+            
+            .step-label {
+                font-size: 0.7rem;
+            }
+            
+            .step-number {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+            
+            .wizard-content {
+                padding: 20px;
+            }
+            
+            .option-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+            
+            .option-card {
+                padding: 12px;
+                min-height: 70px;
+            }
+            
+            .option-title {
+                font-size: 0.95rem;
+            }
+            
+            .option-price {
+                font-size: 1rem;
+            }
+            
+            .option-icon {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+            
+            .wizard-navigation {
+                padding: 15px 20px;
+            }
+            
+            .btn-wizard {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .image-preview img {
+                max-height: 200px;
+            }
         }
     </style>
 </head>
@@ -646,7 +718,6 @@
                 card.onclick = () => selectSize(product);
                 card.innerHTML = `
                     <div class="option-title">${product.size}</div>
-                    <div class="option-description">${product.name}</div>
                     <div class="option-price">$${product.retail_price.toFixed(2)}</div>
                 `;
                 grid.appendChild(card);
