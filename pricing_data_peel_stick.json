@@ -1,0 +1,33 @@
+{
+  "product_type": "Peel & Stick",
+  "lumaprints_subcategory_id": "106001",
+  "sizes": [
+    {"size": "4×6", "price": 3.79},
+    {"size": "8×10", "price": 4.30},
+    {"size": "8×12", "price": 4.43},
+    {"size": "10×20", "price": 7.08},
+    {"size": "10×30", "price": 8.48},
+    {"size": "11×14", "price": 6.44},
+    {"size": "12×12", "price": 6.30},
+    {"size": "12×16", "price": 6.96},
+    {"size": "12×18", "price": 7.31},
+    {"size": "16×20", "price": 8.76},
+    {"size": "16×24", "price": 9.64},
+    {"size": "16×48", "price": 17.91},
+    {"size": "18×24", "price": 10.32},
+    {"size": "20×20", "price": 9.87},
+    {"size": "20×40", "price": 18.48},
+    {"size": "20×60", "price": 25.58},
+    {"size": "24×30", "price": 17.07},
+    {"size": "24×36", "price": 19.61},
+    {"size": "30×30", "price": 20.25},
+    {"size": "30×40", "price": 25.58},
+    {"size": "30×60", "price": 34.59},
+    {"size": "32×48", "price": 31.17},
+    {"size": "36×48", "price": 33.86},
+    {"size": "36×72", "price": 34.82},
+    {"size": "40×40", "price": 32.06},
+    {"size": "40×60", "price": 40.26}
+  ]
+}
+
