@@ -10,7 +10,8 @@ import os
 from PIL import Image
 
 DB_PATH = '/data/lumaprints_pricing.db'
-DEFAULT_MARKUP_PERCENTAGE = 150.0  # 150% markup = 2.5x cost
+DEFAULT_MARKUP_PERCENTAGE = 50.0  # 50% markup for testing = 1.5x cost
+# TODO: Later integrate with pricing tool at https://fifthelement.photos/admin/pricing
 
 def connect_to_pricing_database():
     """Get database connection - NEW function name"""
