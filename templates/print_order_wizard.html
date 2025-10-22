@@ -646,6 +646,18 @@
         }
         
         function loadProductTypes() {
+            // Define the desired order
+            const desiredOrder = [
+                'Canvas Prints',
+                'Framed Canvas Prints',
+                'Fine Art Paper Prints',
+                'Framed Fine Art Paper Prints',
+                'Foam-Mounted Fine Art Paper Prints',
+                'Metal Prints',
+                'Peel and Stick Prints',
+                'Rolled Canvas Prints'
+            ];
+            
             // Get unique product types
             const productTypes = {};
             allProducts.forEach(product => {
@@ -659,11 +671,16 @@
                 productTypes[product.product_type].count++;
             });
             
+            // Sort by desired order
+            const sortedTypes = desiredOrder
+                .filter(name => productTypes[name])
+                .map(name => productTypes[name]);
+            
             // Render product type cards
             const grid = document.getElementById('product-types-grid');
             grid.innerHTML = '';
             
-            Object.values(productTypes).forEach(type => {
+            sortedTypes.forEach(type => {
                 const card = document.createElement('div');
                 card.className = 'option-card';
                 card.onclick = () => selectProductType(type.name);
