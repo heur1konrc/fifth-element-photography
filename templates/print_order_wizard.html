@@ -633,7 +633,8 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        allProducts = data.products;
+                        // Filter products based on allowed options
+                        allProducts = filterAllowedProducts(data.products);
                         loadProductTypes();
                     } else {
                         alert('Error loading products: ' + (data.error || 'Unknown error'));
@@ -643,6 +644,34 @@
                     console.error('Error:', error);
                     alert('Failed to load products');
                 });
+        }
+        
+        function filterAllowedProducts(products) {
+            // Allowed options for Framed Fine Art Paper Prints
+            const allowedPaperTypes = ['Hot Press', 'Cold Press', 'Semi-Glossy', 'Semi-Matte'];
+            const allowedMatSizes = ['No Mat'];
+            const allowedFrameColors = ['Black', 'White'];
+            
+            return products.filter(product => {
+                // For Framed Fine Art Paper Prints, apply filters
+                if (product.product_type === 'Framed Fine Art Paper Prints') {
+                    const parsed = parseFramedFineArt(product.name);
+                    
+                    // Check if paper type is allowed
+                    if (!allowedPaperTypes.includes(parsed.paperType)) return false;
+                    
+                    // Check if mat size is allowed
+                    if (!allowedMatSizes.includes(parsed.matSize)) return false;
+                    
+                    // Check if frame color is allowed
+                    if (!allowedFrameColors.includes(parsed.frameColor)) return false;
+                    
+                    return true;
+                }
+                
+                // For all other product types, include all products
+                return true;
+            });
         }
         
         function loadProductTypes() {
