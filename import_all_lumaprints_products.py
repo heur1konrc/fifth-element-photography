@@ -81,6 +81,7 @@ def init_database():
             category_id INTEGER NOT NULL,
             size TEXT NOT NULL,
             cost_price REAL NOT NULL,
+            retail_price REAL NOT NULL,
             lumaprints_subcategory_id INTEGER,
             lumaprints_options TEXT,
             active INTEGER DEFAULT 1,
@@ -210,10 +211,10 @@ def import_canvas():
             name = f"Canvas {depth_data['name']} {clean_size}"
             
             cursor.execute('''
-                INSERT INTO products (name, product_type_id, category_id, size, cost_price, 
+                INSERT INTO products (name, product_type_id, category_id, size, cost_price, retail_price, 
                                     lumaprints_subcategory_id, lumaprints_options)
-                VALUES (?, 1, ?, ?, ?, ?, '{}')
-            ''', (name, category_id, clean_size, price, subcategory_id))
+                VALUES (?, 1, ?, ?, ?, ?, ?, '{}')
+            ''', (name, category_id, clean_size, price, price, subcategory_id))
             product_count += 1
     
     conn.commit()
@@ -269,10 +270,10 @@ def import_framed_canvas():
                 options = json.dumps({'frame_color': color_id})
                 
                 cursor.execute('''
-                    INSERT INTO products (name, product_type_id, category_id, size, cost_price, 
+                    INSERT INTO products (name, product_type_id, category_id, size, cost_price, retail_price, 
                                         lumaprints_subcategory_id, lumaprints_options)
-                    VALUES (?, 2, ?, ?, ?, ?, ?)
-                ''', (name, category_id, clean_size, price, subcategory_id, options))
+                    VALUES (?, 2, ?, ?, ?, ?, ?, ?)
+                ''', (name, category_id, clean_size, price, price, subcategory_id, options))
                 product_count += 1
     
     conn.commit()
@@ -314,10 +315,10 @@ def import_fine_art_paper():
             options = json.dumps({'paper_type': paper_type_id})
             
             cursor.execute('''
-                INSERT INTO products (name, product_type_id, category_id, size, cost_price, 
+                INSERT INTO products (name, product_type_id, category_id, size, cost_price, retail_price, 
                                     lumaprints_subcategory_id, lumaprints_options)
-                VALUES (?, 3, ?, ?, ?, ?, ?)
-            ''', (name, category_id, clean_size, price, LUMAPRINTS_CODES['fine_art_paper'], options))
+                VALUES (?, 3, ?, ?, ?, ?, ?, ?)
+            ''', (name, category_id, clean_size, price, price, LUMAPRINTS_CODES['fine_art_paper'], options))
             product_count += 1
         
         category_id += 1
@@ -394,10 +395,10 @@ def import_framed_fine_art():
                             })
                             
                             cursor.execute('''
-                                INSERT INTO products (name, product_type_id, category_id, size, cost_price, 
+                                INSERT INTO products (name, product_type_id, category_id, size, cost_price, retail_price, 
                                                     lumaprints_subcategory_id, lumaprints_options)
-                                VALUES (?, 4, ?, ?, ?, ?, ?)
-                            ''', (name, category_id, clean_size, price, subcategory_id, options))
+                                VALUES (?, 4, ?, ?, ?, ?, ?, ?)
+                            ''', (name, category_id, clean_size, price, price, subcategory_id, options))
                             product_count += 1
                         except Exception as e:
                             print(f"⚠️  Error importing {frame_key} {paper_name}: {e}")
@@ -444,10 +445,10 @@ def import_foam_mounted():
             options = json.dumps({'paper_type': paper_type_id})
             
             cursor.execute('''
-                INSERT INTO products (name, product_type_id, category_id, size, cost_price, 
+                INSERT INTO products (name, product_type_id, category_id, size, cost_price, retail_price, 
                                     lumaprints_subcategory_id, lumaprints_options)
-                VALUES (?, 7, ?, ?, ?, ?, ?)
-            ''', (name, category_id, clean_size, price, LUMAPRINTS_CODES['foam_mounted'], options))
+                VALUES (?, 7, ?, ?, ?, ?, ?, ?)
+            ''', (name, category_id, clean_size, price, price, LUMAPRINTS_CODES['foam_mounted'], options))
             product_count += 1
         
         category_id += 1
@@ -480,10 +481,10 @@ def import_metal_prints():
         name = f"Metal Print {size}"
         
         cursor.execute('''
-            INSERT INTO products (name, product_type_id, category_id, size, cost_price, 
+            INSERT INTO products (name, product_type_id, category_id, size, cost_price, retail_price, 
                                 lumaprints_subcategory_id, lumaprints_options)
-            VALUES (?, 5, 25, ?, ?, ?, '{}')
-        ''', (name, size, price, LUMAPRINTS_CODES['metal_prints']))
+            VALUES (?, 5, 25, ?, ?, ?, ?, '{}')
+        ''', (name, size, price, price, LUMAPRINTS_CODES['metal_prints']))
         product_count += 1
     
     conn.commit()
@@ -514,10 +515,10 @@ def import_peel_stick():
         name = f"Peel & Stick {size}"
         
         cursor.execute('''
-            INSERT INTO products (name, product_type_id, category_id, size, cost_price, 
+            INSERT INTO products (name, product_type_id, category_id, size, cost_price, retail_price, 
                                 lumaprints_subcategory_id, lumaprints_options)
-            VALUES (?, 6, 26, ?, ?, ?, '{}')
-        ''', (name, size, price, LUMAPRINTS_CODES['peel_stick']))
+            VALUES (?, 6, 26, ?, ?, ?, ?, '{}')
+        ''', (name, size, price, price, LUMAPRINTS_CODES['peel_stick']))
         product_count += 1
     
     conn.commit()
