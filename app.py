@@ -2889,6 +2889,13 @@ def get_pricing_summary():
 from hierarchical_api_new import register_hierarchical_routes_new
 register_hierarchical_routes_new(app)
 
+# ============================================================================
+# ADMIN IMPORT ENDPOINT
+# ============================================================================
+
+from admin_import_endpoint import register_import_routes
+register_import_routes(app)
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 # 
