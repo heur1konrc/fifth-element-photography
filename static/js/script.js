@@ -652,7 +652,7 @@ function openOrderWizard() {
     const imageElement = document.getElementById('modalImage');
     if (imageElement && imageElement.src) {
         // Redirect to the wizard with the image URL
-        const wizardUrl = `https://fifth-element-photography-production.up.railway.app/print-order-wizard?image=${encodeURIComponent(imageElement.src)}`;
+        const wizardUrl = `https://fifthelement.photos/print-order-wizard?image=${encodeURIComponent(imageElement.src)}`;
         window.location.href = wizardUrl;
     } else {
         console.error('No image selected');
