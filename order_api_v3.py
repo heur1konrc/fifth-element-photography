@@ -184,11 +184,12 @@ def register_order_routes_v3(app):
             filename = image_url.split('/')[-1]
             
             # Try to read from local filesystem first
+            # Priority: originals (high-res) > web-optimized
             local_paths = [
-                f'/data/images/{filename}',
-                f'/data/{filename}',
-                f'./data/images/{filename}',
-                f'./images/{filename}'
+                f'/data/originals/{filename}',  # High-res originals
+                f'/data/{filename}',             # Web-optimized fallback
+                f'./data/originals/{filename}',
+                f'./data/{filename}'
             ]
             
             metadata = None
