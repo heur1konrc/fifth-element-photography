@@ -761,8 +761,10 @@
                 }
             });
             
-            // Enable next button
+            // Enable both next buttons
             document.getElementById('btn-next').disabled = false;
+            const stepBtn = document.getElementById('btn-next-step' + currentStep);
+            if (stepBtn) stepBtn.disabled = false;
         }
         
         // Helper functions to parse framed product names
@@ -959,8 +961,10 @@
                 }
             });
             
-            // Enable next button
+            // Enable both next buttons
             document.getElementById('btn-next').disabled = false;
+            const stepBtn = document.getElementById('btn-next-step' + currentStep);
+            if (stepBtn) stepBtn.disabled = false;
         }
         
         function loadSizes() {
@@ -1023,8 +1027,10 @@
             selection.price = product.retail_price;
             selection.productName = product.name;
             
-            // Enable next button
+            // Enable both next buttons
             document.getElementById('btn-next').disabled = false;
+            const stepBtn = document.getElementById('btn-next-step' + currentStep);
+            if (stepBtn) stepBtn.disabled = false;
         }
         
         function loadReview() {
