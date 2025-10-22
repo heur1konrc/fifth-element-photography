@@ -641,19 +641,39 @@
         function loadImageData() {
             const img = new Image();
             img.onload = function() {
-                // Calculate GCD to simplify ratio
-                function gcd(a, b) {
-                    return b === 0 ? a : gcd(b, a % b);
-                }
+                // Calculate decimal ratio
+                const decimalRatio = this.width / this.height;
                 
-                const divisor = gcd(this.width, this.height);
-                const ratioWidth = Math.round(this.width / divisor);
-                const ratioHeight = Math.round(this.height / divisor);
+                // Common photography aspect ratios
+                const commonRatios = [
+                    { ratio: 1/1, display: '1:1' },      // Square
+                    { ratio: 4/5, display: '4:5' },      // Portrait
+                    { ratio: 5/4, display: '5:4' },      // Large format
+                    { ratio: 4/3, display: '4:3' },      // Micro four-thirds
+                    { ratio: 3/2, display: '3:2' },      // Standard DSLR
+                    { ratio: 2/3, display: '2:3' },      // Portrait DSLR
+                    { ratio: 16/9, display: '16:9' },    // Widescreen
+                    { ratio: 9/16, display: '9:16' },    // Portrait widescreen
+                    { ratio: 5/2, display: '5:2' },      // Panoramic
+                    { ratio: 2/1, display: '2:1' }       // Panoramic
+                ];
+                
+                // Find closest common ratio
+                let closestRatio = commonRatios[0];
+                let minDiff = Math.abs(decimalRatio - closestRatio.ratio);
+                
+                for (let i = 1; i < commonRatios.length; i++) {
+                    const diff = Math.abs(decimalRatio - commonRatios[i].ratio);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestRatio = commonRatios[i];
+                    }
+                }
                 
                 imageData = {
                     width: this.width,
                     height: this.height,
-                    ratio: `${ratioWidth}:${ratioHeight}`,
+                    ratio: closestRatio.display,
                     dpi: Math.round((this.width / (this.width / 300)))
                 };
                 
