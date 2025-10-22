@@ -344,6 +344,52 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* Size Selector */
+        .size-selector-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .size-label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .size-dropdown {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            background: white;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 45px;
+        }
+        
+        .size-dropdown:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        
+        .size-dropdown:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .size-dropdown option {
+            padding: 10px;
+        }
+        
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .wizard-container {
@@ -476,8 +522,11 @@
             <!-- Step 3: Size Selection -->
             <div class="wizard-step" id="step-3">
                 <h2 class="step-title">Choose Your Size</h2>
-                <div class="option-grid" id="sizes-grid">
-                    <!-- Dynamically loaded -->
+                <div class="size-selector-container">
+                    <label for="size-select" class="size-label">Select a print size:</label>
+                    <select id="size-select" class="size-dropdown">
+                        <option value="">-- Select Size --</option>
+                    </select>
                 </div>
             </div>
             
@@ -708,20 +757,30 @@
                 product.category === selection.subOption
             );
             
-            // Render size cards
-            const grid = document.getElementById('sizes-grid');
-            grid.innerHTML = '';
+            // Sort by price
+            matchingProducts.sort((a, b) => a.retail_price - b.retail_price);
+            
+            // Populate dropdown
+            const dropdown = document.getElementById('size-select');
+            dropdown.innerHTML = '<option value="">-- Select Size --</option>';
             
             matchingProducts.forEach(product => {
-                const card = document.createElement('div');
-                card.className = 'option-card';
-                card.onclick = () => selectSize(product);
-                card.innerHTML = `
-                    <div class="option-title">${product.size}</div>
-                    <div class="option-price">$${product.retail_price.toFixed(2)}</div>
-                `;
-                grid.appendChild(card);
+                const option = document.createElement('option');
+                option.value = product.id;
+                option.textContent = `${product.size} - $${product.retail_price.toFixed(2)}`;
+                option.dataset.product = JSON.stringify(product);
+                dropdown.appendChild(option);
             });
+            
+            // Add change listener
+            dropdown.onchange = function() {
+                if (this.value) {
+                    const product = JSON.parse(this.options[this.selectedIndex].dataset.product);
+                    selectSize(product);
+                } else {
+                    document.getElementById('btn-next').disabled = true;
+                }
+            };
         }
         
         function selectSize(product) {
@@ -729,12 +788,6 @@
             selection.productId = product.id;
             selection.price = product.retail_price;
             selection.productName = product.name;
-            
-            // Highlight selected card
-            document.querySelectorAll('#sizes-grid .option-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
             
             // Enable next button
             document.getElementById('btn-next').disabled = false;
