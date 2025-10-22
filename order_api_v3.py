@@ -63,18 +63,14 @@ def calculate_compatible_sizes(image_width, image_height, image_ratio, min_dpi=1
     return compatible_sizes
 
 
-def get_image_metadata(image_url):
+def get_image_metadata_from_file(image_path):
     """
-    Get image metadata from URL
+    Get image metadata from local file
     Returns width, height, and calculated DPI
     """
     try:
-        # Download image
-        response = requests.get(image_url, timeout=10)
-        response.raise_for_status()
-        
-        # Open with PIL
-        img = Image.open(BytesIO(response.content))
+        # Open image from local filesystem
+        img = Image.open(image_path)
         
         width, height = img.size
         ratio = round(width / height, 2)
@@ -91,7 +87,7 @@ def get_image_metadata(image_url):
             'dpi': dpi
         }
     except Exception as e:
-        print(f"Error getting image metadata: {e}")
+        print(f"Error getting image metadata from file: {e}")
         return None
 
 
@@ -176,21 +172,14 @@ def register_order_routes_v3(app):
         try:
             data = request.json
             
-            if not data or 'url' not in data:
-                return jsonify({
-                    'success': False,
-                    'error': 'Image URL is required'
-                }), 400
-            
-            # Get image metadata if not provided
-            if 'width' not in data or 'height' not in data:
-                metadata = get_image_metadata(data['url'])
-                if not metadata:
+            # Frontend must provide image dimensions
+            required = ['url', 'width', 'height', 'ratio']
+            for field in required:
+                if field not in data:
                     return jsonify({
                         'success': False,
-                        'error': 'Failed to load image metadata'
+                        'error': f'Missing required field: {field}'
                     }), 400
-                data.update(metadata)
             
             # Get compatible products
             products = get_products_for_image(data)
@@ -208,6 +197,8 @@ def register_order_routes_v3(app):
             
         except Exception as e:
             print(f"Error in api_get_products: {e}")
+            import traceback
+            traceback.print_exc()
             return jsonify({
                 'success': False,
                 'error': str(e)
