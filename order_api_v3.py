@@ -172,27 +172,56 @@ def register_order_routes_v3(app):
         try:
             data = request.json
             
-            # Frontend must provide image dimensions
-            required = ['url', 'width', 'height', 'ratio']
-            for field in required:
-                if field not in data:
+            # Image URL is required
+            if 'url' not in data:
+                return jsonify({
+                    'success': False,
+                    'error': 'Image URL is required'
+                }), 400
+            
+            # Extract filename from URL
+            image_url = data['url']
+            filename = image_url.split('/')[-1]
+            
+            # Try to read from local filesystem first
+            local_paths = [
+                f'/data/images/{filename}',
+                f'/data/{filename}',
+                f'./data/images/{filename}',
+                f'./images/{filename}'
+            ]
+            
+            metadata = None
+            for path in local_paths:
+                if os.path.exists(path):
+                    metadata = get_image_metadata_from_file(path)
+                    if metadata:
+                        print(f"✅ Read image metadata from {path}: {metadata['width']}×{metadata['height']}")
+                        break
+            
+            # If local read failed, use dimensions from frontend (may be resized)
+            if not metadata:
+                print(f"⚠️  Could not read image from filesystem, using frontend dimensions")
+                if 'width' in data and 'height' in data:
+                    metadata = {
+                        'width': data['width'],
+                        'height': data['height'],
+                        'ratio': data.get('ratio', data['width'] / data['height']),
+                        'dpi': data.get('dpi', 300)
+                    }
+                else:
                     return jsonify({
                         'success': False,
-                        'error': f'Missing required field: {field}'
+                        'error': 'Could not determine image dimensions'
                     }), 400
             
             # Get compatible products
-            products = get_products_for_image(data)
+            products = get_products_for_image(metadata)
             
             return jsonify({
                 'success': True,
                 'products': products,
-                'image_data': {
-                    'width': data['width'],
-                    'height': data['height'],
-                    'ratio': data['ratio'],
-                    'dpi': data.get('dpi', 300)
-                }
+                'image_data': metadata
             })
             
         except Exception as e:
