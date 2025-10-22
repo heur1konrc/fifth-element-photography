@@ -4119,6 +4119,7 @@ def get_hierarchical_available_sizes():
         cursor.execute("SELECT value FROM settings WHERE key_name = 'global_markup_percentage'")
         markup_row = cursor.fetchone()
         markup_percentage = float(markup_row['value']) if markup_row else 150.0
+        multiplier = (markup_percentage / 100) + 1  # Convert percentage to multiplier
         
         # Build query - prefer Lumaprints codes over internal IDs
         query = """
@@ -4154,7 +4155,7 @@ def get_hierarchical_available_sizes():
         products = []
         for row in cursor.fetchall():
             # Calculate customer price using global markup
-            customer_price = row['cost_price'] * (markup_percentage / 100)
+            customer_price = row['cost_price'] * multiplier
             
             # Parse Lumaprints options JSON
             lumaprints_options = []
@@ -4203,6 +4204,7 @@ def get_hierarchical_product_details(product_id):
         cursor.execute("SELECT value FROM settings WHERE key_name = 'global_markup_percentage'")
         markup_row = cursor.fetchone()
         markup_percentage = float(markup_row['value']) if markup_row else 150.0
+        multiplier = (markup_percentage / 100) + 1  # Convert percentage to multiplier
         
         cursor.execute("""
             SELECT p.*, c.name as category_name, pt.name as product_type_name,
@@ -4223,7 +4225,7 @@ def get_hierarchical_product_details(product_id):
             }), 404
         
         # Calculate customer price using global markup
-        customer_price = row['cost_price'] * (markup_percentage / 100)
+        customer_price = row['cost_price'] * multiplier
         
         # Parse Lumaprints options JSON
         lumaprints_options = []
@@ -4374,6 +4376,7 @@ def debug_sizes():
         cursor.execute("SELECT value FROM settings WHERE key_name = 'global_markup_percentage'")
         markup_row = cursor.fetchone()
         markup_percentage = float(markup_row['value']) if markup_row else 150.0
+        multiplier = (markup_percentage / 100) + 1  # Convert percentage to multiplier
         
         # Use the exact same query as the working API
         query = """
@@ -4428,7 +4431,7 @@ def debug_sizes():
         
         for product in products:
             # Calculate customer price like the API does
-            customer_price = product['cost_price'] * (markup_percentage / 100)
+            customer_price = product['cost_price'] * multiplier
             html += f"""
             <tr>
                 <td style="padding: 10px;">{product['id']}</td>
@@ -4458,7 +4461,7 @@ def debug_sizes():
                     "name": p['name'],
                     "size": p['size'],
                     "cost_price": float(p['cost_price']),
-                    "customer_price": float(p['cost_price'] * (markup_percentage / 100)),
+                    "customer_price": float(p['cost_price'] * multiplier),
                     "category_name": p['category_name']
                 }
                 for p in products
