@@ -2907,6 +2907,10 @@ register_order_routes_v3(app)
 from print_order_api import setup_print_order_routes
 setup_print_order_routes(app)
 
+# Register print order diagnostic routes
+from print_order_diagnostic import register_print_diagnostic_routes
+register_print_diagnostic_routes(app)
+
 # Register diagnostic routes
 from diagnostic_api import register_diagnostic_routes
 register_diagnostic_routes(app)
