@@ -267,6 +267,8 @@ def register_order_routes_v3(app):
     def api_submit_order():
         """Submit order to OrderDesk after payment"""
         try:
+            from orderdesk_integration import create_order
+            
             data = request.json
             
             # Validate required fields
@@ -278,17 +280,46 @@ def register_order_routes_v3(app):
                         'error': f'Missing required field: {field}'
                     }), 400
             
-            # TODO: Send to OrderDesk API
-            # This will be implemented with OrderDesk API credentials
+            # Submit to OrderDesk
+            result = create_order(
+                customer_data=data['customer'],
+                cart_items=data['items'],
+                payment_data=data['payment']
+            )
             
-            return jsonify({
-                'success': True,
-                'message': 'Order submitted to OrderDesk',
-                'order_id': 'TBD'  # Will be returned by OrderDesk API
-            })
+            if result['success']:
+                return jsonify({
+                    'success': True,
+                    'message': 'Order submitted to OrderDesk',
+                    'order_id': result['order_id'],
+                    'order_number': result['order_number']
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': result['error']
+                }), 500
             
         except Exception as e:
             print(f"Error in api_submit_order: {e}")
+            return jsonify({
+                'success': False,
+                'error': str(e)
+            }), 500
+    
+    @app.route('/webhooks/orderdesk/shipment', methods=['POST'])
+    def webhook_orderdesk_shipment():
+        """Receive shipment notifications from OrderDesk"""
+        try:
+            from orderdesk_integration import handle_shipment_webhook
+            
+            data = request.json
+            result = handle_shipment_webhook(data)
+            
+            return jsonify(result)
+            
+        except Exception as e:
+            print(f"Error in webhook_orderdesk_shipment: {e}")
             return jsonify({
                 'success': False,
                 'error': str(e)
