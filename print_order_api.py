@@ -117,6 +117,11 @@ def setup_print_order_routes(app):
         """Render the print order form - NEW route"""
         return render_template('print_order_form.html')
     
+    @app.route('/print-order-wizard')
+    def render_print_order_wizard():
+        """Render the wizard-style print order form - NEW route"""
+        return render_template('print_order_wizard.html')
+    
     @app.route('/api/print-order/products', methods=['POST'])
     def fetch_products_for_print():
         """API endpoint to get products - NEW route and function name"""
