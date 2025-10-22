@@ -2882,6 +2882,13 @@ def get_pricing_summary():
 # END LUMAPRINTS ROUTES
 # ============================================================================
 
+# ============================================================================
+# NEW HIERARCHICAL API ROUTES (V2 - Simplified Database Structure)
+# ============================================================================
+
+from hierarchical_api_new import register_hierarchical_routes_new
+register_hierarchical_routes_new(app)
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 # 
