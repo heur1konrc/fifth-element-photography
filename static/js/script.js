@@ -646,3 +646,16 @@ function showImageView() {
     // Show the image view
     document.getElementById('modalMainView').style.display = 'block';
 }
+
+function openOrderWizard() {
+    // Get the current image URL from the modal
+    const imageElement = document.getElementById('modalImage');
+    if (imageElement && imageElement.src) {
+        // Redirect to the wizard with the image URL
+        const wizardUrl = `https://fifth-element-photography-production.up.railway.app/print-order-wizard?image=${encodeURIComponent(imageElement.src)}`;
+        window.location.href = wizardUrl;
+    } else {
+        console.error('No image selected');
+        alert('Please select an image first');
+    }
+}
