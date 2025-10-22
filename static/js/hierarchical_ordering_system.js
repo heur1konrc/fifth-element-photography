@@ -525,8 +525,8 @@ class HierarchicalOrderingSystem {
         
         let html = '';
         
-        if (optionType === 'frame_color' || optionType === 'paper_type') {
-            // Render as visual cards for colors and paper types
+        if (optionType === 'frame_color' || optionType === 'paper_type' || optionType === 'frame_size') {
+            // Render as visual cards for colors, paper types, and frame sizes
             html = `
                 <div class="visual-options-grid">
                     ${subOptions.map(option => `
@@ -572,8 +572,8 @@ class HierarchicalOrderingSystem {
         
         let html = '';
         
-        if (optionType === 'frame_color') {
-            // Render as visual cards for frame colors
+        if (optionType === 'frame_color' || optionType === 'frame_size') {
+            // Render as visual cards for frame colors and frame sizes
             html = `
                 <div class="visual-options-grid">
                     ${subOptions.map(option => `
