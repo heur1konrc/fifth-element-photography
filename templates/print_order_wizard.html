@@ -502,7 +502,9 @@
             
             <!-- Step 1: Product Type -->
             <div class="wizard-step active" id="step-1">
-                <h2 class="step-title">Choose Your Product Type</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="step-title" style="margin: 0;">Choose Your Product Type</h2>
+                </div>
                 <div class="option-grid" id="product-types-grid">
                     <div class="loading">
                         <div class="spinner"></div>
@@ -513,7 +515,12 @@
             
             <!-- Step 2: Sub-Options -->
             <div class="wizard-step" id="step-2">
-                <h2 class="step-title">Choose Your Options</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="step-title" style="margin: 0;">Choose Your Options</h2>
+                    <button class="btn-wizard btn-next" id="btn-next-step2" onclick="nextStep()" disabled style="margin: 0;">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
                 <div class="option-grid" id="sub-options-grid">
                     <!-- Dynamically loaded -->
                 </div>
@@ -521,7 +528,12 @@
             
             <!-- Step 3: Size Selection -->
             <div class="wizard-step" id="step-3">
-                <h2 class="step-title">Choose Your Size</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="step-title" style="margin: 0;">Choose Your Size</h2>
+                    <button class="btn-wizard btn-next" id="btn-next-step3" onclick="nextStep()" disabled style="margin: 0;">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
                 <div class="size-selector-container">
                     <label for="size-select" class="size-label">Select a print size:</label>
                     <select id="size-select" class="size-dropdown">
@@ -1177,6 +1189,14 @@
             document.getElementById('btn-back').style.display = currentStep > 1 ? 'block' : 'none';
             document.getElementById('btn-next').style.display = currentStep < 4 ? 'block' : 'none';
             document.getElementById('btn-next').disabled = true;
+            
+            // Update step-specific Next buttons
+            if (document.getElementById('btn-next-step2')) {
+                document.getElementById('btn-next-step2').disabled = true;
+            }
+            if (document.getElementById('btn-next-step3')) {
+                document.getElementById('btn-next-step3').disabled = true;
+            }
             
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
