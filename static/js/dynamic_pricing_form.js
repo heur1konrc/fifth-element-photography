@@ -97,7 +97,7 @@ async function onSubcategoryChange(e) {
         sizes.forEach(item => {
             const option = document.createElement('option');
             option.value = item.size;
-            option.textContent = `${item.size}" - $${item.price.toFixed(2)}`;
+            option.textContent = `${item.size}"`;
             option.dataset.price = item.price;
             select.appendChild(option);
         });
@@ -108,13 +108,19 @@ async function onSubcategoryChange(e) {
 
 function onSizeChange(e) {
     const size = e.target.value;
-    if (!size) return;
+    if (!size) {
+        document.getElementById('priceDisplay').textContent = '--';
+        return;
+    }
     
     const selectedOption = e.target.options[e.target.selectedIndex];
     const price = parseFloat(selectedOption.dataset.price);
     
     currentConfig.size = size;
     currentConfig.price = price;
+    
+    // Display price separately
+    document.getElementById('priceDisplay').textContent = `$${price.toFixed(2)}`;
     
     updateJSON();
 }
