@@ -5425,6 +5425,6 @@ app.register_blueprint(pricing_form)
 app.register_blueprint(order_form_api)
 
 # Dynamic order form route
-@app.route('/order')
+@app.route('/order-form')
 def dynamic_order_form():
     return render_template('dynamic_order_form.html')
