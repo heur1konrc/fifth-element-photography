@@ -98,12 +98,13 @@ def get_option_groups(subcategory_id):
         for row in cursor.fetchall():
             group_id = row['id']
             
-            # Get options for this group
+            # Get options for this group via junction table
             cursor.execute('''
-                SELECT id, name, display_order
-                FROM options
-                WHERE option_group_id = ?
-                ORDER BY display_order
+                SELECT o.id, o.name, ogo.display_order
+                FROM options o
+                JOIN option_group_options ogo ON o.id = ogo.option_id
+                WHERE ogo.option_group_id = ?
+                ORDER BY ogo.display_order
             ''', (group_id,))
             
             options = []
@@ -169,12 +170,13 @@ def get_product_structure(category_id):
             for og_row in cursor.fetchall():
                 og_id = og_row['id']
                 
-                # Get options
+                # Get options via junction table
                 cursor.execute('''
-                    SELECT id, name, display_order
-                    FROM options
-                    WHERE option_group_id = ?
-                    ORDER BY display_order
+                    SELECT o.id, o.name, ogo.display_order
+                    FROM options o
+                    JOIN option_group_options ogo ON o.id = ogo.option_id
+                    WHERE ogo.option_group_id = ?
+                    ORDER BY ogo.display_order
                 ''', (og_id,))
                 
                 options = [{'id': opt['id'], 'name': opt['name']} for opt in cursor.fetchall()]
