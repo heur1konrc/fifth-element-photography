@@ -84,7 +84,10 @@ async function onSubcategoryChange(e) {
     
     // Load sizes for this subcategory/option
     try {
-        const url = `/api/products/sizes?subcategory_id=${config.subcategoryId}&option_id=${config.optionId}`;
+        let url = `/api/products/sizes?subcategory_id=${config.subcategoryId}`;
+        if (config.optionId !== null && config.optionId !== undefined) {
+            url += `&option_id=${config.optionId}`;
+        }
         const response = await fetch(url);
         const sizes = await response.json();
         
