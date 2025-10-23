@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumaprints Product Configuration Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+-->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+        .form-card {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+<div id="app" class="max-w-4xl mx-auto">
+    <header class="text-center mb-10">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Product Order Configuration</h1>
+        <p class="text-gray-600">Select your product and options to generate the API payload.</p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Configuration Form (LHS) -->
+        <div class="lg:col-span-2 p-6 bg-white rounded-xl form-card">
+            <h2 class="text-xl font-semibold mb-6 text-gray-700 border-b pb-3">Product Details & Options</h2>
+            
+            <form id="orderForm" class="space-y-6">
+                <!-- Product Category -->
+                <div>
+                    <label for="productCategory" class="block text-sm font-medium text-gray-700 mb-1">1. Select Product Category</label>
+                    <select id="productCategory" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                        <option value="">-- Choose a Category --</option>
+                    </select>
+                </div>
+
+                <!-- Subcategory (Specific Product) -->
+                <div id="subcategoryGroup" class="hidden">
+                    <label for="subcategory" class="block text-sm font-medium text-gray-700 mb-1">2. Select Specific Product (Subcategory ID)</label>
+                    <select id="subcategory" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                        <option value="">-- Choose Product ID --</option>
+                    </select>
+                </div>
+
+                <!-- Product Dimensions (Dropdown) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="productSize" class="block text-sm font-medium text-gray-700 mb-1">3. Select Print Size</label>
+                        <select id="productSize" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                             <option value="">-- Select Size (Width x Height) --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="quantity" class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+                        <input type="number" id="quantity" value="1" min="1" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Dynamic Options -->
+                <div id="dynamicOptions" class="space-y-4 pt-4 border-t mt-6">
+                    <!-- Options will be injected here -->
+                    <p class="text-sm text-gray-500">Select a Product to view available options.</p>
+                </div>
+            </form>
+        </div>
+
+        <!-- JSON Output (RHS) -->
+        <div class="lg:col-span-1 p-6 bg-gray-50 rounded-xl form-card">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-3">API Payload (JSON)</h2>
+            <p class="text-sm text-gray-600 mb-4">This object represents the required configuration for the Lumaprints API.</p>
+            <pre id="jsonOutput" class="bg-gray-800 text-green-400 p-4 rounded-lg overflow-x-auto text-xs sm:text-sm whitespace-pre-wrap break-all min-h-[200px]">
+{
+    // Configuration will appear here.
+    // Select a product and its options.
+}
+            </pre>
+            <button id="copyButton" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out">
+                Copy JSON to Clipboard
+            </button>
+            <div id="copyMessage" class="mt-2 text-center text-sm text-green-600 opacity-0 transition duration-300">Copied!</div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/dynamic_pricing_form.js"></script>
+-->
+<!--
+<script>
+    // --- PRINT SIZES ---
+    const PRINT_SIZES = ["8x10", "10x12", "12x14", "14x18", "24x36"];
+
+    // --- MOCK PRODUCT CONFIGURATION DATA (UPDATED) ---
+    const productConfigurations = {
+        "Rolled Canvas": {
+            subcategories: {
+                "Rolled Canvas (101005)": "101005",
+            },
+            options: {
+                "Canvas Border": [
+                    { id: 1, label: "Image Wrap (default)", name: "canvas_border", default: true },
+                    { id: 2, label: "Mirror Wrap", name: "canvas_border" },
+                    { id: 3, label: "Solid Color", name: "canvas_border" },
+                ],
+                "Rolled Canvas Border Size": [
+                    { id: 19, label: "2 inch border plus 1 inch white space (default)", name: "rolled_canvas_border_size", default: true },
+                    { id: 20, label: "1 inch border plus 1 inch white space", name: "rolled_canvas_border_size" },
+                    { id: 21, label: "No border with 1 inch white space", name: "rolled_canvas_border_size" },
+                    { id: 22, label: "Trimmed (No border, No white space)", name: "rolled_canvas_border_size" },
+                ],
+            }
+        },
+        "Stretched Canvas": {
+            subcategories: {
+                "0.75in Stretched Canvas (101001)": "101001",
+                "1.25in Stretched Canvas (101002)": "101002",
+                "1.50in Stretched Canvas (101003)": "101003",
+            },
+            options: {
+                "Canvas Border": [
+                    { id: 1, label: "Image Wrap (default)", name: "canvas_border", default: true },
+                    { id: 2, label: "Mirror Wrap", name: "canvas_border" },
+                    { id: 3, label: "Solid Color", name: "canvas_border" },
+                ],
+                "Canvas Hanging Hardware": [
+                    { id: 4, label: "Sawtooth Hanger installed (default)", name: "canvas_hanging_hardware", default: true },
+                    { id: 5, label: "Hanging Wire installed", name: "canvas_hanging_hardware" },
+                    { id: 6, label: "Black Backboard backing with sawtooth installed", name: "canvas_hanging_hardware" },
+                    { id: 7, label: "Black Backboard backing with hanging wire installed", name: "canvas_hanging_hardware" },
+                    { id: 8, label: "Hanging Wire provided loose", name: "canvas_hanging_hardware" },
+                    { id: 133, label: "Three-point Security Hardware installed", name: "canvas_hanging_hardware" },
+                ],
+                // Note: 1.25in subcategory uses a different hardware option, but we group them for simplicity here.
+                "Canvas Underlayer": [
+                    { id: 9, label: "None (default)", name: "canvas_underlayer", default: true },
+                    { id: 10, label: "Foamcore Underlayer", name: "canvas_underlayer" },
+                ],
+            }
+        },
+        "Framed Canvas": {
+            subcategories: {
+                "0.75in Framed Canvas (102001)": "102001",
+                "1.25in Framed Canvas (102002)": "102002",
+                "1.50in Framed Canvas (102003)": "102003",
+            },
+            options: {
+                "Canvas Border": [
+                    { id: 1, label: "Image Wrap (default)", name: "canvas_border", default: true },
+                    { id: 2, label: "Mirror Wrap", name: "canvas_border" },
+                    { id: 3, label: "Solid Color", name: "canvas_border" },
+                ],
+                "Framed Canvas Hanging Hardware": [
+                    { id: 16, label: "Hanging Wire installed (default)", name: "framed_canvas_hanging_hardware", default: true },
+                    { id: 17, label: "Black Backboard backing with hanging wire installed", name: "framed_canvas_hanging_hardware" },
+                    { id: 18, label: "Hanging Hardware Provided Loose", name: "framed_canvas_hanging_hardware" },
+                    { id: 134, label: "Three-point Security Hardware installed", name: "framed_canvas_hanging_hardware" },
+                ],
+                "1.25in Framed Canvas Hanging Hardware": [ // Unique option for 102002
+                    { id: 28, label: "Hanging Wire installed (default)", name: "1.25in_framed_canvas_hanging_hardware", default: true },
+                ],
+                "Frame Style (0.75in)": [ // Unique option for 102001
+                    { id: 12, label: "0.75in Black Floating Frame (default)", name: "0.75in_frame_style", default: true },
+                    { id: 13, label: "0.75in White Floating Frame", name: "0.75in_frame_style" },
+                    { id: 14, label: "0.75in Silver Floating Frame", name: "0.75in_frame_style" },
+                    { id: 15, label: "0.75in Gold Floating Frame", name: "0.75in_frame_style" },
+                ],
+                "Frame Style (1.25in)": [ // Unique option for 102002
+                    { id: 27, label: "1.25in Black Floating Frame (default)", name: "1.25in_frame_style", default: true },
+                    { id: 91, label: "1.25in Oak Floating Frame", name: "1.25in_frame_style" },
+                    { id: 120, label: "1.25in Walnut Floating Frame", name: "1.25in_frame_style" },
+                ],
+                "Frame Style (1.50in)": [ // Unique option for 102003
+                    { id: 23, label: "1.50in Black Floating Frame (default)", name: "1.50in_frame_style", default: true },
+                    { id: 24, label: "1.50in White Floating Frame", name: "1.50in_frame_style" },
+                    { id: 25, label: "1.50in Silver Floating Frame", name: "1.50in_frame_style" },
+                    { id: 26, label: "1.50in Gold Floating Frame", name: "1.50in_frame_style" },
+                    { id: 92, label: "1.50in Oak Floating Frame", name: "1.50in_frame_style" },
+                ],
+                "Canvas Underlayer": [
+                    { id: 9, label: "None (default)", name: "canvas_underlayer", default: true },
+                    { id: 10, label: "Foamcore Underlayer", name: "canvas_underlayer" },
+                ],
+            }
+        },
+        "Fine Art Paper": {
+            subcategories: {
+                "Archival Matte Fine Art Paper (103001)": "103001",
+                "Hot Press Fine Art Paper (103002)": "103002",
+                "Cold Press Fine Art Paper (103003)": "103003",
+                "Semi-Glossy Fine Art Paper (103005)": "103005",
+                "Metallic Fine Art Paper (103006)": "103006",
+                "Glossy Fine Art Paper (103007)": "103007",
+                "Semi-Matte Fine Art Paper (103008)": "103008",
+                "Somerset Velvet Fine Art Paper (103009)": "103009",
+            },
+            options: {
+                "Fine Art Paper Bleed": [
+                    { id: 36, label: "0.25in Bleed (default)", name: "fine_art_paper_bleed", default: true },
+                    { id: 37, label: "0.50in Bleed", name: "fine_art_paper_bleed" },
+                    { id: 38, label: "1.00in Bleed", name: "fine_art_paper_bleed" },
+                    { id: 39, label: "No Bleed (Trimmed)", name: "fine_art_paper_bleed" },
+                ],
+            }
+        },
+        "Framed Fine Art Paper": {
+            subcategories: {
+                "0.875in Black Frame (105001)": "105001",
+                "0.875in White Frame (105002)": "105002",
+                "0.875in Oak Frame (105003)": "105003",
+                "1.25in Black Frame (105005)": "105005",
+                "1.25in White Frame (105006)": "105006",
+                "1.25in Oak Frame (105007)": "105007",
+            },
+            options: {
+                "Mat Size": [
+                    { id: 64, label: "No Mat (default)", name: "mat_size", default: true },
+                    { id: 65, label: "1.0 inch on each side", name: "mat_size" },
+                    { id: 66, label: "1.5 inch on each side", name: "mat_size" },
+                    { id: 67, label: "2.0 inch on each side", name: "mat_size" },
+                    { id: 68, label: "2.5 inch on each side", name: "mat_size" },
+                    { id: 69, label: "3.0 inch on each side", name: "mat_size" },
+                    { id: 70, label: "3.5 inch on each side", name: "mat_size" },
+                    { id: 71, label: "4.0 inch on each side", name: "mat_size" },
+                    { id: 72, label: "4.5 inch on each side", name: "mat_size" },
+                    { id: 73, label: "5.0 inch on each side", name: "mat_size" },
+                ],
+                "Mat Color": [
+                    { id: 96, label: "White (default)", name: "mat_color", default: true },
+                    { id: 97, label: "White with Black Core", name: "mat_color" },
+                    { id: 98, label: "Smooth Black", name: "mat_color" },
+                    { id: 99, label: "Antique White", name: "mat_color" },
+                    { id: 100, label: "Raven Black Rag", name: "mat_color" },
+                    { id: 101, label: "Dawn Grey", name: "mat_color" },
+                    { id: 102, label: "Cream", name: "mat_color" },
+                    { id: 103, label: "Sand", name: "mat_color" },
+                    { id: 104, label: "Off White", name: "mat_color" },
+                    { id: 105, label: "Pearl", name: "mat_color" },
+                    { id: 106, label: "Silver Florentine", name: "mat_color" },
+                    { id: 107, label: "French Blue", name: "mat_color" },
+                    { id: 108, label: "Indigo", name: "mat_color" },
+                    { id: 109, label: "Sauterne", name: "mat_color" },
+                    { id: 110, label: "Moss Point Green", name: "mat_color" },
+                ],
+                "Paper Type": [
+                    { id: 74, label: "Archival Matte Fine Art Paper (default)", name: "paper_type", default: true },
+                    { id: 75, label: "Hot Press Fine Art Paper", name: "paper_type" },
+                    { id: 76, label: "Cold Press Fine Art Paper", name: "paper_type" },
+                    { id: 77, label: "Metallic Fine Art Paper", name: "paper_type" },
+                    { id: 78, label: "Semi-Glossy Fine Art Paper", name: "paper_type" },
+                    { id: 79, label: "Glossy Photo Paper", name: "paper_type" },
+                    { id: 80, label: "Semi-Matte Photo Paper", name: "paper_type" },
+                    { id: 82, label: "Somerset Velvet", name: "paper_type" },
+                ],
+                "Framed Fine Art Paper Hanging Hardware": [
+                    { id: 83, label: "Hanging Wire installed on frame (default)", name: "framed_fine_art_paper_hanging_hardware", default: true },
+                    { id: 93, label: "Sawtooth Hanger installed on frame", name: "framed_fine_art_paper_hanging_hardware" },
+                    { id: 135, label: "Wall Buddies Hanger installed on frame", name: "framed_fine_art_paper_hanging_hardware" },
+                ],
+                "Framed Fine Art Paper Backing": [
+                    { id: 94, label: "None (default)", name: "framed_fine_art_paper_backing", default: true },
+                    { id: 95, label: "Kraft Paper", name: "framed_fine_art_paper_backing" },
+                ],
+            }
+        },
+        "Metal": {
+            subcategories: {
+                "Metal Print (106001)": "106001",
+            },
+            options: {
+                "Metal Surface": [
+                    { id: 29, label: "Glossy White (default)", name: "metal_surface", default: true },
+                    { id: 30, label: "Glossy Silver", name: "metal_surface" },
+                ],
+                "Metal Hanging Hardware": [
+                    { id: 31, label: "Inset Frame (default)", name: "metal_hanging_hardware", default: true },
+                    { id: 32, label: "Metal Easel", name: "metal_hanging_hardware" },
+                    { id: 33, label: "Small (3/4 inch) Stainless Steel Mounting Posts", name: "metal_hanging_hardware" },
+                    { id: 34, label: "Large (1 inch) Stainless Steel Mounting Posts", name: "metal_hanging_hardware" },
+                    { id: 35, label: "None", name: "metal_hanging_hardware" },
+                ],
+            }
+        }
+    };
+
+    // --- DOM Elements ---
+    const productCategorySelect = document.getElementById('productCategory');
+    const subcategoryGroup = document.getElementById('subcategoryGroup');
+    const subcategorySelect = document.getElementById('subcategory');
+    const productSizeSelect = document.getElementById('productSize'); // NEW
+    const dynamicOptionsDiv = document.getElementById('dynamicOptions');
+    const jsonOutputPre = document.getElementById('jsonOutput');
+    const orderForm = document.getElementById('orderForm');
+    const copyButton = document.getElementById('copyButton');
+    const copyMessage = document.getElementById('copyMessage');
+
+    // --- Initialization ---
+
+    /**
+     * Populates the print size dropdown.
+     */
+    function populateSizes() {
+        productSizeSelect.innerHTML = '<option value="">-- Select Size (Width x Height) --</option>'; // Initial placeholder
+        PRINT_SIZES.forEach(size => {
+            const option = document.createElement('option');
+            option.value = size;
+            option.textContent = size;
+            productSizeSelect.appendChild(option);
+        });
+        // Set a default value to generate valid JSON initially
+        if (PRINT_SIZES.length > 0) {
+            productSizeSelect.value = PRINT_SIZES[0];
+        }
+    }
+
+    /**
+     * Populates the initial product category dropdown.
+     */
+    function populateCategories() {
+        Object.keys(productConfigurations).forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            productCategorySelect.appendChild(option);
+        });
+    }
+
+    /**
+     * Updates the subcategory dropdown based on the selected product category.
+     * @param {string} category The selected product category key.
+     */
+    function updateSubcategories(category) {
+        subcategorySelect.innerHTML = '<option value="">-- Choose Product ID --</option>'; // Reset
+        dynamicOptionsDiv.innerHTML = '<p class="text-sm text-gray-500">Select a Product to view available options.</p>';
+
+        if (!category) {
+            subcategoryGroup.classList.add('hidden');
+            return;
+        }
+
+        const subcategories = productConfigurations[category].subcategories;
+        Object.keys(subcategories).forEach(label => {
+            const option = document.createElement('option');
+            option.value = subcategories[label];
+            option.textContent = label;
+            subcategorySelect.appendChild(option);
+        });
+        subcategoryGroup.classList.remove('hidden');
+    }
+
+    /**
+     * Updates the dynamic options section based on the selected subcategory.
+     * @param {string} category The selected product category key.
+     */
+    function updateOptions(category) {
+        const productData = productConfigurations[category];
+        dynamicOptionsDiv.innerHTML = ''; // Clear previous options
+
+        if (!productData) {
+            dynamicOptionsDiv.innerHTML = '<p class="text-sm text-gray-500">Select a Product to view available options.</p>';
+            return;
+        }
+
+        let hasOptions = false;
+        for (const optionTitle in productData.options) {
+            hasOptions = true;
+            const optionsArray = productData.options[optionTitle];
+            
+            const optionGroup = document.createElement('div');
+            optionGroup.className = 'space-y-1';
+
+            const label = document.createElement('label');
+            label.className = 'block text-sm font-medium text-gray-700';
+            label.textContent = `Option: ${optionTitle}`;
+
+            const select = document.createElement('select');
+            select.id = optionsArray[0].name; // Use the option's name as ID
+            select.name = optionsArray[0].name; // Use the option's name as attribute
+            select.className = 'w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out';
+            select.required = true;
+
+            optionsArray.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option.id;
+                opt.textContent = `${option.id}: ${option.label}`;
+                if (option.default) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+
+            optionGroup.appendChild(label);
+            optionGroup.appendChild(select);
+            dynamicOptionsDiv.appendChild(optionGroup);
+        }
+
+        if (!hasOptions) {
+            dynamicOptionsDiv.innerHTML = '<p class="text-sm text-gray-500">This product has no specific options listed in the table.</p>';
+        }
+    }
+    
+    /**
+     * Generates the final JSON payload and displays it.
+     */
+    function generateJson() {
+        const category = productCategorySelect.value;
+        const subcategoryId = subcategorySelect.value;
+        
+        if (!subcategoryId) {
+             jsonOutputPre.textContent = JSON.stringify({ message: "Please select a product category and a specific product ID." }, null, 4);
+             return;
+        }
+
+        const selectedSize = productSizeSelect.value;
+        const quantity = document.getElementById('quantity').value;
+        
+        if (!selectedSize || !quantity) {
+             jsonOutputPre.textContent = JSON.stringify({ message: "Please ensure both a size and quantity are selected." }, null, 4);
+             return;
+        }
+
+        // Parse size string (e.g., "8x10") into width and height
+        const [widthStr, heightStr] = selectedSize.split('x');
+        const width = parseInt(widthStr, 10);
+        const height = parseInt(heightStr, 10);
+
+
+        // Base Product and Dimension Information (Mocking an API item structure)
+        const payload = {
+            subcategoryId: parseInt(subcategoryId, 10),
+            quantity: parseInt(quantity, 10),
+            size: {
+                width: width,
+                height: height
+            },
+            options: {} // Configuration options go here
+        };
+
+        // Collect all dynamic options
+        const dynamicSelects = dynamicOptionsDiv.querySelectorAll('select');
+        dynamicSelects.forEach(select => {
+            // The select name is the API's option parameter name (e.g., 'canvas_border')
+            const optionName = select.name;
+            const optionId = parseInt(select.value, 10);
+            
+            // Map the option to the required structure { optionName: optionId }
+            payload.options[optionName] = optionId;
+        });
+
+        jsonOutputPre.textContent = JSON.stringify(payload, null, 4);
+    }
+
+    // --- Event Listeners ---
+
+    // 1. Handle Category Selection
+    productCategorySelect.addEventListener('change', (e) => {
+        const selectedCategory = e.target.value;
+        updateSubcategories(selectedCategory);
+        
+        // Reset JSON output when category changes
+        jsonOutputPre.textContent = JSON.stringify({ message: "Select a specific product ID to see configuration." }, null, 4);
+    });
+
+    // 2. Handle Subcategory Selection
+    subcategorySelect.addEventListener('change', () => {
+        const selectedCategory = productCategorySelect.value;
+        updateOptions(selectedCategory);
+        generateJson(); // Generate initial JSON after selecting subcategory
+    });
+
+    // 3. Handle Form Field Changes (for all inputs/selects)
+    orderForm.addEventListener('change', generateJson);
+    orderForm.addEventListener('input', generateJson);
+
+    // 4. Copy to Clipboard
+    copyButton.addEventListener('click', () => {
+        const textToCopy = jsonOutputPre.textContent;
+        // document.execCommand('copy') is used for compatibility in iframes
+        const textarea = document.createElement('textarea');
+        textarea.value = textToCopy;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            copyMessage.classList.remove('opacity-0');
+            copyMessage.classList.add('opacity-100');
+            setTimeout(() => {
+                copyMessage.classList.remove('opacity-100');
+                copyMessage.classList.add('opacity-0');
+            }, 2000);
+        } catch (err) {
+            console.error('Could not copy text: ', err);
+        }
+        document.body.removeChild(textarea);
+    });
+
+    // Initial setup on load
+    populateCategories();
+    populateSizes();
+    // Initialize JSON output with selected default values
+    generateJson(); 
+</script>
+-->
+
+</body>
+</html>

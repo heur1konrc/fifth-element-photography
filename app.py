@@ -5414,3 +5414,10 @@ def restore_database_from_backup():
         <p>Error: {str(e)}</p>
         """, 500
 
+
+# Register pricing form blueprints
+from product_api import product_api
+from pricing_form_route import pricing_form
+
+app.register_blueprint(product_api)
+app.register_blueprint(pricing_form)
