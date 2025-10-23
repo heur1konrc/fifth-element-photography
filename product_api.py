@@ -27,27 +27,46 @@ def get_categories():
 
 @product_api.route('/api/products/subcategories/<category>', methods=['GET'])
 def get_subcategories(category):
-    """Get all unique products for a category"""
+    """Get unique product types for a category (without size variants)"""
     conn = get_db()
     cursor = conn.cursor()
     
+    # Get unique combinations of subcategory_id and option_id
     cursor.execute('''
         SELECT DISTINCT 
-            name,
             lumaprints_subcategory_id,
-            lumaprints_frame_option_id
+            lumaprints_frame_option_id,
+            name
         FROM products 
         WHERE category = ?
-        ORDER BY name
+        ORDER BY lumaprints_subcategory_id, lumaprints_frame_option_id
     ''', (category,))
     
+    # Use a dict to track unique product types
+    seen = set()
     products = []
+    
     for row in cursor.fetchall():
-        products.append({
-            'name': row[0],
-            'subcategory_id': row[1],
-            'option_id': row[2]
-        })
+        subcategory_id = row[0]
+        option_id = row[1]
+        full_name = row[2]
+        
+        # Create unique key
+        key = (subcategory_id, option_id)
+        
+        if key not in seen:
+            seen.add(key)
+            # Extract product name without size (remove "8x10" etc from name)
+            # e.g., "Fine Art Paper 10×10" - Archival Matte" -> "Fine Art Paper - Archival Matte"
+            import re
+            clean_name = re.sub(r'\s*\d+[x×]\d+"?\s*-?\s*', ' - ', full_name)
+            clean_name = re.sub(r'\s+', ' ', clean_name).strip()
+            
+            products.append({
+                'name': clean_name,
+                'subcategory_id': subcategory_id,
+                'option_id': option_id
+            })
     
     conn.close()
     return jsonify(products)
