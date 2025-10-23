@@ -1,14 +1,10 @@
 import os
 import sys
-import psycopg2
+import sqlite3
 
 # Database connection
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if not DATABASE_URL:
-    print("ERROR: DATABASE_URL not set")
-    sys.exit(1)
-
-conn = psycopg2.connect(DATABASE_URL)
+DB_PATH = '/data/lumaprints_pricing.db'
+conn = sqlite3.connect(DB_PATH)
 cur = conn.cursor()
 
 category = "Metal"
@@ -74,7 +70,7 @@ for size, price in white_sizes_prices:
     product_name = f'{category} {size}" - Glossy White'
     cur.execute("""
         INSERT INTO products (name, category, size, price, lumaprints_subcategory_id, lumaprints_frame_option_id)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (?, ?, ?, ?, ?, ?)
     """, (product_name, category, size, price, subcategory_id, 34))
     products_added += 1
 
@@ -83,7 +79,7 @@ for size, price in silver_sizes_prices:
     product_name = f'{category} {size}" - Glossy Silver'
     cur.execute("""
         INSERT INTO products (name, category, size, price, lumaprints_subcategory_id, lumaprints_frame_option_id)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        VALUES (?, ?, ?, ?, ?, ?)
     """, (product_name, category, size, price, subcategory_id, 35))
     products_added += 1
 
