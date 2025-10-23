@@ -205,13 +205,47 @@ class DynamicOrderForm {
     }
     
     async updatePricing() {
-        // TODO: Call pricing API
-        // For now, just show placeholder
-        if (this.currentSubcategory && this.selectedSize) {
+        if (!this.currentSubcategory || !this.selectedSize) {
+            return;
+        }
+        
+        try {
             const [width, height] = this.selectedSize.split('x').map(Number);
             
-            // Placeholder pricing
-            document.getElementById('price-value').textContent = '$0.00';
+            // Collect selected option IDs
+            const options = Object.values(this.selectedOptions);
+            
+            // Show loading state
+            document.getElementById('price-value').textContent = 'Calculating...';
+            
+            // Call pricing API
+            const response = await fetch('/api/order-form/pricing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    subcategory_id: this.currentSubcategory,
+                    width: width,
+                    height: height,
+                    options: options,
+                    quantity: 1
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                const retailPrice = data.pricing.retail_price;
+                document.getElementById('price-value').textContent = `$${retailPrice.toFixed(2)}`;
+            } else {
+                document.getElementById('price-value').textContent = 'Price unavailable';
+                console.error('Pricing error:', data.error);
+            }
+            
+        } catch (error) {
+            document.getElementById('price-value').textContent = 'Error';
+            console.error('Failed to get pricing:', error);
         }
     }
     

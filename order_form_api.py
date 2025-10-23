@@ -206,7 +206,10 @@ def get_product_structure(category_id):
 
 @order_form_api.route('/api/order-form/pricing', methods=['POST'])
 def get_pricing():
-    """Get pricing for a product configuration (placeholder - needs Lumaprints API integration)"""
+    """Get pricing for a product configuration from Lumaprints API"""
+    import requests
+    import base64
+    
     try:
         data = request.json
         subcategory_id = data.get('subcategory_id')
@@ -215,19 +218,57 @@ def get_pricing():
         options = data.get('options', [])
         quantity = data.get('quantity', 1)
         
-        # TODO: Call Lumaprints pricing API
-        # For now, return placeholder
+        # Validate required fields
+        if not subcategory_id or not width or not height:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required fields: subcategory_id, width, height'
+            }), 400
         
-        return jsonify({
-            'success': True,
-            'pricing': {
-                'wholesale_price': 0.00,
-                'retail_price': 0.00,
-                'quantity': quantity,
-                'message': 'Pricing integration pending'
-            }
-        })
+        # Get Lumaprints API credentials from environment
+        api_key = os.environ.get('LUMAPRINTS_SANDBOX_API_KEY', 'e909ca3adc5026beb5dc306020ffe3068cf0e5962d31303137373136')
+        api_secret = os.environ.get('LUMAPRINTS_SANDBOX_API_SECRET', '23ab680f283aeabd077e2d31303137373136')
         
+        # Create Basic Auth header
+        credentials = f"{api_key}:{api_secret}"
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+        
+        # Call Lumaprints pricing API
+        pricing_url = 'https://sandbox.lumaprints.com/api/v1/pricing'
+        headers = {
+            'Authorization': f'Basic {encoded_credentials}',
+            'Content-Type': 'application/json'
+        }
+        
+        payload = {
+            'subcategoryId': subcategory_id,
+            'width': width,
+            'height': height,
+            'options': options,
+            'quantity': quantity
+        }
+        
+        response = requests.post(pricing_url, json=payload, headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            pricing_data = response.json()
+            return jsonify({
+                'success': True,
+                'pricing': {
+                    'wholesale_price': pricing_data.get('wholesalePrice', 0.00),
+                    'retail_price': pricing_data.get('retailPrice', 0.00),
+                    'quantity': quantity
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': f'Lumaprints API error: {response.status_code}',
+                'details': response.text
+            }), response.status_code
+        
+    except requests.exceptions.RequestException as e:
+        return jsonify({'success': False, 'error': f'API request failed: {str(e)}'}), 500
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
