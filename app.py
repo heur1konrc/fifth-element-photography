@@ -5418,6 +5418,13 @@ def restore_database_from_backup():
 # Register pricing form blueprints
 from product_api import product_api
 from pricing_form_route import pricing_form
+from order_form_api import order_form_api
 
 app.register_blueprint(product_api)
 app.register_blueprint(pricing_form)
+app.register_blueprint(order_form_api)
+
+# Dynamic order form route
+@app.route('/order')
+def dynamic_order_form():
+    return render_template('dynamic_order_form.html')
