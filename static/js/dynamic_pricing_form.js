@@ -53,28 +53,24 @@ async function onCategoryChange(e) {
     
     try {
         const response = await fetch(`/api/products/subcategories/${encodeURIComponent(category)}`);
-        const subcategories = await response.json();
+        const products = await response.json();
         
         const select = document.getElementById('subcategory');
         select.innerHTML = '<option value="">-- Choose Product --</option>';
         
-        subcategories.forEach(sub => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = `Subcategory ${sub.id}`;
-            
-            sub.options.forEach(opt => {
-                const option = document.createElement('option');
-                option.value = JSON.stringify({subcategoryId: sub.id, optionId: opt.id});
-                option.textContent = opt.name;
-                optgroup.appendChild(option);
+        products.forEach(product => {
+            const option = document.createElement('option');
+            option.value = JSON.stringify({
+                subcategoryId: product.subcategory_id, 
+                optionId: product.option_id
             });
-            
-            select.appendChild(optgroup);
+            option.textContent = product.name;
+            select.appendChild(option);
         });
         
         document.getElementById('subcategoryGroup').classList.remove('hidden');
     } catch (error) {
-        console.error('Error loading subcategories:', error);
+        console.error('Error loading products:', error);
     }
 }
 

@@ -27,41 +27,30 @@ def get_categories():
 
 @product_api.route('/api/products/subcategories/<category>', methods=['GET'])
 def get_subcategories(category):
-    """Get subcategories (unique subcategory_ids) for a category"""
+    """Get all unique products for a category"""
     conn = get_db()
     cursor = conn.cursor()
     
     cursor.execute('''
         SELECT DISTINCT 
+            name,
             lumaprints_subcategory_id,
-            lumaprints_frame_option_id,
-            name
+            lumaprints_frame_option_id
         FROM products 
         WHERE category = ?
-        ORDER BY lumaprints_subcategory_id, lumaprints_frame_option_id
+        ORDER BY name
     ''', (category,))
     
-    subcategories = {}
+    products = []
     for row in cursor.fetchall():
-        subcategory_id = row[0]
-        option_id = row[1]
-        name = row[2]
-        
-        # Extract the product type from name (e.g., "Framed Canvas 0.75" Black Frame" -> "0.75" Black Frame")
-        if subcategory_id not in subcategories:
-            subcategories[subcategory_id] = {
-                'id': subcategory_id,
-                'options': []
-            }
-        
-        if option_id and option_id not in [opt['id'] for opt in subcategories[subcategory_id]['options']]:
-            subcategories[subcategory_id]['options'].append({
-                'id': option_id,
-                'name': name
-            })
+        products.append({
+            'name': row[0],
+            'subcategory_id': row[1],
+            'option_id': row[2]
+        })
     
     conn.close()
-    return jsonify(list(subcategories.values()))
+    return jsonify(products)
 
 @product_api.route('/api/products/sizes', methods=['GET'])
 def get_sizes():
