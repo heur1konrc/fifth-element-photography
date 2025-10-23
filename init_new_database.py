@@ -18,8 +18,9 @@ def init_new_database():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # Drop old tables if they exist
-    print("Dropping old tables...")
+    # Drop old views and tables if they exist
+    print("Dropping old views and tables...")
+    cursor.execute('DROP VIEW IF EXISTS active_products')
     cursor.execute('DROP TABLE IF EXISTS products')
     cursor.execute('DROP TABLE IF EXISTS product_types')
     cursor.execute('DROP TABLE IF EXISTS categories')
