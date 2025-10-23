@@ -92,7 +92,7 @@ async function onSubcategoryChange(e) {
         const sizes = await response.json();
         
         const select = document.getElementById('productSize');
-        select.innerHTML = '<option value="">-- Select Size --</option>';
+        select.innerHTML = '<option value="">Select Size</option>';
         
         sizes.forEach(item => {
             const option = document.createElement('option');
