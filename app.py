@@ -2893,7 +2893,7 @@ register_hierarchical_routes_new(app)
 # ADMIN IMPORT ENDPOINT
 # ============================================================================
 
-from admin_import_endpoint import register_import_routes
+from admin_import_endpoint_new import register_import_routes
 register_import_routes(app)
 
 # ============================================================================
