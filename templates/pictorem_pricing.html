@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pictorem Pricing Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .markup-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .markup-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .markup-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .markup-control input {
+            width: 120px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .markup-control button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .markup-control button:hover {
+            background: #0056b3;
+        }
+        
+        .markup-info {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .products-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .products-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .products-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .price {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .base-price {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .category {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .alert {
+            padding: 12px 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .btn-clear-cache {
+            padding: 8px 16px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        
+        .btn-clear-cache:hover {
+            background: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pictorem Pricing Management</h1>
+        <p class="subtitle">Manage markup percentage and view product pricing</p>
+        
+        <div id="alert-container"></div>
+        
+        <div class="markup-section">
+            <h2>Global Markup Percentage</h2>
+            <div class="markup-control">
+                <label for="markup-input">Markup:</label>
+                <input type="number" id="markup-input" value="{{ markup }}" min="0" max="500" step="1">
+                <span>%</span>
+                <button onclick="updateMarkup()">Update Markup</button>
+                <button class="btn-clear-cache" onclick="clearCache()">Clear Price Cache</button>
+            </div>
+            <div class="markup-info">
+                Current markup: <strong>{{ markup }}%</strong> 
+                (Base price × {{ (markup / 100 + 1)|round(2) }} = Customer price)
+            </div>
+        </div>
+        
+        <h2>Product Pricing</h2>
+        <p class="subtitle">Sample pricing for each product (first available size)</p>
+        
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Sample Size</th>
+                    <th>Base Price</th>
+                    <th>Customer Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td><strong>{{ product.name }}</strong></td>
+                    <td class="category">{{ product.category_name }}</td>
+                    <td>{{ product.sample_size or 'N/A' }}</td>
+                    <td class="base-price">${{ "%.2f"|format(product.sample_base_price) if product.sample_base_price else 'N/A' }}</td>
+                    <td class="price">${{ "%.2f"|format(product.sample_customer_price) if product.sample_customer_price else 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <script>
+        function showAlert(message, type) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+        
+        async function updateMarkup() {
+            const markup = document.getElementById('markup-input').value;
+            
+            try {
+                const response = await fetch('/api/pictorem/update_markup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ markup: parseFloat(markup) })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert(`Markup updated to ${data.markup}%. Refreshing page...`, 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showAlert(data.error || 'Failed to update markup', 'error');
+                }
+            } catch (error) {
+                showAlert('Error updating markup: ' + error.message, 'error');
+            }
+        }
+        
+        async function clearCache() {
+            if (!confirm('Clear all cached prices? This will force fresh API calls for all products.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/pictorem/clear_cache', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showAlert(`Cache cleared. ${data.deleted} entries removed.`, 'success');
+                } else {
+                    showAlert(data.error || 'Failed to clear cache', 'error');
+                }
+            } catch (error) {
+                showAlert('Error clearing cache: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
+

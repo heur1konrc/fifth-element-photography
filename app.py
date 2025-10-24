@@ -13,10 +13,13 @@ import hashlib
 import secrets
 
 # Lumaprints integration imports
-from lumaprints_api import get_lumaprints_client, get_pricing_calculator
+# from lumaprints_api import get_lumaprints_client, get_pricing_calculator  # REPLACED WITH PICTOREM
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+
+# Register Pictorem admin blueprint
+app.register_blueprint(pictorem_admin_bp)
 
 # Initialize database if it doesn't exist
 def ensure_database_exists():
@@ -3634,8 +3637,28 @@ def get_products_with_variants():
 # Dynamic product API for frontend
 @app.route('/api/products', methods=['GET'])
 def get_frontend_products():
-    """Get all products for frontend order form (no auth required)"""
+    """Get all products for frontend order form (no auth required) - PICTOREM VERSION"""
     return get_products_for_frontend()
+
+@app.route('/api/categories', methods=['GET'])
+def get_frontend_categories():
+    """Get all product categories for frontend"""
+    return get_categories_for_frontend()
+
+@app.route('/api/product/<slug>', methods=['GET'])
+def get_product_by_slug(slug):
+    """Get product details by slug"""
+    return get_product_details(slug)
+
+@app.route('/api/price', methods=['POST'])
+def calculate_product_price():
+    """Calculate price for a product configuration"""
+    data = request.get_json()
+    product_slug = data.get('product_slug')
+    width = data.get('width')
+    height = data.get('height')
+    options = data.get('options', {})
+    return get_product_price_api(product_slug, width, height, options)
 
 @app.route('/api/product-details', methods=['GET'])
 def get_product_details():
