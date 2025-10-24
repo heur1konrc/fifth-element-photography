@@ -5429,7 +5429,3 @@ app.register_blueprint(order_form_api)
 def dynamic_order_form():
     return render_template('dynamic_order_form.html')
 
-@app.route('/fotomoto-test')
-def fotomoto_test():
-    """Fotomoto widget test page with warning banner"""
-    return render_template('fotomoto_test.html')
