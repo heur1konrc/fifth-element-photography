@@ -47,68 +47,16 @@
             background: #f8f9fa;
             padding: 20px;
             border-bottom: 2px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         
-        .product-header-left h2 {
+        .product-header h2 {
             color: #333;
             margin-bottom: 5px;
         }
         
-        .product-header-left .description {
+        .product-header .description {
             color: #666;
             font-size: 14px;
-        }
-        
-        .product-header-right {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .sync-btn {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        
-        .sync-btn:hover:not(:disabled) {
-            background: #0056b3;
-        }
-        
-        .sync-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-        }
-        
-        .sync-status {
-            font-size: 13px;
-            color: #666;
-            min-width: 150px;
-            text-align: right;
-        }
-        
-        .sync-status.syncing {
-            color: #007bff;
-            font-weight: 600;
-        }
-        
-        .sync-status.success {
-            color: #28a745;
-            font-weight: 600;
-        }
-        
-        .sync-status.error {
-            color: #dc3545;
-            font-weight: 600;
         }
         
         .product-content {
@@ -286,6 +234,7 @@
                 try {
                     const settingsRes = await fetch('/api/database/test');
                     const settingsData = await settingsRes.json();
+                    // Markup will be fetched separately if needed
                     document.getElementById('stat-markup').textContent = '50%';
                 } catch (e) {
                     document.getElementById('stat-markup').textContent = '50%';
@@ -301,70 +250,17 @@
             }
         }
         
-        async function syncProductPrices(productSlug, button, statusElement) {
-            button.disabled = true;
-            statusElement.textContent = 'Syncing...';
-            statusElement.className = 'sync-status syncing';
-            
-            try {
-                const response = await fetch(`/api/sync_product/${productSlug}`, {
-                    method: 'POST'
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    statusElement.textContent = `✓ Synced ${result.synced}/${result.total_sizes} sizes`;
-                    statusElement.className = 'sync-status success';
-                    
-                    // Reload the page to show updated prices
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
-                } else {
-                    statusElement.textContent = `✗ Error: ${result.error}`;
-                    statusElement.className = 'sync-status error';
-                    button.disabled = false;
-                }
-            } catch (error) {
-                statusElement.textContent = `✗ Error: ${error.message}`;
-                statusElement.className = 'sync-status error';
-                button.disabled = false;
-            }
-        }
-        
         async function renderProduct(product, container) {
             const section = document.createElement('div');
             section.className = 'product-section';
             
-            // Header with sync button
+            // Header
             const header = document.createElement('div');
             header.className = 'product-header';
-            
-            const headerLeft = document.createElement('div');
-            headerLeft.className = 'product-header-left';
-            headerLeft.innerHTML = `
+            header.innerHTML = `
                 <h2>${product.name}</h2>
                 <div class="description">${product.description || ''}</div>
             `;
-            
-            const headerRight = document.createElement('div');
-            headerRight.className = 'product-header-right';
-            
-            const syncStatus = document.createElement('div');
-            syncStatus.className = 'sync-status';
-            syncStatus.textContent = 'Ready to sync';
-            
-            const syncBtn = document.createElement('button');
-            syncBtn.className = 'sync-btn';
-            syncBtn.textContent = 'Sync Prices';
-            syncBtn.onclick = () => syncProductPrices(product.slug, syncBtn, syncStatus);
-            
-            headerRight.appendChild(syncStatus);
-            headerRight.appendChild(syncBtn);
-            
-            header.appendChild(headerLeft);
-            header.appendChild(headerRight);
             section.appendChild(header);
             
             const content = document.createElement('div');
@@ -487,7 +383,8 @@
         }
         
         // Load catalog on page load
-        loadCatalog();
+        window.addEventListener('load', loadCatalog);
     </script>
 </body>
 </html>
+

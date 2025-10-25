@@ -315,6 +315,24 @@ def api_sync_prices():
             'error': str(e)
         }), 500
 
+@pictorem_admin_bp.route('/api/sync_product/<product_slug>', methods=['POST'])
+def api_sync_single_product(product_slug):
+    """Sync prices for a single product"""
+    if not check_admin():
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        from sync_single_product import sync_product_prices
+        result = sync_product_prices(product_slug)
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @pictorem_admin_bp.route('/api/update_price', methods=['POST'])
 def api_update_individual_price():
     """Update individual product price"""
