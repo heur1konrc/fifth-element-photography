@@ -43,7 +43,14 @@ def init_pictorem_database(force=False):
         cursor = conn.cursor()
         
         # Read and execute schema
-        with open('create_pictorem_db.sql', 'r') as f:
+        import os
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        sql_path = os.path.join(script_dir, 'create_pictorem_db.sql')
+        
+        if not os.path.exists(sql_path):
+            raise FileNotFoundError(f"SQL schema file not found at {sql_path}")
+        
+        with open(sql_path, 'r') as f:
             schema = f.read()
             cursor.executescript(schema)
         
