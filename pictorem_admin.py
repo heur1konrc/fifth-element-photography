@@ -263,8 +263,17 @@ def api_products():
 @pictorem_admin_bp.route('/api/product/<slug>/sizes')
 def api_product_sizes(slug):
     """Get sizes for a product"""
-    sizes = get_product_sizes(slug)
-    return jsonify(sizes)
+    try:
+        sizes = get_product_sizes(slug)
+        return jsonify(sizes)
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'error': str(e),
+            'error_type': type(e).__name__,
+            'traceback': traceback.format_exc(),
+            'slug': slug
+        }), 500
 
 @pictorem_admin_bp.route('/api/product/<slug>/options')
 def api_product_options(slug):
