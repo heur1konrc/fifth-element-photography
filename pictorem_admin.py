@@ -9,7 +9,7 @@ from pictorem_api import PictoremAPI, get_all_products, get_product_sizes, get_p
 
 pictorem_admin_bp = Blueprint('pictorem_admin', __name__)
 
-DB_PATH = 'pictorem.db'
+DB_PATH = '/data/pictorem.db'
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)

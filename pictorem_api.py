@@ -9,7 +9,7 @@ import json
 from datetime import datetime, timedelta
 from functools import wraps
 
-DB_PATH = 'pictorem.db'
+DB_PATH = '/data/pictorem.db'
 
 class PictoremAPI:
     def __init__(self):

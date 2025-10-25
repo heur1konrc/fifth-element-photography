@@ -7,7 +7,7 @@ import sqlite3
 from flask import jsonify
 from pictorem_api import PictoremAPI, get_all_products, get_product_sizes, get_product_options
 
-DB_PATH = 'pictorem.db'
+DB_PATH = '/data/pictorem.db'
 
 def get_db_connection():
     """Get database connection"""
