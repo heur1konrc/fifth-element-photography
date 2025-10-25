@@ -78,10 +78,18 @@ def init_pictorem_database(force=False):
         return True
         
     except Exception as e:
-        print(f"❌ Error initializing Pictorem database: {e}")
+        error_msg = f"❌ Error initializing Pictorem database: {e}"
+        print(error_msg)
         import traceback
         traceback.print_exc()
-        return False
+        
+        # Return detailed error info
+        return {
+            'success': False,
+            'error': str(e),
+            'error_type': type(e).__name__,
+            'traceback': traceback.format_exc()
+        }
 
 def check_database_status():
     """Check if database exists and is populated"""
