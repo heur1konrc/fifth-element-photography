@@ -210,6 +210,9 @@
             <button id="btn-init" class="btn btn-success" onclick="initializeDatabase()">
                 Initialize Database
             </button>
+            <button id="btn-cleanup" class="btn btn-success" onclick="cleanupDuplicates()" style="background: #17a2b8;">
+                Remove Duplicate Orientations
+            </button>
             <button id="btn-force" class="btn btn-danger" onclick="forceInitialize()">
                 Force Re-Initialize
             </button>
@@ -352,6 +355,42 @@
             
             // Same as initialize for now - the force flag is handled server-side
             await initializeDatabase();
+        }
+        
+        async function cleanupDuplicates() {
+            if (!confirm('Remove duplicate orientation sizes (e.g., keep 8x10, remove 10x8)?\n\nThis will reduce the size count from 154 to 77.')) {
+                return;
+            }
+            
+            document.getElementById('log-container').classList.remove('hidden');
+            const logBox = document.getElementById('log-box');
+            logBox.textContent = 'Cleaning up duplicate orientations...\n';
+            
+            try {
+                const response = await fetch('/api/cleanup_duplicate_orientations', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    logBox.textContent += '\n✓ Cleanup complete!\n';
+                    logBox.textContent += `Total sizes before: ${data.total_sizes}\n`;
+                    logBox.textContent += `Sizes deleted: ${data.sizes_deleted}\n`;
+                    logBox.textContent += `Pricing entries deleted: ${data.pricing_deleted}\n`;
+                    logBox.textContent += `Sizes remaining: ${data.sizes_remaining}\n`;
+                    
+                    showAlert(`Successfully removed ${data.sizes_deleted} duplicate sizes!`, 'success');
+                    
+                    // Refresh status
+                    setTimeout(checkStatus, 1000);
+                } else {
+                    logBox.textContent += '\n' + (data.message || 'No duplicates found');
+                    showAlert(data.message || 'No duplicates found', 'info');
+                }
+            } catch (error) {
+                logBox.textContent += '\nError: ' + error.message;
+                showAlert('Error cleaning up duplicates: ' + error.message, 'error');
+            }
         }
         
         // Check status on page load
