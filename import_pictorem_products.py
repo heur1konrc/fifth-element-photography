@@ -197,19 +197,19 @@ def import_standard_sizes():
     conn = get_db()
     cursor = conn.cursor()
     
-    # Standard photography sizes
+    # Standard photography sizes (only one orientation per size)
     standard_sizes = [
-        (8, 10), (10, 8),
-        (11, 14), (14, 11),
-        (12, 16), (16, 12),
-        (16, 20), (20, 16),
-        (18, 24), (24, 18),
-        (20, 24), (24, 20),
-        (20, 30), (30, 20),
-        (24, 30), (30, 24),
-        (24, 36), (36, 24),
-        (30, 40), (40, 30),
-        (36, 48), (48, 36)
+        (8, 10),
+        (11, 14),
+        (12, 16),
+        (16, 20),
+        (18, 24),
+        (20, 24),
+        (20, 30),
+        (24, 30),
+        (24, 36),
+        (30, 40),
+        (36, 48)
     ]
     
     # Get all products
