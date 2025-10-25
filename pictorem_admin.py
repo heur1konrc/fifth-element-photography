@@ -47,6 +47,14 @@ def admin_products():
     products = get_all_products()
     return render_template('pictorem_products.html', products=products)
 
+@pictorem_admin_bp.route('/admin/catalog')
+def admin_catalog():
+    """Complete product catalog with all sizes and options"""
+    if not check_admin():
+        return redirect(url_for('admin_login'))
+    
+    return render_template('product_catalog.html')
+
 @pictorem_admin_bp.route('/admin/pricing')
 def admin_pricing():
     """Pricing management interface"""
