@@ -43,7 +43,6 @@ def init_pictorem_database(force=False):
         cursor = conn.cursor()
         
         # Read and execute schema
-        import os
         script_dir = os.path.dirname(os.path.abspath(__file__))
         sql_path = os.path.join(script_dir, 'create_pictorem_db.sql')
         
