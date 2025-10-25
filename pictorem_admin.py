@@ -55,6 +55,14 @@ def admin_catalog():
     
     return render_template('product_catalog.html')
 
+@pictorem_admin_bp.route('/admin/pricing_management')
+def admin_pricing_management():
+    """Complete pricing management with individual price control"""
+    if not check_admin():
+        return redirect(url_for('admin_login'))
+    
+    return render_template('pricing_management.html')
+
 @pictorem_admin_bp.route('/admin/pricing')
 def admin_pricing():
     """Pricing management interface"""
@@ -283,4 +291,110 @@ def api_force_init_database():
     status['init_success'] = init_success
     
     return jsonify(status)
+
+@pictorem_admin_bp.route('/api/sync_prices', methods=['POST'])
+def api_sync_prices():
+    """Sync all prices from Pictorem API"""
+    if not check_admin():
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        from sync_all_prices import sync_all_prices
+        result = sync_all_prices()
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@pictorem_admin_bp.route('/api/update_price', methods=['POST'])
+def api_update_individual_price():
+    """Update individual product price"""
+    if not check_admin():
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    data = request.json
+    pricing_id = data.get('id')
+    new_price = data.get('price')
+    
+    if not pricing_id or not new_price:
+        return jsonify({'error': 'Missing parameters'}), 400
+    
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            UPDATE pictorem_product_pricing
+            SET price_override = ?, customer_price = ?, updated_at = datetime('now')
+            WHERE id = ?
+        """, (new_price, new_price, pricing_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@pictorem_admin_bp.route('/api/get_all_pricing')
+def api_get_all_pricing():
+    """Get all product pricing data"""
+    if not check_admin():
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT 
+                pp.id,
+                p.name as product_name,
+                p.slug as product_slug,
+                s.width || 'x' || s.height as size_name,
+                pp.preorder_code,
+                pp.base_price,
+                pp.markup_percentage,
+                pp.customer_price,
+                pp.price_override,
+                pp.active,
+                pp.last_synced,
+                pp.updated_at
+            FROM pictorem_product_pricing pp
+            JOIN pictorem_products p ON pp.product_id = p.id
+            JOIN pictorem_sizes s ON pp.size_id = s.id
+            WHERE pp.active = 1
+            ORDER BY p.display_order, p.name, s.width, s.height
+        """)
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        pricing = []
+        for row in rows:
+            pricing.append({
+                'id': row[0],
+                'product_name': row[1],
+                'product_slug': row[2],
+                'size_name': row[3],
+                'preorder_code': row[4],
+                'base_price': row[5],
+                'markup_percentage': row[6],
+                'customer_price': row[7],
+                'price_override': row[8],
+                'active': row[9],
+                'last_synced': row[10],
+                'updated_at': row[11]
+            })
+        
+        return jsonify(pricing)
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
