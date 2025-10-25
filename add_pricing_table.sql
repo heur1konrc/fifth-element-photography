@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS pictorem_product_pricing (
     UNIQUE(product_id, size_id, option_id)
 );
 
-CREATE INDEX idx_pricing_product ON pictorem_product_pricing(product_id);
-CREATE INDEX idx_pricing_size ON pictorem_product_pricing(size_id);
-CREATE INDEX idx_pricing_active ON pictorem_product_pricing(active);
+CREATE INDEX IF NOT EXISTS idx_pricing_product ON pictorem_product_pricing(product_id);
+CREATE INDEX IF NOT EXISTS idx_pricing_size ON pictorem_product_pricing(size_id);
+CREATE INDEX IF NOT EXISTS idx_pricing_active ON pictorem_product_pricing(active);
 
