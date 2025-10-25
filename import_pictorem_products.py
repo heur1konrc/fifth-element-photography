@@ -9,8 +9,9 @@ from datetime import datetime
 
 DB_PATH = 'pictorem.db'
 
-def get_db():
-    conn = sqlite3.connect(DB_PATH)
+def get_db(db_path=None):
+    path = db_path or DB_PATH
+    conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -364,8 +365,14 @@ def verify_import():
     print(f"Product Options:  {option_count}")
     print("="*60)
 
-if __name__ == '__main__':
+def populate_database(db_path=None):
+    """Main function to populate database with all products"""
+    global DB_PATH
+    if db_path:
+        DB_PATH = db_path
+    
     print("Starting Pictorem product import...")
+    print(f"Database: {DB_PATH}")
     print()
     
     import_categories()
@@ -377,4 +384,7 @@ if __name__ == '__main__':
     verify_import()
     print()
     print("✅ Import complete!")
+
+if __name__ == '__main__':
+    populate_database()
 
