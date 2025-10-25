@@ -113,7 +113,7 @@ def get_pricing_data():
     cursor.execute("SELECT COUNT(*) as total FROM products")
     total_products = cursor.fetchone()['total']
     
-    total_categories = len(category_names)
+    total_categories = len(categories)
     
     cursor.execute("SELECT AVG(price) as avg FROM products")
     avg_cost = cursor.fetchone()['avg'] or 0
