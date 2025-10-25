@@ -22,7 +22,7 @@ def check_admin():
     # TEMPORARILY DISABLED FOR TESTING
     return True
     # return session.get('admin_logged_in', False)
-@pictorem_admin_bp.route('/admin/pictorem')
+@pictorem_admin_bp.route('/admin/products')
 def admin_dashboard():
     """Pictorem admin dashboard"""
     if not check_admin():
@@ -30,7 +30,7 @@ def admin_dashboard():
     
     return render_template('pictorem_admin.html')
 
-@pictorem_admin_bp.route('/admin/pictorem/database')
+@pictorem_admin_bp.route('/admin/database')
 def admin_database():
     """Pictorem database administration"""
     if not check_admin():
@@ -38,7 +38,7 @@ def admin_database():
     
     return render_template('pictorem_db_admin.html')
 
-@pictorem_admin_bp.route('/admin/pictorem/products')
+@pictorem_admin_bp.route('/admin/products/list')
 def admin_products():
     """View and manage products"""
     if not check_admin():
@@ -47,7 +47,7 @@ def admin_products():
     products = get_all_products()
     return render_template('pictorem_products.html', products=products)
 
-@pictorem_admin_bp.route('/admin/pictorem/pricing')
+@pictorem_admin_bp.route('/admin/pricing')
 def admin_pricing():
     """Pricing management interface"""
     if not check_admin():
@@ -112,7 +112,7 @@ def admin_pricing():
     
     return render_template('pictorem_pricing.html', products=products, markup=markup)
 
-@pictorem_admin_bp.route('/admin/pictorem/settings')
+@pictorem_admin_bp.route('/admin/settings')
 def admin_settings():
     """Settings management"""
     if not check_admin():
@@ -130,7 +130,7 @@ def admin_settings():
 
 # API Endpoints
 
-@pictorem_admin_bp.route('/api/pictorem/get_price', methods=['POST'])
+@pictorem_admin_bp.route('/api/get_price', methods=['POST'])
 def api_get_price():
     """Get price for a product configuration"""
     data = request.json
@@ -156,7 +156,7 @@ def api_get_price():
     
     return jsonify(price)
 
-@pictorem_admin_bp.route('/api/pictorem/update_markup', methods=['POST'])
+@pictorem_admin_bp.route('/api/update_markup', methods=['POST'])
 def api_update_markup():
     """Update global markup percentage"""
     if not check_admin():
@@ -180,7 +180,7 @@ def api_update_markup():
     
     return jsonify({'success': True, 'markup': new_markup})
 
-@pictorem_admin_bp.route('/api/pictorem/clear_cache', methods=['POST'])
+@pictorem_admin_bp.route('/api/clear_cache', methods=['POST'])
 def api_clear_cache():
     """Clear pricing cache"""
     if not check_admin():
@@ -199,26 +199,26 @@ def api_clear_cache():
     
     return jsonify({'success': True, 'deleted': total_deleted})
 
-@pictorem_admin_bp.route('/api/pictorem/products')
+@pictorem_admin_bp.route('/api/products/catalog')
 def api_products():
     """Get all products"""
     products = get_all_products()
     return jsonify(products)
 
-@pictorem_admin_bp.route('/api/pictorem/product/<slug>/sizes')
+@pictorem_admin_bp.route('/api/product/<slug>/sizes')
 def api_product_sizes(slug):
     """Get sizes for a product"""
     sizes = get_product_sizes(slug)
     return jsonify(sizes)
 
-@pictorem_admin_bp.route('/api/pictorem/product/<slug>/options')
+@pictorem_admin_bp.route('/api/product/<slug>/options')
 def api_product_options(slug):
     """Get options for a product"""
     option_type = request.args.get('type')
     options = get_product_options(slug, option_type)
     return jsonify(options)
 
-@pictorem_admin_bp.route('/api/pictorem/test_api', methods=['POST'])
+@pictorem_admin_bp.route('/api/test_api', methods=['POST'])
 def api_test_api():
     """Test Pictorem API connection"""
     if not check_admin():
@@ -242,7 +242,7 @@ def api_test_api():
             'message': 'API connection failed'
         }), 500
 
-@pictorem_admin_bp.route('/api/pictorem/test')
+@pictorem_admin_bp.route('/api/database/test')
 def api_test_database():
     """Test database status and initialization"""
     from init_pictorem_db import check_database_status, init_pictorem_database
@@ -262,7 +262,7 @@ def api_test_database():
     
     return jsonify(status)
 
-@pictorem_admin_bp.route('/api/pictorem/init', methods=['POST'])
+@pictorem_admin_bp.route('/api/database/init', methods=['POST'])
 def api_force_init_database():
     """Force re-initialization of database"""
     from init_pictorem_db import init_pictorem_database, check_database_status

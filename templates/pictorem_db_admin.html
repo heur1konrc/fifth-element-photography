@@ -295,7 +295,7 @@
         
         async function checkStatus() {
             try {
-                const response = await fetch('/api/pictorem/test');
+                const response = await fetch('/api/database/test');
                 const data = await response.json();
                 updateStatus(data);
                 
@@ -321,7 +321,7 @@
             logBox.textContent = 'Initializing database...\n';
             
             try {
-                const response = await fetch('/api/pictorem/init', {
+                const response = await fetch('/api/database/init', {
                     method: 'POST'
                 });
                 const data = await response.json();
