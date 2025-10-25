@@ -3575,6 +3575,7 @@ from dynamic_product_api import (
     get_products_for_frontend, get_product_details_api
 )
 from database_setup_route import setup_database_route
+from rebuild_lumaprints_db import rebuild_database_route
 
 @app.route('/admin/pricing')
 @require_admin_auth
@@ -3676,6 +3677,12 @@ def get_product_details():
 def setup_database():
     """Initialize database with required tables and sample data"""
     return setup_database_route()
+
+@app.route('/admin/rebuild-lumaprints-db', methods=['GET'])
+@require_admin_auth
+def rebuild_lumaprints_db():
+    """Rebuild Lumaprints database from JSON pricing files"""
+    return rebuild_database_route()
 
 @app.route('/admin/pricing/update-variant', methods=['POST'])
 @require_admin_auth
