@@ -220,6 +220,40 @@ def api_clear_cache():
     
     return jsonify({'success': True, 'deleted': total_deleted})
 
+@pictorem_admin_bp.route('/api/debug/data_directory')
+def api_debug_data_directory():
+    """Debug: Check /data directory contents"""
+    import os
+    try:
+        if os.path.exists('/data'):
+            files = os.listdir('/data')
+            file_info = []
+            for f in files:
+                path = os.path.join('/data', f)
+                size = os.path.getsize(path) if os.path.isfile(path) else 0
+                file_info.append({
+                    'name': f,
+                    'size': size,
+                    'is_file': os.path.isfile(path),
+                    'is_dir': os.path.isdir(path)
+                })
+            return jsonify({
+                'exists': True,
+                'files': file_info,
+                'db_path': DB_PATH,
+                'db_exists': os.path.exists(DB_PATH)
+            })
+        else:
+            return jsonify({
+                'exists': False,
+                'message': '/data directory does not exist'
+            })
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'type': type(e).__name__
+        })
+
 @pictorem_admin_bp.route('/api/products/catalog')
 def api_products():
     """Get all products"""
