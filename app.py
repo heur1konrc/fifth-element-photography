@@ -2762,9 +2762,10 @@ def load_catalog():
     except FileNotFoundError:
         return {"categories": [], "subcategories": {}, "options": {}, "stores": []}
 
-# Initialize dynamic pricing calculator with 150% markup using database
+# Initialize dynamic pricing calculator using database-stored markup
 from dynamic_pricing_calculator import get_dynamic_pricing_calculator
-pricing_calc = get_dynamic_pricing_calculator(markup_percentage=150.0)
+from pricing_admin import get_global_markup
+pricing_calc = get_dynamic_pricing_calculator(markup_percentage=get_global_markup())
 
 @app.route('/api/lumaprints/categories')
 def get_lumaprints_categories():
