@@ -11,6 +11,11 @@ DB_PATH = '/data/pictorem.db'
 def init_pictorem_database(force=False):
     """Initialize Pictorem database with schema and data"""
     
+    # If force=True, delete existing database
+    if force and os.path.exists(DB_PATH):
+        print(f"Force re-initialize: Deleting existing database at {DB_PATH}")
+        os.remove(DB_PATH)
+    
     # Check if database already exists and is populated
     if os.path.exists(DB_PATH) and not force:
         # Check if it has tables
