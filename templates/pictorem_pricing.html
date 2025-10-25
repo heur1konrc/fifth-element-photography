@@ -223,7 +223,7 @@
             const markup = document.getElementById('markup-input').value;
             
             try {
-                const response = await fetch('/api/pictorem/update_markup', {
+                const response = await fetch('/api/update_markup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -252,7 +252,7 @@
             }
             
             try {
-                const response = await fetch('/api/pictorem/clear_cache', {
+                const response = await fetch('/api/clear_cache', {
                     method: 'POST'
                 });
                 
