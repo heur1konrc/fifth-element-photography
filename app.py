@@ -2769,12 +2769,13 @@ pricing_calc = get_dynamic_pricing_calculator(markup_percentage=get_global_marku
 
 @app.route('/api/lumaprints/categories')
 def get_lumaprints_categories():
-    """Get available product categories"""
+    """Get available product categories from live Lumaprints API"""
     try:
-        catalog = load_catalog()
+        client = get_lumaprints_client(sandbox=False)
+        categories = client.get_categories()
         return jsonify({
             'success': True,
-            'categories': catalog.get('categories', [])
+            'categories': categories
         })
     except Exception as e:
         return jsonify({
@@ -2784,7 +2785,7 @@ def get_lumaprints_categories():
 
 @app.route('/api/lumaprints/pricing', methods=['POST'])
 def get_lumaprints_pricing():
-    """Calculate pricing for a specific product configuration"""
+    """Calculate pricing for a specific product configuration using live API"""
     try:
         data = request.get_json()
         
@@ -2803,8 +2804,9 @@ def get_lumaprints_pricing():
         quantity = int(data.get('quantity', 1))
         options = data.get('options', [])
         
-        # Calculate pricing
-        pricing_result = pricing_calc.calculate_retail_price(
+        # Get pricing from live Lumaprints API
+        client = get_lumaprints_client(sandbox=False)
+        api_pricing = client.get_pricing(
             subcategory_id=subcategory_id,
             width=width,
             height=height,
@@ -2812,31 +2814,32 @@ def get_lumaprints_pricing():
             options=options if options else None
         )
         
-        if 'error' in pricing_result:
-            return jsonify({
-                'success': False,
-                'error': pricing_result['error']
-            }), 500
+        # Get wholesale price from API response
+        wholesale_price = api_pricing.get('price', 0)
+        
+        # Apply markup
+        markup_percentage = get_global_markup()
+        retail_price = wholesale_price * (1 + markup_percentage / 100)
+        price_per_item = retail_price / quantity
         
         # Format response for frontend compatibility
         formatted_response = {
             'success': True,
             'pricing': {
-                'formatted_price': f"${pricing_result['total_retail']:.2f}",
-                'formatted_price_per_item': f"${pricing_result['price_per_item']:.2f}",
-                'total_price': pricing_result['total_retail'],
-                'price_per_item': pricing_result['price_per_item'],
-                'wholesale_price': pricing_result['wholesale_price'],
-                'quantity': pricing_result['quantity'],
-                'markup_percentage': pricing_result['markup_percentage']
+                'formatted_price': f"${retail_price:.2f}",
+                'formatted_price_per_item': f"${price_per_item:.2f}",
+                'total_price': round(retail_price, 2),
+                'price_per_item': round(price_per_item, 2),
+                'wholesale_price': round(wholesale_price, 2),
+                'quantity': quantity,
+                'markup_percentage': markup_percentage
             },
             'product_info': {
                 'subcategory_id': subcategory_id,
-                'category': pricing_result.get('category', ''),
-                'subcategory': pricing_result.get('subcategory', ''),
                 'width': width,
                 'height': height
-            }
+            },
+            'api_response': api_pricing
         }
         
         return jsonify(formatted_response)
@@ -2854,14 +2857,23 @@ def get_lumaprints_pricing():
 
 @app.route('/api/lumaprints/sizes/<int:subcategory_id>')
 def get_lumaprints_sizes(subcategory_id):
-    """Get available sizes for a specific subcategory"""
+    """Get available sizes for a specific subcategory from live API"""
     try:
-        sizes = pricing_calc.get_available_sizes(subcategory_id)
+        client = get_lumaprints_client(sandbox=False)
+        options = client.get_subcategory_options(subcategory_id)
+        
+        # Extract size information from options
+        # The API returns options including sizes, we need to parse them
+        sizes = []
+        for option in options:
+            if option.get('type') == 'size' or 'size' in option.get('name', '').lower():
+                sizes.append(option)
         
         return jsonify({
             'success': True,
             'subcategory_id': subcategory_id,
-            'sizes': sizes
+            'sizes': sizes,
+            'all_options': options  # Include all options for debugging
         })
         
     except Exception as e:
