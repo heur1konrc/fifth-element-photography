@@ -422,6 +422,72 @@ def api_get_all_pricing():
         return jsonify({'error': str(e)}), 500
 
 
+@pictorem_admin_bp.route('/api/debug_duplicates', methods=['GET'])
+def api_debug_duplicates():
+    """Debug endpoint to see what duplicates exist"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Get total count
+        cursor.execute("SELECT COUNT(*) as count FROM pictorem_sizes")
+        total_count = cursor.fetchone()[0]
+        
+        # Find duplicates
+        cursor.execute("""
+            SELECT product_id, width, height, COUNT(*) as count
+            FROM pictorem_sizes
+            GROUP BY product_id, width, height
+            HAVING COUNT(*) > 1
+        """)
+        
+        duplicates = cursor.fetchall()
+        duplicate_details = []
+        
+        for dup in duplicates:
+            product_id = dup[0]
+            width = dup[1]
+            height = dup[2]
+            count = dup[3]
+            
+            # Get product name
+            cursor.execute("SELECT name FROM pictorem_products WHERE id = ?", (product_id,))
+            product_name = cursor.fetchone()[0]
+            
+            # Get all IDs for this duplicate
+            cursor.execute("""
+                SELECT id FROM pictorem_sizes
+                WHERE product_id = ? AND width = ? AND height = ?
+                ORDER BY id
+            """, (product_id, width, height))
+            
+            ids = [row[0] for row in cursor.fetchall()]
+            
+            duplicate_details.append({
+                'product_name': product_name,
+                'product_id': product_id,
+                'width': width,
+                'height': height,
+                'duplicate_count': count,
+                'ids': ids,
+                'ids_to_delete': ids[1:]
+            })
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'total_sizes': total_count,
+            'duplicate_groups': len(duplicates),
+            'total_duplicates_to_delete': sum(d['duplicate_count'] - 1 for d in duplicate_details),
+            'details': duplicate_details
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
 @pictorem_admin_bp.route('/api/cleanup_duplicate_orientations', methods=['POST'])
 def api_cleanup_duplicate_orientations():
     """Remove exact duplicate sizes using SQL GROUP BY"""
