@@ -117,12 +117,17 @@ def get_pricing_data():
     
     conn.close()
     
+    # Calculate avg customer price
+    multiplier = (global_markup / 100) + 1
+    avg_customer_price = avg_cost * multiplier
+    
     return {
         'categories': categories,
         'global_markup': global_markup,
         'total_products': total_products,
         'total_categories': total_categories,
         'avg_cost': avg_cost,
+        'avg_customer_price': avg_customer_price,
         'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
 
