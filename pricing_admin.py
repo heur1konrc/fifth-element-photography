@@ -78,18 +78,19 @@ def get_pricing_data():
     
     categories = []
     for cat_name in category_names:
-        # Get unique product types in this category
+        # Get all products with all sizes in this category
         cursor.execute("""
-            SELECT DISTINCT 
+            SELECT 
+                id,
                 name,
+                size,
                 category,
                 price,
                 lumaprints_subcategory_id,
                 lumaprints_frame_option_id
             FROM products 
             WHERE category = ?
-            ORDER BY name
-            LIMIT 10
+            ORDER BY name, size
         """, (cat_name,))
         
         products = []
