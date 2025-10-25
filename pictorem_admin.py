@@ -424,7 +424,7 @@ def api_get_all_pricing():
 
 @pictorem_admin_bp.route('/api/cleanup_duplicate_orientations', methods=['POST'])
 def api_cleanup_duplicate_orientations():
-    """Remove duplicate orientation sizes (e.g., keep 8x10, remove 10x8)"""
+    """Remove ALL duplicate sizes (exact duplicates and orientation duplicates)"""
     try:
         conn = get_db()
         cursor = conn.cursor()
@@ -433,12 +433,12 @@ def api_cleanup_duplicate_orientations():
         cursor.execute("""
             SELECT id, product_id, width, height, orientation
             FROM pictorem_sizes
-            ORDER BY product_id, width, height
+            ORDER BY product_id, id
         """)
         
         all_sizes = cursor.fetchall()
         
-        # Track which sizes to keep (smaller dimension first)
+        # Track which sizes to keep (first occurrence only)
         sizes_to_delete = []
         seen_combinations = set()
         
@@ -448,17 +448,15 @@ def api_cleanup_duplicate_orientations():
             width = row['width']
             height = row['height']
             
-            # Create a normalized key (smaller dimension first)
-            min_dim = min(width, height)
-            max_dim = max(width, height)
-            key = (product_id, min_dim, max_dim)
+            # Create key for exact match (product + width + height)
+            exact_key = (product_id, width, height)
             
-            if key in seen_combinations:
-                # This is a duplicate (opposite orientation)
+            if exact_key in seen_combinations:
+                # This is an exact duplicate
                 sizes_to_delete.append(size_id)
             else:
-                # First time seeing this combination
-                seen_combinations.add(key)
+                # First time seeing this exact combination
+                seen_combinations.add(exact_key)
         
         if sizes_to_delete:
             # Delete pricing data for these sizes first
