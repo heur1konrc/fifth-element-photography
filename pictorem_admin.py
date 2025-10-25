@@ -264,3 +264,23 @@ def api_test_api():
             'message': 'API connection failed'
         }), 500
 
+@pictorem_admin_bp.route('/api/pictorem/test')
+def api_test_database():
+    """Test database status and initialization"""
+    from init_pictorem_db import check_database_status, init_pictorem_database
+    import os
+    
+    status = check_database_status()
+    
+    # If database doesn't exist, try to initialize it
+    if not status['exists']:
+        print("Database not found, attempting initialization...")
+        init_success = init_pictorem_database()
+        status['initialization_attempted'] = True
+        status['initialization_success'] = init_success
+        
+        if init_success:
+            status = check_database_status()
+    
+    return jsonify(status)
+
