@@ -18,7 +18,9 @@ def sync_all_prices():
     cursor = conn.cursor()
     
     # Create pricing table if it doesn't exist
-    with open('add_pricing_table.sql', 'r') as f:
+    import os
+    sql_path = os.path.join(os.path.dirname(__file__), 'add_pricing_table.sql')
+    with open(sql_path, 'r') as f:
         cursor.executescript(f.read())
     
     # Get global markup
