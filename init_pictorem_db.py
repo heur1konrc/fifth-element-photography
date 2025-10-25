@@ -8,13 +8,28 @@ import os
 
 DB_PATH = '/data/pictorem.db'
 
-def init_pictorem_database():
+def init_pictorem_database(force=False):
     """Initialize Pictorem database with schema and data"""
     
-    # Check if database already exists
-    if os.path.exists(DB_PATH):
-        print(f"Pictorem database already exists at {DB_PATH}")
-        return True
+    # Check if database already exists and is populated
+    if os.path.exists(DB_PATH) and not force:
+        # Check if it has tables
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            tables = cursor.fetchall()
+            conn.close()
+            
+            if len(tables) > 0:
+                print(f"Pictorem database already exists and is populated at {DB_PATH}")
+                return True
+            else:
+                print(f"Database exists but is empty, will populate...")
+        except:
+            print(f"Database exists but has errors, will recreate...")
+            if os.path.exists(DB_PATH):
+                os.remove(DB_PATH)
     
     print(f"Creating Pictorem database at {DB_PATH}...")
     
@@ -39,6 +54,15 @@ def init_pictorem_database():
         conn.close()
         
         print(f"✅ Pictorem database initialized successfully at {DB_PATH}")
+        
+        # Verify it worked
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM pictorem_products")
+        count = cursor.fetchone()[0]
+        conn.close()
+        print(f"✅ Verified: {count} products in database")
+        
         return True
         
     except Exception as e:

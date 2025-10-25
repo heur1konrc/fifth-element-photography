@@ -272,15 +272,29 @@ def api_test_database():
     
     status = check_database_status()
     
-    # If database doesn't exist, try to initialize it
-    if not status['exists']:
-        print("Database not found, attempting initialization...")
-        init_success = init_pictorem_database()
+    # If database doesn't exist or is empty, try to initialize it
+    if not status['exists'] or (status.get('stats') and len(status['stats']) == 0):
+        print("Database not found or empty, attempting initialization...")
+        init_success = init_pictorem_database(force=False)
         status['initialization_attempted'] = True
         status['initialization_success'] = init_success
         
         if init_success:
             status = check_database_status()
+    
+    return jsonify(status)
+
+@pictorem_admin_bp.route('/api/pictorem/init', methods=['POST'])
+def api_force_init_database():
+    """Force re-initialization of database"""
+    from init_pictorem_db import init_pictorem_database, check_database_status
+    
+    print("Force initializing Pictorem database...")
+    init_success = init_pictorem_database(force=True)
+    
+    status = check_database_status()
+    status['force_init'] = True
+    status['init_success'] = init_success
     
     return jsonify(status)
 
