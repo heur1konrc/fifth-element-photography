@@ -269,12 +269,12 @@
                 </div>
 
                 {% for category in categories %}
-                <div class="category-section" data-category-id="{{ category.id }}">
-                    <div class="category-header" style="cursor: pointer;" onclick="toggleCategory({{ category.id }})">
+                <div class="category-section" data-category-id="{{ loop.index }}">
+                    <div class="category-header" style="cursor: pointer;" onclick="toggleCategory({{ loop.index }})">
                         <div class="row align-items-center">
                             <div class="col">
                                 <h5 class="mb-0">
-                                    <i class="fas fa-chevron-down me-2 category-chevron" id="chevron{{ category.id }}"></i>
+                                    <i class="fas fa-chevron-down me-2 category-chevron" id="chevron{{ loop.index }}"></i>
                                     {{ category.name }}
                                 </h5>
                                 <small class="text-muted">{{ category.description }}</small>
@@ -285,7 +285,7 @@
                         </div>
                     </div>
                     
-                    <div class="category-content" id="categoryContent{{ category.id }}" style="display: none;">
+                    <div class="category-content" id="categoryContent{{ loop.index }}" style="display: none;">
                         {% if category.products %}
                         <div class="table-responsive">
                             <table class="table table-sm">
