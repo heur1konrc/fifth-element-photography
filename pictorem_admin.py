@@ -22,43 +22,21 @@ def check_admin():
     # TEMPORARILY DISABLED FOR TESTING
     return True
     # return session.get('admin_logged_in', False)
-
 @pictorem_admin_bp.route('/admin/pictorem')
 def admin_dashboard():
     """Pictorem admin dashboard"""
     if not check_admin():
-        return redirect(url_for('admin_login'))
+        return redirect('/admin/login')
     
-    conn = get_db()
-    cursor = conn.cursor()
+    return render_template('pictorem_admin.html')
+
+@pictorem_admin_bp.route('/admin/pictorem/database')
+def admin_database():
+    """Pictorem database administration"""
+    if not check_admin():
+        return redirect('/admin/login')
     
-    # Get stats
-    cursor.execute('SELECT COUNT(*) as count FROM pictorem_categories WHERE active = 1')
-    category_count = cursor.fetchone()['count']
-    
-    cursor.execute('SELECT COUNT(*) as count FROM pictorem_products WHERE active = 1')
-    product_count = cursor.fetchone()['count']
-    
-    cursor.execute('SELECT COUNT(*) as count FROM pictorem_sizes WHERE active = 1')
-    size_count = cursor.fetchone()['count']
-    
-    cursor.execute('SELECT value FROM pictorem_settings WHERE key_name = "global_markup_percentage"')
-    markup = cursor.fetchone()['value']
-    
-    cursor.execute('SELECT COUNT(*) as count FROM pictorem_pricing_cache WHERE expires_at > datetime("now")')
-    cache_count = cursor.fetchone()['count']
-    
-    conn.close()
-    
-    stats = {
-        'categories': category_count,
-        'products': product_count,
-        'sizes': size_count,
-        'markup': markup,
-        'cached_prices': cache_count
-    }
-    
-    return render_template('pictorem_admin.html', stats=stats)
+    return render_template('pictorem_db_admin.html')
 
 @pictorem_admin_bp.route('/admin/pictorem/products')
 def admin_products():

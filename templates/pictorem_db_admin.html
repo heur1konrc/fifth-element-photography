@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pictorem Database Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .status-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .status-box h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        
+        .status-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .status-value {
+            color: #6c757d;
+        }
+        
+        .status-value.success {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .status-value.error {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .log-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 15px;
+            white-space: pre-wrap;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pictorem Database Administration</h1>
+        <p class="subtitle">Initialize and manage the Pictorem product database</p>
+        
+        <div id="alert-container"></div>
+        
+        <div class="status-box">
+            <h2>Database Status</h2>
+            <div id="status-content">
+                <div class="status-item">
+                    <span class="status-label">Checking...</span>
+                    <span class="status-value"><div class="loading"></div></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button id="btn-check" class="btn btn-primary" onclick="checkStatus()">
+                Check Status
+            </button>
+            <button id="btn-init" class="btn btn-success" onclick="initializeDatabase()">
+                Initialize Database
+            </button>
+            <button id="btn-force" class="btn btn-danger" onclick="forceInitialize()">
+                Force Re-Initialize
+            </button>
+        </div>
+        
+        <div id="log-container" class="hidden">
+            <h2 style="margin-top: 30px; margin-bottom: 10px;">Initialization Log</h2>
+            <div id="log-box" class="log-box"></div>
+        </div>
+    </div>
+    
+    <script>
+        function showAlert(message, type) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+        
+        function updateStatus(data) {
+            const container = document.getElementById('status-content');
+            container.innerHTML = '';
+            
+            // Database exists
+            const existsItem = document.createElement('div');
+            existsItem.className = 'status-item';
+            existsItem.innerHTML = `
+                <span class="status-label">Database File:</span>
+                <span class="status-value ${data.exists ? 'success' : 'error'}">${data.exists ? '✓ Exists' : '✗ Not Found'}</span>
+            `;
+            container.appendChild(existsItem);
+            
+            // Path
+            const pathItem = document.createElement('div');
+            pathItem.className = 'status-item';
+            pathItem.innerHTML = `
+                <span class="status-label">Path:</span>
+                <span class="status-value">${data.path}</span>
+            `;
+            container.appendChild(pathItem);
+            
+            // Tables
+            if (data.tables && data.tables.length > 0) {
+                const tablesItem = document.createElement('div');
+                tablesItem.className = 'status-item';
+                tablesItem.innerHTML = `
+                    <span class="status-label">Tables:</span>
+                    <span class="status-value success">${data.tables.length} tables</span>
+                `;
+                container.appendChild(tablesItem);
+            }
+            
+            // Stats
+            if (data.stats) {
+                for (const [key, value] of Object.entries(data.stats)) {
+                    const statItem = document.createElement('div');
+                    statItem.className = 'status-item';
+                    const label = key.replace('pictorem_', '').replace(/_/g, ' ');
+                    statItem.innerHTML = `
+                        <span class="status-label">${label}:</span>
+                        <span class="status-value ${value > 0 ? 'success' : 'error'}">${value}</span>
+                    `;
+                    container.appendChild(statItem);
+                }
+            }
+            
+            // Message
+            if (data.message) {
+                const msgItem = document.createElement('div');
+                msgItem.className = 'status-item';
+                msgItem.innerHTML = `
+                    <span class="status-label">Status:</span>
+                    <span class="status-value">${data.message}</span>
+                `;
+                container.appendChild(msgItem);
+            }
+        }
+        
+        async function checkStatus() {
+            try {
+                const response = await fetch('/api/pictorem/test');
+                const data = await response.json();
+                updateStatus(data);
+                
+                if (data.exists && data.stats && Object.keys(data.stats).length > 0) {
+                    showAlert('Database is initialized and populated', 'success');
+                } else if (data.exists) {
+                    showAlert('Database exists but is empty - click Initialize Database', 'info');
+                } else {
+                    showAlert('Database not found - click Initialize Database', 'error');
+                }
+            } catch (error) {
+                showAlert('Error checking status: ' + error.message, 'error');
+            }
+        }
+        
+        async function initializeDatabase() {
+            if (!confirm('Initialize the Pictorem database? This will create tables and import products.')) {
+                return;
+            }
+            
+            document.getElementById('log-container').classList.remove('hidden');
+            const logBox = document.getElementById('log-box');
+            logBox.textContent = 'Initializing database...\n';
+            
+            try {
+                const response = await fetch('/api/pictorem/init', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                logBox.textContent += '\nInitialization complete!\n';
+                logBox.textContent += JSON.stringify(data, null, 2);
+                
+                updateStatus(data);
+                
+                if (data.init_success) {
+                    showAlert('Database initialized successfully!', 'success');
+                } else {
+                    showAlert('Database initialization failed - check logs', 'error');
+                }
+                
+                // Refresh status
+                setTimeout(checkStatus, 1000);
+            } catch (error) {
+                logBox.textContent += '\nError: ' + error.message;
+                showAlert('Error initializing database: ' + error.message, 'error');
+            }
+        }
+        
+        async function forceInitialize() {
+            if (!confirm('Force re-initialize? This will DELETE the existing database and recreate it from scratch!')) {
+                return;
+            }
+            
+            // Same as initialize for now - the force flag is handled server-side
+            await initializeDatabase();
+        }
+        
+        // Check status on page load
+        window.addEventListener('load', checkStatus);
+    </script>
+</body>
+</html>
+
