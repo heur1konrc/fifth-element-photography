@@ -322,14 +322,31 @@ def api_force_init_database():
     """Force re-initialization of database"""
     from init_pictorem_db import init_pictorem_database, check_database_status
     
-    print("Force initializing Pictorem database...")
-    init_success = init_pictorem_database(force=True)
-    
-    status = check_database_status()
-    status['force_init'] = True
-    status['init_success'] = init_success
-    
-    return jsonify(status)
+    try:
+        print("Force initializing Pictorem database...")
+        init_result = init_pictorem_database(force=True)
+        
+        status = check_database_status()
+        status['force_init'] = True
+        
+        # Handle both boolean and dict return values
+        if isinstance(init_result, dict):
+            status['init_success'] = init_result.get('success', False)
+            status['init_error'] = init_result.get('error')
+            status['init_error_type'] = init_result.get('error_type')
+            status['init_traceback'] = init_result.get('traceback')
+        else:
+            status['init_success'] = init_result
+        
+        return jsonify(status)
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'error_type': type(e).__name__,
+            'traceback': traceback.format_exc()
+        }), 500
 
 @pictorem_admin_bp.route('/api/sync_prices', methods=['POST'])
 def api_sync_prices():
