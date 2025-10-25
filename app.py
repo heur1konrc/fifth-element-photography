@@ -13,18 +13,18 @@ import hashlib
 import secrets
 
 # Lumaprints integration imports
-# from lumaprints_api import get_lumaprints_client, get_pricing_calculator  # REPLACED WITH PICTOREM
+from lumaprints_api import get_lumaprints_client, get_pricing_calculator
 
-# Pictorem integration
-from pictorem_product_api import get_products_for_frontend, get_product_price_api, get_categories_for_frontend, get_product_details
-from pictorem_admin import pictorem_admin_bp
-from pictorem_api import PictoremAPI
+# Pictorem integration (DISABLED)
+# from pictorem_product_api import get_products_for_frontend, get_product_price_api, get_categories_for_frontend, get_product_details
+# from pictorem_admin import pictorem_admin_bp
+# from pictorem_api import PictoremAPI
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
-# Register Pictorem admin blueprint
-app.register_blueprint(pictorem_admin_bp)
+# Register Pictorem admin blueprint (DISABLED)
+# app.register_blueprint(pictorem_admin_bp)
 
 # Initialize database if it doesn't exist
 def ensure_database_exists():
