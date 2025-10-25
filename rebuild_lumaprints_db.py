@@ -147,12 +147,12 @@ def import_canvas(conn, stats):
         
         cursor = conn.cursor()
         
-        # Canvas categories
+        # Canvas categories - match JSON keys
         canvas_categories = {
-            'rolled': ('Canvas - Rolled', 101000),
-            '0.75': ('Canvas - 0.75" Stretched', 101001),
-            '1.25': ('Canvas - 1.25" Stretched', 101002),
-            '1.5': ('Canvas - 1.5" Stretched', 101003)
+            'canvas_rolled': ('Canvas - Rolled', 101000),
+            'canvas_075': ('Canvas - 0.75" Stretched', 101001),
+            'canvas_125': ('Canvas - 1.25" Stretched', 101002),
+            'canvas_150': ('Canvas - 1.5" Stretched', 101003)
         }
         
         for depth_key, depth_data in data.items():
@@ -193,9 +193,9 @@ def import_framed_canvas(conn, stats):
         cursor = conn.cursor()
         
         framed_categories = {
-            '0.75': ('Framed Canvas - 0.75"', 102001),
-            '1.25': ('Framed Canvas - 1.25"', 102002),
-            '1.5': ('Framed Canvas - 1.5"', 102003)
+            'framed_canvas_075': ('Framed Canvas - 0.75"', 102001),
+            'framed_canvas_125': ('Framed Canvas - 1.25"', 102002),
+            'framed_canvas_150': ('Framed Canvas - 1.5"', 102003)
         }
         
         for depth_key, depth_data in data.items():
