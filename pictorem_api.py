@@ -367,15 +367,25 @@ def get_all_products():
 
 
 def get_product_sizes(product_slug):
-    """Get all sizes for a product"""
+    """Get all sizes for a product with pricing"""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     
     cursor.execute('''
-        SELECT s.width, s.height, s.orientation, s.display_name
+        SELECT 
+            s.id as size_id,
+            s.width, 
+            s.height, 
+            s.orientation, 
+            s.display_name,
+            pr.base_price,
+            pr.customer_price,
+            pr.markup_percentage,
+            pr.last_synced
         FROM pictorem_sizes s
         JOIN pictorem_products p ON s.product_id = p.id
+        LEFT JOIN pictorem_product_pricing pr ON (pr.size_id = s.id AND pr.product_id = p.id AND pr.option_id IS NULL)
         WHERE p.slug = ? AND s.active = 1
         ORDER BY s.display_order
     ''', (product_slug,))
