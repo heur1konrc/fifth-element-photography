@@ -383,14 +383,15 @@
                         const sizeCard = document.createElement('div');
                         sizeCard.className = 'size-card';
                         
-                        // Calculate customer price (base * 1.5 for 50% markup)
-                        const customerPrice = (size.base_price * 1.5).toFixed(2);
+                        // Format prices to 2 decimal places
+                        const basePrice = size.base_price ? parseFloat(size.base_price).toFixed(2) : 'N/A';
+                        const customerPrice = size.customer_price ? parseFloat(size.customer_price).toFixed(2) : 'N/A';
                         
                         sizeCard.innerHTML = `
                             <div class="size-name">${size.width}" × ${size.height}"</div>
                             <div class="size-price">
                                 <span class="price-label">Base:</span>
-                                <span class="base-price">$${size.base_price}</span>
+                                <span class="base-price">$${basePrice}</span>
                             </div>
                             <div class="size-price">
                                 <span class="price-label">Customer:</span>
