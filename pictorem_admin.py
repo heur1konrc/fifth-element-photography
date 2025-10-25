@@ -424,73 +424,60 @@ def api_get_all_pricing():
 
 @pictorem_admin_bp.route('/api/cleanup_duplicate_orientations', methods=['POST'])
 def api_cleanup_duplicate_orientations():
-    """Remove ALL duplicate sizes (exact duplicates and orientation duplicates)"""
+    """Remove exact duplicate sizes using SQL GROUP BY"""
     try:
         conn = get_db()
         cursor = conn.cursor()
         
-        # Get all sizes
+        # Count total before
+        cursor.execute("SELECT COUNT(*) as count FROM pictorem_sizes")
+        total_before = cursor.fetchone()[0]
+        
+        # Find duplicates
         cursor.execute("""
-            SELECT id, product_id, width, height, orientation
+            SELECT product_id, width, height, COUNT(*) as count
             FROM pictorem_sizes
-            ORDER BY product_id, id
+            GROUP BY product_id, width, height
+            HAVING COUNT(*) > 1
         """)
         
-        all_sizes = cursor.fetchall()
-        
-        # Track which sizes to keep (first occurrence only)
+        duplicates = cursor.fetchall()
         sizes_to_delete = []
-        seen_combinations = set()
         
-        for row in all_sizes:
-            size_id = row['id']
-            product_id = row['product_id']
-            width = row['width']
-            height = row['height']
+        for dup in duplicates:
+            product_id = dup[0]
+            width = dup[1]
+            height = dup[2]
             
-            # Create key for exact match (product + width + height)
-            exact_key = (product_id, width, height)
+            cursor.execute("""
+                SELECT id FROM pictorem_sizes
+                WHERE product_id = ? AND width = ? AND height = ?
+                ORDER BY id
+            """, (product_id, width, height))
             
-            if exact_key in seen_combinations:
-                # This is an exact duplicate
-                sizes_to_delete.append(size_id)
-            else:
-                # First time seeing this exact combination
-                seen_combinations.add(exact_key)
+            ids = [row[0] for row in cursor.fetchall()]
+            if len(ids) > 1:
+                sizes_to_delete.extend(ids[1:])
         
         if sizes_to_delete:
-            # Delete pricing data for these sizes first
             placeholders = ','.join('?' * len(sizes_to_delete))
-            cursor.execute(f"""
-                DELETE FROM pictorem_product_pricing
-                WHERE size_id IN ({placeholders})
-            """, sizes_to_delete)
-            pricing_deleted = cursor.rowcount
-            
-            # Delete the duplicate sizes
-            cursor.execute(f"""
-                DELETE FROM pictorem_sizes
-                WHERE id IN ({placeholders})
-            """, sizes_to_delete)
-            sizes_deleted = cursor.rowcount
-            
+            cursor.execute(f"DELETE FROM pictorem_product_pricing WHERE size_id IN ({placeholders})", sizes_to_delete)
+            cursor.execute(f"DELETE FROM pictorem_sizes WHERE id IN ({placeholders})", sizes_to_delete)
             conn.commit()
+            
+            cursor.execute("SELECT COUNT(*) as count FROM pictorem_sizes")
+            total_after = cursor.fetchone()[0]
             conn.close()
             
             return jsonify({
                 'success': True,
-                'total_sizes': len(all_sizes),
-                'sizes_deleted': sizes_deleted,
-                'pricing_deleted': pricing_deleted,
-                'sizes_remaining': len(all_sizes) - sizes_deleted
+                'duplicate_sets': len(duplicates),
+                'sizes_deleted': len(sizes_to_delete),
+                'sizes_remaining': total_after
             })
         else:
             conn.close()
-            return jsonify({
-                'success': True,
-                'message': 'No duplicate orientations found',
-                'total_sizes': len(all_sizes)
-            })
+            return jsonify({'success': True, 'message': 'No duplicates found'})
         
     except Exception as e:
         import traceback
