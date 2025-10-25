@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Test - Customer Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .step {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .step-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .product-card {
+            padding: 15px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .product-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .product-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .product-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .product-desc {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        
+        .size-card {
+            padding: 12px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .size-card:hover {
+            border-color: #667eea;
+        }
+        
+        .size-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .size-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .size-price {
+            color: #28a745;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .order-summary {
+            background: #f0f4ff;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .summary-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #d0d9ff;
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+            padding-top: 15px;
+            margin-top: 10px;
+            border-top: 2px solid #667eea;
+        }
+        
+        .summary-label {
+            color: #666;
+        }
+        
+        .summary-value {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .total-price {
+            font-size: 24px;
+            color: #667eea;
+        }
+        
+        .btn-checkout {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.2s;
+        }
+        
+        .btn-checkout:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-checkout:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Your Print</h1>
+        <p class="subtitle">Test Customer Experience - See how pricing works</p>
+        
+        <!-- Step 1: Select Product -->
+        <div class="step">
+            <div class="step-title">Step 1: Choose Your Product Type</div>
+            <div id="product-list" class="product-grid">
+                <div class="loading">Loading products...</div>
+            </div>
+        </div>
+        
+        <!-- Step 2: Select Size -->
+        <div class="step hidden" id="size-step">
+            <div class="step-title">Step 2: Choose Your Size</div>
+            <div id="size-list" class="size-grid">
+                <div class="loading">Select a product first...</div>
+            </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="order-summary hidden" id="order-summary">
+            <div class="summary-title">Order Summary</div>
+            <div class="summary-row">
+                <span class="summary-label">Product:</span>
+                <span class="summary-value" id="summary-product">-</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Size:</span>
+                <span class="summary-value" id="summary-size">-</span>
+            </div>
+            <div class="summary-row">
+                <span class="summary-label">Total:</span>
+                <span class="summary-value total-price" id="summary-price">$0.00</span>
+            </div>
+            <button class="btn-checkout" onclick="checkout()">Proceed to Checkout</button>
+        </div>
+    </div>
+    
+    <script>
+        let products = [];
+        let selectedProduct = null;
+        let selectedSize = null;
+        
+        async function loadProducts() {
+            try {
+                // Get products from API
+                const response = await fetch('/api/products');
+                products = await response.json();
+                
+                const container = document.getElementById('product-list');
+                container.innerHTML = '';
+                
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.onclick = () => selectProduct(product);
+                    card.innerHTML = `
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-desc">${product.description || ''}</div>
+                    `;
+                    container.appendChild(card);
+                });
+                
+            } catch (error) {
+                document.getElementById('product-list').innerHTML = 
+                    `<div class="loading" style="color: #dc3545;">Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function selectProduct(product) {
+            selectedProduct = product;
+            selectedSize = null;
+            
+            // Update UI
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.product-card').classList.add('selected');
+            
+            // Show size step
+            document.getElementById('size-step').classList.remove('hidden');
+            document.getElementById('order-summary').classList.add('hidden');
+            
+            // Load sizes with pricing
+            await loadSizes(product);
+        }
+        
+        async function loadSizes(product) {
+            const container = document.getElementById('size-list');
+            container.innerHTML = '<div class="loading">Loading sizes and prices...</div>';
+            
+            try {
+                // Get pricing data for this product
+                const response = await fetch('/api/get_all_pricing');
+                const allPricing = await response.json();
+                
+                // Filter for this product
+                const productPricing = allPricing.filter(p => p.product_slug === product.slug);
+                
+                if (productPricing.length === 0) {
+                    container.innerHTML = `
+                        <div class="loading" style="color: #dc3545;">
+                            No pricing data available. Admin needs to sync prices first.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = '';
+                
+                productPricing.forEach(pricing => {
+                    const card = document.createElement('div');
+                    card.className = 'size-card';
+                    card.onclick = () => selectSize(pricing);
+                    
+                    const price = pricing.price_override || pricing.customer_price;
+                    
+                    card.innerHTML = `
+                        <div class="size-name">${pricing.size_name}</div>
+                        <div class="size-price">$${price.toFixed(2)}</div>
+                    `;
+                    container.appendChild(card);
+                });
+                
+            } catch (error) {
+                container.innerHTML = 
+                    `<div class="loading" style="color: #dc3545;">Error: ${error.message}</div>`;
+            }
+        }
+        
+        function selectSize(pricing) {
+            selectedSize = pricing;
+            
+            // Update UI
+            document.querySelectorAll('.size-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.size-card').classList.add('selected');
+            
+            // Show order summary
+            updateOrderSummary();
+        }
+        
+        function updateOrderSummary() {
+            if (!selectedProduct || !selectedSize) return;
+            
+            const price = selectedSize.price_override || selectedSize.customer_price;
+            
+            document.getElementById('summary-product').textContent = selectedProduct.name;
+            document.getElementById('summary-size').textContent = selectedSize.size_name;
+            document.getElementById('summary-price').textContent = `$${price.toFixed(2)}`;
+            
+            document.getElementById('order-summary').classList.remove('hidden');
+        }
+        
+        function checkout() {
+            if (!selectedProduct || !selectedSize) {
+                alert('Please select a product and size');
+                return;
+            }
+            
+            const price = selectedSize.price_override || selectedSize.customer_price;
+            
+            alert(`Checkout Demo\n\nProduct: ${selectedProduct.name}\nSize: ${selectedSize.size_name}\nPrice: $${price.toFixed(2)}\n\nIn production, this would go to payment processing.`);
+        }
+        
+        // Load products on page load
+        window.addEventListener('load', loadProducts);
+    </script>
+</body>
+</html>
+

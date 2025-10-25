@@ -63,6 +63,11 @@ def admin_pricing_management():
     
     return render_template('pricing_management.html')
 
+@pictorem_admin_bp.route('/order-test')
+def order_test():
+    """Test order form to demonstrate customer experience"""
+    return render_template('order_test.html')
+
 @pictorem_admin_bp.route('/admin/pricing')
 def admin_pricing():
     """Pricing management interface"""

@@ -39,6 +39,12 @@ def sync_all_prices():
     for product_id, slug, preorder_template in products:
         print(f"Syncing prices for {slug}...")
         
+        # Skip framed products for now (they need options)
+        if 'framed' in slug.lower():
+            print(f"  Skipping {slug} (framed products need options - coming soon)")
+            print()
+            continue
+        
         # Get all sizes for this product
         cursor.execute("""
             SELECT id, width, height, orientation 
