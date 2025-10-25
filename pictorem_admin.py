@@ -475,6 +475,7 @@ def api_cleanup_duplicate_orientations():
                 'sizes_deleted': len(sizes_to_delete),
                 'pricing_deleted': len(sizes_to_delete),
                 'sizes_remaining': total_after
+            })
         else:
             conn.close()
             return jsonify({'success': True, 'message': 'No duplicates found'})
