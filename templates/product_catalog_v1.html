@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Catalog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .product-section {
+            margin-bottom: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .product-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 2px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .product-header-left h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .product-header-left .description {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .product-header-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .sync-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .sync-btn:hover:not(:disabled) {
+            background: #0056b3;
+        }
+        
+        .sync-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .sync-status {
+            font-size: 13px;
+            color: #666;
+            min-width: 150px;
+            text-align: right;
+        }
+        
+        .sync-status.syncing {
+            color: #007bff;
+            font-weight: 600;
+        }
+        
+        .sync-status.success {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .sync-status.error {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .product-content {
+            padding: 20px;
+        }
+        
+        .sizes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .size-card {
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            background: #fff;
+        }
+        
+        .size-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .size-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .size-price {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+        
+        .price-label {
+            color: #666;
+        }
+        
+        .price-value {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        .base-price {
+            color: #6c757d;
+        }
+        
+        .options-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .options-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        
+        .option-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .option-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .option-code {
+            color: #6c757d;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .stats-bar {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 6px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #007bff;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Complete Product Catalog</h1>
+        <p class="subtitle">All products, sizes, options, and pricing</p>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="stat-products">-</div>
+                <div class="stat-label">Products</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-sizes">-</div>
+                <div class="stat-label">Total Sizes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-options">-</div>
+                <div class="stat-label">Options</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="stat-markup">-</div>
+                <div class="stat-label">Markup</div>
+            </div>
+        </div>
+        
+        <div id="catalog-container">
+            <div class="loading">Loading product catalog...</div>
+        </div>
+    </div>
+    
+    <script>
+        async function loadCatalog() {
+            try {
+                // Get database status for stats
+                const statusRes = await fetch('/api/database/test');
+                const status = await statusRes.json();
+                
+                if (status.stats) {
+                    document.getElementById('stat-products').textContent = status.stats.pictorem_products || 0;
+                    document.getElementById('stat-sizes').textContent = status.stats.pictorem_sizes || 0;
+                    document.getElementById('stat-options').textContent = status.stats.pictorem_product_options || 0;
+                }
+                
+                // Get products
+                const productsRes = await fetch('/api/products/catalog');
+                const products = await productsRes.json();
+                
+                const container = document.getElementById('catalog-container');
+                container.innerHTML = '';
+                
+                // Get markup
+                let markup = 50;
+                try {
+                    const settingsRes = await fetch('/api/database/test');
+                    const settingsData = await settingsRes.json();
+                    document.getElementById('stat-markup').textContent = '50%';
+                } catch (e) {
+                    document.getElementById('stat-markup').textContent = '50%';
+                }
+                
+                for (const product of products) {
+                    await renderProduct(product, container);
+                }
+                
+            } catch (error) {
+                document.getElementById('catalog-container').innerHTML = 
+                    `<div class="loading" style="color: #dc3545;">Error loading catalog: ${error.message}</div>`;
+            }
+        }
+        
+        async function syncProductPrices(productSlug, button, statusElement) {
+            button.disabled = true;
+            statusElement.textContent = 'Syncing...';
+            statusElement.className = 'sync-status syncing';
+            
+            try {
+                const response = await fetch(`/api/sync_product/${productSlug}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusElement.textContent = `✓ Synced ${result.synced}/${result.total_sizes} sizes`;
+                    statusElement.className = 'sync-status success';
+                    
+                    // Reload the page to show updated prices
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    statusElement.textContent = `✗ Error: ${result.error}`;
+                    statusElement.className = 'sync-status error';
+                    button.disabled = false;
+                }
+            } catch (error) {
+                statusElement.textContent = `✗ Error: ${error.message}`;
+                statusElement.className = 'sync-status error';
+                button.disabled = false;
+            }
+        }
+        
+        async function renderProduct(product, container) {
+            const section = document.createElement('div');
+            section.className = 'product-section';
+            
+            // Header with sync button
+            const header = document.createElement('div');
+            header.className = 'product-header';
+            
+            const headerLeft = document.createElement('div');
+            headerLeft.className = 'product-header-left';
+            headerLeft.innerHTML = `
+                <h2>${product.name}</h2>
+                <div class="description">${product.description || ''}</div>
+            `;
+            
+            const headerRight = document.createElement('div');
+            headerRight.className = 'product-header-right';
+            
+            const syncStatus = document.createElement('div');
+            syncStatus.className = 'sync-status';
+            syncStatus.textContent = 'Ready to sync';
+            
+            const syncBtn = document.createElement('button');
+            syncBtn.className = 'sync-btn';
+            syncBtn.textContent = 'Sync Prices';
+            syncBtn.onclick = () => syncProductPrices(product.slug, syncBtn, syncStatus);
+            
+            headerRight.appendChild(syncStatus);
+            headerRight.appendChild(syncBtn);
+            
+            header.appendChild(headerLeft);
+            header.appendChild(headerRight);
+            section.appendChild(header);
+            
+            const content = document.createElement('div');
+            content.className = 'product-content';
+            
+            // Get sizes
+            try {
+                const sizesRes = await fetch(`/api/product/${product.slug}/sizes`);
+                const sizes = await sizesRes.json();
+                
+                if (sizes && sizes.length > 0) {
+                    const sizesGrid = document.createElement('div');
+                    sizesGrid.className = 'sizes-grid';
+                    
+                    for (const size of sizes) {
+                        const sizeCard = document.createElement('div');
+                        sizeCard.className = 'size-card';
+                        
+                        // Format prices to 2 decimal places
+                        const basePrice = size.base_price ? parseFloat(size.base_price).toFixed(2) : 'N/A';
+                        const customerPrice = size.customer_price ? parseFloat(size.customer_price).toFixed(2) : 'N/A';
+                        
+                        sizeCard.innerHTML = `
+                            <div class="size-name">${size.width}" × ${size.height}"</div>
+                            <div class="size-price">
+                                <span class="price-label">Base:</span>
+                                <span class="base-price">$${basePrice}</span>
+                            </div>
+                            <div class="size-price">
+                                <span class="price-label">Customer:</span>
+                                <span class="price-value">$${customerPrice}</span>
+                            </div>
+                        `;
+                        
+                        sizesGrid.appendChild(sizeCard);
+                    }
+                    
+                    content.appendChild(sizesGrid);
+                }
+                
+                // Get options (for framed products)
+                if (product.slug === 'framed-fine-art') {
+                    const optionsSection = document.createElement('div');
+                    optionsSection.className = 'options-section';
+                    
+                    // Frames
+                    const framesRes = await fetch(`/api/product/${product.slug}/options?type=moulding`);
+                    const frames = await framesRes.json();
+                    
+                    if (frames && frames.length > 0) {
+                        optionsSection.innerHTML += `<h3>Frame Styles (${frames.length})</h3>`;
+                        const framesGrid = document.createElement('div');
+                        framesGrid.className = 'options-grid';
+                        
+                        frames.forEach(frame => {
+                            const item = document.createElement('div');
+                            item.className = 'option-item';
+                            item.innerHTML = `
+                                <div class="option-name">${frame.name}</div>
+                                <div class="option-code">${frame.code}</div>
+                            `;
+                            framesGrid.appendChild(item);
+                        });
+                        
+                        optionsSection.appendChild(framesGrid);
+                    }
+                    
+                    // Mats
+                    const matsRes = await fetch(`/api/product/${product.slug}/options?type=mat`);
+                    const mats = await matsRes.json();
+                    
+                    if (mats && mats.length > 0) {
+                        optionsSection.innerHTML += `<h3 style="margin-top: 20px;">Mat Options (${mats.length})</h3>`;
+                        const matsGrid = document.createElement('div');
+                        matsGrid.className = 'options-grid';
+                        
+                        mats.forEach(mat => {
+                            const item = document.createElement('div');
+                            item.className = 'option-item';
+                            item.innerHTML = `
+                                <div class="option-name">${mat.name}</div>
+                                <div class="option-code">${mat.code}</div>
+                            `;
+                            matsGrid.appendChild(item);
+                        });
+                        
+                        optionsSection.appendChild(matsGrid);
+                    }
+                    
+                    // Glazing
+                    const glazingRes = await fetch(`/api/product/${product.slug}/options?type=glazing`);
+                    const glazing = await glazingRes.json();
+                    
+                    if (glazing && glazing.length > 0) {
+                        optionsSection.innerHTML += `<h3 style="margin-top: 20px;">Glazing Options (${glazing.length})</h3>`;
+                        const glazingGrid = document.createElement('div');
+                        glazingGrid.className = 'options-grid';
+                        
+                        glazing.forEach(glaze => {
+                            const item = document.createElement('div');
+                            item.className = 'option-item';
+                            item.innerHTML = `
+                                <div class="option-name">${glaze.name}</div>
+                                <div class="option-code">${glaze.code}</div>
+                            `;
+                            glazingGrid.appendChild(item);
+                        });
+                        
+                        optionsSection.appendChild(glazingGrid);
+                    }
+                    
+                    content.appendChild(optionsSection);
+                }
+                
+            } catch (error) {
+                content.innerHTML = `<div style="color: #dc3545; padding: 20px;">Error loading product details: ${error.message}</div>`;
+            }
+            
+            section.appendChild(content);
+            container.appendChild(section);
+        }
+        
+        // Load catalog on page load
+        loadCatalog();
+    </script>
+</body>
+</html>

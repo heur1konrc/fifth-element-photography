@@ -421,3 +421,81 @@ def api_get_all_pricing():
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
+
+@pictorem_admin_bp.route('/api/cleanup_duplicate_orientations', methods=['POST'])
+def api_cleanup_duplicate_orientations():
+    """Remove duplicate orientation sizes (e.g., keep 8x10, remove 10x8)"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Get all sizes
+        cursor.execute("""
+            SELECT id, product_id, width, height, orientation
+            FROM pictorem_sizes
+            ORDER BY product_id, width, height
+        """)
+        
+        all_sizes = cursor.fetchall()
+        
+        # Track which sizes to keep (smaller dimension first)
+        sizes_to_delete = []
+        seen_combinations = set()
+        
+        for row in all_sizes:
+            size_id = row['id']
+            product_id = row['product_id']
+            width = row['width']
+            height = row['height']
+            
+            # Create a normalized key (smaller dimension first)
+            min_dim = min(width, height)
+            max_dim = max(width, height)
+            key = (product_id, min_dim, max_dim)
+            
+            if key in seen_combinations:
+                # This is a duplicate (opposite orientation)
+                sizes_to_delete.append(size_id)
+            else:
+                # First time seeing this combination
+                seen_combinations.add(key)
+        
+        if sizes_to_delete:
+            # Delete pricing data for these sizes first
+            placeholders = ','.join('?' * len(sizes_to_delete))
+            cursor.execute(f"""
+                DELETE FROM pictorem_product_pricing
+                WHERE size_id IN ({placeholders})
+            """, sizes_to_delete)
+            pricing_deleted = cursor.rowcount
+            
+            # Delete the duplicate sizes
+            cursor.execute(f"""
+                DELETE FROM pictorem_sizes
+                WHERE id IN ({placeholders})
+            """, sizes_to_delete)
+            sizes_deleted = cursor.rowcount
+            
+            conn.commit()
+            conn.close()
+            
+            return jsonify({
+                'success': True,
+                'total_sizes': len(all_sizes),
+                'sizes_deleted': sizes_deleted,
+                'pricing_deleted': pricing_deleted,
+                'sizes_remaining': len(all_sizes) - sizes_deleted
+            })
+        else:
+            conn.close()
+            return jsonify({
+                'success': True,
+                'message': 'No duplicate orientations found',
+                'total_sizes': len(all_sizes)
+            })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
