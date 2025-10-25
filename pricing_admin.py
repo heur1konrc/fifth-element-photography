@@ -72,26 +72,28 @@ def get_pricing_data():
     global_markup = get_global_markup()
     multiplier = (global_markup / 100) + 1
     
-    # Get all categories
-    cursor.execute("SELECT DISTINCT category FROM products ORDER BY category")
-    category_names = [row['category'] for row in cursor.fetchall()]
+    # Get all categories from categories table
+    cursor.execute("SELECT id, name FROM categories ORDER BY name")
+    category_rows = cursor.fetchall()
     
     categories = []
-    for cat_name in category_names:
-        # Get all products with all sizes in this category
+    for cat_row in category_rows:
+        cat_id = cat_row['id']
+        cat_name = cat_row['name']
+        
+        # Get all products in this category
         cursor.execute("""
             SELECT 
-                id,
-                name,
-                size,
-                category,
-                price,
-                lumaprints_subcategory_id,
-                lumaprints_frame_option_id
-            FROM products 
-            WHERE category = ?
-            ORDER BY name, size
-        """, (cat_name,))
+                p.id,
+                p.name,
+                p.size,
+                p.cost_price as price,
+                p.lumaprints_subcategory_id,
+                p.lumaprints_frame_option as lumaprints_frame_option_id
+            FROM products p
+            WHERE p.category_id = ?
+            ORDER BY p.name, p.size
+        """, (cat_id,))
         
         products = []
         for prod_row in cursor.fetchall():
