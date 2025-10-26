@@ -350,6 +350,51 @@
             });
             event.target.classList.add('selected');
             
+            // Show size step
+            document.getElementById('step-size').style.display = 'block';
+            document.getElementById('step-size').classList.add('active');
+            
+            // Load sizes
+            const container = document.getElementById('sizes-container');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading sizes...</p></div>';
+            
+            try {
+                const response = await fetch(`/api/lumaprints/sizes/${subcategory.subcategoryId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displaySizes(data.sizes);
+                } else {
+                    throw new Error(data.error || 'Failed to load sizes');
+                }
+            } catch (error) {
+                showError('Failed to load sizes: ' + error.message);
+            }
+        }
+        
+        function displaySizes(sizes) {
+            const container = document.getElementById('sizes-container');
+            container.className = 'option-grid';
+            container.innerHTML = '';
+            
+            sizes.forEach(size => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = size.name;
+                btn.onclick = () => selectSize(size);
+                container.appendChild(btn);
+            });
+        }
+        
+        async function selectSize(size) {
+            state.selectedSize = size;
+            
+            // Highlight selection
+            document.querySelectorAll('#sizes-container .option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
             // Show options step
             document.getElementById('step-options').style.display = 'block';
             document.getElementById('step-options').classList.add('active');
@@ -359,7 +404,7 @@
             container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading options...</p></div>';
             
             try {
-                const response = await fetch(`/api/lumaprints/options/${subcategory.subcategoryId}`);
+                const response = await fetch(`/api/lumaprints/options/${state.selectedSubcategory.subcategoryId}`);
                 const data = await response.json();
                 
                 if (data.success) {
