@@ -2462,10 +2462,10 @@ def get_lumaprints_catalog():
 
 @app.route('/api/lumaprints/subcategories/<int:category_id>')
 def get_lumaprints_subcategories(category_id):
-    """Get subcategories for a specific category"""
+    """Get subcategories for a specific category from live API"""
     try:
-        catalog = load_lumaprints_catalog()
-        subcategories = catalog.get('subcategories', {}).get(str(category_id), [])
+        client = get_lumaprints_client(sandbox=False)
+        subcategories = client.get_category_subcategories(category_id)
         return jsonify({
             'success': True,
             'subcategories': subcategories
