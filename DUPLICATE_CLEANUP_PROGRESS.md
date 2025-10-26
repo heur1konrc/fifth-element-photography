@@ -212,5 +212,25 @@ standard_sizes = [
 **Commits:**
 - 9682e13 - Add debug endpoint
 - 03935f9 - Fix cleanup function (didn't work)
-- 3dcc891 - **FIX IMPORT SCRIPT** (the real fix!)
+- 3dcc891 - Fix import script to remove duplicate orientations
+- 79692e3 - Remove old pictorem.db file
+- e9b4cff - Fix force re-initialize to actually delete old database
+
+**CURRENT STATUS:** 
+- Fixed import script to remove duplicate orientations (8×10 only, not both 8×10 and 10×8)
+- Database has 77 sizes (11 sizes × 7 products) - CORRECT!
+- No duplicates in database confirmed via debug endpoint
+- **NEW ISSUE:** Catalog page showing "Error loading product details: Unexpected token '<'"
+- API endpoint `/api/product/<slug>/sizes` returning 500 error
+- Added debug endpoint to check /data directory contents
+- Waiting for Railway deployment to diagnose API error
+
+**Next Steps:**
+1. ✅ Checked /data directory - pictorem.db was missing!
+2. ✅ Fixed init script to use absolute path for SQL schema file
+3. ⏳ Waiting for user to Force Re-Initialize database
+4. Verify catalog displays correctly (no duplicates)
+5. Build test order form per user requirements
+
+**CRITICAL:** Public must NEVER see "Pictorem" anywhere - backend only!
 

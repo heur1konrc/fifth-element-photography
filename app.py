@@ -3588,6 +3588,7 @@ from dynamic_product_api import (
 )
 from database_setup_route import setup_database_route
 from rebuild_lumaprints_db import rebuild_database_route
+from order_route import order_form_route
 
 @app.route('/admin/pricing')
 @require_admin_auth
@@ -5473,7 +5474,8 @@ app.register_blueprint(pricing_form)
 app.register_blueprint(order_form_api)
 
 # Dynamic order form route
-@app.route('/order-form')
-def dynamic_order_form():
-    return render_template('dynamic_order_form.html')
+@app.route('/order')
+def order_form():
+    """Clean order form using dynamic Lumaprints API"""
+    return order_form_route()
 
