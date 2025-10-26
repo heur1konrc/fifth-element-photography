@@ -2819,8 +2819,8 @@ def get_lumaprints_pricing():
         quantity = int(data.get('quantity', 1))
         options = data.get('options', [])
         
-        # Get pricing from live Lumaprints API
-        client = get_lumaprints_client(sandbox=True)
+        # Get pricing from live Lumaprints API (use production for pricing)
+        client = get_lumaprints_client(sandbox=False)
         api_pricing = client.get_pricing(
             subcategory_id=subcategory_id,
             width=width,
