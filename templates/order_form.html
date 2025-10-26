@@ -581,7 +581,8 @@
                 container.appendChild(optionDiv);
             }
             
-            calculatePrice();
+            // Enable Add to Cart button
+            document.getElementById('add-to-cart').disabled = false;
         }
         
         async function fetchPrice(optionIds) {
