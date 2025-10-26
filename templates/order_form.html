@@ -376,7 +376,7 @@
             displaySizes();
         }
         
-        function displaySizes() {
+        async function displaySizes() {
             const container = document.getElementById('sizes-container');
             const infoEl = document.getElementById('image-dimensions-info');
             
@@ -425,15 +425,64 @@
             }
             
             container.className = 'option-grid';
-            container.innerHTML = '';
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading prices...</p></div>';
             
-            sizes.forEach(size => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = size.name;
-                btn.onclick = () => selectSize(size);
-                container.appendChild(btn);
-            });
+            // Fetch prices from our pricing API
+            try {
+                const categoryId = state.selectedCategory.categoryId;
+                const response = await fetch(`/api/pricing/category/${categoryId}`);
+                const data = await response.json();
+                
+                if (data.success && data.products) {
+                    // Create a price lookup map: "widthxheight" -> price
+                    const priceMap = {};
+                    data.products.forEach(product => {
+                        const key = `${Math.round(product.size.split('×')[0])}x${Math.round(product.size.split('×')[1])}`;
+                        priceMap[key] = product.retail_price;
+                    });
+                    
+                    // Clear loading and display size buttons with prices
+                    container.innerHTML = '';
+                    sizes.forEach(size => {
+                        const btn = document.createElement('button');
+                        btn.className = 'option-btn';
+                        
+                        // Look up price
+                        const sizeKey = `${size.width}x${size.height}`;
+                        const price = priceMap[sizeKey];
+                        
+                        if (price) {
+                            btn.innerHTML = `${size.name}<br><strong>$${price.toFixed(2)}</strong>`;
+                        } else {
+                            btn.textContent = size.name;
+                        }
+                        
+                        btn.onclick = () => selectSize(size);
+                        container.appendChild(btn);
+                    });
+                } else {
+                    // Fallback: display without prices
+                    container.innerHTML = '';
+                    sizes.forEach(size => {
+                        const btn = document.createElement('button');
+                        btn.className = 'option-btn';
+                        btn.textContent = size.name;
+                        btn.onclick = () => selectSize(size);
+                        container.appendChild(btn);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading prices:', error);
+                // Fallback: display without prices
+                container.innerHTML = '';
+                sizes.forEach(size => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = size.name;
+                    btn.onclick = () => selectSize(size);
+                    container.appendChild(btn);
+                });
+            }
         }
         
         async function selectSize(size) {
