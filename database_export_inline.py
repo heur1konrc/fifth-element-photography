@@ -16,24 +16,29 @@ def export_pricing_database():
         
         export_data = {
             'exported_at': datetime.now().isoformat(),
-            'product_types': [],
             'categories': [],
             'products': [],
+            'product_variants': [],
+            'sub_options': [],
             'settings': {},
             'statistics': {}
         }
         
-        # Export product types
-        cursor.execute("SELECT * FROM product_types ORDER BY display_order")
-        export_data['product_types'] = [dict(row) for row in cursor.fetchall()]
-        
         # Export categories
-        cursor.execute("SELECT * FROM categories ORDER BY product_type_id, display_order")
+        cursor.execute("SELECT * FROM categories ORDER BY id")
         export_data['categories'] = [dict(row) for row in cursor.fetchall()]
         
         # Export all products
         cursor.execute("SELECT * FROM products ORDER BY category_id, size")
         export_data['products'] = [dict(row) for row in cursor.fetchall()]
+        
+        # Export product variants
+        cursor.execute("SELECT * FROM product_variants ORDER BY product_id")
+        export_data['product_variants'] = [dict(row) for row in cursor.fetchall()]
+        
+        # Export sub_options
+        cursor.execute("SELECT * FROM sub_options ORDER BY product_type_id, level, display_order")
+        export_data['sub_options'] = [dict(row) for row in cursor.fetchall()]
         
         # Export settings
         cursor.execute("SELECT * FROM settings")
@@ -43,29 +48,33 @@ def export_pricing_database():
         # Calculate statistics
         cursor.execute("""
             SELECT 
-                pt.name as product_type,
                 c.name as category,
                 COUNT(p.id) as product_count,
                 MIN(p.cost_price) as min_cost,
                 MAX(p.cost_price) as max_cost,
-                AVG(p.cost_price) as avg_cost
-            FROM product_types pt
-            LEFT JOIN categories c ON pt.id = c.product_type_id
+                AVG(p.cost_price) as avg_cost,
+                MIN(p.price) as min_price,
+                MAX(p.price) as max_price,
+                AVG(p.price) as avg_price
+            FROM categories c
             LEFT JOIN products p ON c.id = p.category_id
-            GROUP BY pt.id, c.id
-            ORDER BY pt.display_order, c.display_order
+            GROUP BY c.id
+            ORDER BY c.id
         """)
         export_data['statistics']['by_category'] = [dict(row) for row in cursor.fetchall()]
         
         # Total counts
+        cursor.execute("SELECT COUNT(*) as total FROM products WHERE active = 1")
+        export_data['statistics']['total_active_products'] = cursor.fetchone()['total']
+        
         cursor.execute("SELECT COUNT(*) as total FROM products")
         export_data['statistics']['total_products'] = cursor.fetchone()['total']
         
         cursor.execute("SELECT COUNT(*) as total FROM categories")
         export_data['statistics']['total_categories'] = cursor.fetchone()['total']
         
-        cursor.execute("SELECT COUNT(*) as total FROM product_types")
-        export_data['statistics']['total_product_types'] = cursor.fetchone()['total']
+        cursor.execute("SELECT COUNT(*) as total FROM product_variants")
+        export_data['statistics']['total_variants'] = cursor.fetchone()['total']
         
         conn.close()
         
