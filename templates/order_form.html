@@ -238,7 +238,7 @@
                 </div>
                 
                 <!-- Price Display -->
-                <div class="price-display" id="price-display" style="display: none;">
+                <div class="price-display" id="price-display" style="display: block;">
                     <div class="label">Your Price</div>
                     <div class="amount" id="price-amount">$0.00</div>
                     <div class="label" style="font-size: 0.5em; margin-top: 10px;">
@@ -444,6 +444,9 @@
             });
             event.target.classList.add('selected');
             
+            // Update price display
+            updateTotalPrice();
+            
             // DISABLED: Image quality check (see CRITICAL_NOTE_IMAGE_CHECK.md)
             // TODO: Re-enable with FULL SIZE HIRES IMAGE path, not thumbnail
             /*
@@ -519,6 +522,27 @@
             
             // Skip directly to loading options
             loadOptionsForSize();
+        }
+        
+        function updateTotalPrice() {
+            let total = 0;
+            let basePrice = 0;
+            
+            // Add size price if selected
+            if (state.selectedSize && state.selectedSize.price) {
+                basePrice = state.selectedSize.price;
+                total = basePrice;
+            }
+            
+            // TODO: Add option prices when implemented
+            
+            // Update display
+            document.getElementById('base-price').textContent = `$${basePrice.toFixed(2)}`;
+            document.getElementById('price-amount').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('markup-percent').textContent = '0%'; // TODO: Apply markup
+            
+            // Show price display
+            document.getElementById('price-display').style.display = 'block';
         }
         
         async function loadOptionsForSize() {
