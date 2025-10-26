@@ -408,8 +408,16 @@
                 
                 container.innerHTML = '';
                 
-                // Display each size with price
+                // Group products by size (since each size has multiple frame colors)
+                const sizeMap = new Map();
                 data.products.forEach(product => {
+                    if (!sizeMap.has(product.size)) {
+                        sizeMap.set(product.size, product);
+                    }
+                });
+                
+                // Display each unique size with price
+                sizeMap.forEach(product => {
                     // Parse size (e.g., "8×10" -> width: 8, height: 10)
                     const sizeParts = product.size.split('×');
                     if (sizeParts.length !== 2) return;
