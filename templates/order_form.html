@@ -551,10 +551,7 @@
                 return;
             }
             
-            // Get base price first (no options selected)
-            const basePrice = await fetchPrice([]);
-            
-            // Render each option group
+            // Render each option group (without individual pricing for speed)
             for (const group of optionGroups) {
                 const optionDiv = document.createElement('div');
                 optionDiv.style.marginBottom = '20px';
@@ -569,25 +566,11 @@
                     const grid = document.createElement('div');
                     grid.className = 'option-grid';
                     
-                    // Fetch prices for all options in this group
                     for (const item of group.optionGroupItems) {
                         const btn = document.createElement('button');
                         btn.className = 'option-btn';
                         btn.dataset.optionId = item.optionId;
-                        
-                        // Calculate price with this option
-                        const priceWithOption = await fetchPrice([item.optionId]);
-                        const priceDiff = priceWithOption ? (priceWithOption - basePrice) : 0;
-                        
-                        // Display option name with price
-                        if (priceDiff > 0) {
-                            btn.innerHTML = `${item.optionName} <span style="color: #10b981; font-weight: 600;">+$${priceDiff.toFixed(2)}</span>`;
-                        } else if (priceDiff < 0) {
-                            btn.innerHTML = `${item.optionName} <span style="color: #ef4444; font-weight: 600;">-$${Math.abs(priceDiff).toFixed(2)}</span>`;
-                        } else {
-                            btn.textContent = item.optionName;
-                        }
-                        
+                        btn.textContent = item.optionName;
                         btn.onclick = () => selectOption(group.optionGroup, item.optionId, btn);
                         grid.appendChild(btn);
                     }
