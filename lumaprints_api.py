@@ -303,8 +303,8 @@ def get_lumaprints_client(sandbox: bool = True) -> LumaprintsAPI:
     """
     # Load credentials from environment or use defaults
     import os
-    API_KEY = os.getenv('LUMAPRINTS_API_KEY', '4fca2b7f5f9f14ba643eadf24b8f6c11735f434e2d31303538393431')
-    API_SECRET = os.getenv('LUMAPRINTS_API_SECRET', '3a8e919361b3d4353bae2d31303538393431')
+    API_KEY = os.getenv('LUMAPRINTS_API_KEY', 'e909ca3adc5026beb5dc306020ffe3068cf0e5962d31303137373136')
+    API_SECRET = os.getenv('LUMAPRINTS_API_SECRET', '23ab680f283aeabd077e2d31303137373136')
     
     return LumaprintsAPI(API_KEY, API_SECRET, sandbox=sandbox)
 
