@@ -2921,8 +2921,8 @@ register_import_routes(app)
 # ORDER FORM V3 - CLEAN IMPLEMENTATION
 # ============================================================================
 
-from order_api_v3 import register_order_routes_v3
-register_order_routes_v3(app)
+# from order_api_v3 import register_order_routes_v3
+# register_order_routes_v3(app)  # Disabled - using new /order route instead
 
 # NEW: Register fresh print order routes to bypass Railway cache
 from print_order_api import setup_print_order_routes
