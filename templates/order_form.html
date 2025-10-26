@@ -510,7 +510,7 @@
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             
-            // API returns {options: [{optionGroup, optionGroupItems: [...]}]}
+            // API returns array directly: [{optionGroup, optionGroupItems: [{optionId, optionName}]}]
             const optionGroups = apiResponse.options || apiResponse;
             
             if (!optionGroups || optionGroups.length === 0) {
@@ -537,11 +537,9 @@
                     group.optionGroupItems.forEach(item => {
                         const btn = document.createElement('button');
                         btn.className = 'option-btn';
-                        btn.textContent = item.itemName;
-                        if (item.price && item.price > 0) {
-                            btn.textContent += ` (+$${item.price.toFixed(2)})`;
-                        }
-                        btn.onclick = () => selectOption(group.optionGroup, item.itemId, btn);
+                        btn.textContent = item.optionName;
+                        // Note: price is not included in options API, will be calculated in pricing API
+                        btn.onclick = () => selectOption(group.optionGroup, item.optionId, btn);
                         grid.appendChild(btn);
                     });
                     
