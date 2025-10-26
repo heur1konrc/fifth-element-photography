@@ -2457,7 +2457,7 @@ def get_lumaprints_subcategories(category_id):
     """Get subcategories for a specific category from live API"""
     try:
         client = get_lumaprints_client(sandbox=False)
-        subcategories = client.get_category_subcategories(category_id)
+        subcategories = client.get_subcategories(category_id)
         return jsonify({
             'success': True,
             'subcategories': subcategories
