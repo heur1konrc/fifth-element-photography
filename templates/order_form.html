@@ -425,64 +425,32 @@
             }
             
             container.className = 'option-grid';
-            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading prices...</p></div>';
+            container.innerHTML = '';
             
-            // Fetch prices from our pricing API
-            try {
-                const categoryId = state.selectedCategory.categoryId;
-                const response = await fetch(`/api/pricing/category/${categoryId}`);
-                const data = await response.json();
+            // Display size buttons and fetch prices in parallel
+            const subcategoryId = state.selectedSubcategory.id;
+            
+            sizes.forEach(async (size) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = size.name; // Show size immediately
+                btn.onclick = () => selectSize(size);
+                container.appendChild(btn);
                 
-                if (data.success && data.products) {
-                    // Create a price lookup map: "widthxheight" -> price
-                    const priceMap = {};
-                    data.products.forEach(product => {
-                        const key = `${Math.round(product.size.split('×')[0])}x${Math.round(product.size.split('×')[1])}`;
-                        priceMap[key] = product.retail_price;
-                    });
+                // Fetch price for this specific size
+                try {
+                    const sizeParam = `${size.width}x${size.height}`;
+                    const response = await fetch(`/api/pricing/product?subcategory_id=${subcategoryId}&size=${sizeParam}`);
+                    const data = await response.json();
                     
-                    // Clear loading and display size buttons with prices
-                    container.innerHTML = '';
-                    sizes.forEach(size => {
-                        const btn = document.createElement('button');
-                        btn.className = 'option-btn';
-                        
-                        // Look up price
-                        const sizeKey = `${size.width}x${size.height}`;
-                        const price = priceMap[sizeKey];
-                        
-                        if (price) {
-                            btn.innerHTML = `${size.name}<br><strong>$${price.toFixed(2)}</strong>`;
-                        } else {
-                            btn.textContent = size.name;
-                        }
-                        
-                        btn.onclick = () => selectSize(size);
-                        container.appendChild(btn);
-                    });
-                } else {
-                    // Fallback: display without prices
-                    container.innerHTML = '';
-                    sizes.forEach(size => {
-                        const btn = document.createElement('button');
-                        btn.className = 'option-btn';
-                        btn.textContent = size.name;
-                        btn.onclick = () => selectSize(size);
-                        container.appendChild(btn);
-                    });
+                    if (data.success && data.retail_price) {
+                        btn.innerHTML = `${size.name}<br><strong>$${data.retail_price.toFixed(2)}</strong>`;
+                    }
+                } catch (error) {
+                    console.error(`Error loading price for ${size.name}:`, error);
+                    // Keep button with just size name
                 }
-            } catch (error) {
-                console.error('Error loading prices:', error);
-                // Fallback: display without prices
-                container.innerHTML = '';
-                sizes.forEach(size => {
-                    const btn = document.createElement('button');
-                    btn.className = 'option-btn';
-                    btn.textContent = size.name;
-                    btn.onclick = () => selectSize(size);
-                    container.appendChild(btn);
-                });
-            }
+            });
         }
         
         async function selectSize(size) {
