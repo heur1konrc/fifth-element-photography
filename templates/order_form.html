@@ -534,7 +534,7 @@
             }
         }
         
-        function displayOptions(apiResponse) {
+        async function displayOptions(apiResponse) {
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             
@@ -547,8 +547,11 @@
                 return;
             }
             
+            // Get base price first (no options selected)
+            const basePrice = await fetchPrice([]);
+            
             // Render each option group
-            optionGroups.forEach(group => {
+            for (const group of optionGroups) {
                 const optionDiv = document.createElement('div');
                 optionDiv.style.marginBottom = '20px';
                 
@@ -562,22 +565,58 @@
                     const grid = document.createElement('div');
                     grid.className = 'option-grid';
                     
-                    group.optionGroupItems.forEach(item => {
+                    // Fetch prices for all options in this group
+                    for (const item of group.optionGroupItems) {
                         const btn = document.createElement('button');
                         btn.className = 'option-btn';
-                        btn.textContent = item.optionName;
-                        // Note: price is not included in options API, will be calculated in pricing API
+                        btn.dataset.optionId = item.optionId;
+                        
+                        // Calculate price with this option
+                        const priceWithOption = await fetchPrice([item.optionId]);
+                        const priceDiff = priceWithOption ? (priceWithOption - basePrice) : 0;
+                        
+                        // Display option name with price
+                        if (priceDiff > 0) {
+                            btn.innerHTML = `${item.optionName} <span style="color: #10b981; font-weight: 600;">+$${priceDiff.toFixed(2)}</span>`;
+                        } else if (priceDiff < 0) {
+                            btn.innerHTML = `${item.optionName} <span style="color: #ef4444; font-weight: 600;">-$${Math.abs(priceDiff).toFixed(2)}</span>`;
+                        } else {
+                            btn.textContent = item.optionName;
+                        }
+                        
                         btn.onclick = () => selectOption(group.optionGroup, item.optionId, btn);
                         grid.appendChild(btn);
-                    });
+                    }
                     
                     optionDiv.appendChild(grid);
                 }
                 
                 container.appendChild(optionDiv);
-            });
+            }
             
             calculatePrice();
+        }
+        
+        async function fetchPrice(optionIds) {
+            try {
+                const response = await fetch('/api/lumaprints/pricing', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subcategoryId: state.selectedSubcategory.subcategoryId,
+                        width: state.selectedSize.width,
+                        height: state.selectedSize.height,
+                        quantity: 1,
+                        options: optionIds
+                    })
+                });
+                
+                const data = await response.json();
+                return data.success ? data.pricing.wholesale_price : null;
+            } catch (error) {
+                console.error('Price fetch failed:', error);
+                return null;
+            }
         }
         
         function selectOption(optionId, valueId, btnElement) {
