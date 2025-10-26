@@ -458,8 +458,9 @@
                 const checkData = await checkResponse.json();
                 
                 if (!checkData.success) {
-                    // Image validation failed - show warning but allow to continue
-                    if (confirm(`Warning: ${checkData.message || 'Image quality may not be optimal for this size'}. Continue anyway?`)) {
+                    // Image validation failed - show detailed error
+                    const errorMsg = checkData.result?.message || checkData.message || checkData.error || 'Image quality check failed';
+                    if (confirm(`${errorMsg}\n\nContinue anyway?`)) {
                         // User chose to continue
                         displaySizes(); // Restore size selection
                         loadOptionsForSize();
@@ -469,8 +470,31 @@
                         return;
                     }
                 } else {
-                    // Image is good, proceed to options
-                    loadOptionsForSize();
+                    // Check the actual API response message
+                    const apiResult = checkData.result;
+                    if (apiResult && apiResult.message) {
+                        // Show the message from Lumaprints API
+                        const details = `Image: ${apiResult.actualImageWidth}x${apiResult.actualImageHeight} (${apiResult.actualImageAspectRatio})\n` +
+                                      `Recommended: ${apiResult.recommendedWidth}x${apiResult.recommendedHeight} (${apiResult.expectedAspectRatio})\n\n` +
+                                      `${apiResult.message}`;
+                        
+                        if (apiResult.message.includes('not same') || apiResult.message.includes('incorrect')) {
+                            // Aspect ratio issue - show warning
+                            if (confirm(details + '\n\nContinue anyway?')) {
+                                displaySizes();
+                                loadOptionsForSize();
+                            } else {
+                                displaySizes();
+                                return;
+                            }
+                        } else {
+                            // Image is good, proceed to options
+                            loadOptionsForSize();
+                        }
+                    } else {
+                        // No detailed message, proceed
+                        loadOptionsForSize();
+                    }
                 }
             } catch (error) {
                 // If check fails, allow user to proceed anyway
