@@ -506,38 +506,42 @@
             }
         }
         
-        function displayOptions(options) {
+        function displayOptions(apiResponse) {
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             
-            if (!options || options.length === 0) {
+            // API returns {options: [{optionGroup, optionGroupItems: [...]}]}
+            const optionGroups = apiResponse.options || apiResponse;
+            
+            if (!optionGroups || optionGroups.length === 0) {
                 container.innerHTML = '<p>No additional options available. Ready to order!</p>';
                 calculatePrice();
                 return;
             }
             
-            // Group options by type if needed
-            options.forEach(option => {
+            // Render each option group
+            optionGroups.forEach(group => {
                 const optionDiv = document.createElement('div');
-                optionDiv.style.marginBottom = '15px';
+                optionDiv.style.marginBottom = '20px';
                 
                 const label = document.createElement('h4');
-                label.textContent = option.name;
+                label.textContent = group.optionGroup;
                 label.style.marginBottom = '10px';
+                label.style.color = '#667eea';
                 optionDiv.appendChild(label);
                 
-                if (option.values && option.values.length > 0) {
+                if (group.optionGroupItems && group.optionGroupItems.length > 0) {
                     const grid = document.createElement('div');
                     grid.className = 'option-grid';
                     
-                    option.values.forEach(value => {
+                    group.optionGroupItems.forEach(item => {
                         const btn = document.createElement('button');
                         btn.className = 'option-btn';
-                        btn.textContent = value.name;
-                        if (value.price) {
-                            btn.textContent += ` (+$${value.price})`;
+                        btn.textContent = item.itemName;
+                        if (item.price && item.price > 0) {
+                            btn.textContent += ` (+$${item.price.toFixed(2)})`;
                         }
-                        btn.onclick = () => selectOption(option.id, value.id, btn);
+                        btn.onclick = () => selectOption(group.optionGroup, item.itemId, btn);
                         grid.appendChild(btn);
                     });
                     
