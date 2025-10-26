@@ -2477,10 +2477,10 @@ def get_lumaprints_subcategories(category_id):
         }), 500
 @app.route('/api/lumaprints/options/<int:subcategory_id>')
 def get_lumaprints_options(subcategory_id):
-    """Get frame options for a specific subcategory (3rd level for Framed Canvas)"""
+    """Get all options for a specific subcategory from live API"""
     try:
-        catalog = load_lumaprints_catalog()
-        options = catalog.get('options', {}).get(str(subcategory_id), [])
+        client = get_lumaprints_client(sandbox=True)
+        options = client.get_subcategory_options(subcategory_id)
         return jsonify({
             'success': True,
             'options': options
