@@ -445,6 +445,9 @@
             });
             event.target.classList.add('selected');
             
+            // DISABLED: Image quality check (see CRITICAL_NOTE_IMAGE_CHECK.md)
+            // TODO: Re-enable with FULL SIZE HIRES IMAGE path, not thumbnail
+            /*
             // First, validate image dimensions for this size
             const validationContainer = document.getElementById('sizes-container');
             validationContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Checking image quality...</p></div>';
@@ -513,6 +516,10 @@
                     displaySizes();
                 }
             }
+            */
+            
+            // Skip directly to loading options
+            loadOptionsForSize();
         }
         
         async function loadOptionsForSize() {
