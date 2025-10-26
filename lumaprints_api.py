@@ -119,24 +119,27 @@ class LumaprintsAPI:
         """
         return self._make_request("GET", "/stores")
     
-    def check_image(self, image_url: str, subcategory_id: int, width: float, height: float) -> Dict:
+    def check_image(self, subcategory_id: int, print_width: float, print_height: float, 
+                   image_url: str, order_item_options: List[int] = None) -> Dict:
         """
         Check if an image meets quality requirements for printing
         
         Args:
-            image_url: URL of the image to check
             subcategory_id: ID of the subcategory
-            width: Print width in inches
-            height: Print height in inches
+            print_width: Print width in inches
+            print_height: Print height in inches
+            image_url: URL of the image to check
+            order_item_options: List of option IDs for the product
             
         Returns:
             Image check result dictionary
         """
         data = {
-            "imageUrl": image_url,
             "subcategoryId": subcategory_id,
-            "width": width,
-            "height": height
+            "printWidth": print_width,
+            "printHeight": print_height,
+            "imageUrl": image_url,
+            "orderItemOptions": order_item_options or []
         }
         
         return self._make_request("POST", "/images/checkImageConfig", data)

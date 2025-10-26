@@ -2491,6 +2491,41 @@ def get_lumaprints_options(subcategory_id):
             'error': str(e)
         }), 500
 
+@app.route('/api/lumaprints/check-image', methods=['POST'])
+def check_lumaprints_image():
+    """Check if an image meets quality requirements for a specific print size"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['subcategoryId', 'printWidth', 'printHeight', 'imageUrl']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }), 400
+        
+        client = get_lumaprints_client(sandbox=True)
+        result = client.check_image(
+            subcategory_id=data['subcategoryId'],
+            print_width=float(data['printWidth']),
+            print_height=float(data['printHeight']),
+            image_url=data['imageUrl'],
+            order_item_options=data.get('orderItemOptions', [])
+        )
+        
+        return jsonify({
+            'success': True,
+            'result': result
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'message': 'Image quality check failed'
+        }), 500
+
 @app.route('/api/lumaprints/pricing-detailed', methods=['POST'])
 def get_lumaprints_pricing_detailed():
     """Calculate detailed pricing for a specific product configuration"""

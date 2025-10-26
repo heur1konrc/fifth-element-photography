@@ -224,9 +224,10 @@
                     <div id="subcategories-container"></div>
                 </div>
                 
-                <!-- Step 3: Size -->
+                <!-- Step 3: Choose Size -->
                 <div class="step" id="step-size" style="display: none;">
                     <h3>3. Choose Size</h3>
+                    <p id="image-dimensions-info" style="margin-bottom: 15px; color: #666;"></p>
                     <div id="sizes-container"></div>
                 </div>
                 
@@ -259,6 +260,8 @@
     <script>
         const state = {
             imageUrl: "{{ image_url }}",
+            imageWidth: null,
+            imageHeight: null,
             selectedCategory: null,
             selectedSubcategory: null,
             selectedSize: null,
@@ -266,10 +269,21 @@
             currentPrice: null
         };
         
-        // Load categories on page load
+        // Load image dimensions and categories on page load
         document.addEventListener('DOMContentLoaded', () => {
+            loadImageDimensions();
             loadCategories();
         });
+        
+        function loadImageDimensions() {
+            const img = new Image();
+            img.onload = function() {
+                state.imageWidth = this.width;
+                state.imageHeight = this.height;
+                console.log(`Image dimensions: ${state.imageWidth}x${state.imageHeight}`);
+            };
+            img.src = state.imageUrl;
+        }
         
         async function loadCategories() {
             try {
@@ -341,7 +355,7 @@
             });
         }
         
-        async function selectSubcategory(subcategory) {
+        function selectSubcategory(subcategory) {
             state.selectedSubcategory = subcategory;
             
             // Highlight selection
@@ -354,26 +368,54 @@
             document.getElementById('step-size').style.display = 'block';
             document.getElementById('step-size').classList.add('active');
             
-            // Load sizes
-            const container = document.getElementById('sizes-container');
-            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading sizes...</p></div>';
-            
-            try {
-                const response = await fetch(`/api/lumaprints/sizes/${subcategory.subcategoryId}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    displaySizes(data.sizes);
-                } else {
-                    throw new Error(data.error || 'Failed to load sizes');
-                }
-            } catch (error) {
-                showError('Failed to load sizes: ' + error.message);
-            }
+            // Display available sizes based on image aspect ratio
+            displaySizes();
         }
         
-        function displaySizes(sizes) {
+        function displaySizes() {
             const container = document.getElementById('sizes-container');
+            const infoEl = document.getElementById('image-dimensions-info');
+            
+            if (!state.imageWidth || !state.imageHeight) {
+                container.innerHTML = '<p>Loading image dimensions...</p>';
+                setTimeout(displaySizes, 100);
+                return;
+            }
+            
+            // Calculate aspect ratio
+            const aspectRatio = state.imageWidth / state.imageHeight;
+            infoEl.textContent = `Your image is ${state.imageWidth}x${state.imageHeight} pixels (${aspectRatio.toFixed(2)} aspect ratio)`;
+            
+            // Generate available sizes based on aspect ratio
+            const sizes = [];
+            const minSize = 4;
+            const maxSize = 60;
+            
+            // For square images
+            if (Math.abs(aspectRatio - 1) < 0.01) {
+                for (let size = minSize; size <= maxSize; size += 2) {
+                    sizes.push({ width: size, height: size, name: `${size}x${size}"` });
+                }
+            }
+            // For landscape images (width > height)
+            else if (aspectRatio > 1) {
+                for (let width = minSize; width <= maxSize; width += 2) {
+                    const height = Math.round(width / aspectRatio);
+                    if (height >= minSize && height <= maxSize) {
+                        sizes.push({ width, height, name: `${width}x${height}"` });
+                    }
+                }
+            }
+            // For portrait images (height > width)
+            else {
+                for (let height = minSize; height <= maxSize; height += 2) {
+                    const width = Math.round(height * aspectRatio);
+                    if (width >= minSize && width <= maxSize) {
+                        sizes.push({ width, height, name: `${width}x${height}"` });
+                    }
+                }
+            }
+            
             container.className = 'option-grid';
             container.innerHTML = '';
             
@@ -395,6 +437,53 @@
             });
             event.target.classList.add('selected');
             
+            // First, validate image dimensions for this size
+            const validationContainer = document.getElementById('sizes-container');
+            validationContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Checking image quality...</p></div>';
+            
+            try {
+                // Check image with Lumaprints API
+                const checkResponse = await fetch('/api/lumaprints/check-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subcategoryId: state.selectedSubcategory.subcategoryId,
+                        printWidth: size.width,
+                        printHeight: size.height,
+                        imageUrl: state.imageUrl,
+                        orderItemOptions: [] // Will be filled in later
+                    })
+                });
+                
+                const checkData = await checkResponse.json();
+                
+                if (!checkData.success) {
+                    // Image validation failed - show warning but allow to continue
+                    if (confirm(`Warning: ${checkData.message || 'Image quality may not be optimal for this size'}. Continue anyway?`)) {
+                        // User chose to continue
+                        displaySizes(); // Restore size selection
+                        loadOptionsForSize();
+                    } else {
+                        // User cancelled - restore size selection
+                        displaySizes();
+                        return;
+                    }
+                } else {
+                    // Image is good, proceed to options
+                    loadOptionsForSize();
+                }
+            } catch (error) {
+                // If check fails, allow user to proceed anyway
+                console.error('Image check failed:', error);
+                if (confirm('Could not verify image quality. Continue anyway?')) {
+                    loadOptionsForSize();
+                } else {
+                    displaySizes();
+                }
+            }
+        }
+        
+        async function loadOptionsForSize() {
             // Show options step
             document.getElementById('step-options').style.display = 'block';
             document.getElementById('step-options').classList.add('active');
