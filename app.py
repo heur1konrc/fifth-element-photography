@@ -5568,6 +5568,41 @@ def import_database():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+# Pricing API routes
+@app.route('/api/pricing/product', methods=['GET'])
+def get_pricing():
+    """Get pricing for a specific product"""
+    from pricing_api import get_product_price
+    
+    subcategory_id = request.args.get('subcategory_id', type=int)
+    size = request.args.get('size')
+    variant_id = request.args.get('variant_id', type=int)
+    
+    if not subcategory_id or not size:
+        return jsonify({
+            'success': False,
+            'error': 'Missing required parameters: subcategory_id and size'
+        }), 400
+    
+    result = get_product_price(subcategory_id, size, variant_id)
+    return jsonify(result)
+
+@app.route('/api/pricing/category/<int:category_id>', methods=['GET'])
+def get_category_pricing(category_id):
+    """Get all products and pricing for a category"""
+    from pricing_api import get_category_products
+    
+    result = get_category_products(category_id)
+    return jsonify(result)
+
+@app.route('/api/pricing/variants/<int:product_id>', methods=['GET'])
+def get_product_variants_route(product_id):
+    """Get all variants for a product"""
+    from pricing_api import get_product_variants
+    
+    result = get_product_variants(product_id)
+    return jsonify(result)
+
 # Dynamic order form route
 @app.route('/order')
 def order_form():
