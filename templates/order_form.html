@@ -439,7 +439,10 @@
                 
                 // Fetch price for this specific size
                 try {
-                    const sizeParam = `${size.width}x${size.height}`;
+                    // Normalize size to short side x long side
+                    const shortSide = Math.min(size.width, size.height);
+                    const longSide = Math.max(size.width, size.height);
+                    const sizeParam = `${shortSide}x${longSide}`;
                     const response = await fetch(`/api/pricing/product?subcategory_id=${subcategoryId}&size=${sizeParam}`);
                     const data = await response.json();
                     
