@@ -5495,6 +5495,14 @@ def diagnose_database_route():
     result = diagnose_database()
     return jsonify(result)
 
+@app.route('/admin/database/check-products', methods=['GET'])
+@require_admin_auth
+def check_products_route():
+    """Check what products exist in database"""
+    from check_products import check_products
+    result = check_products()
+    return jsonify(result)
+
 @app.route('/admin/database/export', methods=['POST'])
 @require_admin_auth
 def export_database():
