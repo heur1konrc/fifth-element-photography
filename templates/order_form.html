@@ -670,7 +670,17 @@
         }
         
         document.getElementById('add-to-cart').addEventListener('click', () => {
-            alert('Cart functionality coming soon! Price: ' + state.currentPrice.formatted_price);
+            // Collect order details
+            const orderDetails = {
+                image: state.imageUrl,
+                category: state.selectedCategory?.name,
+                subcategory: state.selectedSubcategory?.name,
+                size: `${state.selectedSize?.width}x${state.selectedSize?.height}`,
+                options: state.selectedOptions
+            };
+            
+            console.log('Order details:', orderDetails);
+            alert(`Order ready!\n\nProduct: ${orderDetails.category} - ${orderDetails.subcategory}\nSize: ${orderDetails.size}"\n\nCart functionality coming soon!`);
         });
     </script>
 </body>
