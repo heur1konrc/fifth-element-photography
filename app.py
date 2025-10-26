@@ -776,15 +776,7 @@ def api_images():
     images = scan_images()
     return jsonify(images)
 
-@app.route('/api/lumaprints/subcategories/<int:category_id>')
-def api_lumaprints_subcategories(category_id):
-    """Get subcategories for a specific category"""
-    try:
-        client = get_lumaprints_client()
-        subcategories = client.get_subcategories(category_id)
-        return jsonify(subcategories)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+# Removed duplicate subcategories route - using the one at line ~2463 instead
 
 @app.route('/order-print/<image_id>')
 def order_print(image_id):
