@@ -5480,6 +5480,86 @@ app.register_blueprint(product_api)
 app.register_blueprint(pricing_form)
 app.register_blueprint(order_form_api)
 
+# Database management routes
+@app.route('/admin/database')
+@require_admin_auth
+def admin_database():
+    """Database export/import management page"""
+    return render_template('admin_database.html')
+
+@app.route('/admin/database/export', methods=['POST'])
+@require_admin_auth
+def export_database():
+    """Export pricing database to JSON"""
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(__file__))
+    from export_pricing_db import export_database as do_export
+    
+    try:
+        output_file = do_export()
+        return send_file(
+            output_file,
+            as_attachment=True,
+            download_name=f'pricing_db_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json',
+            mimetype='application/json'
+        )
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/admin/database/import', methods=['POST'])
+@require_admin_auth
+def import_database():
+    """Import pricing database from JSON"""
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(__file__))
+    from import_pricing_db import import_database as do_import
+    
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'No file uploaded'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'No file selected'}), 400
+        
+        if not file.filename.endswith('.json'):
+            return jsonify({'success': False, 'error': 'File must be a JSON file'}), 400
+        
+        # Save uploaded file temporarily
+        temp_path = '/tmp/uploaded_pricing_db.json'
+        file.save(temp_path)
+        
+        # Import the database
+        do_import(temp_path, '/data/lumaprints_pricing.db', clear_existing=True)
+        
+        # Get stats
+        import sqlite3
+        conn = sqlite3.connect('/data/lumaprints_pricing.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM products")
+        product_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM categories")
+        category_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM product_types")
+        product_type_count = cursor.fetchone()[0]
+        conn.close()
+        
+        # Clean up temp file
+        os.remove(temp_path)
+        
+        return jsonify({
+            'success': True,
+            'stats': {
+                'products': product_count,
+                'categories': category_count,
+                'product_types': product_type_count
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 # Dynamic order form route
 @app.route('/order')
 def order_form():
