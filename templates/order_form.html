@@ -382,11 +382,13 @@
                 return;
             }
             
-            // Calculate aspect ratio
-            const aspectRatio = state.imageWidth / state.imageHeight;
-            infoEl.textContent = `Your image is ${state.imageWidth}x${state.imageHeight} pixels (${aspectRatio.toFixed(2)} aspect ratio)`;
+            // Calculate aspect ratio (always > 1 for long/short)
+            const aspectRatio = Math.max(state.imageWidth, state.imageHeight) / Math.min(state.imageWidth, state.imageHeight);
+            const isLandscape = state.imageWidth > state.imageHeight;
+            infoEl.textContent = `Your image is ${state.imageWidth}x${state.imageHeight} pixels (${aspectRatio.toFixed(2)} aspect ratio, ${isLandscape ? 'landscape' : 'portrait'})`;
             
             // Generate available sizes based on aspect ratio
+            // Always display as short side x long side
             const sizes = [];
             const minSize = 4;
             const maxSize = 60;
@@ -394,24 +396,26 @@
             // For square images
             if (Math.abs(aspectRatio - 1) < 0.01) {
                 for (let size = minSize; size <= maxSize; size += 2) {
-                    sizes.push({ width: size, height: size, name: `${size}x${size}"` });
+                    sizes.push({ 
+                        width: size, 
+                        height: size, 
+                        name: `${size}x${size}"` 
+                    });
                 }
             }
-            // For landscape images (width > height)
-            else if (aspectRatio > 1) {
-                for (let width = minSize; width <= maxSize; width += 2) {
-                    const height = Math.round(width / aspectRatio);
-                    if (height >= minSize && height <= maxSize) {
-                        sizes.push({ width, height, name: `${width}x${height}"` });
-                    }
-                }
-            }
-            // For portrait images (height > width)
+            // For non-square images (iterate by short side)
             else {
-                for (let height = minSize; height <= maxSize; height += 2) {
-                    const width = Math.round(height * aspectRatio);
-                    if (width >= minSize && width <= maxSize) {
-                        sizes.push({ width, height, name: `${width}x${height}"` });
+                for (let shortSide = minSize; shortSide <= maxSize; shortSide += 2) {
+                    const longSide = Math.round(shortSide * aspectRatio);
+                    if (longSide >= minSize && longSide <= maxSize) {
+                        // Store actual width/height based on image orientation
+                        const width = isLandscape ? longSide : shortSide;
+                        const height = isLandscape ? shortSide : longSide;
+                        sizes.push({ 
+                            width, 
+                            height, 
+                            name: `${shortSide}x${longSide}"` 
+                        });
                     }
                 }
             }
