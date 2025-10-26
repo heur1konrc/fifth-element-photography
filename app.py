@@ -5491,20 +5491,17 @@ def admin_database():
 @require_admin_auth
 def export_database():
     """Export pricing database to JSON"""
-    import sys
-    import os
     import traceback
-    sys.path.insert(0, os.path.dirname(__file__))
-    from export_pricing_db import export_database as do_export
+    from database_export_inline import export_pricing_database
     
     try:
-        output_file = do_export()
-        return send_file(
-            output_file,
-            as_attachment=True,
-            download_name=f'pricing_db_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json',
-            mimetype='application/json'
-        )
+        export_data = export_pricing_database()
+        
+        # Return JSON directly
+        response = jsonify(export_data)
+        response.headers['Content-Disposition'] = f'attachment; filename=pricing_db_export_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+        return response
+        
     except Exception as e:
         print(f"Export error: {str(e)}")
         print(traceback.format_exc())
