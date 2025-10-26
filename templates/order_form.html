@@ -386,74 +386,53 @@
                 return;
             }
             
-            // Calculate aspect ratio (always > 1 for long/short)
+            // Calculate aspect ratio
             const aspectRatio = Math.max(state.imageWidth, state.imageHeight) / Math.min(state.imageWidth, state.imageHeight);
             const isLandscape = state.imageWidth > state.imageHeight;
             infoEl.textContent = `Your image is ${state.imageWidth}x${state.imageHeight} pixels (${aspectRatio.toFixed(2)} aspect ratio, ${isLandscape ? 'landscape' : 'portrait'})`;
             
-            // Generate available sizes based on aspect ratio
-            // Always display as short side x long side
-            const sizes = [];
-            const minSize = 4;
-            const maxSize = 60;
-            
-            // For square images
-            if (Math.abs(aspectRatio - 1) < 0.01) {
-                for (let size = minSize; size <= maxSize; size += 2) {
-                    sizes.push({ 
-                        width: size, 
-                        height: size, 
-                        name: `${size}x${size}"` 
-                    });
-                }
-            }
-            // For non-square images (iterate by short side)
-            else {
-                for (let shortSide = minSize; shortSide <= maxSize; shortSide += 2) {
-                    const longSide = Math.round(shortSide * aspectRatio);
-                    if (longSide >= minSize && longSide <= maxSize) {
-                        // Store actual width/height based on image orientation
-                        const width = isLandscape ? longSide : shortSide;
-                        const height = isLandscape ? shortSide : longSide;
-                        sizes.push({ 
-                            width, 
-                            height, 
-                            name: `${shortSide}x${longSide}"` 
-                        });
-                    }
-                }
-            }
-            
             container.className = 'option-grid';
-            container.innerHTML = '';
+            container.innerHTML = '<p>Loading sizes and prices...</p>';
             
-            // Display size buttons and fetch prices in parallel
+            // Fetch sizes and prices from pricing database
             const subcategoryId = state.selectedSubcategory.subcategoryId;
             
-            sizes.forEach(async (size) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = size.name; // Show size immediately
-                btn.onclick = () => selectSize(size);
-                container.appendChild(btn);
+            try {
+                const response = await fetch(`/api/pricing/category/${subcategoryId}`);
+                const data = await response.json();
                 
-                // Fetch price for this specific size
-                try {
-                    // Normalize size to short side x long side
-                    const shortSide = Math.min(size.width, size.height);
-                    const longSide = Math.max(size.width, size.height);
-                    const sizeParam = `${shortSide}x${longSide}`;
-                    const response = await fetch(`/api/pricing/product?subcategory_id=${subcategoryId}&size=${sizeParam}`);
-                    const data = await response.json();
-                    
-                    if (data.success && data.retail_price) {
-                        btn.innerHTML = `${size.name}<br><strong>$${data.retail_price.toFixed(2)}</strong>`;
-                    }
-                } catch (error) {
-                    console.error(`Error loading price for ${size.name}:`, error);
-                    // Keep button with just size name
+                if (!data.success || !data.products || data.products.length === 0) {
+                    container.innerHTML = '<p>No sizes available for this product.</p>';
+                    return;
                 }
-            });
+                
+                container.innerHTML = '';
+                
+                // Display each size with price
+                data.products.forEach(product => {
+                    // Parse size (e.g., "8×10" -> width: 8, height: 10)
+                    const sizeParts = product.size.split('×');
+                    if (sizeParts.length !== 2) return;
+                    
+                    const width = parseInt(sizeParts[0]);
+                    const height = parseInt(sizeParts[1]);
+                    
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerHTML = `${product.size}"<br><strong>$${product.retail_price.toFixed(2)}</strong>`;
+                    btn.onclick = () => selectSize({
+                        width: isLandscape ? height : width,
+                        height: isLandscape ? width : height,
+                        name: `${product.size}"`,
+                        price: product.retail_price
+                    });
+                    container.appendChild(btn);
+                });
+                
+            } catch (error) {
+                console.error('Error loading sizes and prices:', error);
+                container.innerHTML = '<p>Error loading sizes. Please try again.</p>';
+            }
         }
         
         async function selectSize(size) {
