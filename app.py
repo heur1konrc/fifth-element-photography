@@ -5487,6 +5487,14 @@ def admin_database():
     """Database export/import management page"""
     return render_template('admin_database.html')
 
+@app.route('/admin/database/diagnose', methods=['GET'])
+@require_admin_auth
+def diagnose_database_route():
+    """Diagnose database structure"""
+    from database_diagnostic import diagnose_database
+    result = diagnose_database()
+    return jsonify(result)
+
 @app.route('/admin/database/export', methods=['POST'])
 @require_admin_auth
 def export_database():
