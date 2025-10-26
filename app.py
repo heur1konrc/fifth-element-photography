@@ -2479,7 +2479,7 @@ def get_lumaprints_subcategories(category_id):
 def get_lumaprints_options(subcategory_id):
     """Get all options for a specific subcategory from live API"""
     try:
-        client = get_lumaprints_client(sandbox=True)
+        client = get_lumaprints_client(sandbox=False)
         options = client.get_subcategory_options(subcategory_id)
         return jsonify({
             'success': True,
@@ -2506,7 +2506,7 @@ def check_lumaprints_image():
                     'error': f'Missing required field: {field}'
                 }), 400
         
-        client = get_lumaprints_client(sandbox=True)
+        client = get_lumaprints_client(sandbox=False)
         result = client.check_image(
             subcategory_id=data['subcategoryId'],
             print_width=float(data['printWidth']),
@@ -2786,7 +2786,7 @@ pricing_calc = get_dynamic_pricing_calculator(markup_percentage=get_global_marku
 def get_lumaprints_categories():
     """Get available product categories from live Lumaprints API"""
     try:
-        client = get_lumaprints_client(sandbox=True)
+        client = get_lumaprints_client(sandbox=False)
         categories = client.get_categories()
         return jsonify({
             'success': True,
@@ -2874,7 +2874,7 @@ def get_lumaprints_pricing():
 def get_lumaprints_sizes(subcategory_id):
     """Get available sizes for a specific subcategory from live API"""
     try:
-        client = get_lumaprints_client(sandbox=True)
+        client = get_lumaprints_client(sandbox=False)
         options = client.get_subcategory_options(subcategory_id)
         
         # Extract size information from options
