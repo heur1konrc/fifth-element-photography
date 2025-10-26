@@ -776,16 +776,6 @@ def api_images():
     images = scan_images()
     return jsonify(images)
 
-@app.route('/api/lumaprints/categories')
-def api_lumaprints_categories():
-    """Get all Lumaprints product categories"""
-    try:
-        client = get_lumaprints_client()
-        categories = client.get_categories()
-        return jsonify(categories)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 @app.route('/api/lumaprints/subcategories/<int:category_id>')
 def api_lumaprints_subcategories(category_id):
     """Get subcategories for a specific category"""
