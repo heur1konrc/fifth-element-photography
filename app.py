@@ -5493,6 +5493,7 @@ def export_database():
     """Export pricing database to JSON"""
     import sys
     import os
+    import traceback
     sys.path.insert(0, os.path.dirname(__file__))
     from export_pricing_db import export_database as do_export
     
@@ -5505,7 +5506,9 @@ def export_database():
             mimetype='application/json'
         )
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        print(f"Export error: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({'success': False, 'error': f'{type(e).__name__}: {str(e)}'}), 500
 
 @app.route('/admin/database/import', methods=['POST'])
 @require_admin_auth
