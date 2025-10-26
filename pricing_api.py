@@ -115,10 +115,10 @@ def get_product_price(lumaprints_subcategory_id, size, variant_id=None):
 
 def get_category_products(category_id):
     """
-    Get all products in a category with pricing
+    Get all products for a Lumaprints subcategory with pricing
     
     Args:
-        category_id: Category ID
+        category_id: Lumaprints subcategory ID (e.g., 102003)
     
     Returns:
         dict with products list or error
@@ -138,7 +138,7 @@ def get_category_products(category_id):
                 c.name as category_name
             FROM products p
             JOIN categories c ON p.category_id = c.id
-            WHERE p.category_id = ?
+            WHERE p.lumaprints_subcategory_id = ?
             AND p.active = 1
             ORDER BY p.size
         """, (category_id,))
@@ -149,7 +149,7 @@ def get_category_products(category_id):
         
         return {
             'success': True,
-            'category_id': category_id,
+            'subcategory_id': category_id,
             'products': products
         }
         
