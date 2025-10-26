@@ -428,7 +428,7 @@
             container.innerHTML = '';
             
             // Display size buttons and fetch prices in parallel
-            const subcategoryId = state.selectedSubcategory.id;
+            const subcategoryId = state.selectedSubcategory.subcategoryId;
             
             sizes.forEach(async (size) => {
                 const btn = document.createElement('button');
