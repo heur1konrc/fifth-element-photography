@@ -2771,7 +2771,7 @@ pricing_calc = get_dynamic_pricing_calculator(markup_percentage=get_global_marku
 def get_lumaprints_categories():
     """Get available product categories from live Lumaprints API"""
     try:
-        client = get_lumaprints_client(sandbox=False)
+        client = get_lumaprints_client(sandbox=True)
         categories = client.get_categories()
         return jsonify({
             'success': True,
@@ -2805,7 +2805,7 @@ def get_lumaprints_pricing():
         options = data.get('options', [])
         
         # Get pricing from live Lumaprints API
-        client = get_lumaprints_client(sandbox=False)
+        client = get_lumaprints_client(sandbox=True)
         api_pricing = client.get_pricing(
             subcategory_id=subcategory_id,
             width=width,
@@ -2859,7 +2859,7 @@ def get_lumaprints_pricing():
 def get_lumaprints_sizes(subcategory_id):
     """Get available sizes for a specific subcategory from live API"""
     try:
-        client = get_lumaprints_client(sandbox=False)
+        client = get_lumaprints_client(sandbox=True)
         options = client.get_subcategory_options(subcategory_id)
         
         # Extract size information from options
