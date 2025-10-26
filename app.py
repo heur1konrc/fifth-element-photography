@@ -786,16 +786,6 @@ def api_lumaprints_subcategories(category_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/lumaprints/options/<int:subcategory_id>')
-def api_lumaprints_options(subcategory_id):
-    """Get all options for a specific subcategory"""
-    try:
-        client = get_lumaprints_client()
-        options = client.get_subcategory_options(subcategory_id)
-        return jsonify(options)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 @app.route('/order-print/<image_id>')
 def order_print(image_id):
     """Redirect old order print route to new PayPal-integrated form"""
