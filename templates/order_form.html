@@ -601,20 +601,16 @@
         }
         
         async function calculatePrice() {
-            if (!state.selectedSubcategory) return;
-            
-            // For now, use a default size - you'll need to add size selection
-            const width = 16;
-            const height = 20;
+            if (!state.selectedSubcategory || !state.selectedSize) return;
             
             try {
                 const response = await fetch('/api/lumaprints/pricing', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        subcategoryId: state.selectedSubcategory.id,
-                        width: width,
-                        height: height,
+                        subcategoryId: state.selectedSubcategory.subcategoryId,
+                        width: state.selectedSize.width,
+                        height: state.selectedSize.height,
                         quantity: 1,
                         options: state.selectedOptions.map(o => o.valueId)
                     })
@@ -626,6 +622,8 @@
                     state.currentPrice = data.pricing;
                     displayPrice(data.pricing);
                     document.getElementById('add-to-cart').disabled = false;
+                } else {
+                    console.error('Pricing error:', data.error);
                 }
             } catch (error) {
                 console.error('Price calculation failed:', error);
