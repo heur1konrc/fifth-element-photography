@@ -360,9 +360,13 @@
             
             try {
                 const response = await fetch(`/api/lumaprints/options/${subcategory.subcategoryId}`);
-                const options = await response.json();
+                const data = await response.json();
                 
-                displayOptions(options);
+                if (data.success) {
+                    displayOptions(data.options);
+                } else {
+                    throw new Error(data.error || 'Failed to load options');
+                }
             } catch (error) {
                 showError('Failed to load options: ' + error.message);
             }
