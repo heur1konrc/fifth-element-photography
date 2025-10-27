@@ -386,10 +386,24 @@
                 return;
             }
             
-            // Calculate aspect ratio
-            const aspectRatio = Math.max(state.imageWidth, state.imageHeight) / Math.min(state.imageWidth, state.imageHeight);
+            // Calculate aspect ratio in X:X format
             const isLandscape = state.imageWidth > state.imageHeight;
-            infoEl.textContent = `Your image is ${state.imageWidth}x${state.imageHeight} pixels (${aspectRatio.toFixed(2)} aspect ratio, ${isLandscape ? 'landscape' : 'portrait'})`;
+            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
+            const divisor = gcd(state.imageWidth, state.imageHeight);
+            const ratioW = state.imageWidth / divisor;
+            const ratioH = state.imageHeight / divisor;
+            
+            // Simplify ratio if numbers are too large
+            let displayRatioW = ratioW;
+            let displayRatioH = ratioH;
+            if (ratioW > 100 || ratioH > 100) {
+                const scale = Math.max(ratioW, ratioH) / 10;
+                displayRatioW = Math.round(ratioW / scale * 10) / 10;
+                displayRatioH = Math.round(ratioH / scale * 10) / 10;
+            }
+            
+            const aspectRatioText = `${displayRatioW}:${displayRatioH}`;
+            infoEl.textContent = `Your image is ${state.imageWidth}×${state.imageHeight} pixels (${aspectRatioText} aspect ratio, ${isLandscape ? 'landscape' : 'portrait'})`;
             
             container.className = 'option-grid';
             container.innerHTML = '<p>Loading sizes and prices...</p>';
@@ -460,11 +474,22 @@
             // Update price display
             updateTotalPrice();
             
-            // DISABLED: Image quality check (see CRITICAL_NOTE_IMAGE_CHECK.md)
-            // TODO: Re-enable with FULL SIZE HIRES IMAGE path, not thumbnail
-            /*
+            // Calculate and display DPI for selected size
+            const printWidth = size.width;
+            const printHeight = size.height;
+            const dpiWidth = Math.round(state.imageWidth / printWidth);
+            const dpiHeight = Math.round(state.imageHeight / printHeight);
+            const minDPI = Math.min(dpiWidth, dpiHeight);
+            
+            const infoEl = document.getElementById('image-dimensions-info');
+            const aspectRatioText = infoEl.textContent.match(/\((.+?) aspect ratio/)[1];
+            const orientation = state.imageWidth > state.imageHeight ? 'landscape' : 'portrait';
+            infoEl.textContent = `Your image is ${state.imageWidth}×${state.imageHeight} pixels (${aspectRatioText} aspect ratio, ${orientation}) | Print size: ${size.name} | DPI: ${minDPI}`;
+            
+            // Image quality check - now using full public URL
             // First, validate image dimensions for this size
             const validationContainer = document.getElementById('sizes-container');
+            const originalHTML = validationContainer.innerHTML;
             validationContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Checking image quality...</p></div>';
             
             try {
@@ -485,32 +510,65 @@
                 
                 if (!checkData.success) {
                     // Image validation failed - show detailed error
-                    const errorMsg = checkData.result?.message || checkData.message || checkData.error || 'Image quality check failed';
-                    if (confirm(`${errorMsg}\n\nContinue anyway?`)) {
+                    validationContainer.innerHTML = originalHTML;
+                    
+                    // Build detailed error message
+                    let errorMsg = 'Image Quality Check Failed:\n\n';
+                    
+                    if (checkData.result && checkData.result.message) {
+                        // Lumaprints returned a detailed message
+                        const result = checkData.result;
+                        errorMsg += `Reason: ${result.message}\n\n`;
+                        
+                        if (result.actualImageWidth && result.actualImageHeight) {
+                            errorMsg += `Your Image:\n`;
+                            errorMsg += `  Size: ${result.actualImageWidth}×${result.actualImageHeight} pixels\n`;
+                            if (result.actualImageAspectRatio) {
+                                errorMsg += `  Aspect Ratio: ${result.actualImageAspectRatio}\n`;
+                            }
+                            errorMsg += `\n`;
+                        }
+                        
+                        if (result.recommendedWidth && result.recommendedHeight) {
+                            errorMsg += `Required for ${size.name} Print:\n`;
+                            errorMsg += `  Minimum Size: ${result.recommendedWidth}×${result.recommendedHeight} pixels\n`;
+                            if (result.expectedAspectRatio) {
+                                errorMsg += `  Expected Aspect Ratio: ${result.expectedAspectRatio}\n`;
+                            }
+                        }
+                    } else {
+                        // Generic error
+                        errorMsg += checkData.message || checkData.error || 'Unknown error occurred';
+                    }
+                    
+                    if (confirm(errorMsg + '\n\nContinue anyway?')) {
                         // User chose to continue
-                        displaySizes(); // Restore size selection
                         loadOptionsForSize();
                     } else {
-                        // User cancelled - restore size selection
-                        displaySizes();
+                        // User cancelled - keep size selection visible
                         return;
                     }
                 } else {
                     // Check the actual API response message
                     const apiResult = checkData.result;
                     if (apiResult && apiResult.message) {
-                        // Show the message from Lumaprints API
-                        const details = `Image: ${apiResult.actualImageWidth}x${apiResult.actualImageHeight} (${apiResult.actualImageAspectRatio})\n` +
-                                      `Recommended: ${apiResult.recommendedWidth}x${apiResult.recommendedHeight} (${apiResult.expectedAspectRatio})\n\n` +
-                                      `${apiResult.message}`;
-                        
+                        // Check if there's a warning even on success
                         if (apiResult.message.includes('not same') || apiResult.message.includes('incorrect')) {
                             // Aspect ratio issue - show warning
-                            if (confirm(details + '\n\nContinue anyway?')) {
-                                displaySizes();
+                            validationContainer.innerHTML = originalHTML;
+                            
+                            let warningMsg = 'Image Quality Warning:\n\n';
+                            warningMsg += `Your Image:\n`;
+                            warningMsg += `  Size: ${apiResult.actualImageWidth}×${apiResult.actualImageHeight} pixels\n`;
+                            warningMsg += `  Aspect Ratio: ${apiResult.actualImageAspectRatio}\n\n`;
+                            warningMsg += `Required for ${size.name} Print:\n`;
+                            warningMsg += `  Minimum Size: ${apiResult.recommendedWidth}×${apiResult.recommendedHeight} pixels\n`;
+                            warningMsg += `  Expected Aspect Ratio: ${apiResult.expectedAspectRatio}\n\n`;
+                            warningMsg += `${apiResult.message}`;
+                            
+                            if (confirm(warningMsg + '\n\nContinue anyway?')) {
                                 loadOptionsForSize();
                             } else {
-                                displaySizes();
                                 return;
                             }
                         } else {
@@ -525,16 +583,13 @@
             } catch (error) {
                 // If check fails, allow user to proceed anyway
                 console.error('Image check failed:', error);
+                validationContainer.innerHTML = originalHTML;
                 if (confirm('Could not verify image quality. Continue anyway?')) {
                     loadOptionsForSize();
                 } else {
-                    displaySizes();
+                    return;
                 }
             }
-            */
-            
-            // Skip directly to loading options
-            loadOptionsForSize();
         }
         
         function updateTotalPrice() {
