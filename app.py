@@ -2507,10 +2507,37 @@ def check_lumaprints_image():
             order_item_options=data.get('orderItemOptions', [])
         )
         
-        return jsonify({
-            'success': True,
-            'result': result
-        })
+        # Check if result contains a status code (from error responses)
+        status_code = result.pop('_status_code', 200)
+        
+        if status_code == 200:
+            # Image quality check passed
+            return jsonify({
+                'success': True,
+                'result': result
+            })
+        elif status_code == 400:
+            # Invalid URL or request
+            return jsonify({
+                'success': False,
+                'error': result.get('message', 'Invalid image URL'),
+                'details': result
+            }), 400
+        elif status_code == 406:
+            # Image sized incorrectly - return detailed error info
+            return jsonify({
+                'success': False,
+                'error': result.get('message', 'Image does not meet quality requirements'),
+                'details': result
+            }), 406
+        else:
+            # Unexpected status code
+            return jsonify({
+                'success': False,
+                'error': 'Unexpected response from Lumaprints API',
+                'details': result
+            }), 500
+            
     except Exception as e:
         return jsonify({
             'success': False,

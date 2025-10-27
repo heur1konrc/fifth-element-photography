@@ -64,10 +64,25 @@ class LumaprintsAPI:
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
             
-            # Check if request was successful
+            # For check_image endpoint, return response even on 400/406 errors
+            # These contain valuable error details from Lumaprints
+            if response.status_code in [200, 400, 406]:
+                try:
+                    result = response.json()
+                    # Add status code to result for error handling
+                    result['_status_code'] = response.status_code
+                    return result
+                except ValueError:
+                    # Response is not JSON
+                    return {
+                        '_status_code': response.status_code,
+                        'message': response.text
+                    }
+            
+            # For other status codes, raise an error
             response.raise_for_status()
             
-            # Return JSON response
+            # Return JSON response for successful requests
             return response.json()
             
         except requests.exceptions.RequestException as e:
