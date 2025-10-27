@@ -42,7 +42,7 @@ class LumaprintsAPI:
         self.api_key_preview = f"{api_key[:20]}..."
         self.api_secret_preview = f"{api_secret[:20]}..."
     
-    def _make_request(self, method: str, endpoint: str, data: Optional[Dict] = None) -> Dict:
+    def _make_request(self, method: str, endpoint: str, data: Optional[Dict] = None, timeout: int = 30) -> Dict:
         """
         Make authenticated request to Lumaprints API
         
@@ -50,6 +50,7 @@ class LumaprintsAPI:
             method: HTTP method (GET, POST, etc.)
             endpoint: API endpoint (without base URL)
             data: Request payload for POST requests
+            timeout: Request timeout in seconds (default 30)
             
         Returns:
             API response as dictionary
@@ -58,9 +59,9 @@ class LumaprintsAPI:
         
         try:
             if method.upper() == "GET":
-                response = requests.get(url, headers=self.headers, timeout=30)
+                response = requests.get(url, headers=self.headers, timeout=timeout)
             elif method.upper() == "POST":
-                response = requests.post(url, headers=self.headers, json=data, timeout=30)
+                response = requests.post(url, headers=self.headers, json=data, timeout=timeout)
             else:
                 raise ValueError(f"Unsupported HTTP method: {method}")
             
@@ -158,7 +159,8 @@ class LumaprintsAPI:
             "orderItemOptions": order_item_options or []
         }
         
-        return self._make_request("POST", "/images/checkImageConfig", data)
+        # Use longer timeout for image checking (can take time to download and validate)
+        return self._make_request("POST", "/images/checkImageConfig", data, timeout=60)
     
     def submit_order(self, order_data: Dict) -> Dict:
         """
