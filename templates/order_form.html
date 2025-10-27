@@ -465,16 +465,12 @@
                     }
                 });
                 
-                // Calculate image aspect ratio for filtering
-                const imageAspectRatio = state.imageWidth / state.imageHeight;
-                
                 // Convert to array and sort by price (lowest to highest)
                 const sortedProducts = Array.from(sizeMap.values()).sort((a, b) => {
                     return a.retail_price - b.retail_price;
                 });
                 
-                // Filter and display sizes that match image aspect ratio
-                let matchingCount = 0;
+                // Display each unique size with price
                 sortedProducts.forEach(product => {
                     // Parse size (e.g., "8×10" -> width: 8, height: 10)
                     const sizeParts = product.size.split('×');
@@ -482,21 +478,6 @@
                     
                     const width = parseInt(sizeParts[0]);
                     const height = parseInt(sizeParts[1]);
-                    
-                    // Calculate print aspect ratio (handle both orientations)
-                    const printAspectRatio = width / height;
-                    const printAspectRatioFlipped = height / width;
-                    
-                    // Check if aspect ratios match within 5% tolerance
-                    const tolerance = 0.05;
-                    const matchesRatio = 
-                        Math.abs(imageAspectRatio - printAspectRatio) / imageAspectRatio <= tolerance ||
-                        Math.abs(imageAspectRatio - printAspectRatioFlipped) / imageAspectRatio <= tolerance;
-                    
-                    // Skip sizes that don't match aspect ratio
-                    if (!matchesRatio) return;
-                    
-                    matchingCount++;
                     
                     const btn = document.createElement('button');
                     btn.className = 'option-btn';
@@ -510,10 +491,6 @@
                     container.appendChild(btn);
                 });
                 
-                // Show message if no matching sizes found
-                if (matchingCount === 0) {
-                    container.innerHTML = `<p style="color: #e74c3c;">No print sizes match your image aspect ratio (${aspectRatioText}). Please crop your image or choose a different image.</p>`;
-                }               
             } catch (error) {
                 console.error('Error loading sizes and prices:', error);
                 container.innerHTML = '<p>Error loading sizes. Please try again.</p>';
