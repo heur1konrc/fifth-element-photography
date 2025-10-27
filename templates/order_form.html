@@ -512,9 +512,8 @@
                 
                 // Show message if no matching sizes found
                 if (matchingCount === 0) {
-                    container.innerHTML = '<p style="color: #e74c3c;">No print sizes match your image aspect ratio (' + aspectRatioText + '). Please crop your image or choose a different image.</p>';
-                }
-                
+                    container.innerHTML = `<p style="color: #e74c3c;">No print sizes match your image aspect ratio (${aspectRatioText}). Please crop your image or choose a different image.</p>`;
+                }               
             } catch (error) {
                 console.error('Error loading sizes and prices:', error);
                 container.innerHTML = '<p>Error loading sizes. Please try again.</p>';
