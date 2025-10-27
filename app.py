@@ -5640,7 +5640,8 @@ def get_image_exif(filename):
             dpi = img.info.get('dpi', None)
             if dpi and isinstance(dpi, tuple):
                 # DPI is stored as (x_dpi, y_dpi), usually they're the same
-                dpi_value = dpi[0]
+                # Convert to float in case it's IFDRational
+                dpi_value = float(dpi[0])
             else:
                 # Try to get from EXIF
                 try:
@@ -5648,14 +5649,24 @@ def get_image_exif(filename):
                     if exif_data:
                         # EXIF tag 282 is XResolution, 283 is YResolution
                         x_res = exif_data.get(282)
-                        if x_res and isinstance(x_res, tuple):
-                            dpi_value = x_res[0] / x_res[1]
+                        if x_res:
+                            # Handle IFDRational objects (fractions)
+                            if isinstance(x_res, tuple) and len(x_res) == 2:
+                                dpi_value = float(x_res[0]) / float(x_res[1])
+                            else:
+                                # It's already a number or IFDRational
+                                dpi_value = float(x_res)
                         else:
                             dpi_value = None
                     else:
                         dpi_value = None
-                except:
+                except Exception as exif_error:
+                    print(f"[EXIF] Error reading EXIF: {exif_error}")
                     dpi_value = None
+            
+            # Ensure DPI is JSON serializable
+            if dpi_value is not None:
+                dpi_value = float(dpi_value)
             
             return jsonify({
                 'success': True,
