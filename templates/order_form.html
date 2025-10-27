@@ -465,12 +465,16 @@
                     }
                 });
                 
+                // Calculate image aspect ratio for filtering
+                const imageAspectRatio = state.imageWidth / state.imageHeight;
+                
                 // Convert to array and sort by price (lowest to highest)
                 const sortedProducts = Array.from(sizeMap.values()).sort((a, b) => {
                     return a.retail_price - b.retail_price;
                 });
                 
-                // Display each unique size with price
+                // Filter and display sizes that match image aspect ratio
+                let matchingCount = 0;
                 sortedProducts.forEach(product => {
                     // Parse size (e.g., "8×10" -> width: 8, height: 10)
                     const sizeParts = product.size.split('×');
@@ -478,6 +482,21 @@
                     
                     const width = parseInt(sizeParts[0]);
                     const height = parseInt(sizeParts[1]);
+                    
+                    // Calculate print aspect ratio (handle both orientations)
+                    const printAspectRatio = width / height;
+                    const printAspectRatioFlipped = height / width;
+                    
+                    // Check if aspect ratios match within 5% tolerance
+                    const tolerance = 0.05;
+                    const matchesRatio = 
+                        Math.abs(imageAspectRatio - printAspectRatio) / imageAspectRatio <= tolerance ||
+                        Math.abs(imageAspectRatio - printAspectRatioFlipped) / imageAspectRatio <= tolerance;
+                    
+                    // Skip sizes that don't match aspect ratio
+                    if (!matchesRatio) return;
+                    
+                    matchingCount++;
                     
                     const btn = document.createElement('button');
                     btn.className = 'option-btn';
@@ -490,6 +509,11 @@
                     });
                     container.appendChild(btn);
                 });
+                
+                // Show message if no matching sizes found
+                if (matchingCount === 0) {
+                    container.innerHTML = '<p style="color: #e74c3c;">No print sizes match your image aspect ratio (' + aspectRatioText + '). Please crop your image or choose a different image.</p>';
+                }
                 
             } catch (error) {
                 console.error('Error loading sizes and prices:', error);
@@ -521,14 +545,18 @@
             
             infoEl.textContent = `Your image is ${state.imageWidth}×${state.imageHeight} pixels (${aspectRatioText} aspect ratio, ${orientation}) | Print size: ${size.name}${dpiText}`;
             
-            // Image quality check - now using full public URL
-            // First, validate image dimensions for this size
+            // Image quality check - DISABLED due to Lumaprints API timeout issues
+            // Instead, we filter sizes by aspect ratio to prevent mismatches
+            // Skip API validation and load options directly
+            loadOptionsForSize();
+            return;
+            
+            /* DISABLED - Replaced with client-side aspect ratio filtering
             const validationContainer = document.getElementById('sizes-container');
             const originalHTML = validationContainer.innerHTML;
             validationContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Checking image quality...</p></div>';
             
             try {
-                // Check image with Lumaprints API
                 const checkResponse = await fetch('/api/lumaprints/check-image', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
