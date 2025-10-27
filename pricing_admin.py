@@ -22,18 +22,18 @@ def get_global_markup():
     # Create settings table if it doesn't exist
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS settings (
-            key TEXT PRIMARY KEY,
+            key_name TEXT PRIMARY KEY,
             value TEXT NOT NULL,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     
-    cursor.execute("SELECT value FROM settings WHERE key = 'global_markup_percentage'")
+    cursor.execute("SELECT value FROM settings WHERE key_name = 'global_markup_percentage'")
     result = cursor.fetchone()
     
     if not result:
         # Set default markup
-        cursor.execute("INSERT INTO settings (key, value) VALUES ('global_markup_percentage', '50.0')")
+        cursor.execute("INSERT INTO settings (key_name, value) VALUES ('global_markup_percentage', '50.0')")
         conn.commit()
         markup = 50.0
     else:
@@ -49,14 +49,14 @@ def set_global_markup(markup_percentage):
     
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS settings (
-            key TEXT PRIMARY KEY,
+            key_name TEXT PRIMARY KEY,
             value TEXT NOT NULL,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
     
     cursor.execute("""
-        INSERT OR REPLACE INTO settings (key, value, updated_at) 
+        INSERT OR REPLACE INTO settings (key_name, value, updated_at) 
         VALUES ('global_markup_percentage', ?, CURRENT_TIMESTAMP)
     """, (str(markup_percentage),))
     
