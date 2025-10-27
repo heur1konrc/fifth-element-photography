@@ -238,7 +238,7 @@
                 </div>
                 
                 <!-- Price Display -->
-                <div class="price-display" id="price-display" style="display: block;">
+                <div class="price-display" id="price-display" style="display: none;">
                     <div class="label">Your Price</div>
                     <div class="amount" id="price-amount">$0.00</div>
                     <div class="label" style="font-size: 0.5em; margin-top: 10px;">
@@ -262,7 +262,6 @@
             imageUrl: "{{ image_url }}",
             imageWidth: null,
             imageHeight: null,
-            imageDPI: null,
             selectedCategory: null,
             selectedSubcategory: null,
             selectedSize: null,
@@ -276,42 +275,14 @@
             loadCategories();
         });
         
-        async function loadImageDimensions() {
-            // Extract filename from image URL
-            const urlParts = state.imageUrl.split('/');
-            const filename = urlParts[urlParts.length - 1];
-            
-            try {
-                // Fetch EXIF data including DPI from backend
-                const response = await fetch(`/api/image/exif/${filename}`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    state.imageWidth = data.width;
-                    state.imageHeight = data.height;
-                    state.imageDPI = data.dpi || null;
-                    console.log(`Image: ${state.imageWidth}×${state.imageHeight}, DPI: ${state.imageDPI || 'Unknown'}`);
-                } else {
-                    // Fallback to loading image dimensions from img element
-                    const img = new Image();
-                    img.onload = function() {
-                        state.imageWidth = this.width;
-                        state.imageHeight = this.height;
-                        console.log(`Image dimensions: ${state.imageWidth}×${state.imageHeight} (DPI unavailable)`);
-                    };
-                    img.src = state.imageUrl;
-                }
-            } catch (error) {
-                console.error('Error loading image EXIF:', error);
-                // Fallback to loading image dimensions from img element
-                const img = new Image();
-                img.onload = function() {
-                    state.imageWidth = this.width;
-                    state.imageHeight = this.height;
-                    console.log(`Image dimensions: ${state.imageWidth}×${state.imageHeight} (DPI unavailable)`);
-                };
-                img.src = state.imageUrl;
-            }
+        function loadImageDimensions() {
+            const img = new Image();
+            img.onload = function() {
+                state.imageWidth = this.width;
+                state.imageHeight = this.height;
+                console.log(`Image dimensions: ${state.imageWidth}x${state.imageHeight}`);
+            };
+            img.src = state.imageUrl;
         }
         
         async function loadCategories() {
@@ -405,7 +376,7 @@
             displaySizes();
         }
         
-        async function displaySizes() {
+        function displaySizes() {
             const container = document.getElementById('sizes-container');
             const infoEl = document.getElementById('image-dimensions-info');
             
@@ -415,86 +386,54 @@
                 return;
             }
             
-            // Calculate aspect ratio in X:X format
+            // Calculate aspect ratio (always > 1 for long/short)
+            const aspectRatio = Math.max(state.imageWidth, state.imageHeight) / Math.min(state.imageWidth, state.imageHeight);
             const isLandscape = state.imageWidth > state.imageHeight;
-            const gcd = (a, b) => b === 0 ? a : gcd(b, a % b);
-            const divisor = gcd(state.imageWidth, state.imageHeight);
-            const ratioW = state.imageWidth / divisor;
-            const ratioH = state.imageHeight / divisor;
+            infoEl.textContent = `Your image is ${state.imageWidth}x${state.imageHeight} pixels (${aspectRatio.toFixed(2)} aspect ratio, ${isLandscape ? 'landscape' : 'portrait'})`;
             
-            // Simplify ratio if numbers are too large
-            let displayRatioW = ratioW;
-            let displayRatioH = ratioH;
-            if (ratioW > 100 || ratioH > 100) {
-                const scale = Math.max(ratioW, ratioH) / 10;
-                displayRatioW = Math.round(ratioW / scale * 10) / 10;
-                displayRatioH = Math.round(ratioH / scale * 10) / 10;
+            // Generate available sizes based on aspect ratio
+            // Always display as short side x long side
+            const sizes = [];
+            const minSize = 4;
+            const maxSize = 60;
+            
+            // For square images
+            if (Math.abs(aspectRatio - 1) < 0.01) {
+                for (let size = minSize; size <= maxSize; size += 2) {
+                    sizes.push({ 
+                        width: size, 
+                        height: size, 
+                        name: `${size}x${size}"` 
+                    });
+                }
             }
-            
-            const aspectRatioText = `${displayRatioW}:${displayRatioH}`;
-            
-            // Build info text with DPI if available
-            let infoText = `Your image is ${state.imageWidth}×${state.imageHeight} pixels (${aspectRatioText} aspect ratio, ${isLandscape ? 'landscape' : 'portrait'})`;
-            if (state.imageDPI) {
-                infoText += ` | DPI: ${Math.round(state.imageDPI)}`;
+            // For non-square images (iterate by short side)
+            else {
+                for (let shortSide = minSize; shortSide <= maxSize; shortSide += 2) {
+                    const longSide = Math.round(shortSide * aspectRatio);
+                    if (longSide >= minSize && longSide <= maxSize) {
+                        // Store actual width/height based on image orientation
+                        const width = isLandscape ? longSide : shortSide;
+                        const height = isLandscape ? shortSide : longSide;
+                        sizes.push({ 
+                            width, 
+                            height, 
+                            name: `${shortSide}x${longSide}"` 
+                        });
+                    }
+                }
             }
-            infoEl.textContent = infoText;
             
             container.className = 'option-grid';
-            container.innerHTML = '<p>Loading sizes and prices...</p>';
+            container.innerHTML = '';
             
-            // Fetch sizes and prices from pricing database
-            const subcategoryId = state.selectedSubcategory.subcategoryId;
-            
-            try {
-                const response = await fetch(`/api/pricing/category/${subcategoryId}`);
-                const data = await response.json();
-                
-                if (!data.success || !data.products || data.products.length === 0) {
-                    container.innerHTML = '<p>No sizes available for this product.</p>';
-                    return;
-                }
-                
-                container.innerHTML = '';
-                
-                // Group products by size (since each size has multiple frame colors)
-                const sizeMap = new Map();
-                data.products.forEach(product => {
-                    if (!sizeMap.has(product.size)) {
-                        sizeMap.set(product.size, product);
-                    }
-                });
-                
-                // Convert to array and sort by price (lowest to highest)
-                const sortedProducts = Array.from(sizeMap.values()).sort((a, b) => {
-                    return a.retail_price - b.retail_price;
-                });
-                
-                // Display each unique size with price
-                sortedProducts.forEach(product => {
-                    // Parse size (e.g., "8×10" -> width: 8, height: 10)
-                    const sizeParts = product.size.split('×');
-                    if (sizeParts.length !== 2) return;
-                    
-                    const width = parseInt(sizeParts[0]);
-                    const height = parseInt(sizeParts[1]);
-                    
-                    const btn = document.createElement('button');
-                    btn.className = 'option-btn';
-                    btn.innerHTML = `${product.size}"<br><strong>$${product.retail_price.toFixed(2)}</strong>`;
-                    btn.onclick = () => selectSize({
-                        width: isLandscape ? height : width,
-                        height: isLandscape ? width : height,
-                        name: `${product.size}"`,
-                        price: product.retail_price
-                    });
-                    container.appendChild(btn);
-                });
-                
-            } catch (error) {
-                console.error('Error loading sizes and prices:', error);
-                container.innerHTML = '<p>Error loading sizes. Please try again.</p>';
-            }
+            sizes.forEach(size => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = size.name;
+                btn.onclick = () => selectSize(size);
+                container.appendChild(btn);
+            });
         }
         
         async function selectSize(size) {
@@ -506,33 +445,15 @@
             });
             event.target.classList.add('selected');
             
-            // Update price display
-            updateTotalPrice();
-            
-            // Display EXIF DPI if available
-            const infoEl = document.getElementById('image-dimensions-info');
-            const aspectRatioText = infoEl.textContent.match(/\((.+?) aspect ratio/)[1];
-            const orientation = state.imageWidth > state.imageHeight ? 'landscape' : 'portrait';
-            
-            let dpiText = '';
-            if (state.imageDPI) {
-                dpiText = ` | DPI: ${Math.round(state.imageDPI)}`;
-            }
-            
-            infoEl.textContent = `Your image is ${state.imageWidth}×${state.imageHeight} pixels (${aspectRatioText} aspect ratio, ${orientation}) | Print size: ${size.name}${dpiText}`;
-            
-            // Image quality check - DISABLED due to Lumaprints API timeout issues
-            // Instead, we filter sizes by aspect ratio to prevent mismatches
-            // Skip API validation and load options directly
-            loadOptionsForSize();
-            return;
-            
-            /* DISABLED - Replaced with client-side aspect ratio filtering
+            // DISABLED: Image quality check (see CRITICAL_NOTE_IMAGE_CHECK.md)
+            // TODO: Re-enable with FULL SIZE HIRES IMAGE path, not thumbnail
+            /*
+            // First, validate image dimensions for this size
             const validationContainer = document.getElementById('sizes-container');
-            const originalHTML = validationContainer.innerHTML;
             validationContainer.innerHTML = '<div class="loading"><div class="spinner"></div><p>Checking image quality...</p></div>';
             
             try {
+                // Check image with Lumaprints API
                 const checkResponse = await fetch('/api/lumaprints/check-image', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -549,67 +470,32 @@
                 
                 if (!checkData.success) {
                     // Image validation failed - show detailed error
-                    validationContainer.innerHTML = originalHTML;
-                    
-                    // Build detailed error message
-                    let errorMsg = 'Image Quality Check Failed:\n\n';
-                    
-                    // Check for details field (from 400/406 errors) or result field (from other errors)
-                    const details = checkData.details || checkData.result;
-                    
-                    if (details && details.message) {
-                        // Lumaprints returned a detailed message
-                        errorMsg += `Reason: ${details.message}\n\n`;
-                        
-                        if (details.actualImageWidth && details.actualImageHeight) {
-                            errorMsg += `Your Image:\n`;
-                            errorMsg += `  Size: ${details.actualImageWidth}×${details.actualImageHeight} pixels\n`;
-                            if (details.actualImageAspectRatio) {
-                                errorMsg += `  Aspect Ratio: ${details.actualImageAspectRatio}\n`;
-                            }
-                            errorMsg += `\n`;
-                        }
-                        
-                        if (details.expectedWidth && details.expectedHeight) {
-                            errorMsg += `Required for ${size.name} Print:\n`;
-                            errorMsg += `  Minimum Size: ${details.expectedWidth}×${details.expectedHeight} pixels\n`;
-                            if (details.expectedAspectRatio) {
-                                errorMsg += `  Expected Aspect Ratio: ${details.expectedAspectRatio}\n`;
-                            }
-                        }
-                    } else {
-                        // Generic error
-                        errorMsg += checkData.message || checkData.error || 'Unknown error occurred';
-                    }
-                    
-                    if (confirm(errorMsg + '\n\nContinue anyway?')) {
+                    const errorMsg = checkData.result?.message || checkData.message || checkData.error || 'Image quality check failed';
+                    if (confirm(`${errorMsg}\n\nContinue anyway?`)) {
                         // User chose to continue
+                        displaySizes(); // Restore size selection
                         loadOptionsForSize();
                     } else {
-                        // User cancelled - keep size selection visible
+                        // User cancelled - restore size selection
+                        displaySizes();
                         return;
                     }
                 } else {
                     // Check the actual API response message
                     const apiResult = checkData.result;
                     if (apiResult && apiResult.message) {
-                        // Check if there's a warning even on success
+                        // Show the message from Lumaprints API
+                        const details = `Image: ${apiResult.actualImageWidth}x${apiResult.actualImageHeight} (${apiResult.actualImageAspectRatio})\n` +
+                                      `Recommended: ${apiResult.recommendedWidth}x${apiResult.recommendedHeight} (${apiResult.expectedAspectRatio})\n\n` +
+                                      `${apiResult.message}`;
+                        
                         if (apiResult.message.includes('not same') || apiResult.message.includes('incorrect')) {
                             // Aspect ratio issue - show warning
-                            validationContainer.innerHTML = originalHTML;
-                            
-                            let warningMsg = 'Image Quality Warning:\n\n';
-                            warningMsg += `Your Image:\n`;
-                            warningMsg += `  Size: ${apiResult.actualImageWidth}×${apiResult.actualImageHeight} pixels\n`;
-                            warningMsg += `  Aspect Ratio: ${apiResult.actualImageAspectRatio}\n\n`;
-                            warningMsg += `Required for ${size.name} Print:\n`;
-                            warningMsg += `  Minimum Size: ${apiResult.recommendedWidth}×${apiResult.recommendedHeight} pixels\n`;
-                            warningMsg += `  Expected Aspect Ratio: ${apiResult.expectedAspectRatio}\n\n`;
-                            warningMsg += `${apiResult.message}`;
-                            
-                            if (confirm(warningMsg + '\n\nContinue anyway?')) {
+                            if (confirm(details + '\n\nContinue anyway?')) {
+                                displaySizes();
                                 loadOptionsForSize();
                             } else {
+                                displaySizes();
                                 return;
                             }
                         } else {
@@ -624,34 +510,16 @@
             } catch (error) {
                 // If check fails, allow user to proceed anyway
                 console.error('Image check failed:', error);
-                validationContainer.innerHTML = originalHTML;
                 if (confirm('Could not verify image quality. Continue anyway?')) {
                     loadOptionsForSize();
                 } else {
-                    return;
+                    displaySizes();
                 }
             }
-        }
-        
-        function updateTotalPrice() {
-            let total = 0;
-            let basePrice = 0;
+            */
             
-            // Add size price if selected
-            if (state.selectedSize && state.selectedSize.price) {
-                basePrice = state.selectedSize.price;
-                total = basePrice;
-            }
-            
-            // TODO: Add option prices when implemented
-            
-            // Update display
-            document.getElementById('base-price').textContent = `$${basePrice.toFixed(2)}`;
-            document.getElementById('price-amount').textContent = `$${total.toFixed(2)}`;
-            document.getElementById('markup-percent').textContent = '0%'; // TODO: Apply markup
-            
-            // Show price display
-            document.getElementById('price-display').style.display = 'block';
+            // Skip directly to loading options
+            loadOptionsForSize();
         }
         
         async function loadOptionsForSize() {
@@ -825,6 +693,3 @@
 </body>
 </html>
 
-
-
-<!-- CACHE_BUST_COMMENT_OCT26_2025_2330 -->
