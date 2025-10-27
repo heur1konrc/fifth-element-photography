@@ -432,7 +432,13 @@
             }
             
             const aspectRatioText = `${displayRatioW}:${displayRatioH}`;
-            infoEl.textContent = `Your image is ${state.imageWidth}×${state.imageHeight} pixels (${aspectRatioText} aspect ratio, ${isLandscape ? 'landscape' : 'portrait'})`;
+            
+            // Build info text with DPI if available
+            let infoText = `Your image is ${state.imageWidth}×${state.imageHeight} pixels (${aspectRatioText} aspect ratio, ${isLandscape ? 'landscape' : 'portrait'})`;
+            if (state.imageDPI) {
+                infoText += ` | DPI: ${Math.round(state.imageDPI)}`;
+            }
+            infoEl.textContent = infoText;
             
             container.className = 'option-grid';
             container.innerHTML = '<p>Loading sizes and prices...</p>';
