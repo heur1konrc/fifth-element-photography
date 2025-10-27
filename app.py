@@ -5616,18 +5616,18 @@ def get_image_exif(filename):
     """Get EXIF data including DPI from image file"""
     try:
         from PIL import Image
+        import requests
+        from io import BytesIO
         
-        # Build image path
-        image_path = os.path.join(IMAGES_FOLDER, filename)
+        # Construct the URL for the image (use production where images actually exist)
+        image_url = f"https://fifthelement.photos/images/{filename}"
         
-        if not os.path.exists(image_path):
-            return jsonify({
-                'success': False,
-                'error': 'Image not found'
-            }), 404
+        # Fetch the image from URL
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
         
-        # Open image and extract info
-        with Image.open(image_path) as img:
+        # Open image from response content
+        with Image.open(BytesIO(response.content)) as img:
             width, height = img.size
             
             # Get DPI from image info
@@ -5637,15 +5637,18 @@ def get_image_exif(filename):
                 dpi_value = dpi[0]
             else:
                 # Try to get from EXIF
-                exif_data = img._getexif()
-                if exif_data:
-                    # EXIF tag 282 is XResolution, 283 is YResolution
-                    x_res = exif_data.get(282)
-                    if x_res and isinstance(x_res, tuple):
-                        dpi_value = x_res[0] / x_res[1]
+                try:
+                    exif_data = img._getexif()
+                    if exif_data:
+                        # EXIF tag 282 is XResolution, 283 is YResolution
+                        x_res = exif_data.get(282)
+                        if x_res and isinstance(x_res, tuple):
+                            dpi_value = x_res[0] / x_res[1]
+                        else:
+                            dpi_value = None
                     else:
                         dpi_value = None
-                else:
+                except:
                     dpi_value = None
             
             return jsonify({
