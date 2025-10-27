@@ -69,8 +69,9 @@ class LumaprintsAPI:
             if response.status_code in [200, 400, 406]:
                 try:
                     result = response.json()
-                    # Add status code to result for error handling
-                    result['_status_code'] = response.status_code
+                    # Add status code to result for error handling (only for dict responses)
+                    if isinstance(result, dict):
+                        result['_status_code'] = response.status_code
                     return result
                 except ValueError:
                     # Response is not JSON
