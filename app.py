@@ -5616,14 +5616,20 @@ def get_image_exif(filename):
     """Get EXIF data including DPI from image file"""
     try:
         from PIL import Image
+        import traceback
         
         # Images are stored in /data persistent volume on Railway
         image_path = os.path.join(IMAGES_FOLDER, filename)
+        print(f"[EXIF] Attempting to read image from: {image_path}")
+        print(f"[EXIF] IMAGES_FOLDER = {IMAGES_FOLDER}")
+        print(f"[EXIF] File exists: {os.path.exists(image_path)}")
         
         if not os.path.exists(image_path):
+            error_msg = f'Image not found at {image_path}'
+            print(f"[EXIF ERROR] {error_msg}")
             return jsonify({
                 'success': False,
-                'error': f'Image not found at {image_path}'
+                'error': error_msg
             }), 404
         
         # Open image from local filesystem
@@ -5660,9 +5666,14 @@ def get_image_exif(filename):
             })
             
     except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"[EXIF ERROR] Exception occurred: {str(e)}")
+        print(f"[EXIF ERROR] Traceback:\n{error_trace}")
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': str(e),
+            'traceback': error_trace
         }), 500
 
 # Dynamic order form route
