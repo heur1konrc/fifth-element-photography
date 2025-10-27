@@ -38,7 +38,7 @@ def get_product_price(lumaprints_subcategory_id, size, variant_id=None):
                 p.name,
                 p.size,
                 p.cost_price,
-                p.price as retail_price,
+                p.cost_price as retail_price,
                 p.lumaprints_subcategory_id,
                 p.lumaprints_frame_option,
                 p.lumaprints_options,
@@ -133,7 +133,7 @@ def get_category_products(category_id):
                 p.name,
                 p.size,
                 p.cost_price,
-                p.price as retail_price,
+                p.cost_price as retail_price,
                 p.lumaprints_subcategory_id,
                 c.name as category_name
             FROM products p
