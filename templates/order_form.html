@@ -425,49 +425,44 @@
             infoText += '<br>The following sizes and options are best for the selected image:';
             infoEl.innerHTML = infoText;
             
-            // Generate available sizes based on aspect ratio
-            // Always display as short side x long side
-            const sizes = [];
-            const minSize = 4;
-            const maxSize = 60;
-            
-            // For square images
-            if (Math.abs(aspectRatio - 1) < 0.01) {
-                for (let size = minSize; size <= maxSize; size += 2) {
-                    sizes.push({ 
-                        width: size, 
-                        height: size, 
-                        name: `${size}x${size}"` 
-                    });
-                }
-            }
-            // For non-square images (iterate by short side)
-            else {
-                for (let shortSide = minSize; shortSide <= maxSize; shortSide += 2) {
-                    const longSide = Math.round(shortSide * aspectRatio);
-                    if (longSide >= minSize && longSide <= maxSize) {
-                        // Store actual width/height based on image orientation
-                        const width = isLandscape ? longSide : shortSide;
-                        const height = isLandscape ? shortSide : longSide;
-                        sizes.push({ 
-                            width, 
-                            height, 
-                            name: `${shortSide}x${longSide}"` 
-                        });
-                    }
-                }
-            }
-            
+            // Fetch available sizes and prices from pricing database
             container.className = 'option-grid';
-            container.innerHTML = '';
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading sizes and prices...</p></div>';
             
-            sizes.forEach(size => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = size.name;
-                btn.onclick = () => selectSize(size);
-                container.appendChild(btn);
-            });
+            try {
+                const response = await fetch(`/api/pricing/category/${state.selectedSubcategory.subcategoryId}`);
+                const data = await response.json();
+                
+                if (data.success && data.products && data.products.length > 0) {
+                    container.innerHTML = '';
+                    
+                    data.products.forEach(product => {
+                        const btn = document.createElement('button');
+                        btn.className = 'option-btn';
+                        
+                        // Parse size (e.g., "10×20" to get width and height)
+                        const sizeParts = product.size.split('×');
+                        const width = parseInt(sizeParts[0]);
+                        const height = parseInt(sizeParts[1]);
+                        
+                        // Display size and price
+                        btn.innerHTML = `${product.size}<br><span style="font-size: 0.9em; color: #666;">$${product.retail_price.toFixed(2)}</span>`;
+                        btn.onclick = () => selectSize({
+                            width: width,
+                            height: height,
+                            name: product.size,
+                            price: product.retail_price,
+                            productId: product.id
+                        });
+                        container.appendChild(btn);
+                    });
+                } else {
+                    container.innerHTML = '<p style="text-align: center; padding: 20px;">No sizes available for this product.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading sizes:', error);
+                container.innerHTML = '<p style="text-align: center; padding: 20px; color: red;">Error loading sizes. Please try again.</p>';
+            }
         }
         
         async function selectSize(size) {
