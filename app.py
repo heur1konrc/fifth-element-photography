@@ -22,6 +22,7 @@ from lumaprints_api import get_lumaprints_client, get_pricing_calculator
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+app.config['TEMPLATES_AUTO_RELOAD'] = True  # Force template reloading to prevent caching issues
 
 # Register Pictorem admin blueprint (DISABLED)
 # app.register_blueprint(pictorem_admin_bp)
