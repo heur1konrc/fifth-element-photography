@@ -262,6 +262,7 @@
             imageUrl: "{{ image_url }}",
             imageWidth: null,
             imageHeight: null,
+            imageDPI: null,
             selectedCategory: null,
             selectedSubcategory: null,
             selectedSize: null,
@@ -275,14 +276,42 @@
             loadCategories();
         });
         
-        function loadImageDimensions() {
-            const img = new Image();
-            img.onload = function() {
-                state.imageWidth = this.width;
-                state.imageHeight = this.height;
-                console.log(`Image dimensions: ${state.imageWidth}x${state.imageHeight}`);
-            };
-            img.src = state.imageUrl;
+        async function loadImageDimensions() {
+            // Extract filename from image URL
+            const urlParts = state.imageUrl.split('/');
+            const filename = urlParts[urlParts.length - 1];
+            
+            try {
+                // Fetch EXIF data including DPI from backend
+                const response = await fetch(`/api/image/exif/${filename}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    state.imageWidth = data.width;
+                    state.imageHeight = data.height;
+                    state.imageDPI = data.dpi || null;
+                    console.log(`Image: ${state.imageWidth}×${state.imageHeight}, DPI: ${state.imageDPI || 'Unknown'}`);
+                } else {
+                    // Fallback to loading image dimensions from img element
+                    const img = new Image();
+                    img.onload = function() {
+                        state.imageWidth = this.width;
+                        state.imageHeight = this.height;
+                        console.log(`Image dimensions: ${state.imageWidth}×${state.imageHeight} (DPI unavailable)`);
+                    };
+                    img.src = state.imageUrl;
+                }
+            } catch (error) {
+                console.error('Error loading image EXIF:', error);
+                // Fallback to loading image dimensions from img element
+                const img = new Image();
+                img.onload = function() {
+                    state.imageWidth = this.width;
+                    state.imageHeight = this.height;
+                    console.log(`Image dimensions: ${state.imageWidth}×${state.imageHeight} (DPI unavailable)`);
+                };
+                img.src = state.imageUrl;
+            }
         }
         
         async function loadCategories() {
@@ -474,17 +503,17 @@
             // Update price display
             updateTotalPrice();
             
-            // Calculate and display DPI for selected size
-            const printWidth = size.width;
-            const printHeight = size.height;
-            const dpiWidth = Math.round(state.imageWidth / printWidth);
-            const dpiHeight = Math.round(state.imageHeight / printHeight);
-            const minDPI = Math.min(dpiWidth, dpiHeight);
-            
+            // Display EXIF DPI if available
             const infoEl = document.getElementById('image-dimensions-info');
             const aspectRatioText = infoEl.textContent.match(/\((.+?) aspect ratio/)[1];
             const orientation = state.imageWidth > state.imageHeight ? 'landscape' : 'portrait';
-            infoEl.textContent = `Your image is ${state.imageWidth}×${state.imageHeight} pixels (${aspectRatioText} aspect ratio, ${orientation}) | Print size: ${size.name} | DPI: ${minDPI}`;
+            
+            let dpiText = '';
+            if (state.imageDPI) {
+                dpiText = ` | DPI: ${Math.round(state.imageDPI)}`;
+            }
+            
+            infoEl.textContent = `Your image is ${state.imageWidth}×${state.imageHeight} pixels (${aspectRatioText} aspect ratio, ${orientation}) | Print size: ${size.name}${dpiText}`;
             
             // Image quality check - now using full public URL
             // First, validate image dimensions for this size

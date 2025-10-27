@@ -5611,6 +5611,57 @@ def get_product_variants_route(product_id):
     result = get_product_variants(product_id)
     return jsonify(result)
 
+@app.route('/api/image/exif/<path:filename>', methods=['GET'])
+def get_image_exif(filename):
+    """Get EXIF data including DPI from image file"""
+    try:
+        from PIL import Image
+        
+        # Build image path
+        image_path = os.path.join(IMAGES_FOLDER, filename)
+        
+        if not os.path.exists(image_path):
+            return jsonify({
+                'success': False,
+                'error': 'Image not found'
+            }), 404
+        
+        # Open image and extract info
+        with Image.open(image_path) as img:
+            width, height = img.size
+            
+            # Get DPI from image info
+            dpi = img.info.get('dpi', None)
+            if dpi and isinstance(dpi, tuple):
+                # DPI is stored as (x_dpi, y_dpi), usually they're the same
+                dpi_value = dpi[0]
+            else:
+                # Try to get from EXIF
+                exif_data = img._getexif()
+                if exif_data:
+                    # EXIF tag 282 is XResolution, 283 is YResolution
+                    x_res = exif_data.get(282)
+                    if x_res and isinstance(x_res, tuple):
+                        dpi_value = x_res[0] / x_res[1]
+                    else:
+                        dpi_value = None
+                else:
+                    dpi_value = None
+            
+            return jsonify({
+                'success': True,
+                'width': width,
+                'height': height,
+                'dpi': dpi_value,
+                'format': img.format
+            })
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 # Dynamic order form route
 @app.route('/order')
 def order_form():
