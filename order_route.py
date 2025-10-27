@@ -22,8 +22,11 @@ def order_form_route():
             # Just filename, prepend /images/
             relative_path = f"/images/{image_param}"
         
-        # Get the base URL from the request
+        # Get the base URL from the request and force HTTPS
         base_url = request.host_url.rstrip('/')
+        # Force HTTPS for production (Railway uses reverse proxy)
+        if 'fifthelement.photos' in base_url:
+            base_url = base_url.replace('http://', 'https://')
         image_url = f"{base_url}{relative_path}"
     
     return render_template('order_form.html', image_url=image_url)
