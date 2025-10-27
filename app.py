@@ -5616,18 +5616,18 @@ def get_image_exif(filename):
     """Get EXIF data including DPI from image file"""
     try:
         from PIL import Image
-        import requests
-        from io import BytesIO
         
-        # Construct the URL for the image (use production where images actually exist)
-        image_url = f"https://fifthelement.photos/images/{filename}"
+        # Images are stored in /data persistent volume on Railway
+        image_path = os.path.join(IMAGES_FOLDER, filename)
         
-        # Fetch the image from URL
-        response = requests.get(image_url, timeout=10)
-        response.raise_for_status()
+        if not os.path.exists(image_path):
+            return jsonify({
+                'success': False,
+                'error': f'Image not found at {image_path}'
+            }), 404
         
-        # Open image from response content
-        with Image.open(BytesIO(response.content)) as img:
+        # Open image from local filesystem
+        with Image.open(image_path) as img:
             width, height = img.size
             
             # Get DPI from image info
