@@ -17,7 +17,7 @@ import hashlib
 import secrets
 
 # Lumaprints integration imports
-from lumaprints_api import get_lumaprints_client, get_pricing_calculator
+# REMOVED v2.0.0: from lumaprints_api import get_lumaprints_client, get_pricing_calculator
 
 # Pictorem integration (DISABLED)
 # from pictorem_product_api import get_products_for_frontend, get_product_price_api, get_categories_for_frontend, get_product_details
@@ -51,8 +51,9 @@ def ensure_database_exists():
     if not os.path.exists(db_path):
         print(f"Database not found at {db_path}, initializing...")
         try:
-            from init_pricing_db import init_pricing_database
-            init_pricing_database()
+            # REMOVED v2.0.0: from init_pricing_db import init_pricing_database
+            # REMOVED v2.0.0: init_pricing_database()
+            pass
             print("Database initialized successfully")
         except Exception as e:
             print(f"Error initializing database: {e}")
@@ -2554,9 +2555,9 @@ def load_catalog():
         return {"categories": [], "subcategories": {}, "options": {}, "stores": []}
 
 # Initialize dynamic pricing calculator using database-stored markup
-from dynamic_pricing_calculator import get_dynamic_pricing_calculator
-from pricing_admin import get_global_markup
-pricing_calc = get_dynamic_pricing_calculator(markup_percentage=get_global_markup())
+# REMOVED v2.0.0: from dynamic_pricing_calculator import get_dynamic_pricing_calculator
+# REMOVED v2.0.0: from pricing_admin import get_global_markup
+# REMOVED v2.0.0: pricing_calc = get_dynamic_pricing_calculator(markup_percentage=get_global_markup())
 
 @app.route('/api/lumaprints/categories')
 def get_lumaprints_categories():
@@ -3238,80 +3239,80 @@ def save_pricing_config(config):
         return False
 
 # Import pricing admin functions
-from pricing_admin import (
-    admin_pricing_route, update_global_markup_route, update_product_cost_route,
-    add_product_route, delete_product_route
-)
-from category_admin import (
-    add_category_route, delete_category_route, get_categories_route
-)
-from variant_routes import (
-    get_product_variants_route, get_variant_price_route, get_products_with_variants_route
-)
-from dynamic_product_api import (
-    get_products_for_frontend, get_product_details_api
-)
-from database_setup_route import setup_database_route
-from rebuild_lumaprints_db import rebuild_database_route
-from order_route import order_form_route
+# REMOVED v2.0.0: from pricing_admin import (
+# REMOVED v2.0.0:     admin_pricing_route, update_global_markup_route, update_product_cost_route,
+# REMOVED v2.0.0:     add_product_route, delete_product_route
+# REMOVED v2.0.0: )
+# REMOVED v2.0.0: from category_admin import (
+# REMOVED v2.0.0:     add_category_route, delete_category_route, get_categories_route
+# REMOVED v2.0.0: )
+# REMOVED v2.0.0: from variant_routes import (
+# REMOVED v2.0.0:     get_product_variants_route, get_variant_price_route, get_products_with_variants_route
+# REMOVED v2.0.0: )
+# REMOVED v2.0.0: from dynamic_product_api import (
+# REMOVED v2.0.0:     get_products_for_frontend, get_product_details_api
+# REMOVED v2.0.0: )
+# REMOVED v2.0.0: from database_setup_route import setup_database_route
+# REMOVED v2.0.0: from rebuild_lumaprints_db import rebuild_database_route
+# REMOVED v2.0.0: from order_route import order_form_route
 
-@app.route('/api/product-variants', methods=['GET'])
-def get_product_variants():
-    """Get variants for a specific product"""
-    return get_product_variants_route()
+# REMOVED v2.0.0: @app.route('/api/product-variants', methods=['GET'])
+# REMOVED v2.0.0: def get_product_variants():
+# REMOVED v2.0.0:     """Get variants for a specific product"""
+# REMOVED v2.0.0:     return get_product_variants_route()
 
-@app.route('/api/variant-price', methods=['GET'])
-def get_variant_price():
-    """Get price for a specific variant"""
-    return get_variant_price_route()
+# REMOVED v2.0.0: @app.route('/api/variant-price', methods=['GET'])
+# REMOVED v2.0.0: def get_variant_price():
+# REMOVED v2.0.0:     """Get price for a specific variant"""
+# REMOVED v2.0.0:     return get_variant_price_route()
 
-@app.route('/api/products-with-variants', methods=['GET'])
-def get_products_with_variants():
-    """Get all products with variant information"""
-    return get_products_with_variants_route()
+# REMOVED v2.0.0: @app.route('/api/products-with-variants', methods=['GET'])
+# REMOVED v2.0.0: def get_products_with_variants():
+# REMOVED v2.0.0:     """Get all products with variant information"""
+# REMOVED v2.0.0:     return get_products_with_variants_route()
 
 # Dynamic product API for frontend
-@app.route('/api/products', methods=['GET'])
-def get_frontend_products():
-    """Get all products for frontend order form (no auth required) - PICTOREM VERSION"""
-    return get_products_for_frontend()
+# REMOVED v2.0.0: @app.route('/api/products', methods=['GET'])
+# REMOVED v2.0.0: def get_frontend_products():
+# REMOVED v2.0.0:     """Get all products for frontend order form (no auth required) - PICTOREM VERSION"""
+# REMOVED v2.0.0:     return get_products_for_frontend()
 
-@app.route('/api/categories', methods=['GET'])
-def get_frontend_categories():
-    """Get all product categories for frontend"""
-    return get_categories_for_frontend()
+# REMOVED v2.0.0: @app.route('/api/categories', methods=['GET'])
+# REMOVED v2.0.0: def get_frontend_categories():
+# REMOVED v2.0.0:     """Get all product categories for frontend"""
+# REMOVED v2.0.0:     return get_categories_for_frontend()
 
-@app.route('/api/product/<slug>', methods=['GET'])
-def get_product_by_slug(slug):
-    """Get product details by slug"""
-    return get_product_details(slug)
+# REMOVED v2.0.0: @app.route('/api/product/<slug>', methods=['GET'])
+# REMOVED v2.0.0: def get_product_by_slug(slug):
+# REMOVED v2.0.0:     """Get product details by slug"""
+# REMOVED v2.0.0:     return get_product_details(slug)
 
-@app.route('/api/price', methods=['POST'])
-def calculate_product_price():
-    """Calculate price for a product configuration"""
-    data = request.get_json()
-    product_slug = data.get('product_slug')
-    width = data.get('width')
-    height = data.get('height')
-    options = data.get('options', {})
-    return get_product_price_api(product_slug, width, height, options)
+# REMOVED v2.0.0: @app.route('/api/price', methods=['POST'])
+# REMOVED v2.0.0: def calculate_product_price():
+# REMOVED v2.0.0:     """Calculate price for a product configuration"""
+# REMOVED v2.0.0:     data = request.get_json()
+# REMOVED v2.0.0:     product_slug = data.get('product_slug')
+# REMOVED v2.0.0:     width = data.get('width')
+# REMOVED v2.0.0:     height = data.get('height')
+# REMOVED v2.0.0:     options = data.get('options', {})
+# REMOVED v2.0.0:     return get_product_price_api(product_slug, width, height, options)
 
-@app.route('/api/product-details', methods=['GET'])
-def get_product_details():
-    """Get detailed product information (no auth required)"""
-    return get_product_details_api()
+# REMOVED v2.0.0: @app.route('/api/product-details', methods=['GET'])
+# REMOVED v2.0.0: def get_product_details():
+# REMOVED v2.0.0:     """Get detailed product information (no auth required)"""
+# REMOVED v2.0.0:     return get_product_details_api()
 
 # Database setup route (for initializing live database)
-@app.route('/setup-database', methods=['GET'])
-def setup_database():
-    """Initialize database with required tables and sample data"""
-    return setup_database_route()
+# REMOVED v2.0.0: @app.route('/setup-database', methods=['GET'])
+# REMOVED v2.0.0: def setup_database():
+# REMOVED v2.0.0:     """Initialize database with required tables and sample data"""
+# REMOVED v2.0.0:     return setup_database_route()
 
-@app.route('/admin/rebuild-lumaprints-db', methods=['GET'])
-@require_admin_auth
-def rebuild_lumaprints_db():
-    """Rebuild Lumaprints database from JSON pricing files"""
-    return rebuild_database_route()
+# REMOVED v2.0.0: @app.route('/admin/rebuild-lumaprints-db', methods=['GET'])
+# REMOVED v2.0.0: @require_admin_auth
+# REMOVED v2.0.0: def rebuild_lumaprints_db():
+# REMOVED v2.0.0:     """Rebuild Lumaprints database from JSON pricing files"""
+# REMOVED v2.0.0:     return rebuild_database_route()
 
 @app.route('/api/hierarchical/product-types', methods=['GET'])
 def get_hierarchical_product_types():
@@ -4713,13 +4714,13 @@ def restore_database_from_backup():
 
 
 # Register pricing form blueprints
-from product_api import product_api
-from pricing_form_route import pricing_form
-from order_form_api import order_form_api
+# REMOVED v2.0.0: from product_api import product_api
+# REMOVED v2.0.0: from pricing_form_route import pricing_form
+# REMOVED v2.0.0: from order_form_api import order_form_api
 
-app.register_blueprint(product_api)
-app.register_blueprint(pricing_form)
-app.register_blueprint(order_form_api)
+# REMOVED v2.0.0: app.register_blueprint(product_api)
+# REMOVED v2.0.0: app.register_blueprint(pricing_form)
+# REMOVED v2.0.0: app.register_blueprint(order_form_api)
 
 # Database management routes
 @app.route('/admin/database')
@@ -4749,10 +4750,11 @@ def check_products_route():
 def export_database():
     """Export pricing database to JSON"""
     import traceback
-    from database_export_inline import export_pricing_database
+    # REMOVED v2.0.0: from database_export_inline import export_pricing_database
+    # REMOVED v2.0.0: export_data = export_pricing_database()
     
     try:
-        export_data = export_pricing_database()
+        return jsonify({'success': False, 'error': 'Export functionality removed in v2.0.0'}), 410
         
         # Return JSON directly
         response = jsonify(export_data)
@@ -4771,7 +4773,8 @@ def import_database():
     import sys
     import os
     sys.path.insert(0, os.path.dirname(__file__))
-    from import_pricing_db import import_database as do_import
+    # REMOVED v2.0.0: from import_pricing_db import import_database as do_import
+    pass
     
     try:
         if 'file' not in request.files:
