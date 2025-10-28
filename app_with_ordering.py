@@ -1,7 +1,3 @@
-# Fifth Element Photography v2.0.0 - 2025-10-27
-# Print ordering removed - Gallery and admin tools only
-# See app_version.py for changelog and REMOVAL_LOG_20251027.md for details
-
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, send_file, send_from_directory
 import os
 import json
@@ -781,6 +777,11 @@ def api_images():
     return jsonify(images)
 
 # Removed duplicate subcategories route - using the one at line ~2463 instead
+
+@app.route('/order-print/<image_id>')
+def order_print(image_id):
+    """Redirect old order print route to new PayPal-integrated form"""
+    return redirect('/test_order_form')
 
 @app.route('/images/<filename>')
 def serve_image(filename):
@@ -2544,6 +2545,248 @@ def check_lumaprints_image():
             'message': 'Image quality check failed'
         }), 500
 
+@app.route('/api/lumaprints/pricing-detailed', methods=['POST'])
+def get_lumaprints_pricing_detailed():
+    """Calculate detailed pricing for a specific product configuration"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['subcategoryId', 'width', 'height']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }), 400
+        
+        subcategory_id = data['subcategoryId']
+        width = float(data['width'])
+        height = float(data['height'])
+        quantity = int(data.get('quantity', 1))
+        options = data.get('options', [])
+        
+        # Calculate pricing
+        pricing_result = pricing_calc.calculate_retail_price(
+            subcategory_id=subcategory_id,
+            width=width,
+            height=height,
+            quantity=quantity,
+            options=options if options else None
+        )
+        
+        if 'error' in pricing_result:
+            return jsonify({
+                'success': False,
+                'error': pricing_result['error']
+            }), 500
+        
+        # Format response
+        response = {
+            'success': True,
+            'pricing': {
+                'subcategoryId': subcategory_id,
+                'width': width,
+                'height': height,
+                'quantity': quantity,
+                'options': options,
+                'wholesale_price': pricing_result['wholesale_price'],
+                'markup_percentage': pricing_result['markup_percentage'],
+                'markup_amount': pricing_result['markup_amount'],
+                'retail_price': pricing_result['retail_price'],
+                'price_per_item': pricing_result['price_per_item'],
+                'formatted_price': f"${pricing_result['retail_price']:.2f}",
+                'formatted_price_per_item': f"${pricing_result['price_per_item']:.2f}"
+            }
+        }
+        
+        return jsonify(response)
+        
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'error': f'Invalid data format: {str(e)}'
+        }), 400
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+# 
+@app.route('/order-print')
+def order_print_form():
+    """Redirect old order print form to new PayPal-integrated form"""
+    return redirect('/test_order_form')
+
+@app.route('/api/lumaprints/submit-order', methods=['POST'])
+def submit_lumaprints_order():
+    """Submit an order to Lumaprints and store locally"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['customer', 'shipping', 'items', 'payment']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }), 400
+        
+        # Generate order ID
+        order_id = str(uuid.uuid4())[:8].upper()
+        
+        # Calculate total price from items
+        total_price = sum(item.get('totalPrice', 0) for item in data['items'])
+        
+        # Create order record
+        order_record = {
+            'orderId': order_id,
+            'timestamp': datetime.now().isoformat(),
+            'status': 'payment_received',
+            'customer': data['customer'],
+            'items': data['items'],
+            'pricing': {
+                'total': total_price
+            },
+            'shipping': data['shipping'],
+            'payment': data['payment'],
+            'lumaprints': {
+                'orderId': None,
+                'status': None,
+                'submitted': False
+            }
+        }
+        
+        # Store order locally
+        orders = load_orders()
+        orders[order_id] = order_record
+        save_orders(orders)
+        
+        # Submit to Lumaprints API
+        try:
+            api = get_lumaprints_client(sandbox=False)
+            
+            # Prepare order items for Lumaprints
+            order_items = []
+            for i, item in enumerate(data['items']):
+                # Convert local image URL to full URL
+                image_url = item['imageUrl']
+                if image_url.startswith('/static/'):
+                    # Convert to full URL
+                    image_url = f"https://fifth-element-photography-production.up.railway.app{image_url}"
+                
+                order_items.append({
+                    "externalItemId": f"{order_id}-{i+1}",
+                    "subcategoryId": item['subcategoryId'],
+                    "quantity": item['quantity'],
+                    "width": item['width'],
+                    "height": item['height'],
+                    "file": {
+                        "imageUrl": image_url
+                    },
+                    "orderItemOptions": item.get('options', []),
+                    "solidColorHexCode": None
+                })
+            
+            # Prepare Lumaprints order payload
+            lumaprints_payload = {
+                "externalId": order_id,
+                "storeId": "20027",  # Your store ID from catalog
+                "shippingMethod": "default",
+                "productionTime": "regular",
+                "recipient": {
+                    "firstName": data['shipping']['firstName'],
+                    "lastName": data['shipping']['lastName'],
+                    "addressLine1": data['shipping']['address1'],
+                    "addressLine2": data['shipping'].get('address2', ''),
+                    "city": data['shipping']['city'],
+                    "state": data['shipping']['state'],
+                    "zipCode": data['shipping']['postalCode'],
+                    "country": data['shipping']['country'],
+                    "phone": data['shipping'].get('phone', ''),
+                    "company": ""
+                },
+                "orderItems": order_items
+            }
+            
+            # Submit order to Lumaprints
+            lumaprints_response = api.submit_order(lumaprints_payload)
+            
+            # Update order record with Lumaprints response
+            order_record['lumaprints'] = {
+                'orderId': lumaprints_response.get('orderId'),
+                'status': lumaprints_response.get('status'),
+                'submitted': True,
+                'response': lumaprints_response
+            }
+            order_record['status'] = 'submitted'
+            
+            # Save updated order
+            orders[order_id] = order_record
+            save_orders(orders)
+            
+        except Exception as lumaprints_error:
+            # Log the error but don't fail the order
+            print(f"Lumaprints submission error: {lumaprints_error}")
+            order_record['lumaprints']['error'] = str(lumaprints_error)
+            order_record['status'] = 'payment_received'
+            
+            # Save order with error
+            orders[order_id] = order_record
+            save_orders(orders)
+        
+        return jsonify({
+            'success': True,
+            'order': {
+                'id': order_id,
+                'status': order_record['status']
+            },
+            'message': 'Order submitted successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+# 
+@app.route('/order-confirmation/<order_id>')
+def order_confirmation(order_id):
+    """Display order confirmation page"""
+    try:
+        orders = load_orders()
+        order = orders.get(order_id)
+        
+        if not order:
+            return "Order not found", 404
+        
+        return render_template('order_confirmation.html', order=order)
+        
+    except Exception as e:
+        return f"Error loading order confirmation: {str(e)}", 500
+
+@app.route('/admin/orders')
+@require_admin_auth
+def admin_orders():
+    """Admin page to view all orders"""
+    try:
+        orders = load_orders()
+        
+        # Sort orders by timestamp (newest first)
+        sorted_orders = sorted(orders.items(), 
+                             key=lambda x: x[1]['timestamp'], 
+                             reverse=True)
+        
+        return render_template('admin_orders.html', orders=sorted_orders)
+        
+    except Exception as e:
+        return f"Error loading orders: {str(e)}", 500
+# ============================================================================
+# LUMAPRINTS ROUTES (ACTIVE)
+# ============================================================================
+
+# Load product catalog
 def load_catalog():
     """Load the Lumaprints product catalog"""
     catalog_path = os.path.join(os.path.dirname(__file__), 'lumaprints_catalog.json')
@@ -2568,6 +2811,78 @@ def get_lumaprints_categories():
             'success': True,
             'categories': categories
         })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/lumaprints/pricing', methods=['POST'])
+def get_lumaprints_pricing():
+    """Calculate pricing for a specific product configuration using live API"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['subcategoryId', 'width', 'height']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({
+                    'success': False,
+                    'error': f'Missing required field: {field}'
+                }), 400
+        
+        subcategory_id = data['subcategoryId']
+        width = float(data['width'])
+        height = float(data['height'])
+        quantity = int(data.get('quantity', 1))
+        options = data.get('options', [])
+        
+        # Get pricing from live Lumaprints API (use production for pricing)
+        client = get_lumaprints_client(sandbox=False)
+        api_pricing = client.get_pricing(
+            subcategory_id=subcategory_id,
+            width=width,
+            height=height,
+            quantity=quantity,
+            options=options if options else None
+        )
+        
+        # Get wholesale price from API response
+        wholesale_price = api_pricing.get('price', 0)
+        
+        # Apply markup
+        markup_percentage = get_global_markup()
+        retail_price = wholesale_price * (1 + markup_percentage / 100)
+        price_per_item = retail_price / quantity
+        
+        # Format response for frontend compatibility
+        formatted_response = {
+            'success': True,
+            'pricing': {
+                'formatted_price': f"${retail_price:.2f}",
+                'formatted_price_per_item': f"${price_per_item:.2f}",
+                'total_price': round(retail_price, 2),
+                'price_per_item': round(price_per_item, 2),
+                'wholesale_price': round(wholesale_price, 2),
+                'quantity': quantity,
+                'markup_percentage': markup_percentage
+            },
+            'product_info': {
+                'subcategory_id': subcategory_id,
+                'width': width,
+                'height': height
+            },
+            'api_response': api_pricing
+        }
+        
+        return jsonify(formatted_response)
+        
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'error': f'Invalid data format: {str(e)}'
+        }), 400
     except Exception as e:
         return jsonify({
             'success': False,
@@ -2600,6 +2915,60 @@ def get_lumaprints_sizes(subcategory_id):
             'success': False,
             'error': str(e)
         }), 500
+
+@app.route('/api/lumaprints/pricing-summary')
+def get_pricing_summary():
+    """Get pricing database summary information"""
+    try:
+        summary = pricing_calc.pricing_manager.get_pricing_summary()
+        
+        return jsonify({
+            'success': True,
+            'summary': summary
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# ============================================================================
+# END LUMAPRINTS ROUTES
+# ============================================================================
+
+# ============================================================================
+# NEW HIERARCHICAL API ROUTES (V2 - Simplified Database Structure)
+# ============================================================================
+
+from hierarchical_api_new import register_hierarchical_routes_new
+register_hierarchical_routes_new(app)
+
+# ============================================================================
+# ADMIN IMPORT ENDPOINT
+# ============================================================================
+
+from admin_import_endpoint_new import register_import_routes
+register_import_routes(app)
+
+# ============================================================================
+# ORDER FORM V3 - CLEAN IMPLEMENTATION
+# ============================================================================
+
+# from order_api_v3 import register_order_routes_v3
+# register_order_routes_v3(app)  # Disabled - using new /order route instead
+
+# NEW: Register fresh print order routes to bypass Railway cache
+from print_order_api import setup_print_order_routes
+setup_print_order_routes(app)
+
+# Register print order diagnostic routes
+from print_order_diagnostic import register_print_diagnostic_routes
+register_print_diagnostic_routes(app)
+
+# Register diagnostic routes
+from diagnostic_api import register_diagnostic_routes
+register_diagnostic_routes(app)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
@@ -3255,6 +3624,55 @@ from database_setup_route import setup_database_route
 from rebuild_lumaprints_db import rebuild_database_route
 from order_route import order_form_route
 
+@app.route('/admin/pricing')
+@require_admin_auth
+def admin_pricing():
+    """Pricing management admin page"""
+    return admin_pricing_route()
+
+@app.route('/admin/pricing/update-markup', methods=['POST'])
+@require_admin_auth
+def update_global_markup():
+    """Update global markup percentage"""
+    return update_global_markup_route()
+
+@app.route('/admin/pricing/update-product', methods=['POST'])
+@require_admin_auth
+def update_product_cost():
+    """Update individual product cost"""
+    return update_product_cost_route()
+
+@app.route('/admin/pricing/add-product', methods=['POST'])
+@require_admin_auth
+def add_product():
+    """Add new product"""
+    return add_product_route()
+
+@app.route('/admin/pricing/delete-product', methods=['POST'])
+@require_admin_auth
+def delete_pricing_product():
+    """Delete product from pricing system"""
+    return delete_product_route()
+
+@app.route('/admin/pricing/add-category', methods=['POST'])
+@require_admin_auth
+def add_category():
+    """Add new category"""
+    return add_category_route()
+
+@app.route('/admin/pricing/delete-category', methods=['POST'])
+@require_admin_auth
+def delete_category():
+    """Delete category (if empty)"""
+    return delete_category_route()
+
+@app.route('/admin/pricing/categories', methods=['GET'])
+@require_admin_auth
+def get_categories():
+    """Get all categories for dropdown refresh"""
+    return get_categories_route()
+
+# Variant management routes
 @app.route('/api/product-variants', methods=['GET'])
 def get_product_variants():
     """Get variants for a specific product"""
@@ -3312,6 +3730,367 @@ def setup_database():
 def rebuild_lumaprints_db():
     """Rebuild Lumaprints database from JSON pricing files"""
     return rebuild_database_route()
+
+@app.route('/admin/pricing/update-variant', methods=['POST'])
+@require_admin_auth
+def update_variant_price():
+    """Update individual variant base cost"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        variant_key = data.get('variant_key')
+        base_cost = float(data.get('base_cost', 0))
+        
+        config = load_pricing_config()
+        
+        if product_type in config['products'] and variant_key in config['products'][product_type]['variants']:
+            config['products'][product_type]['variants'][variant_key]['base_cost'] = base_cost
+            
+            if save_pricing_config(config):
+                return jsonify({'success': True, 'message': 'Variant price updated successfully'})
+            else:
+                return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+        else:
+            return jsonify({'success': False, 'message': 'Product or variant not found'}), 404
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/pricing/add-variant', methods=['POST'])
+@require_admin_auth
+def add_variant():
+    """Add new variant to existing product"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        variant_name = data.get('variant_name')
+        base_cost = float(data.get('base_cost', 0))
+        sku = data.get('sku', '')
+        lumaprints_options = data.get('lumaprints_options', '')
+        
+        config = load_pricing_config()
+        
+        if product_type not in config['products']:
+            return jsonify({'success': False, 'message': 'Product type not found'}), 404
+        
+        # Create variant key from name
+        variant_key = variant_name.lower().replace(' ', '_').replace('(', '').replace(')', '').replace('"', '')
+        
+        config['products'][product_type]['variants'][variant_key] = {
+            'display_name': variant_name,
+            'base_cost': base_cost,
+            'sku': sku,
+            'lumaprints_options': lumaprints_options
+        }
+        
+        if save_pricing_config(config):
+            return jsonify({'success': True, 'message': 'Variant added successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/pricing/delete-variant', methods=['POST'])
+@require_admin_auth
+def delete_variant():
+    """Delete variant from product"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        variant_key = data.get('variant_key')
+        
+        config = load_pricing_config()
+        
+        if product_type in config['products'] and variant_key in config['products'][product_type]['variants']:
+            del config['products'][product_type]['variants'][variant_key]
+            
+            if save_pricing_config(config):
+                return jsonify({'success': True, 'message': 'Variant deleted successfully'})
+            else:
+                return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+        else:
+            return jsonify({'success': False, 'message': 'Product or variant not found'}), 404
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/pricing/add-product', methods=['POST'])
+@require_admin_auth
+def add_new_product():
+    """Add new product type"""
+    try:
+        data = request.get_json()
+        product_key = data.get('product_key', '').lower()
+        display_name = data.get('display_name', '')
+        
+        if not product_key or not display_name:
+            return jsonify({'success': False, 'message': 'Product key and display name are required'}), 400
+        
+        config = load_pricing_config()
+        
+        if product_key in config['products']:
+            return jsonify({'success': False, 'message': 'Product already exists'}), 400
+        
+        config['products'][product_key] = {
+            'display_name': display_name,
+            'active': True,
+            'variants': {}
+        }
+        
+        if save_pricing_config(config):
+            return jsonify({'success': True, 'message': 'Product added successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/admin/pricing/toggle-product', methods=['POST'])
+@require_admin_auth
+def toggle_product():
+    """Toggle product active/inactive status"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        
+        config = load_pricing_config()
+        
+        if product_type not in config['products']:
+            return jsonify({'success': False, 'message': 'Product not found'}), 404
+        
+        config['products'][product_type]['active'] = not config['products'][product_type].get('active', True)
+        
+        if save_pricing_config(config):
+            return jsonify({'success': True, 'message': 'Product status updated successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Error saving configuration'}), 500
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# Old pricing route removed - replaced with database-driven system
+            
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/pricing/calculate', methods=['POST'])
+def calculate_price():
+    """Calculate final price for a product variant"""
+    try:
+        data = request.get_json()
+        product_type = data.get('product_type')
+        variant_key = data.get('variant_key')
+        
+        config = load_pricing_config()
+        
+        if product_type not in config['products'] or variant_key not in config['products'][product_type]['variants']:
+            return jsonify({'success': False, 'message': 'Product or variant not found'}), 404
+        
+        variant = config['products'][product_type]['variants'][variant_key]
+        base_cost = variant.get('base_cost', 0)
+        margin = config.get('global_margin', 100)
+        
+        final_price = base_cost * (1 + margin / 100)
+        
+        return jsonify({
+            'success': True,
+            'base_cost': base_cost,
+            'margin_percent': margin,
+            'final_price': round(final_price, 2),
+            'variant_info': variant
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+# ============================================================================
+# IMAGE ANALYZER ADMIN ROUTE
+# ============================================================================
+
+
+
+# ============================================================================
+# ORDERDESK TEST INTEGRATION ROUTES
+# ============================================================================
+
+import requests
+
+# OrderDesk API Configuration - UPDATE THESE WITH YOUR ACTUAL VALUES
+ORDERDESK_API_URL = "https://app.orderdesk.me/api/v2/orders"
+ORDERDESK_STORE_ID = "125137"
+ORDERDESK_API_KEY = "pXmXDSnjdoRsjPYWD6uU2CBCcKPgZUur7SDDSMUa6NR2R4v6mQ"
+
+# Product mapping for test - 12x12 Sparrow canvas
+ORDERDESK_PRODUCT_MAPPING = {
+    "101001": {"name": "Canvas Print 0.75in (12x12)", "price": 25.00, "lumaprints_options": "1,5"},
+    "106001": {"name": "Metal Print", "price": 35.00, "lumaprints_options": "29,31"},
+    "103001": {"name": "Fine Art Paper", "price": 20.00, "lumaprints_options": "36"}
+}
+
+@app.route('/test_order_form')
+def test_order_form():
+    """Display the test order form for OrderDesk integration"""
+    # Pass all query parameters to template
+    params = request.args.to_dict()
+    
+    # Check if image parameter is provided
+    if "image" not in params or not params["image"]:
+        params["no_image_selected"] = True
+    
+    return render_template("test_order_form.html", **params)
+
+@app.route('/test_order_submit', methods=['POST'])
+def test_order_submit():
+    """Submit test order to OrderDesk API with dynamic pricing"""
+    try:
+        # Get form data
+        form_data = request.form
+        product_sku = form_data.get('product_sku')  # Now comes from dynamic pricing
+        lumaprints_options = form_data.get('lumaprints_options')  # From dynamic pricing
+        product_price = float(form_data.get('product_price', 0))  # From dynamic pricing
+        paypal_order_id = form_data.get('paypal_order_id')
+        paypal_payer_id = form_data.get('paypal_payer_id')
+        
+        # Verify PayPal payment was completed (DISABLED FOR TESTING)
+        # if not paypal_order_id or not paypal_payer_id:
+        #     return jsonify({
+        #         "status": "error",
+        #         "message": "Payment required before order submission"
+        #     }), 400
+        
+        # Verify we have product information
+        if not product_sku or not lumaprints_options or product_price <= 0:
+            return jsonify({
+                "status": "error", 
+                "message": "Invalid product information"
+            }), 400
+        
+        # Get product name from form data or create a generic one
+        product_name = f"Print Order - SKU {product_sku}"
+        if product_sku == "101001":
+            product_name = "Canvas Print 0.75\" (12x12)"
+        elif product_sku == "101002":
+            product_name = "Canvas Print 1.25\" (12x12)"
+        elif product_sku == "106001":
+            product_name = "Metal Print (12x12)"
+        elif product_sku == "103001":
+            product_name = "Fine Art Paper (12x12)"
+        
+        # Prepare OrderDesk order data with dynamic pricing
+        order_data = {
+            "source_name": "Fifth Element Photography",
+            "email": form_data.get('email'),
+            "shipping": {
+                "first_name": form_data.get('first_name'),
+                "last_name": form_data.get('last_name'),
+                "address1": form_data.get('address1'),
+                "city": form_data.get('city'),
+                "state": form_data.get('state'),
+                "postal_code": form_data.get('postal_code'),
+                "country": form_data.get('country'),
+                "phone": form_data.get('phone', '')
+            },
+            "order_items": [
+                {
+                    "name": product_name + " - SPARROW 12x12 SQUARE CANVAS",
+                    "price": product_price,  # Use dynamic pricing
+                    "quantity": 1,
+                    "weight": 1.0,
+                    "code": product_sku,
+                    "metadata": {
+                        "print_sku": product_sku,
+                        "print_url": "https://fifthelement.photos/images/12x12_Sparrow.jpg",
+                        "print_width": "12",
+                        "print_height": "12",
+                        "lumaprints_options": lumaprints_options
+                    }
+                }
+            ]
+        }
+        
+        # Submit to OrderDesk API
+        headers = {
+            "ORDERDESK-STORE-ID": ORDERDESK_STORE_ID,
+            "ORDERDESK-API-KEY": ORDERDESK_API_KEY,
+            "Content-Type": "application/json"
+        }
+        
+        print("=== ORDERDESK DEBUG INFO ===")
+        print(f"Store ID: {ORDERDESK_STORE_ID}")
+        print(f"API Key: {ORDERDESK_API_KEY[:10]}...")
+        print(f"URL: {ORDERDESK_API_URL}")
+        print("Headers:", headers)
+        print("Order Data:", json.dumps(order_data, indent=2))
+        
+        # Test authentication first
+        test_url = "https://app.orderdesk.me/api/v2/test"
+        test_response = requests.get(test_url, headers=headers)
+        print(f"Auth Test Status: {test_response.status_code}")
+        print(f"Auth Test Response: {test_response.text}")
+        
+        if test_response.status_code != 200:
+            print("❌ Authentication test failed!")
+            return jsonify({
+                "status": "error",
+                "message": "OrderDesk authentication failed",
+                "auth_test_status": test_response.status_code,
+                "auth_test_response": test_response.text
+            }), 401
+        
+        response = requests.post(ORDERDESK_API_URL, headers=headers, json=order_data)
+        
+        print("OrderDesk Response Status:", response.status_code)
+        print("OrderDesk Response:", response.text)
+        
+        if response.status_code == 201:
+            # Success
+            order_response = response.json()
+            print("=== ORDERDESK RESPONSE DEBUG ===")
+            print("Full response:", json.dumps(order_response, indent=2))
+            print("Order ID:", order_response.get("id"))
+            print("Response keys:", list(order_response.keys()) if isinstance(order_response, dict) else "Not a dict")
+            # flash(f'Order submitted successfully! OrderDesk Order ID: {order_response.get("id")}', 'success')  # Removed to clean up admin
+            return jsonify({
+                "status": "success",
+                "message": "Order submitted to OrderDesk successfully",
+                "orderdesk_order_id": order_response.get("order", {}).get("id") if order_response.get("order") else order_response.get("id"),
+                "debug_info": {
+                    "response_keys": list(order_response.keys()) if isinstance(order_response, dict) else "Not a dict",
+                    "id_field": order_response.get("id"),
+                    "order_id_field": order_response.get("order_id"),
+                    "order_number_field": order_response.get("order_number"),
+                    "order_object_id": order_response.get("order", {}).get("id") if order_response.get("order") else None
+                },
+                "response": order_response
+            })
+        else:
+            # Error
+            # flash(f'Error submitting order: {response.text}', 'error')  # Removed to clean up admin
+            return jsonify({
+                "status": "error",
+                "message": f"OrderDesk API error: {response.status_code}",
+                "response": response.text
+            }), 400
+            
+    except Exception as e:
+        print("Exception:", str(e))
+        # flash(f'Error: {str(e)}', 'error')  # Removed to clean up admin
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+
+@app.route('/enhanced_order_form')
+def enhanced_order_form():
+    """Enhanced order form with 3-dropdown product selection system"""
+    return render_template('enhanced_order_form_v2.html')
+
+
+# ===============================================
+# HIERARCHICAL ORDERING SYSTEM API ROUTES
+# ===============================================
 
 @app.route('/api/hierarchical/product-types', methods=['GET'])
 def get_hierarchical_product_types():
@@ -3608,6 +4387,13 @@ def add_test_products():
 def debug_canvas():
     """Debug page for Canvas Prints workflow"""
     return send_from_directory('.', 'debug_canvas.html')
+
+@app.route('/hierarchical_order_form')
+def hierarchical_order_form():
+    """New hierarchical ordering system interface"""
+    image_url = request.args.get('image', '')
+    return render_template('hierarchical_order_form.html', image_url=image_url)
+
 
 @app.route('/admin/fix-test-products')
 def fix_test_products_route():
@@ -4818,6 +5604,40 @@ def import_database():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # Pricing API routes
+@app.route('/api/pricing/product', methods=['GET'])
+def get_pricing():
+    """Get pricing for a specific product"""
+    from pricing_api import get_product_price
+    
+    subcategory_id = request.args.get('subcategory_id', type=int)
+    size = request.args.get('size')
+    variant_id = request.args.get('variant_id', type=int)
+    
+    if not subcategory_id or not size:
+        return jsonify({
+            'success': False,
+            'error': 'Missing required parameters: subcategory_id and size'
+        }), 400
+    
+    result = get_product_price(subcategory_id, size, variant_id)
+    return jsonify(result)
+
+@app.route('/api/pricing/category/<int:category_id>', methods=['GET'])
+def get_category_pricing(category_id):
+    """Get all products and pricing for a category"""
+    from pricing_api import get_category_products
+    
+    result = get_category_products(category_id)
+    return jsonify(result)
+
+@app.route('/api/pricing/variants/<int:product_id>', methods=['GET'])
+def get_product_variants_route(product_id):
+    """Get all variants for a product"""
+    from pricing_api import get_product_variants
+    
+    result = get_product_variants(product_id)
+    return jsonify(result)
+
 @app.route('/api/image/exif/<path:filename>', methods=['GET'])
 def get_image_exif(filename):
     """Get EXIF data including DPI from image file"""
@@ -4895,3 +5715,8 @@ def get_image_exif(filename):
         }), 500
 
 # Dynamic order form route
+@app.route('/order')
+def order_form():
+    """Clean order form using dynamic Lumaprints API"""
+    return order_form_route()
+
