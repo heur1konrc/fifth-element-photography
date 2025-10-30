@@ -11,8 +11,11 @@ import os
 
 pricing_admin_bp = Blueprint('pricing_admin', __name__)
 
-# Database path
-DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'database', 'print_ordering.db')
+# Database path - use /data on Railway, fallback to local for development
+if os.path.exists('/data'):
+    DB_PATH = '/data/print_ordering.db'
+else:
+    DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'database', 'print_ordering.db')
 
 def get_db():
     """Get database connection"""
