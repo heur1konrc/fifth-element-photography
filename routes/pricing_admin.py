@@ -172,10 +172,18 @@ def browse_pricing():
     cursor.execute('SELECT aspect_ratio_id, display_name FROM aspect_ratios WHERE is_enabled = TRUE ORDER BY ratio_decimal')
     aspect_ratios = cursor.fetchall()
     
+    # Group pricing data by category for accordion view
+    pricing_by_category = {}
+    for row in pricing_data:
+        category_name = row['category_name']
+        if category_name not in pricing_by_category:
+            pricing_by_category[category_name] = []
+        pricing_by_category[category_name].append(dict(row))
+    
     conn.close()
     
-    return render_template('admin_pricing_browse.html',
-                         pricing_data=pricing_data,
+    return render_template('admin_pricing_browse_accordion.html',
+                         pricing_by_category=pricing_by_category,
                          categories=categories,
                          subcategories=subcategories,
                          aspect_ratios=aspect_ratios,
