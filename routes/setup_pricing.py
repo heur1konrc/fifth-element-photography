@@ -29,9 +29,9 @@ def setup_pricing_page():
 @setup_pricing_bp.route('/admin/setup-pricing/run', methods=['POST'])
 @admin_required
 def run_pricing_setup():
-    """Execute database setup and import"""
+    """Execute database setup - copy pre-populated database"""
     try:
-        # Determine database path
+        # Determine paths
         if os.path.exists('/data'):
             db_path = '/data/print_ordering.db'
             data_dir = '/data'
@@ -41,6 +41,44 @@ def run_pricing_setup():
         
         os.makedirs(data_dir, exist_ok=True)
         
+        # Use pre-populated database template
+        template_db = os.path.join(os.path.dirname(__file__), '..', 'database_templates', 'print_ordering_initial.db')
+        
+        if not os.path.exists(template_db):
+            return jsonify({
+                'success': False,
+                'error': 'Pre-populated database template not found',
+                'path': template_db
+            })
+        
+        # Copy template to target location
+        import shutil
+        shutil.copy2(template_db, db_path)
+        
+        # Verify the copy worked
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute('SELECT COUNT(*) FROM base_pricing')
+        total_count = cursor.fetchone()[0]
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Database initialized successfully from template',
+            'total': total_count,
+            'db_path': db_path
+        })
+        
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        })
+
+# OLD IMPORT CODE BELOW - KEEPING FOR REFERENCE
+'''
         # Step 1: Create schema
         schema_file = os.path.join(os.path.dirname(__file__), '..', 'database', 'print_ordering_schema.sql')
         
