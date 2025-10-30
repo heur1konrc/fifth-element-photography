@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Pricing - Fifth Element Photography Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        .filters {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            background: white;
+        }
+
+        .filter-group button {
+            padding: 0.75rem 2rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .filter-group button:hover {
+            background: #5568d3;
+        }
+
+        .pricing-table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .price-cell {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .markup-cell {
+            color: #388e3c;
+        }
+
+        .unavailable {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .edit-btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .edit-btn:hover {
+            background: #5568d3;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: #999;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <a href="{{ url_for('pricing_admin.pricing_dashboard') }}" class="back-link">← Back to Pricing Dashboard</a>
+            <h1>📊 Browse Pricing</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Filters -->
+        <form method="GET" action="{{ url_for('pricing_admin.browse_pricing') }}">
+            <div class="filters">
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select name="category_id" id="category_filter">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.category_id }}" {% if cat.category_id == selected_category %}selected{% endif %}>
+                            {{ cat.display_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Product</label>
+                    <select name="subcategory_id" id="subcategory_filter">
+                        <option value="">All Products</option>
+                        {% for sub in subcategories %}
+                        <option value="{{ sub.subcategory_id }}" data-category="{{ sub.category_id }}" 
+                                {% if sub.subcategory_id == selected_subcategory %}selected{% endif %}>
+                            {{ sub.display_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Aspect Ratio</label>
+                    <select name="aspect_ratio_id">
+                        <option value="">All Ratios</option>
+                        {% for ar in aspect_ratios %}
+                        <option value="{{ ar.aspect_ratio_id }}" {% if ar.aspect_ratio_id == selected_aspect_ratio %}selected{% endif %}>
+                            {{ ar.display_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <button type="submit">Apply Filters</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Pricing Table -->
+        <div class="pricing-table-container">
+            {% if pricing_data %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Product</th>
+                        <th>Size</th>
+                        <th>Aspect Ratio</th>
+                        <th>Cost Price</th>
+                        <th>Markup</th>
+                        <th>Retail Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pricing_data %}
+                    <tr class="{% if not item.is_available %}unavailable{% endif %}">
+                        <td>{{ item.category_name }}</td>
+                        <td>{{ item.product_name }}</td>
+                        <td><strong>{{ item.size_name }}</strong></td>
+                        <td><span class="badge">{{ item.ratio_name }}</span></td>
+                        <td class="price-cell">${{ "%.2f"|format(item.cost_price) }}</td>
+                        <td class="markup-cell">
+                            {% if item.markup_percentage > 0 %}
+                                {{ "%.1f"|format(item.markup_percentage) }}%
+                            {% else %}
+                                <span style="color: #999;">No markup</span>
+                            {% endif %}
+                        </td>
+                        <td class="price-cell">${{ "%.2f"|format(item.retail_price) }}</td>
+                        <td>
+                            {% if item.is_available %}
+                                <span style="color: #388e3c;">✓ Available</span>
+                            {% else %}
+                                <span style="color: #d32f2f;">✗ Unavailable</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="edit-btn" onclick="editPrice({{ item.pricing_id }}, {{ item.cost_price }}, {{ item.is_available|tojson }})">
+                                Edit
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="icon">📦</div>
+                <p>No pricing data found for selected filters</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Filter subcategories by selected category
+        document.getElementById('category_filter').addEventListener('change', function() {
+            const categoryId = this.value;
+            const subcategorySelect = document.getElementById('subcategory_filter');
+            const options = subcategorySelect.querySelectorAll('option');
+            
+            options.forEach(option => {
+                if (option.value === '') {
+                    option.style.display = 'block';
+                } else {
+                    const optionCategory = option.getAttribute('data-category');
+                    option.style.display = (!categoryId || optionCategory === categoryId) ? 'block' : 'none';
+                }
+            });
+            
+            subcategorySelect.value = '';
+        });
+
+        function editPrice(pricingId, currentCost, isAvailable) {
+            const newCost = prompt('Enter new cost price:', currentCost);
+            if (newCost === null) return;
+            
+            const newAvailable = confirm('Is this product available?');
+            
+            fetch(`/admin/pricing/edit/${pricingId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `cost_price=${newCost}&is_available=${newAvailable}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Price updated successfully!');
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                alert('Error updating price');
+                console.error(error);
+            });
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Management - Fifth Element Photography Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .action-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .action-card p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-global {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-category {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-subcategory {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .badge-specific {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <a href="/admin" class="back-link">← Back to Admin Dashboard</a>
+            <h1>💰 Pricing Management</h1>
+            <p>Manage product pricing, markups, and availability</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Products</h3>
+                <div class="value">{{ total_products }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Markup Rules</h3>
+                <div class="value">{{ active_markups }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Enabled Categories</h3>
+                <div class="value">{{ enabled_categories }}</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="actions-grid">
+            <a href="{{ url_for('pricing_admin.browse_pricing') }}" class="action-card">
+                <div class="icon">📊</div>
+                <h3>Browse Pricing</h3>
+                <p>View and edit all product prices</p>
+            </a>
+
+            <a href="{{ url_for('pricing_admin.manage_markups') }}" class="action-card">
+                <div class="icon">📈</div>
+                <h3>Manage Markups</h3>
+                <p>Configure markup rules and profit margins</p>
+            </a>
+
+            <a href="{{ url_for('pricing_admin.manage_products') }}" class="action-card">
+                <div class="icon">🎨</div>
+                <h3>Manage Products</h3>
+                <p>Enable/disable product categories</p>
+            </a>
+        </div>
+
+        <!-- Recent Markup Rules -->
+        <div class="section">
+            <h2>Recent Markup Rules</h2>
+            {% if recent_markups %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rule Name</th>
+                        <th>Type</th>
+                        <th>Applies To</th>
+                        <th>Markup</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for markup in recent_markups %}
+                    <tr>
+                        <td><strong>{{ markup.rule_name }}</strong></td>
+                        <td>
+                            <span class="badge badge-{{ markup.rule_type }}">
+                                {{ markup.rule_type|title }}
+                            </span>
+                        </td>
+                        <td>{{ markup.applies_to }}</td>
+                        <td>
+                            {% if markup.markup_type == 'percentage' %}
+                                {{ markup.markup_value }}%
+                            {% else %}
+                                ${{ markup.markup_value }}
+                            {% endif %}
+                        </td>
+                        <td>{{ markup.priority }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="icon">📋</div>
+                <p>No markup rules configured yet</p>
+                <p><a href="{{ url_for('pricing_admin.manage_markups') }}">Add your first markup rule</a></p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+

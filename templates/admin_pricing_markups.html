@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Markups - Fifth Element Photography Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        .section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+        }
+
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-global {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-category {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-subcategory {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .badge-specific {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .badge-active {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .badge-inactive {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 5px;
+        }
+
+        .info-box strong {
+            color: #1976d2;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .empty-state .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <a href="{{ url_for('pricing_admin.pricing_dashboard') }}" class="back-link">← Back to Pricing Dashboard</a>
+            <h1>📈 Manage Markups</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Add New Markup -->
+        <div class="section">
+            <h2>Add New Markup Rule</h2>
+            
+            <div class="info-box">
+                <strong>Markup Priority:</strong> When multiple rules apply, higher priority wins. 
+                Specific rules override category rules, which override global rules.
+            </div>
+
+            <form method="POST" action="{{ url_for('pricing_admin.add_markup') }}">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Rule Name *</label>
+                        <input type="text" name="rule_name" required placeholder="e.g., Standard Markup">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rule Type *</label>
+                        <select name="rule_type" id="rule_type" required>
+                            <option value="global">Global (All Products)</option>
+                            <option value="category">Category</option>
+                            <option value="subcategory">Subcategory (Product)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="category_group" style="display: none;">
+                        <label>Category</label>
+                        <select name="category_id" id="category_select">
+                            <option value="">Select Category</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.category_id }}">{{ cat.display_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="subcategory_group" style="display: none;">
+                        <label>Product</label>
+                        <select name="subcategory_id" id="subcategory_select">
+                            <option value="">Select Product</option>
+                            {% for sub in subcategories %}
+                            <option value="{{ sub.subcategory_id }}" data-category="{{ sub.category_id }}">
+                                {{ sub.display_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Markup Type *</label>
+                        <select name="markup_type" required>
+                            <option value="percentage">Percentage (%)</option>
+                            <option value="fixed">Fixed Amount ($)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Markup Value *</label>
+                        <input type="number" name="markup_value" step="0.01" required placeholder="e.g., 40">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <input type="number" name="priority" value="0" placeholder="0 = lowest">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">Add Markup Rule</button>
+            </form>
+        </div>
+
+        <!-- Existing Markups -->
+        <div class="section">
+            <h2>Existing Markup Rules</h2>
+            
+            {% if markups %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rule Name</th>
+                        <th>Type</th>
+                        <th>Applies To</th>
+                        <th>Markup</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for markup in markups %}
+                    <tr>
+                        <td><strong>{{ markup.rule_name }}</strong></td>
+                        <td>
+                            <span class="badge badge-{{ markup.rule_type }}">
+                                {{ markup.rule_type|title }}
+                            </span>
+                        </td>
+                        <td>{{ markup.applies_to }}</td>
+                        <td>
+                            {% if markup.markup_type == 'percentage' %}
+                                <strong>{{ markup.markup_value }}%</strong>
+                            {% else %}
+                                <strong>${{ markup.markup_value }}</strong>
+                            {% endif %}
+                        </td>
+                        <td>{{ markup.priority }}</td>
+                        <td>
+                            <span class="badge badge-{% if markup.is_active %}active{% else %}inactive{% endif %}">
+                                {% if markup.is_active %}Active{% else %}Inactive{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" {% if markup.is_active %}checked{% endif %}
+                                           onchange="toggleMarkup({{ markup.markup_id }})">
+                                    <span class="slider"></span>
+                                </label>
+                                <form method="POST" action="{{ url_for('pricing_admin.delete_markup', markup_id=markup.markup_id) }}" 
+                                      style="display: inline;" onsubmit="return confirm('Delete this markup rule?')">
+                                    <button type="submit" class="btn btn-danger btn-small">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="icon">📋</div>
+                <p>No markup rules configured yet</p>
+                <p>Add your first markup rule above to start setting profit margins</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Show/hide category and subcategory dropdowns based on rule type
+        document.getElementById('rule_type').addEventListener('change', function() {
+            const ruleType = this.value;
+            const categoryGroup = document.getElementById('category_group');
+            const subcategoryGroup = document.getElementById('subcategory_group');
+            
+            if (ruleType === 'category') {
+                categoryGroup.style.display = 'flex';
+                subcategoryGroup.style.display = 'none';
+            } else if (ruleType === 'subcategory') {
+                categoryGroup.style.display = 'flex';
+                subcategoryGroup.style.display = 'flex';
+            } else {
+                categoryGroup.style.display = 'none';
+                subcategoryGroup.style.display = 'none';
+            }
+        });
+
+        // Filter subcategories by selected category
+        document.getElementById('category_select').addEventListener('change', function() {
+            const categoryId = this.value;
+            const subcategorySelect = document.getElementById('subcategory_select');
+            const options = subcategorySelect.querySelectorAll('option');
+            
+            options.forEach(option => {
+                if (option.value === '') {
+                    option.style.display = 'block';
+                } else {
+                    const optionCategory = option.getAttribute('data-category');
+                    option.style.display = (optionCategory === categoryId) ? 'block' : 'none';
+                }
+            });
+            
+            subcategorySelect.value = '';
+        });
+
+        function toggleMarkup(markupId) {
+            fetch(`/admin/pricing/markups/${markupId}/toggle`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                alert('Error toggling markup');
+                console.error(error);
+            });
+        }
+    </script>
+</body>
+</html>
+

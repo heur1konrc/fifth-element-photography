@@ -30,6 +30,10 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 # Register Pictorem admin blueprint (DISABLED)
 # app.register_blueprint(pictorem_admin_bp)
 
+# Register Print Ordering Pricing Admin (Beta v0.1.0)
+from routes.pricing_admin import pricing_admin_bp
+app.register_blueprint(pricing_admin_bp)
+
 # Initialize database if it doesn't exist
 def ensure_database_exists():
     """Ensure the database exists and has the required schema"""
