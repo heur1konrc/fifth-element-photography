@@ -462,7 +462,7 @@
                                 <span style="font-weight: 600; color: #495057;">Filter by Aspect Ratio:</span>
                                 {% set ratios = category.products | map(attribute='aspect_ratio') | unique | list %}
                                 {% for ratio in ratios %}
-                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="event.stopPropagation();">
                                     <input type="checkbox" 
                                            class="ratio-filter" 
                                            data-category="{{ category.category_id }}" 
@@ -605,7 +605,12 @@
             const filterCheckboxes = document.querySelectorAll('.ratio-filter');
             
             filterCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
+                checkbox.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                
+                checkbox.addEventListener('change', function(e) {
+                    e.stopPropagation();
                     const categoryId = this.dataset.category;
                     const ratio = this.dataset.ratio;
                     const isChecked = this.checked;
