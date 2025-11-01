@@ -456,6 +456,26 @@
                         <p style="color: #667eea; font-weight: 600; margin: 0;">{{ category.product_count }} products</p>
                     </div>
                     <div class="category-products">
+                        <!-- Aspect Ratio Filters -->
+                        <div style="padding: 1rem; background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+                            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                                <span style="font-weight: 600; color: #495057;">Filter by Aspect Ratio:</span>
+                                {% set ratios = category.products | map(attribute='aspect_ratio') | unique | list %}
+                                {% for ratio in ratios %}
+                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                    <input type="checkbox" 
+                                           class="ratio-filter" 
+                                           data-category="{{ category.category_id }}" 
+                                           data-ratio="{{ ratio }}" 
+                                           checked
+                                           style="cursor: pointer;">
+                                    <span style="background: #e0e7ff; color: #4c51bf; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem;">
+                                        {{ ratio }}
+                                    </span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
                         <table style="width: 100%; border-collapse: collapse; background: white;">
                             <thead>
                                 <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
@@ -470,7 +490,7 @@
                             </thead>
                             <tbody>
                                 {% for product in category.products %}
-                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                <tr style="border-bottom: 1px solid #e9ecef;" data-category="{{ category.category_id }}" data-ratio="{{ product.aspect_ratio }}">
                                     <td style="padding: 0.75rem;">{{ product.product_name }}</td>
                                     <td style="padding: 0.75rem;">{{ product.size_name }}</td>
                                     <td style="padding: 0.75rem; text-align: center;">
@@ -579,6 +599,26 @@
                 card.classList.remove('expanded');
             });
         }
+
+        // Aspect Ratio Filtering
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterCheckboxes = document.querySelectorAll('.ratio-filter');
+            
+            filterCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const categoryId = this.dataset.category;
+                    const ratio = this.dataset.ratio;
+                    const isChecked = this.checked;
+                    
+                    // Find all rows for this category and ratio
+                    const rows = document.querySelectorAll(`tr[data-category="${categoryId}"][data-ratio="${ratio}"]`);
+                    
+                    rows.forEach(row => {
+                        row.style.display = isChecked ? '' : 'none';
+                    });
+                });
+            });
+        });
 
         // Apply Global Markup
         async function applyGlobalMarkup() {
