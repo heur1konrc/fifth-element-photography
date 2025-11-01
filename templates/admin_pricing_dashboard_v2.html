@@ -456,8 +456,48 @@
                         <p style="color: #667eea; font-weight: 600; margin: 0;">{{ category.product_count }} products</p>
                     </div>
                     <div class="category-products">
-                        <p style="color: #999; text-align: center; padding: 1rem;">Click "Browse Pricing" to view and edit products in this category</p>
-                        <a href="{{ url_for('pricing_admin.browse_pricing', category_id=category.category_id) }}" class="btn btn-primary" style="display: inline-block;">View Products</a>
+                        <table style="width: 100%; border-collapse: collapse; background: white;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                                    <th style="padding: 0.75rem; text-align: left;">Product</th>
+                                    <th style="padding: 0.75rem; text-align: left;">Size</th>
+                                    <th style="padding: 0.75rem; text-align: center;">Aspect Ratio</th>
+                                    <th style="padding: 0.75rem; text-align: right;">Cost Price</th>
+                                    <th style="padding: 0.75rem; text-align: right;">Markup</th>
+                                    <th style="padding: 0.75rem; text-align: right;">Retail Price</th>
+                                    <th style="padding: 0.75rem; text-align: center;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in category.products %}
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.75rem;">{{ product.product_name }}</td>
+                                    <td style="padding: 0.75rem;">{{ product.size_name }}</td>
+                                    <td style="padding: 0.75rem; text-align: center;">
+                                        <span style="background: #e0e7ff; color: #4c51bf; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem;">
+                                            {{ product.aspect_ratio }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #2563eb; font-weight: 600;">
+                                        ${{ "%.2f"|format(product.cost_price) }}
+                                    </td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #059669;">
+                                        {{ "%.1f"|format(product.markup_percent) }}%
+                                    </td>
+                                    <td style="padding: 0.75rem; text-align: right; color: #7c3aed; font-weight: 600;">
+                                        ${{ "%.2f"|format(product.cost_price * (1 + product.markup_percent / 100)) }}
+                                    </td>
+                                    <td style="padding: 0.75rem; text-align: center;">
+                                        {% if product.is_available %}
+                                        <span style="color: #10b981;">✓ Available</span>
+                                        {% else %}
+                                        <span style="color: #ef4444;">✗ Unavailable</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 {% endfor %}

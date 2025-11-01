@@ -81,7 +81,37 @@ def pricing_dashboard():
         GROUP BY pc.category_id
         ORDER BY pc.display_order
     ''')
-    categories = cursor.fetchall()
+    categories_raw = cursor.fetchall()
+    
+    # For each category, fetch all products with pricing
+    categories = []
+    for cat in categories_raw:
+        cursor.execute('''
+            SELECT 
+                ps.display_name as product_name,
+                pz.size_name,
+                ar.display_name as aspect_ratio,
+                bp.cost_price,
+                bp.is_available,
+                bp.pricing_id,
+                COALESCE(mr.markup_value, 0) as markup_percent
+            FROM base_pricing bp
+            JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
+            JOIN print_sizes pz ON bp.size_id = pz.size_id
+            JOIN aspect_ratios ar ON pz.aspect_ratio_id = ar.aspect_ratio_id
+            LEFT JOIN markup_rules mr ON mr.rule_type = 'global' AND mr.is_active = TRUE
+            WHERE ps.category_id = ?
+            ORDER BY ps.display_name, pz.width, pz.height
+        ''', (cat['category_id'],))
+        products = cursor.fetchall()
+        
+        categories.append({
+            'category_id': cat['category_id'],
+            'display_name': cat['display_name'],
+            'description': cat['description'],
+            'product_count': cat['product_count'],
+            'products': products
+        })
     
     conn.close()
     
