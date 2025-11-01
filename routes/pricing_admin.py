@@ -49,41 +49,49 @@ def pricing_dashboard():
     cursor.execute('SELECT COUNT(*) FROM base_pricing WHERE is_available = TRUE')
     total_products = cursor.fetchone()[0]
     
-    cursor.execute('SELECT COUNT(*) FROM markup_rules WHERE is_active = TRUE')
-    active_markups = cursor.fetchone()[0]
-    
     cursor.execute('SELECT COUNT(DISTINCT category_id) FROM product_categories WHERE is_enabled = TRUE')
     enabled_categories = cursor.fetchone()[0]
     
-    # Get active markup rules
+    # Get average cost and retail prices
+    cursor.execute('SELECT AVG(cost_price) FROM base_pricing WHERE is_available = TRUE')
+    avg_cost = cursor.fetchone()[0] or 0
+    
+    # Get global markup if exists
+    cursor.execute("SELECT markup_value FROM markup_rules WHERE rule_type = 'global' AND is_active = TRUE LIMIT 1")
+    global_markup_row = cursor.fetchone()
+    current_multiplier = None
+    avg_retail = avg_cost
+    
+    if global_markup_row:
+        global_markup = global_markup_row[0]
+        current_multiplier = round(1 + global_markup / 100, 2)
+        avg_retail = avg_cost * current_multiplier
+    
+    # Get categories with product counts
     cursor.execute('''
         SELECT 
-            markup_id,
-            rule_name,
-            rule_type,
-            markup_type,
-            markup_value,
-            priority,
-            CASE 
-                WHEN rule_type = 'global' THEN 'All Products'
-                WHEN rule_type = 'category' THEN (SELECT display_name FROM product_categories WHERE category_id = markup_rules.category_id)
-                WHEN rule_type = 'subcategory' THEN (SELECT display_name FROM product_subcategories WHERE subcategory_id = markup_rules.subcategory_id)
-                WHEN rule_type = 'specific' THEN 'Specific Product/Size'
-            END as applies_to
-        FROM markup_rules
-        WHERE is_active = TRUE
-        ORDER BY priority DESC, markup_id DESC
-        LIMIT 10
+            pc.category_id,
+            pc.display_name,
+            pc.description,
+            COUNT(DISTINCT bp.pricing_id) as product_count
+        FROM product_categories pc
+        LEFT JOIN product_subcategories ps ON pc.category_id = ps.category_id
+        LEFT JOIN base_pricing bp ON ps.subcategory_id = bp.subcategory_id AND bp.is_available = TRUE
+        WHERE pc.is_enabled = TRUE
+        GROUP BY pc.category_id
+        ORDER BY pc.display_order
     ''')
-    recent_markups = cursor.fetchall()
+    categories = cursor.fetchall()
     
     conn.close()
     
-    return render_template('admin_pricing.html',
+    return render_template('admin_pricing_dashboard_v2.html',
                          total_products=total_products,
-                         active_markups=active_markups,
                          enabled_categories=enabled_categories,
-                         recent_markups=recent_markups)
+                         avg_cost=avg_cost,
+                         avg_retail=avg_retail,
+                         current_multiplier=current_multiplier,
+                         categories=categories)
 
 # ============================================================================
 # PRICING BROWSER
@@ -414,4 +422,242 @@ def calculate_pricing():
         'profit': profit,
         'margin_percentage': round((profit / retail * 100) if retail > 0 else 0, 2)
     })
+
+
+
+# ============================================================================
+# GLOBAL MARKUP - SIMPLE ONE-CLICK MARKUP FOR ALL PRODUCTS
+# ============================================================================
+
+@pricing_admin_bp.route('/admin/pricing/global-markup', methods=['POST'])
+# @admin_required  # Temporarily disabled for testing
+def apply_global_markup():
+    """Apply a single markup percentage to all products"""
+    try:
+        data = request.json
+        markup_percentage = float(data.get('markup_percentage', 0))
+        
+        if markup_percentage < 0:
+            return jsonify({'success': False, 'error': 'Markup cannot be negative'}), 400
+        
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Delete any existing global markup rules
+        cursor.execute("DELETE FROM markup_rules WHERE rule_type = 'global'")
+        
+        # Create new global markup rule
+        cursor.execute('''
+            INSERT INTO markup_rules 
+            (rule_name, rule_type, markup_type, markup_value, priority, is_active)
+            VALUES (?, 'global', 'percentage', ?, 0, TRUE)
+        ''', (f'Global Markup {markup_percentage}%', markup_percentage))
+        
+        conn.commit()
+        
+        # Get count of affected products
+        cursor.execute('SELECT COUNT(*) FROM base_pricing WHERE is_available = TRUE')
+        product_count = cursor.fetchone()[0]
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Global markup of {markup_percentage}% applied to {product_count} products'
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================================================
+# ADD CATEGORY
+# ============================================================================
+
+@pricing_admin_bp.route('/admin/pricing/categories/add', methods=['POST'])
+# @admin_required  # Temporarily disabled for testing
+def add_category():
+    """Add a new product category"""
+    try:
+        data = request.json if request.is_json else request.form
+        
+        category_name = data.get('category_name', '').strip()
+        display_name = data.get('display_name', '').strip()
+        description = data.get('description', '').strip()
+        
+        if not category_name or not display_name:
+            return jsonify({'success': False, 'error': 'Category name and display name are required'}), 400
+        
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Get next category_id (start from 200 to avoid conflicts)
+        cursor.execute('SELECT MAX(category_id) FROM product_categories')
+        max_id = cursor.fetchone()[0]
+        next_id = max(200, (max_id or 199) + 1)
+        
+        # Get next display order
+        cursor.execute('SELECT MAX(display_order) FROM product_categories')
+        max_order = cursor.fetchone()[0]
+        next_order = (max_order or 0) + 1
+        
+        # Insert new category
+        cursor.execute('''
+            INSERT INTO product_categories 
+            (category_id, category_name, display_name, description, display_order, is_enabled)
+            VALUES (?, ?, ?, ?, ?, TRUE)
+        ''', (next_id, category_name, display_name, description, next_order))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'category_id': next_id,
+            'message': f'Category "{display_name}" added successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================================================
+# ADD PRODUCT (SUBCATEGORY)
+# ============================================================================
+
+@pricing_admin_bp.route('/admin/pricing/products/add', methods=['POST'])
+# @admin_required  # Temporarily disabled for testing
+def add_product():
+    """Add a new product (subcategory)"""
+    try:
+        data = request.json if request.is_json else request.form
+        
+        category_id = int(data.get('category_id'))
+        subcategory_name = data.get('subcategory_name', '').strip()
+        display_name = data.get('display_name', '').strip()
+        description = data.get('description', '').strip()
+        
+        if not subcategory_name or not display_name:
+            return jsonify({'success': False, 'error': 'Product name and display name are required'}), 400
+        
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Get next subcategory_id for this category (category_id * 1000 + sequence)
+        cursor.execute('SELECT MAX(subcategory_id) FROM product_subcategories WHERE category_id = ?', (category_id,))
+        max_id = cursor.fetchone()[0]
+        
+        if max_id:
+            next_id = max_id + 1
+        else:
+            next_id = category_id * 1000 + 1
+        
+        # Get next display order
+        cursor.execute('SELECT MAX(display_order) FROM product_subcategories WHERE category_id = ?', (category_id,))
+        max_order = cursor.fetchone()[0]
+        next_order = (max_order or 0) + 1
+        
+        # Insert new subcategory
+        cursor.execute('''
+            INSERT INTO product_subcategories 
+            (subcategory_id, category_id, subcategory_name, display_name, description, display_order, is_enabled)
+            VALUES (?, ?, ?, ?, ?, ?, TRUE)
+        ''', (next_id, category_id, subcategory_name, display_name, description, next_order))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'subcategory_id': next_id,
+            'message': f'Product "{display_name}" added successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================================================
+# ADD PRICING ENTRY
+# ============================================================================
+
+@pricing_admin_bp.route('/admin/pricing/entries/add', methods=['POST'])
+# @admin_required  # Temporarily disabled for testing
+def add_pricing_entry():
+    """Add a new pricing entry for a product/size combination"""
+    try:
+        data = request.json if request.is_json else request.form
+        
+        subcategory_id = int(data.get('subcategory_id'))
+        size_id = int(data.get('size_id'))
+        cost_price = float(data.get('cost_price'))
+        is_available = data.get('is_available', 'true').lower() == 'true'
+        notes = data.get('notes', '').strip()
+        
+        if cost_price < 0:
+            return jsonify({'success': False, 'error': 'Cost price cannot be negative'}), 400
+        
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        # Check if this combination already exists
+        cursor.execute('''
+            SELECT pricing_id FROM base_pricing 
+            WHERE subcategory_id = ? AND size_id = ?
+        ''', (subcategory_id, size_id))
+        
+        existing = cursor.fetchone()
+        if existing:
+            return jsonify({'success': False, 'error': 'This product/size combination already exists'}), 400
+        
+        # Insert new pricing entry
+        cursor.execute('''
+            INSERT INTO base_pricing 
+            (subcategory_id, size_id, cost_price, is_available, notes)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (subcategory_id, size_id, cost_price, is_available, notes))
+        
+        pricing_id = cursor.lastrowid
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'pricing_id': pricing_id,
+            'message': 'Pricing entry added successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================================================
+# GET SIZES FOR DROPDOWN
+# ============================================================================
+
+@pricing_admin_bp.route('/api/pricing/sizes')
+# @admin_required  # Temporarily disabled for testing
+def get_sizes():
+    """Get all available print sizes for dropdown"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT 
+                size_id,
+                size_name,
+                width,
+                height,
+                ar.display_name as aspect_ratio
+            FROM print_sizes ps
+            JOIN aspect_ratios ar ON ps.aspect_ratio_id = ar.aspect_ratio_id
+            WHERE ps.is_enabled = TRUE
+            ORDER BY ar.ratio_decimal, ps.width, ps.height
+        ''')
+        
+        sizes = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        
+        return jsonify({'success': True, 'sizes': sizes})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 

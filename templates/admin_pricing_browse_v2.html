@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Pricing - Fifth Element Photography Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        .top-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger:hover {
+            background: #da190b;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Global Markup Section */
+        .global-markup-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .global-markup-section label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .global-markup-section input {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            width: 150px;
+        }
+
+        /* Accordion Styles */
+        .category-accordion {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .category-header:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+        }
+
+        .category-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .category-header .count {
+            background: rgba(255,255,255,0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .category-toggle {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .category-accordion.expanded .category-toggle {
+            transform: rotate(180deg);
+        }
+
+        .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .category-accordion.expanded .category-content {
+            max-height: 15000px;
+            transition: max-height 0.5s ease-in;
+        }
+
+        .products-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .products-table thead {
+            background: #f8f9fa;
+        }
+
+        .products-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .products-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .products-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .products-table tbody tr.unavailable {
+            opacity: 0.5;
+            background: #fff3e0;
+        }
+
+        .price-input {
+            width: 100px;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .price-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .checkbox-cell {
+            text-align: center;
+        }
+
+        .checkbox-cell input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .add-product-row {
+            background: #f0f7ff;
+        }
+
+        .add-product-row input, .add-product-row select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .save-indicator {
+            display: inline-block;
+            margin-left: 0.5rem;
+            color: #4caf50;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        .hide-unavailable-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .hide-unavailable-toggle input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <a href="/admin/pricing" class="back-link">← Back to Dashboard</a>
+            <h1>Browse & Edit Pricing</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Global Markup Section -->
+        <div class="global-markup-section">
+            <label for="global-markup">Global Markup (%):</label>
+            <input type="number" id="global-markup" value="0" step="0.1" min="0" max="1000">
+            <button class="btn btn-success" onclick="applyGlobalMarkup()">Apply to All Products</button>
+            <span class="save-indicator" id="global-save-indicator">✓ Saved</span>
+        </div>
+
+        <!-- Top Controls -->
+        <div class="top-controls">
+            <button class="btn btn-outline" onclick="toggleAll()">Expand All Categories</button>
+            <div class="hide-unavailable-toggle">
+                <input type="checkbox" id="hide-unavailable" onchange="toggleUnavailable()">
+                <label for="hide-unavailable">Hide Unavailable Products</label>
+            </div>
+        </div>
+
+        {% if pricing_by_category %}
+            {% for category_name, products in pricing_by_category.items() %}
+            <div class="category-accordion" id="category-{{ loop.index }}">
+                <div class="category-header" onclick="toggleCategory({{ loop.index }})">
+                    <div>
+                        <h2>{{ category_name }}</h2>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span class="count">{{ products|length }} products</span>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                </div>
+                <div class="category-content">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Size</th>
+                                <th>Aspect Ratio</th>
+                                <th>Cost Price</th>
+                                <th>Markup %</th>
+                                <th>Retail Price</th>
+                                <th style="text-align: center;">Available</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in products %}
+                            <tr class="{% if not item.is_available %}unavailable{% endif %}" data-pricing-id="{{ item.pricing_id }}">
+                                <td>{{ item.product_name }}</td>
+                                <td><strong>{{ item.size_name }}</strong></td>
+                                <td><span class="badge">{{ item.ratio_name }}</span></td>
+                                <td>
+                                    $<input type="number" class="price-input" 
+                                           value="{{ '%.2f'|format(item.cost_price) }}" 
+                                           step="0.01" min="0"
+                                           onchange="updatePrice({{ item.pricing_id }}, 'cost', this.value)">
+                                </td>
+                                <td>
+                                    <input type="number" class="price-input" 
+                                           value="{{ '%.1f'|format(item.markup_percentage) }}" 
+                                           step="0.1" min="0"
+                                           onchange="updateMarkup({{ item.pricing_id }}, this.value)">%
+                                </td>
+                                <td>
+                                    $<input type="number" class="price-input" 
+                                           value="{{ '%.2f'|format(item.retail_price) }}" 
+                                           step="0.01" min="0"
+                                           onchange="updatePrice({{ item.pricing_id }}, 'retail', this.value)">
+                                </td>
+                                <td class="checkbox-cell">
+                                    <input type="checkbox" 
+                                           {% if item.is_available %}checked{% endif %}
+                                           onchange="toggleAvailability({{ item.pricing_id }}, this.checked)">
+                                </td>
+                                <td>
+                                    <button class="btn btn-danger" onclick="deleteProduct({{ item.pricing_id }}, '{{ item.product_name }} - {{ item.size_name }}')">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <!-- Add New Product Row -->
+                            <tr class="add-product-row">
+                                <td colspan="8" style="text-align: center; padding: 1.5rem;">
+                                    <button class="btn btn-success" onclick="showAddProductForm({{ loop.index }})">
+                                        + Add New Product to {{ category_name }}
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <script>
+        let allExpanded = false;
+
+        function toggleCategory(index) {
+            const accordion = document.getElementById(`category-${index}`);
+            accordion.classList.toggle('expanded');
+        }
+
+        function toggleAll() {
+            const accordions = document.querySelectorAll('.category-accordion');
+            const btn = event.target;
+            
+            allExpanded = !allExpanded;
+            
+            accordions.forEach(accordion => {
+                if (allExpanded) {
+                    accordion.classList.add('expanded');
+                } else {
+                    accordion.classList.remove('expanded');
+                }
+            });
+            
+            btn.textContent = allExpanded ? 'Collapse All Categories' : 'Expand All Categories';
+        }
+
+        function toggleUnavailable() {
+            const hide = document.getElementById('hide-unavailable').checked;
+            const unavailableRows = document.querySelectorAll('.unavailable');
+            unavailableRows.forEach(row => {
+                row.style.display = hide ? 'none' : '';
+            });
+        }
+
+        function updatePrice(pricingId, priceType, value) {
+            const data = priceType === 'cost' 
+                ? { cost_price: value }
+                : { retail_price: value };
+            
+            fetch(`/admin/pricing/update/${pricingId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSaveIndicator(pricingId);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Error updating price');
+                console.error(error);
+            });
+        }
+
+        function updateMarkup(pricingId, value) {
+            fetch(`/admin/pricing/update/${pricingId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ markup_percentage: value })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSaveIndicator(pricingId);
+                    // Recalculate retail price
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+
+        function toggleAvailability(pricingId, isAvailable) {
+            fetch(`/admin/pricing/update/${pricingId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ is_available: isAvailable })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-pricing-id="${pricingId}"]`);
+                    if (isAvailable) {
+                        row.classList.remove('unavailable');
+                    } else {
+                        row.classList.add('unavailable');
+                    }
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+
+        function deleteProduct(pricingId, productName) {
+            if (!confirm(`Are you sure you want to delete "${productName}"?`)) {
+                return;
+            }
+            
+            fetch(`/admin/pricing/delete/${pricingId}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-pricing-id="${pricingId}"]`);
+                    row.remove();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+
+        function applyGlobalMarkup() {
+            const markup = document.getElementById('global-markup').value;
+            if (!confirm(`Apply ${markup}% markup to ALL products?`)) {
+                return;
+            }
+            
+            fetch('/admin/pricing/global-markup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ markup_percentage: markup })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const indicator = document.getElementById('global-save-indicator');
+                    indicator.classList.add('show');
+                    setTimeout(() => indicator.classList.remove('show'), 2000);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+
+        function showAddProductForm(categoryIndex) {
+            alert('Add Product feature coming next!');
+        }
+
+        function showSaveIndicator(pricingId) {
+            // Visual feedback that save was successful
+            const row = document.querySelector(`tr[data-pricing-id="${pricingId}"]`);
+            row.style.background = '#e8f5e9';
+            setTimeout(() => {
+                row.style.background = '';
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
+
