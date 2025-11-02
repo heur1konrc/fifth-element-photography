@@ -2147,12 +2147,28 @@ textarea {
 }
 
 .option-badge-full:disabled,
-.option-badge-small:disabled {
+.option-badge-small:disabled,
+.option-badge-full.unavailable,
+.option-badge-small.unavailable {
     background: #1a1a1a;
     border-color: #333;
     color: #666;
     cursor: not-allowed;
     opacity: 0.5;
+    text-decoration: line-through;
+    position: relative;
+}
+
+.option-badge-full.unavailable::after,
+.option-badge-small.unavailable::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: #666;
+    transform: translateY(-50%);
 }
 
 .option-group {

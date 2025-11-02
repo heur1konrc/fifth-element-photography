@@ -1,7 +1,7 @@
 /**
  * Shopify Storefront API Integration
- * Fifth Element Photography - v4.1.0
- * Badge-style variant selectors with availability checking
+ * Fifth Element Photography - v4.2.0
+ * Badge-style variant selectors with dynamic availability checking
  */
 
 // Storefront API endpoint
@@ -258,10 +258,99 @@ function displayProductModal(product, imageTitle) {
     window.selectedOptions = {};
 }
 
+// Check which option values are available given current selections
+function getAvailableOptions(optionIndex) {
+    const product = window.currentProduct;
+    const selectedOptions = window.selectedOptions;
+    const availableValues = new Set();
+    
+    // Find all variants that match currently selected options (excluding the option we're checking)
+    product.variants.edges.forEach(edge => {
+        const variant = edge.node;
+        
+        // Check if this variant matches all currently selected options (except the one we're checking)
+        let matches = true;
+        variant.selectedOptions.forEach((opt, idx) => {
+            if (idx !== optionIndex && selectedOptions[idx] !== undefined) {
+                if (opt.value !== selectedOptions[idx]) {
+                    matches = false;
+                }
+            }
+        });
+        
+        // If it matches and is available, add this option value to available set
+        if (matches && variant.availableForSale) {
+            const optionValue = variant.selectedOptions[optionIndex].value;
+            availableValues.add(optionValue);
+        }
+    });
+    
+    return availableValues;
+}
+
+// Update availability of option badges based on current selections
+function updateOptionAvailability() {
+    const product = window.currentProduct;
+    
+    // For each option after the first selected one, update availability
+    product.options.forEach((option, optionIndex) => {
+        // Skip if this option is already selected
+        if (window.selectedOptions[optionIndex] !== undefined) {
+            return;
+        }
+        
+        // Check if any previous options are selected
+        let hasPreviousSelections = false;
+        for (let i = 0; i < optionIndex; i++) {
+            if (window.selectedOptions[i] !== undefined) {
+                hasPreviousSelections = true;
+                break;
+            }
+        }
+        
+        if (hasPreviousSelections) {
+            const availableValues = getAvailableOptions(optionIndex);
+            const badges = document.querySelectorAll(`[data-option-index="${optionIndex}"]`);
+            
+            badges.forEach(badge => {
+                const value = badge.dataset.optionValue;
+                if (availableValues.has(value)) {
+                    badge.disabled = false;
+                    badge.classList.remove('unavailable');
+                } else {
+                    badge.disabled = true;
+                    badge.classList.add('unavailable');
+                }
+            });
+        }
+    });
+}
+
 // Select an option value
 function selectOption(optionIndex, value) {
+    const badge = document.querySelector(`[data-option-index="${optionIndex}"][data-option-value="${value}"]`);
+    
+    // Don't allow selecting disabled options
+    if (badge && badge.disabled) {
+        return;
+    }
+    
     // Update selected options
     window.selectedOptions[optionIndex] = value;
+    
+    // Clear any selections after this option
+    const product = window.currentProduct;
+    for (let i = optionIndex + 1; i < product.options.length; i++) {
+        delete window.selectedOptions[i];
+        
+        // Remove selected class from badges in later options
+        const laterBadges = document.querySelectorAll(`[data-option-index="${i}"]`);
+        laterBadges.forEach(b => {
+            b.classList.remove('selected');
+            b.disabled = false;
+            b.classList.remove('unavailable');
+        });
+    }
     
     // Update UI - highlight selected badge
     const badges = document.querySelectorAll(`[data-option-index="${optionIndex}"]`);
@@ -273,6 +362,9 @@ function selectOption(optionIndex, value) {
         }
     });
     
+    // Update availability of subsequent options
+    updateOptionAvailability();
+    
     // Check if all options are selected
     const allOptionsSelected = Object.keys(window.selectedOptions).length === window.currentProduct.options.length;
     
@@ -282,6 +374,7 @@ function selectOption(optionIndex, value) {
         // Reset price and disable button
         document.getElementById('variant-price').textContent = 'Select all options';
         document.getElementById('add-to-cart-btn').disabled = true;
+        document.getElementById('availability-message').textContent = '';
     }
 }
 
