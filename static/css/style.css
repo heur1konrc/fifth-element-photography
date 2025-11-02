@@ -2118,6 +2118,13 @@ textarea {
     outline: none;
 }
 
+.availability-message {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    min-height: 20px;
+}
+
 .product-actions {
     margin-top: 30px;
 }

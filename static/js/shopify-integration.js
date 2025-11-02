@@ -1,11 +1,12 @@
 /**
  * Shopify JS Buy SDK Integration
- * Fifth Element Photography - v3.0.0
+ * Fifth Element Photography - v3.1.0
  * Using JS Buy SDK directly instead of Buy Button UI
  */
 
 // Initialize Shopify client
 let shopifyClient = null;
+let currentCheckout = null;
 
 // Initialize the Shopify SDK when page loads
 function initializeShopify() {
@@ -21,6 +22,17 @@ function initializeShopify() {
     });
     
     console.log('Shopify JS Buy SDK initialized successfully');
+    
+    // Create checkout on initialization
+    shopifyClient.checkout.create().then(checkout => {
+        currentCheckout = checkout;
+        console.log('Checkout created:', checkout.id);
+    });
+}
+
+// Format price to always show 2 decimal places
+function formatPrice(amount) {
+    return parseFloat(amount).toFixed(2);
 }
 
 // Open product modal for a specific image
@@ -100,7 +112,7 @@ function displayProductModal(product, imageTitle) {
                 <h3>${product.title}</h3>
                 <div class="product-description">${product.descriptionHtml || ''}</div>
                 <div class="product-price">
-                    <span class="price">$${product.variants[0].price.amount}</span>
+                    <span class="price">$${formatPrice(product.variants[0].price.amount)}</span>
                 </div>
                 
                 <div class="product-options">
@@ -127,6 +139,8 @@ function displayProductModal(product, imageTitle) {
     productHTML += `
                 </div>
                 
+                <div id="availability-message" class="availability-message"></div>
+                
                 <div class="product-actions">
                     <button id="add-to-cart-btn" class="add-to-cart-button">Add to Cart</button>
                 </div>
@@ -137,26 +151,30 @@ function displayProductModal(product, imageTitle) {
     container.innerHTML = productHTML;
     container.classList.remove('shopify-loading');
 
+    // Store product data
+    container.dataset.productData = JSON.stringify(product);
+
     // Add event listeners for variant selection
     const selects = container.querySelectorAll('.variant-select');
     selects.forEach(select => {
-        select.addEventListener('change', () => updateSelectedVariant(product));
+        select.addEventListener('change', () => updateSelectedVariant());
     });
 
     // Add to cart button handler
     document.getElementById('add-to-cart-btn').addEventListener('click', () => {
-        addToCart(product);
+        addToCart();
     });
 
     // Initialize with first variant selected
-    updateSelectedVariant(product);
+    updateSelectedVariant();
 }
 
 // Update selected variant based on option selections
-function updateSelectedVariant(product) {
+function updateSelectedVariant() {
     const container = document.getElementById('shopify-product-component');
     if (!container) return;
 
+    const product = JSON.parse(container.dataset.productData);
     const selects = container.querySelectorAll('.variant-select');
     const selectedOptions = Array.from(selects).map(select => select.value);
 
@@ -171,21 +189,43 @@ function updateSelectedVariant(product) {
         // Update price
         const priceEl = container.querySelector('.price');
         if (priceEl) {
-            priceEl.textContent = `$${variant.price.amount}`;
+            priceEl.textContent = `$${formatPrice(variant.price.amount)}`;
         }
 
-        // Store selected variant ID
+        // Store selected variant
         container.dataset.selectedVariantId = variant.id;
+        container.dataset.selectedVariantAvailable = variant.available;
+
+        // Update availability message and button
+        const availabilityMsg = document.getElementById('availability-message');
+        const addButton = document.getElementById('add-to-cart-btn');
+        
+        if (!variant.available) {
+            availabilityMsg.textContent = 'This combination is currently unavailable';
+            availabilityMsg.style.color = '#ff6b6b';
+            addButton.disabled = true;
+            addButton.textContent = 'Unavailable';
+        } else {
+            availabilityMsg.textContent = '';
+            addButton.disabled = false;
+            addButton.textContent = 'Add to Cart';
+        }
     }
 }
 
 // Add product to cart
-function addToCart(product) {
+function addToCart() {
     const container = document.getElementById('shopify-product-component');
     const variantId = container?.dataset.selectedVariantId;
+    const isAvailable = container?.dataset.selectedVariantAvailable === 'true';
 
     if (!variantId) {
         alert('Please select product options');
+        return;
+    }
+
+    if (!isAvailable) {
+        alert('This variant is currently unavailable');
         return;
     }
 
@@ -193,8 +233,12 @@ function addToCart(product) {
     button.disabled = true;
     button.textContent = 'Adding...';
 
-    // Create or fetch checkout
-    shopifyClient.checkout.create().then(checkout => {
+    // Ensure we have a checkout
+    const checkoutPromise = currentCheckout 
+        ? Promise.resolve(currentCheckout)
+        : shopifyClient.checkout.create();
+
+    checkoutPromise.then(checkout => {
         const lineItemsToAdd = [{
             variantId: variantId,
             quantity: 1
@@ -203,6 +247,7 @@ function addToCart(product) {
         return shopifyClient.checkout.addLineItems(checkout.id, lineItemsToAdd);
     }).then(checkout => {
         console.log('Added to cart, checkout:', checkout);
+        currentCheckout = checkout;
         
         // Redirect to Shopify checkout
         window.location.href = checkout.webUrl;
