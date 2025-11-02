@@ -33,10 +33,8 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 # Register Print Ordering Pricing Admin (Beta v0.1.0)
 from routes.pricing_admin import pricing_admin_bp
 from routes.setup_pricing import setup_pricing_bp
-from routes.download_images import download_bp
 app.register_blueprint(pricing_admin_bp)
 app.register_blueprint(setup_pricing_bp)
-app.register_blueprint(download_bp)
 
 # Initialize database if it doesn't exist
 def ensure_database_exists():
