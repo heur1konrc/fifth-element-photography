@@ -648,7 +648,18 @@ function showImageView() {
 }
 
 function openOrderWizard() {
-    // Redirect to Shopify preview URL for testing
-    const shopifyUrl = 'https://in9ogra9r7t0sy7m-73295331514.shopifypreview.com/products_preview?preview_key=5f54dc771c7e1f8f05cc89deae0621e6';
-    window.open(shopifyUrl, '_blank');
+    // Get the current image URL and title from the modal
+    const imageElement = document.getElementById('modalImage');
+    const titleElement = document.getElementById('modalTitle');
+    
+    if (imageElement && imageElement.src && titleElement) {
+        const imageUrl = imageElement.src;
+        const imageTitle = titleElement.textContent;
+        
+        // Open Shopify product modal
+        openShopifyProductModal(imageUrl, imageTitle);
+    } else {
+        console.error('No image selected');
+        alert('Please select an image first');
+    }
 }
