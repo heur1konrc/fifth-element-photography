@@ -33,8 +33,10 @@ app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 # Register Print Ordering Pricing Admin (Beta v0.1.0)
 from routes.pricing_admin import pricing_admin_bp
 from routes.setup_pricing import setup_pricing_bp
+from routes.download_images import download_bp
 app.register_blueprint(pricing_admin_bp)
 app.register_blueprint(setup_pricing_bp)
+app.register_blueprint(download_bp)
 
 # Initialize database if it doesn't exist
 def ensure_database_exists():
@@ -2444,6 +2446,45 @@ def save_orders(orders):
         json.dump(orders, f, indent=2)
 
 # REMOVED v2.0.0: All Lumaprints API routes removed (catalog, subcategories, options, check-image, categories, sizes, mapping)
+
+@app.route('/admin/download-image/<filename>')
+@require_admin_auth
+def download_image(filename):
+    """Download image - tries high-res first, falls back to web version"""
+    try:
+        from image_storage_manager import ImageStorageManager
+        storage_manager = ImageStorageManager()
+        
+        # Security check - ensure filename is safe
+        if not filename or '..' in filename or '/' in filename:
+            return "Invalid filename", 400
+        
+        # Try high-res version first
+        highres_path = storage_manager.get_highres_path(filename)
+        
+        if highres_path and os.path.exists(highres_path):
+            # Send high-res version
+            return send_from_directory(
+                os.path.dirname(highres_path), 
+                os.path.basename(highres_path), 
+                as_attachment=True,
+                download_name=filename
+            )
+        
+        # Fall back to web version from /data
+        web_path = os.path.join(IMAGES_FOLDER, filename)
+        if os.path.exists(web_path):
+            return send_from_directory(
+                IMAGES_FOLDER,
+                filename,
+                as_attachment=True,
+                download_name=filename
+            )
+        
+        return "Image file not found", 404
+        
+    except Exception as e:
+        return f"Error downloading image: {str(e)}", 500
 
 @app.route('/admin/download-highres/<filename>')
 @require_admin_auth
