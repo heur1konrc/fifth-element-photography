@@ -6,7 +6,7 @@
 const SHOPIFY_CONFIG = {
     domain: 'fifth-element-photography.myshopify.com',
     storefrontAccessToken: '9935a2ea27c8d72d164554a9f855f960',
-    apiVersion: '2025-10'
+    apiVersion: '2024-10'
 };
 
 // Product mapping: image filename -> Shopify product handle
