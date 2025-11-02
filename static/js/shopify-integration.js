@@ -256,6 +256,12 @@ function displayProductModal(product, imageTitle) {
     // Store product data
     window.currentProduct = product;
     window.selectedOptions = {};
+    
+    // Attach Add to Cart button event listener
+    const addToCartBtn = document.getElementById('add-to-cart-btn');
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', addToCart);
+    }
 }
 
 // Check which option values are available given current selections
