@@ -1,7 +1,7 @@
 /**
  * Shopify Storefront API Integration
- * Fifth Element Photography - v4.0.0
- * Using Storefront API directly with GraphQL (JS Buy SDK is deprecated)
+ * Fifth Element Photography - v4.1.0
+ * Badge-style variant selectors with availability checking
  */
 
 // Storefront API endpoint
@@ -185,15 +185,14 @@ function showLoadingModal(title) {
     document.body.style.overflow = 'hidden';
 }
 
-// Display product modal with variants
+// Display product modal with badge-style variant selectors
 function displayProductModal(product, imageTitle) {
     const container = document.getElementById('shopify-product-component');
     if (!container) return;
 
     const imageUrl = product.images.edges[0]?.node.url || '';
-    const firstVariant = product.variants.edges[0]?.node;
 
-    // Build product HTML
+    // Build product HTML with badge selectors
     let productHTML = `
         <div class="product-details">
             <div class="product-image">
@@ -203,26 +202,38 @@ function displayProductModal(product, imageTitle) {
                 <h3>${product.title}</h3>
                 <div class="product-description">${product.descriptionHtml || ''}</div>
                 <div class="product-price">
-                    <span class="price">$${formatPrice(firstVariant.price.amount)}</span>
+                    <span class="price" id="variant-price">Select options</span>
                 </div>
                 
                 <div class="product-options">
     `;
 
-    // Add variant selectors
-    product.options.forEach((option, index) => {
+    // Add badge-style variant selectors
+    product.options.forEach((option, optionIndex) => {
+        const isFirstOption = optionIndex === 0;
+        const badgeClass = isFirstOption ? 'option-badge-full' : 'option-badge-small';
+        
         productHTML += `
             <div class="option-group">
-                <label for="option-${index}">${option.name}:</label>
-                <select id="option-${index}" class="variant-select" data-option-index="${index}">
+                <label class="option-label">${option.name}:</label>
+                <div class="option-badges">
         `;
         
         option.values.forEach(value => {
-            productHTML += `<option value="${value}">${value}</option>`;
+            productHTML += `
+                <button 
+                    class="${badgeClass}" 
+                    data-option-index="${optionIndex}"
+                    data-option-value="${value}"
+                    onclick="selectOption(${optionIndex}, '${value}')"
+                >
+                    ${value}
+                </button>
+            `;
         });
         
         productHTML += `
-                </select>
+                </div>
             </div>
         `;
     });
@@ -233,7 +244,7 @@ function displayProductModal(product, imageTitle) {
                 <div id="availability-message" class="availability-message"></div>
                 
                 <div class="product-actions">
-                    <button id="add-to-cart-btn" class="add-to-cart-button">Add to Cart</button>
+                    <button id="add-to-cart-btn" class="add-to-cart-button" disabled>Add to Cart</button>
                 </div>
             </div>
         </div>
@@ -243,54 +254,64 @@ function displayProductModal(product, imageTitle) {
     container.classList.remove('shopify-loading');
 
     // Store product data
-    container.dataset.productData = JSON.stringify(product);
-
-    // Add event listeners for variant selection
-    const selects = container.querySelectorAll('.variant-select');
-    selects.forEach(select => {
-        select.addEventListener('change', () => updateSelectedVariant());
-    });
-
-    // Add to cart button handler
-    document.getElementById('add-to-cart-btn').addEventListener('click', () => {
-        addToCart();
-    });
-
-    // Initialize with first variant selected
-    updateSelectedVariant();
+    window.currentProduct = product;
+    window.selectedOptions = {};
 }
 
-// Update selected variant based on option selections
-function updateSelectedVariant() {
-    const container = document.getElementById('shopify-product-component');
-    if (!container) return;
+// Select an option value
+function selectOption(optionIndex, value) {
+    // Update selected options
+    window.selectedOptions[optionIndex] = value;
+    
+    // Update UI - highlight selected badge
+    const badges = document.querySelectorAll(`[data-option-index="${optionIndex}"]`);
+    badges.forEach(badge => {
+        if (badge.dataset.optionValue === value) {
+            badge.classList.add('selected');
+        } else {
+            badge.classList.remove('selected');
+        }
+    });
+    
+    // Check if all options are selected
+    const allOptionsSelected = Object.keys(window.selectedOptions).length === window.currentProduct.options.length;
+    
+    if (allOptionsSelected) {
+        updateVariantAvailability();
+    } else {
+        // Reset price and disable button
+        document.getElementById('variant-price').textContent = 'Select all options';
+        document.getElementById('add-to-cart-btn').disabled = true;
+    }
+}
 
-    const product = JSON.parse(container.dataset.productData);
-    const selects = container.querySelectorAll('.variant-select');
-    const selectedOptions = Array.from(selects).map(select => select.value);
-
+// Update variant availability and price
+function updateVariantAvailability() {
+    const product = window.currentProduct;
+    const selectedOptions = window.selectedOptions;
+    
+    // Build selected options array in order
+    const selectedValues = product.options.map((opt, idx) => selectedOptions[idx]);
+    
     // Find matching variant
     const variant = product.variants.edges.find(edge => {
         return edge.node.selectedOptions.every((option, index) => {
-            return option.value === selectedOptions[index];
+            return option.value === selectedValues[index];
         });
     })?.node;
 
+    const priceEl = document.getElementById('variant-price');
+    const availabilityMsg = document.getElementById('availability-message');
+    const addButton = document.getElementById('add-to-cart-btn');
+    
     if (variant) {
         // Update price
-        const priceEl = container.querySelector('.price');
-        if (priceEl) {
-            priceEl.textContent = `$${formatPrice(variant.price.amount)}`;
-        }
-
-        // Store selected variant
-        container.dataset.selectedVariantId = variant.id;
-        container.dataset.selectedVariantAvailable = variant.availableForSale;
-
-        // Update availability message and button
-        const availabilityMsg = document.getElementById('availability-message');
-        const addButton = document.getElementById('add-to-cart-btn');
+        priceEl.textContent = `$${formatPrice(variant.price.amount)}`;
         
+        // Store selected variant
+        window.selectedVariantId = variant.id;
+        
+        // Update availability message and button
         if (!variant.availableForSale) {
             availabilityMsg.textContent = 'This combination is currently unavailable';
             availabilityMsg.style.color = '#ff6b6b';
@@ -301,22 +322,18 @@ function updateSelectedVariant() {
             addButton.disabled = false;
             addButton.textContent = 'Add to Cart';
         }
+    } else {
+        priceEl.textContent = 'Combination not available';
+        addButton.disabled = true;
     }
 }
 
 // Add product to cart
 function addToCart() {
-    const container = document.getElementById('shopify-product-component');
-    const variantId = container?.dataset.selectedVariantId;
-    const isAvailable = container?.dataset.selectedVariantAvailable === 'true';
+    const variantId = window.selectedVariantId;
 
     if (!variantId) {
-        alert('Please select product options');
-        return;
-    }
-
-    if (!isAvailable) {
-        alert('This variant is currently unavailable');
+        alert('Please select all product options');
         return;
     }
 
@@ -347,6 +364,11 @@ function closeShopifyModal() {
         modal.remove();
         document.body.style.overflow = 'auto';
     }
+    
+    // Clean up global state
+    window.currentProduct = null;
+    window.selectedOptions = {};
+    window.selectedVariantId = null;
 }
 
 console.log('Shopify Storefront API integration loaded');

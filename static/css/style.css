@@ -2090,6 +2090,72 @@ textarea {
 }
 
 .option-group {
+    margin-bottom: 25px;
+}
+
+.option-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.option-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.option-badge-full,
+.option-badge-small {
+    background: #2a2a2a;
+    border: 2px solid #444;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.option-badge-full {
+    flex: 1 1 100%;
+    min-width: 100%;
+}
+
+.option-badge-small {
+    flex: 0 0 auto;
+    min-width: 80px;
+}
+
+.option-badge-full:hover,
+.option-badge-small:hover {
+    background: #333;
+    border-color: #4a90e2;
+}
+
+.option-badge-full.selected,
+.option-badge-small.selected {
+    background: #4a90e2;
+    border-color: #4a90e2;
+    color: #fff;
+}
+
+.option-badge-full:disabled,
+.option-badge-small:disabled {
+    background: #1a1a1a;
+    border-color: #333;
+    color: #666;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.option-group {
     margin-bottom: 20px;
 }
 
