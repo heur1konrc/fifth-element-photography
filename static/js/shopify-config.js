@@ -11,7 +11,7 @@ const SHOPIFY_CONFIG = {
 
 // Product mapping: image filename -> Shopify product handle
 const PRODUCT_MAPPING = {
-    'File_000.png': 'lily-of-the-valley',
+    'File_000.png': 'test-print-of-capital-paper-and-canva-combined',
     // Add more mappings as products are created in Shopify
 };
 
