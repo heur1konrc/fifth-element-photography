@@ -1,12 +1,20 @@
 """
 Fifth Element Photography - Main Application
 ==============================================
-Version: v2.0.0
-Date: 2025-10-27
-Description: Photography gallery with admin tools (print ordering removed)
+Version: v2.1.0
+Date: 2025-11-01
+Description: Photography gallery with Shopify e-commerce integration
 
 CHANGELOG:
 ----------
+v2.1.0 (2025-11-01):
+  - ADDED: Shopify Buy Button integration for seamless ordering
+  - ADDED: Modal-based product selection on fifthelement.photos
+  - ADDED: Individual image download functionality in admin
+  - IMPROVED: Users can order prints without leaving the main site
+  - IMPROVED: Product options (substrate, size) embedded in site modal
+  - Backup: fifth-element-photography_backup_shopify_integration_20251101_235239
+
 v2.0.0 (2025-10-27):
   - REMOVED: All print ordering functionality
   - REMOVED: Pricing database and API routes
@@ -35,13 +43,16 @@ ROUTES:
 - /admin/images : Image management
 - /admin/galleries : Gallery management  
 - /admin/settings : Site settings
-- (All /order and /pricing routes removed in v2.0.0)
+- /admin/download-image/<filename> : Download individual images (NEW in v2.1.0)
 
-FILES REMOVED IN v2.0.0:
-------------------------
-See REMOVAL_LOG_20251027.md for complete list
+SHOPIFY INTEGRATION (v2.1.0):
+-----------------------------
+- Store: fifth-element-photography.myshopify.com
+- Products mapped to gallery images
+- Fulfillment via Lumaprints
+- Checkout handled by Shopify
 """
 
-__version__ = "2.0.0"
-__date__ = "2025-10-27"
+__version__ = "2.1.0"
+__date__ = "2025-11-01"
 
