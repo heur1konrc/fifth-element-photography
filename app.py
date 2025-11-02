@@ -2513,55 +2513,6 @@ def download_highres_image(filename):
     except Exception as e:
         return f"Error downloading high-res file: {str(e)}", 500
 
-@app.route('/admin/download-all-images')
-@require_admin_auth
-def download_all_images():
-    """Download all images as a tar.gz file"""
-    try:
-        import tarfile
-        from io import BytesIO
-        from datetime import datetime
-        
-        # Create an in-memory bytes buffer for the tar.gz file
-        memory_file = BytesIO()
-        
-        # Create the tar.gz file
-        with tarfile.open(fileobj=memory_file, mode='w:gz') as tar:
-            # Add all images from /data
-            if os.path.exists(IMAGES_FOLDER):
-                for filename in os.listdir(IMAGES_FOLDER):
-                    if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp')):
-                        file_path = os.path.join(IMAGES_FOLDER, filename)
-                        if os.path.isfile(file_path):
-                            tar.add(file_path, arcname=f"web/{filename}")
-            
-            # Add all high-res originals from /data/originals if they exist
-            highres_dir = '/data/originals'
-            if os.path.exists(highres_dir):
-                for filename in os.listdir(highres_dir):
-                    if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp')):
-                        file_path = os.path.join(highres_dir, filename)
-                        if os.path.isfile(file_path):
-                            tar.add(file_path, arcname=f"originals/{filename}")
-        
-        # Seek to the beginning of the BytesIO buffer
-        memory_file.seek(0)
-        
-        # Generate filename with timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        filename = f'fifth_element_all_images_{timestamp}.tar.gz'
-        
-        # Send the file
-        return send_file(
-            memory_file,
-            mimetype='application/gzip',
-            as_attachment=True,
-            download_name=filename
-        )
-        
-    except Exception as e:
-        return f"Error creating bulk download: {str(e)}", 500
-
 @app.route('/api/image-storage-info')
 def get_image_storage_info():
     """Get storage information for all images"""
