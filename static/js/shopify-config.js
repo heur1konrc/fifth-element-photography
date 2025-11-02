@@ -12,6 +12,7 @@ const SHOPIFY_CONFIG = {
 // Product mapping: image filename -> Shopify product handle
 const PRODUCT_MAPPING = {
     'File_000.png': 'test-print-of-capital-paper-and-canva-combined',
+    'YaharaGC_Final_Round_2025.jpg': 'fine-art-paper-yahara-golf-course-the-final-round',
     // Add more mappings as products are created in Shopify
 };
 
