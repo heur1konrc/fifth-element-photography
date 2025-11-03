@@ -427,15 +427,25 @@ textarea {
     background-color: rgba(0, 0, 255, 0.9);
 }
 
+/* When modal is shown, use flexbox for centering */
+.modal[style*="display: block"],
+.modal[style*="display:block"] {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
 .modal-content {
     position: relative;
-    margin: auto;
+    margin: 2.5vh auto;
     padding: 10px;
     width: 95vw;
-    max-width: 95vw; max-height: 60vw;
-    top: 50%; aspect-ratio: 3/2;
-    transform: translateY(-50%);
+    max-width: 95vw;
+    max-height: 95vh;
+    aspect-ratio: 3/2;
     text-align: center;
+    /* Remove transform centering to prevent top cutoff */
+    overflow: auto;
 }
 
 .close {
