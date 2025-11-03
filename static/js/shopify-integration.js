@@ -202,7 +202,7 @@ function displayProductModal(product, imageTitle) {
                 <h3>${product.title}</h3>
                 <div class="product-description">${product.descriptionHtml || ''}</div>
                 <div class="product-price">
-                    <span class="price" id="variant-price">Select options</span>
+                    <span class="price" id="variant-price">Select a size</span>
                 </div>
                 
                 <div class="product-options">
@@ -378,7 +378,7 @@ function selectOption(optionIndex, value) {
         updateVariantAvailability();
     } else {
         // Reset price and disable button
-        document.getElementById('variant-price').textContent = 'Select all options';
+        document.getElementById('variant-price').textContent = 'Select a size';
         document.getElementById('add-to-cart-btn').disabled = true;
         document.getElementById('availability-message').textContent = '';
     }
