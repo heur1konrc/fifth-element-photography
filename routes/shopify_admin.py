@@ -12,7 +12,14 @@ shopify_admin_bp = Blueprint('shopify_admin', __name__, url_prefix='/admin')
 
 def get_db_path():
     """Get the database path"""
-    return os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'lumaprints_pricing.db')
+    # Use /data for production (Railway persistent volume), fall back to local data/ directory
+    prod_path = '/data/lumaprints_pricing.db'
+    local_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'lumaprints_pricing.db')
+    
+    # Check if we're in production (Railway) by checking if /data exists
+    if os.path.exists('/data'):
+        return prod_path
+    return local_path
 
 def login_required(f):
     """Decorator to require login for admin routes"""
@@ -21,7 +28,7 @@ def login_required(f):
         from flask import session
         if not session.get('logged_in'):
             flash('Please log in to access this page.', 'error')
-            return redirect(url_for('login'))
+            return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
     return decorated_function
 
