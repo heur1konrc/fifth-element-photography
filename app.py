@@ -670,9 +670,19 @@ def index():
                 hero_image = image
                 break
     
-    # Serve same template to all devices (mobile detection disabled)
-    # Mobile and desktop now use the same Shopify integration
-    return render_template('index.html', 
+    # Mobile detection - serve different template based on device
+    if is_mobile_device():
+        return render_template('mobile_new.html', 
+                             images=images, 
+                             categories=categories,
+                             category_counts=category_counts,
+                             featured_image=featured_image,
+                             featured_exif=featured_exif,
+                             about_data=about_data,
+                             hero_image=hero_image)
+    else:
+        # Desktop users get the original template (unchanged)
+        return render_template('index.html', 
                              images=images, 
                              categories=categories,
                              category_counts=category_counts,
