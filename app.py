@@ -4151,3 +4151,45 @@ def get_image_exif(filename):
         }), 500
 
 # Dynamic order form route
+
+
+# Database Migration Routes
+@app.route('/db-migration')
+def db_migration_page():
+    """Database migration page"""
+    return render_template('db_migration.html')
+
+@app.route('/api/migrate-shopify-table', methods=['POST'])
+def migrate_shopify_table():
+    """Create shopify_mappings table"""
+    try:
+        db_path = '/data/lumaprints_pricing.db'
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Check if table exists
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='shopify_mappings'")
+        if cursor.fetchone():
+            conn.close()
+            return jsonify({'success': True, 'message': 'Table already exists'})
+        
+        # Create table
+        cursor.execute('''
+            CREATE TABLE shopify_mappings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                image_filename TEXT UNIQUE NOT NULL,
+                shopify_product_handle TEXT,
+                order_prints_enabled INTEGER DEFAULT 0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True, 'message': 'Table created successfully'})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
