@@ -253,11 +253,25 @@ def require_admin_auth(f):
 def is_mobile_device():
     """Detect if the request is from a mobile device"""
     user_agent = request.headers.get('User-Agent', '').lower()
-    mobile_keywords = [
-        'mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 
-        'windows phone', 'opera mini', 'iemobile', 'webos', 'palm'
+    
+    # Exclude desktop browsers explicitly
+    if 'windows nt' in user_agent or 'macintosh' in user_agent or 'linux x86_64' in user_agent:
+        return False
+    
+    # Check for mobile-specific patterns
+    mobile_patterns = [
+        'android.*mobile',  # Android phones (not tablets)
+        'iphone',
+        'ipod',
+        'blackberry',
+        'windows phone',
+        'opera mini',
+        'iemobile',
+        'mobile.*safari'  # Mobile Safari
     ]
-    return any(keyword in user_agent for keyword in mobile_keywords)
+    
+    import re
+    return any(re.search(pattern, user_agent) for pattern in mobile_patterns)
 
 # Template filter for exposure time conversion
 @app.template_filter('exposure_fraction')
