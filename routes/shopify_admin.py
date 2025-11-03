@@ -156,3 +156,17 @@ def get_all_mappings():
     
     return jsonify({'success': True, 'mappings': mappings})
 
+
+
+
+@shopify_admin_bp.route('/image/<filename>')
+def serve_image(filename):
+    """Serve image from /data directory"""
+    from flask import send_from_directory
+    # Check /data first (Railway), then static/images (local)
+    if os.path.exists('/data'):
+        return send_from_directory('/data', filename)
+    else:
+        images_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'images')
+        return send_from_directory(images_dir, filename)
+
