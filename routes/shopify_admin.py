@@ -36,8 +36,8 @@ def login_required(f):
 # @login_required  # Temporarily disabled for testing
 def shopify_mapping():
     """Shopify product mapping management page"""
-    # Get all images from static/images directory
-    images_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'images')
+    # Get all images - check /data first (Railway), then static/images (local)
+    images_dir = '/data' if os.path.exists('/data') else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'images')
     image_files = []
     
     if os.path.exists(images_dir):
@@ -46,13 +46,17 @@ def shopify_mapping():
                 image_files.append(filename)
     
     # Get existing mappings from database
-    conn = sqlite3.connect(get_db_path())
-    conn.row_factory = sqlite3.Row
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT * FROM shopify_mappings')
-    mappings_rows = cursor.fetchall()
-    conn.close()
+    try:
+        conn = sqlite3.connect(get_db_path())
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT * FROM shopify_mappings')
+        mappings_rows = cursor.fetchall()
+        conn.close()
+    except sqlite3.OperationalError:
+        # Table doesn't exist yet
+        mappings_rows = []
     
     # Convert to dict for easier lookup
     mappings = {row['image_filename']: dict(row) for row in mappings_rows}
