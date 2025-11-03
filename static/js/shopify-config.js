@@ -9,12 +9,25 @@ const SHOPIFY_CONFIG = {
     apiVersion: '2024-10'
 };
 
-// Product mapping: image filename -> Shopify product handle
-const PRODUCT_MAPPING = {
-    'File_000.png': 'test-print-of-capital-paper-and-canva-combined',
-    'YaharaGC_Final_Round_2025.jpg': 'fine-art-paper-yahara-golf-course-the-final-round',
-    // Add more mappings as products are created in Shopify
-};
+// Product mapping cache (loaded from database)
+let PRODUCT_MAPPING = {};
+
+// Load product mappings from database
+async function loadProductMappings() {
+    try {
+        const response = await fetch('/admin/api/shopify-mapping/all');
+        const data = await response.json();
+        if (data.success) {
+            PRODUCT_MAPPING = data.mappings;
+            console.log('Shopify product mappings loaded:', PRODUCT_MAPPING);
+        }
+    } catch (error) {
+        console.error('Error loading Shopify product mappings:', error);
+    }
+}
+
+// Initialize mappings on page load
+loadProductMappings();
 
 // Get Shopify product handle for an image
 function getProductHandle(imageFilename) {
