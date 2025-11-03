@@ -182,52 +182,81 @@
         align-items: flex-start;
     }
     
-    .shopify-product-layout {
+    .product-details {
         flex-direction: column !important;
-        gap: 15px !important;
+        gap: 0 !important;
     }
     
-    .shopify-product-image {
+    .product-image {
+        width: 100% !important;
         max-width: 100% !important;
-        max-height: 300px !important;
+        padding: 15px !important;
+    }
+    
+    .product-image img {
+        max-width: 100% !important;
+        max-height: 250px !important;
         width: auto !important;
+        height: auto !important;
         margin: 0 auto !important;
+        display: block !important;
+        object-fit: contain !important;
+    }
+    
+    .product-info {
+        width: 100% !important;
+        padding: 15px !important;
+    }
+    
+    .product-info h3 {
+        font-size: 18px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .product-description {
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .product-price {
+        font-size: 16px !important;
+        margin-bottom: 15px !important;
+    }
+    
+    .option-group {
+        margin-bottom: 15px !important;
+    }
+    
+    .option-label {
+        font-size: 14px !important;
+        margin-bottom: 8px !important;
         display: block !important;
     }
     
-    .shopify-product-details {
-        width: 100% !important;
-        padding: 0 !important;
+    .option-badges {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
     }
     
-    .shopify-product-title {
-        font-size: 20px !important;
+    .option-badge-full,
+    .option-badge-small {
+        font-size: 13px !important;
+        padding: 10px 14px !important;
+        min-width: auto !important;
     }
     
-    .shopify-product-description {
-        font-size: 14px !important;
-        line-height: 1.5 !important;
-    }
-    
-    .shopify-variant-selector {
-        margin: 15px 0 !important;
-    }
-    
-    .shopify-variant-option {
-        font-size: 14px !important;
-        padding: 10px 15px !important;
-        min-width: 60px !important;
-    }
-    
-    .shopify-add-to-cart-btn {
+    .add-to-cart-button {
         font-size: 16px !important;
         padding: 14px !important;
-        margin-top: 20px !important;
+        width: 100% !important;
+        margin-top: 15px !important;
     }
     
-    .shopify-option-label {
-        font-size: 14px !important;
-        margin-bottom: 10px !important;
+    .availability-message {
+        font-size: 13px !important;
+        margin: 10px 0 !important;
     }
 }
 
