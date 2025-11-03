@@ -220,8 +220,13 @@
     }
     
     .product-price {
-        font-size: 16px !important;
         margin-bottom: 15px !important;
+    }
+    
+    .product-price .price {
+        font-size: 24px !important;
+        font-weight: bold !important;
+        color: #4a90e2 !important;
     }
     
     .option-group {
