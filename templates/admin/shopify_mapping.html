@@ -30,22 +30,44 @@
             opacity: 0.9;
         }
         
-        .back-link {
-            display: inline-block;
-            color: white;
-            text-decoration: none;
+        .nav-links {
+            display: flex;
+            gap: 15px;
             margin-bottom: 20px;
-            font-size: 1.1em;
         }
         
-        .back-link:hover {
-            text-decoration: underline;
+        .nav-link {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .nav-link.back {
+            background: #667eea;
+            color: white;
+        }
+        
+        .nav-link.back:hover {
+            background: #5568d3;
+        }
+        
+        .nav-link.website {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .nav-link.website:hover {
+            background: #45a049;
         }
         
         .mappings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
             margin-top: 20px;
         }
         
@@ -64,13 +86,13 @@
         
         .mapping-card-image {
             width: 100%;
-            height: 200px;
+            height: 140px;
             object-fit: cover;
             background: #f5f5f5;
         }
         
         .mapping-card-content {
-            padding: 20px;
+            padding: 15px;
         }
         
         .mapping-card-filename {
@@ -235,7 +257,10 @@
 </head>
 <body>
     <div class="shopify-mapping-container">
-        <a href="{{ url_for('admin') }}" class="back-link">← Back to Admin</a>
+        <div class="nav-links">
+            <a href="{{ url_for('admin') }}" class="nav-link back">← Back to Admin</a>
+            <a href="{{ url_for('index') }}" class="nav-link website" target="_blank">🌐 Go to Website</a>
+        </div>
         
         <div class="page-header">
             <h1>🛍️ Shopify Product Mapping</h1>

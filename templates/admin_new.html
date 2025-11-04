@@ -114,7 +114,7 @@
             <h2 id="#"></h2>
             <section class="portfolio-section">
                 <div class="section-header">
-                    <h2 class="section-title">Current Portfolio ({{ images|length }} images)</h2>
+                    <h2 class="section-title">Current Portfolio ({{ total_images }} images{% if total_pages > 1 %} - Page {{ page }} of {{ total_pages }}{% endif %})</h2>
                     <div class="section-actions">
                         <button class="btn btn-primary" onclick="openUploadModal()">
                             <i class="fas fa-plus"></i>
@@ -151,6 +151,23 @@
                     </div>
                 </div>
 
+                <!-- Pagination Controls -->
+                {% if total_pages > 1 %}
+                <div class="pagination-controls" style="margin: 20px 0; display: flex; justify-content: center; align-items: center; gap: 10px;">
+                    {% if page > 1 %}
+                        <a href="?page=1" class="btn btn-small btn-secondary"><i class="fas fa-angle-double-left"></i> First</a>
+                        <a href="?page={{ page - 1 }}" class="btn btn-small btn-secondary"><i class="fas fa-angle-left"></i> Previous</a>
+                    {% endif %}
+                    
+                    <span style="padding: 0 15px; color: #fff; font-weight: 500;">Page {{ page }} of {{ total_pages }}</span>
+                    
+                    {% if page < total_pages %}
+                        <a href="?page={{ page + 1 }}" class="btn btn-small btn-secondary">Next <i class="fas fa-angle-right"></i></a>
+                        <a href="?page={{ total_pages }}" class="btn btn-small btn-secondary">Last <i class="fas fa-angle-double-right"></i></a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
                 <!-- Bulk Actions Bar -->
                 <div class="bulk-actions-bar">
                     <div class="selection-controls">
@@ -272,6 +289,23 @@
                             </div>
                         {% endfor %}
                     </div>
+                    
+                    <!-- Pagination Controls (Bottom) -->
+                    {% if total_pages > 1 %}
+                    <div class="pagination-controls" style="margin: 30px 0; display: flex; justify-content: center; align-items: center; gap: 10px;">
+                        {% if page > 1 %}
+                            <a href="?page=1" class="btn btn-small btn-secondary"><i class="fas fa-angle-double-left"></i> First</a>
+                            <a href="?page={{ page - 1 }}" class="btn btn-small btn-secondary"><i class="fas fa-angle-left"></i> Previous</a>
+                        {% endif %}
+                        
+                        <span style="padding: 0 15px; color: #fff; font-weight: 500;">Page {{ page }} of {{ total_pages }}</span>
+                        
+                        {% if page < total_pages %}
+                            <a href="?page={{ page + 1 }}" class="btn btn-small btn-secondary">Next <i class="fas fa-angle-right"></i></a>
+                            <a href="?page={{ total_pages }}" class="btn btn-small btn-secondary">Last <i class="fas fa-angle-double-right"></i></a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 {% else %}
                     <div class="empty-state">
                         <div class="empty-icon">

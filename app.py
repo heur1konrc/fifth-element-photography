@@ -1113,6 +1113,10 @@ def admin_change_password():
 def admin():
     """Admin panel for image management"""
     try:
+        # Pagination parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 24, type=int)  # 24 images per page
+        
         images = scan_images()
         all_categories = sorted(load_categories())
         about_data = load_about_data()
@@ -1126,8 +1130,24 @@ def admin():
                 if image["filename"] == hero_image_data["filename"]:
                     hero_image = image
                     break
-        return render_template('admin_new.html', images=images, all_categories=all_categories, about_data=about_data,
-                             hero_image=hero_image)
+        
+        # Calculate pagination
+        total_images = len(images)
+        total_pages = (total_images + per_page - 1) // per_page  # Ceiling division
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        paginated_images = images[start_idx:end_idx]
+        
+        return render_template('admin_new.html', 
+                             images=paginated_images,
+                             all_images=images,  # For stats
+                             all_categories=all_categories, 
+                             about_data=about_data,
+                             hero_image=hero_image,
+                             page=page,
+                             per_page=per_page,
+                             total_pages=total_pages,
+                             total_images=total_images)
     except Exception as e:
         return f"Admin Error: {str(e)}", 500
 
@@ -1430,13 +1450,13 @@ def manage_categories():
             if new_category and new_category not in categories:
                 categories.append(new_category)
                 if save_categories(categories):
-                    flash(f'Category "{new_category}" added successfully!')
+                    return jsonify({'success': True, 'message': f'Category "{new_category}" added successfully!', 'categories': sorted(load_categories())})
                 else:
-                    flash('Error saving category')
+                    return jsonify({'success': False, 'message': 'Error saving category'}), 500
             elif new_category in categories:
-                flash('Category already exists')
+                return jsonify({'success': False, 'message': 'Category already exists'}), 400
             else:
-                flash('Please enter a category name')
+                return jsonify({'success': False, 'message': 'Please enter a category name'}), 400
         
         elif action == 'delete':
             category_to_delete = request.form.get('category_to_delete')
@@ -1454,15 +1474,15 @@ def manage_categories():
                         updated_count += 1
                 
                 save_image_categories(image_categories)
-                flash(f'Category "{category_to_delete}" deleted. {updated_count} images moved to "other" category.')
+                return jsonify({'success': True, 'message': f'Category "{category_to_delete}" deleted. {updated_count} images moved to "other" category.', 'categories': sorted(load_categories())})
             else:
-                flash('Please select a valid category to delete')
+                return jsonify({'success': False, 'message': 'Please select a valid category to delete'}), 400
         
-        return redirect(url_for('manage_categories'))
+        return jsonify({'success': False, 'message': 'Invalid action'}), 400
     
-    # GET request - show categories management page
+    # GET request - return categories as JSON
     categories = sorted(load_categories())
-    return render_template('admin_categories.html', categories=categories)
+    return jsonify({'categories': categories})
 
 @app.route('/admin/assign_category/<filename>', methods=['POST'])
 @require_admin_auth
