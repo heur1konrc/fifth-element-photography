@@ -1036,3 +1036,100 @@ function randomizePortfolio() {
     });
 }
 
+
+
+
+// Category Management Functions
+async function addCategory(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    try {
+        const response = await fetch('/admin/categories', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert(data.message, 'success');
+            form.reset();
+            await refreshCategoryModal();
+            refreshCategoryButtons(data.categories);
+        } else {
+            showAlert(data.message, 'error');
+        }
+    } catch (error) {
+        showAlert('Error adding category: ' + error.message, 'error');
+    }
+}
+
+async function deleteCategory(event, categoryName) {
+    event.preventDefault();
+    
+    if (!confirm(`Are you sure? Images in "${categoryName}" will be moved to Other category.`)) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('action', 'delete');
+    formData.append('category_to_delete', categoryName);
+    
+    try {
+        const response = await fetch('/admin/categories', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert(data.message, 'success');
+            await refreshCategoryModal();
+            refreshCategoryButtons(data.categories);
+        } else {
+            showAlert(data.message, 'error');
+        }
+    } catch (error) {
+        showAlert('Error deleting category: ' + error.message, 'error');
+    }
+}
+
+async function refreshCategoryModal() {
+    try {
+        const response = await fetch('/admin/categories');
+        const data = await response.json();
+        
+        // Rebuild category list in modal
+        const categoryList = document.querySelector('.category-list');
+        if (categoryList && data.categories) {
+            categoryList.innerHTML = data.categories.map(category => `
+                <div class="category-item">
+                    <span class="category-name">${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+                    <span class="category-count">- images</span>
+                    ${category !== 'other' ? `
+                        <button type="button" class="btn btn-small btn-danger" onclick="deleteCategory(event, '${category}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Error refreshing category modal:', error);
+    }
+}
+
+function refreshCategoryButtons(categories) {
+    const categoryButtonsContainer = document.querySelector('.category-buttons');
+    if (categoryButtonsContainer && categories) {
+        categoryButtonsContainer.innerHTML = categories.sort().map(category => `
+            <button class="category-btn" data-category="${category}" onclick="assignCategoryToSelected('${category}')">
+                ${category.charAt(0).toUpperCase() + category.slice(1)}
+            </button>
+        `).join('');
+    }
+}
+

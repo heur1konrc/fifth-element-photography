@@ -498,7 +498,7 @@
                     <!-- Add Category -->
                     <div class="category-form">
                         <h4>Add New Category</h4>
-                        <form action="{{ url_for('manage_categories') }}" method="post">
+                        <form onsubmit="addCategory(event)">
                             <input type="hidden" name="action" value="add">
                             <div class="form-group">
                                 <input type="text" name="category_name" placeholder="Category name (e.g., Nature and Flora)" required>
@@ -517,13 +517,9 @@
                                     <span class="category-name">{{ category.title() }}</span>
                                     <span class="category-count">{{ count }} images</span>
                                     {% if category != 'other' %}
-                                        <form action="{{ url_for('manage_categories') }}" method="post" style="display: inline;">
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="category_to_delete" value="{{ category }}">
-                                            <button type="submit" class="btn btn-small btn-danger" onclick="return confirm('Are you sure? Images will be moved to Other category.')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-small btn-danger" onclick="deleteCategory(event, '{{ category }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     {% endif %}
                                 </div>
                             {% endfor %}

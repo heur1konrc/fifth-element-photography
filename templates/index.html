@@ -89,25 +89,9 @@
                         <p class="gallery-subtitle">Click any image to view details and order prints</p>
                         <div class="category-filters">
                             <a href="#" class="category-link active" data-category="all">ALL</a>
-                            
-                            <a href="#" class="category-link" data-category="portrait">PORTRAIT</a>
-                            
-                            <a href="#" class="category-link" data-category="landscape">LANDSCAPE</a>
-                            
-                            <a href="#" class="category-link" data-category="wildlife">WILDLIFE</a>
-                            
-                            <a href="#" class="category-link" data-category="wedding">WEDDING</a>
-                            
-                            <a href="#" class="category-link" data-category="commercial">COMMERCIAL</a>
-                            
-                            <a href="#" class="category-link" data-category="street">STREET</a>
-                            
-                            <a href="#" class="category-link" data-category="other">OTHER</a>
-                            
-                            <a href="#" class="category-link" data-category="birds">BIRDS</a>
-                            
-                            <a href="#" class="category-link" data-category="testing manus">TESTING MANUS</a>
-                            
+                            {% for category in categories|sort %}
+                            <a href="#" class="category-link" data-category="{{ category }}">{{ category.upper() }}</a>
+                            {% endfor %}
                         </div>
                         <div class="image-count" id="imageCount">Loading...</div>
                     </div>
