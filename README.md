@@ -127,10 +127,14 @@ The application uses Railway for production deployment with automatic builds tri
 - **v1.1**: Base functionality with desktop interface
 - **v1.2**: Mobile improvements with carousel and modal redesign
 - **v1.3**: Data synchronization and alphabetical sorting
-- **v1.4**: Desktop order system fix and unified ordering (Current)
+- **v1.4**: Desktop order system fix and unified ordering
+- **v2.0.0**: Shopify integration and Lumaprints removal
+- **v2.0.1**: Category management fixes, pagination, and UI improvements (Current)
 
 ---
 
-*Last Updated: October 17, 2024*
-*Desktop Order System: Fixed ✅*
-*Mobile Phase: Complete ✅*
+*Last Updated: November 3, 2024*
+*Current Version: v2.0.1*
+*Shopify Integration: Complete ✅*
+*Category Management: Fixed ✅*
+*Admin Pagination: Added ✅*
