@@ -187,7 +187,7 @@
                         
                         <div class="featured-story-section">
                             <h4>The Story Behind this Image</h4>
-                            <p>This was taken with the Canon R8 and a Sigma 100-600mm Contemporary lens. </p>
+                            <p>{{ featured_image.story if featured_image and featured_image.story else 'No story available for this image.' }}</p>
                         </div>
                         
                     
