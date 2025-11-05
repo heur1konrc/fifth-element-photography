@@ -129,32 +129,46 @@
                             </div>
                             
                             <!-- EXIF Data - Horizontal Layout Below Image -->
+                            {% if featured_exif %}
                             <div class="featured-exif-horizontal">
+                                {% if featured_exif.model %}
                                 <div class="exif-item">
                                     <span class="exif-label">Model:</span>
-                                    <span class="exif-value">Canon EOS R8</span>
+                                    <span class="exif-value">{{ featured_exif.model }}</span>
                                 </div>
+                                {% endif %}
+                                {% if featured_exif.lens %}
                                 <div class="exif-item">
                                     <span class="exif-label">Lens:</span>
-                                    <span class="exif-value">150-600mm F5-6.3 DG OS HSM | Sports 014</span>
+                                    <span class="exif-value">{{ featured_exif.lens }}</span>
                                 </div>
+                                {% endif %}
+                                {% if featured_exif.aperture %}
                                 <div class="exif-item">
                                     <span class="exif-label">Aperture:</span>
-                                    <span class="exif-value">f/8.0</span>
+                                    <span class="exif-value">{{ featured_exif.aperture }}</span>
                                 </div>
+                                {% endif %}
+                                {% if featured_exif.shutter_speed %}
                                 <div class="exif-item">
                                     <span class="exif-label">Shutter Speed:</span>
-                                    <span class="exif-value">1/2000s</span>
+                                    <span class="exif-value">{{ featured_exif.shutter_speed }}</span>
                                 </div>
+                                {% endif %}
+                                {% if featured_exif.iso %}
                                 <div class="exif-item">
                                     <span class="exif-label">ISO:</span>
-                                    <span class="exif-value">1000</span>
+                                    <span class="exif-value">{{ featured_exif.iso }}</span>
                                 </div>
+                                {% endif %}
+                                {% if featured_exif.focal_length %}
                                 <div class="exif-item">
                                     <span class="exif-label">Focal Length:</span>
-                                    <span class="exif-value">600mm</span>
+                                    <span class="exif-value">{{ featured_exif.focal_length }}</span>
                                 </div>
+                                {% endif %}
                             </div>
+                            {% endif %}
                             
                             <!-- Action Buttons -->
                             <div class="image-actions">
