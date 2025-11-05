@@ -129,12 +129,15 @@ The application uses Railway for production deployment with automatic builds tri
 - **v1.3**: Data synchronization and alphabetical sorting
 - **v1.4**: Desktop order system fix and unified ordering
 - **v2.0.0**: Shopify integration and Lumaprints removal
-- **v2.0.1**: Category management fixes, pagination, and UI improvements (Current)
+- **v2.0.1**: Category management fixes, pagination, and UI improvements
+- **v2.0.2**: EXIF data and story fixes, shipping configuration (Current)
 
 ---
 
-*Last Updated: November 3, 2024*
-*Current Version: v2.0.1*
+*Last Updated: November 5, 2024*
+*Current Version: v2.0.2*
 *Shopify Integration: Complete ✅*
-*Category Management: Fixed ✅*
-*Admin Pagination: Added ✅*
+*Shopify Product Mapping: 8 products mapped (In Progress)*
+*Shipping Configuration: 4-tier profile system implemented ✅*
+*Featured Image EXIF: Dynamic extraction ✅*
+*Featured Image Story: Dynamic loading ✅*

@@ -2,6 +2,33 @@
 
 All notable changes to Fifth Element Photography website will be documented in this file.
 
+## [2.0.2] - 2024-11-05
+
+### Fixed
+- **Featured Image EXIF Data** - Replaced hardcoded EXIF data with dynamic extraction from actual image files
+- **EXIF Data Formatting** - Fixed EXIF data structure to properly display camera model, lens, aperture, shutter speed, ISO, and focal length
+- **Featured Image Story** - Replaced hardcoded story text with dynamic loading from admin-edited content
+- **Story Data Loading** - Fixed story loading to use `featured_stories.json` instead of overwriting with description field
+
+### Changed
+- **EXIF Data Extraction** - Modified `extract_exif_data()` to return formatted dict matching template expectations
+- **Story Management** - Separated story and description fields for independent editing
+
+### Progress
+- **Shopify Product Mapping** - 8 products currently mapped to gallery images (ongoing)
+- **Shipping Configuration** - Implemented 4-tier shipping profile system in Shopify
+  - Paper prints profile (93 products)
+  - Small/Medium canvas profile (22 products)
+  - Medium/Large canvas profile
+  - Extra-large canvas profile (6 products)
+- **Shipping Pricing Strategy** - Hybrid model with partial subsidy in product prices (+$3 paper, +$10 canvas) plus customer-selectable shipping speeds
+
+### Documentation
+- Added comprehensive `SHIPPING_SOLUTION_DOCUMENTATION.md` with full shipping strategy details
+- Documented Lumaprints shipping cost analysis and integration research
+
+---
+
 ## [2.0.1] - 2024-11-03
 
 ### Added
