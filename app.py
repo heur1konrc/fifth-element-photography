@@ -494,6 +494,16 @@ def save_background_images(background_list):
     except:
         return False
 
+def load_featured_stories():
+    """Load featured image stories"""
+    try:
+        if os.path.exists('/data/featured_stories.json'):
+            with open('/data/featured_stories.json', 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return {}
+
 def load_featured_image():
     """Load weekly featured image"""
     try:
@@ -653,14 +663,15 @@ def index():
         if not featured_image and images:
             featured_image = images[0]
     
-    # Extract EXIF data for featured image - SINGLE SOURCE APPROACH
+    # Extract EXIF data for featured image
     featured_exif = None
     if featured_image:
         image_path = os.path.join(IMAGES_FOLDER, featured_image['filename'])
         featured_exif = extract_exif_data(image_path)
         
-        # SINGLE SOURCE: Story is always the same as description
-        featured_image['story'] = featured_image.get('description', '')
+        # Load story from featured_stories.json
+        featured_stories = load_featured_stories()
+        featured_image['story'] = featured_stories.get(featured_image['filename'], '')
     
     about_data = load_about_data()
 
@@ -748,8 +759,9 @@ def mobile_new():
         image_path = os.path.join(IMAGES_FOLDER, featured_image['filename'])
         featured_exif = extract_exif_data(image_path)
         
-        # SINGLE SOURCE: Story is always the same as description
-        featured_image['story'] = featured_image.get('description', '')
+        # Load story from featured_stories.json
+        featured_stories = load_featured_stories()
+        featured_image['story'] = featured_stories.get(featured_image['filename'], '')
     
     about_data = load_about_data()
 
