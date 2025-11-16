@@ -1629,10 +1629,9 @@ def edit_image(filename):
                 <div class="form-group">
                     <label>Image Options:</label>
                     <div class="image-options">
-                        <label class="option-checkbox">
-                            <input type="checkbox" name="is_featured" {"checked" if image.get('is_featured') else ""}>
-                            <span><i class="fas fa-star"></i> Set as Featured Image</span>
-                        </label>
+                        <button type="button" class="btn btn-primary btn-small" onclick="setAsFeaturedFromModal('{filename}', '{image.get('title', '')}')">
+                            <i class="fas fa-star"></i> Set as Featured Image
+                        </button>
                         <button type="button" class="btn btn-secondary btn-small" onclick="setAsHeroFromModal('{filename}', '{image.get('title', '')}')">
                             <i class="fas fa-home"></i> Set as Hero Image
                         </button>
