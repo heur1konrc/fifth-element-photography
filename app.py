@@ -1602,9 +1602,9 @@ def edit_image(filename):
         for category in sorted(all_categories):
             checked = 'checked' if category in current_categories else ''
             category_checkboxes += f'''
-                <label class="category-checkbox-label">
+                <label class="category-checkbox-label" style="display: flex; align-items: center; justify-content: flex-start; text-align: left;">
                     <input type="checkbox" name="categories" value="{category}" {checked}>
-                    <span>{category.title()}</span>
+                    <span style="text-align: left;">{category.title()}</span>
                 </label>
             '''
         
