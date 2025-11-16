@@ -1147,6 +1147,7 @@ function setAsFeaturedFromModal(filename, title) {
             if (data.success) {
                 showAlert('Featured image updated successfully!', 'success');
                 closeEditModal();
+                setTimeout(() => location.reload(), 500);
             } else {
                 showAlert('Failed to set featured image: ' + (data.error || 'Unknown error'), 'error');
             }
