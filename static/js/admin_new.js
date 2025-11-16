@@ -1137,15 +1137,35 @@ function refreshCategoryButtons(categories) {
 
 
 // Helper functions for modal actions
+function setAsFeaturedFromModal(filename, title) {
+    if (confirm(`Set "${title}" as the featured image?`)) {
+        fetch(`/toggle_featured/${filename}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Featured image updated successfully!', 'success');
+                closeEditModal();
+            } else {
+                showAlert('Failed to set featured image: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            showAlert('Error: ' + error.message, 'error');
+        });
+    }
+}
+
 function setAsHeroFromModal(filename, title) {
     // Call existing setAsHero function or implement inline
     if (confirm(`Set "${title}" as the hero image?`)) {
-        fetch('/admin/set-hero', {
+        fetch('/set_hero_image', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ filename: filename })
+            body: JSON.stringify({ filename: filename, title: title })
         })
         .then(response => response.json())
         .then(data => {
