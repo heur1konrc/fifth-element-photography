@@ -1626,6 +1626,21 @@ def edit_image(filename):
                         {category_checkboxes}
                     </div>
                 </div>
+                <div class="form-group">
+                    <label>Image Options:</label>
+                    <div class="image-options">
+                        <label class="option-checkbox">
+                            <input type="checkbox" name="is_featured" {"checked" if image.get('is_featured') else ""}>
+                            <span><i class="fas fa-star"></i> Set as Featured Image</span>
+                        </label>
+                        <button type="button" class="btn btn-secondary btn-small" onclick="setAsHeroFromModal('{filename}', '{image.get('title', '')}')">
+                            <i class="fas fa-home"></i> Set as Hero Image
+                        </button>
+                        <button type="button" class="btn btn-warning btn-small" onclick="analyzeImageFromModal('{filename}', '{image.get('title', '')}')">
+                            <i class="fas fa-search"></i> Analyze Image
+                        </button>
+                    </div>
+                </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Changes</button>

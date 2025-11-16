@@ -232,56 +232,27 @@
 
                                 <div class="image-info">
                                     <h3 class="image-title">{{ image.title }}</h3>
-                                    <div class="image-meta">
-                                        <span class="category-tag category-{{ image.category|lower|replace(' ', '-') }}">
-                                            {{ image.category.title() }}
-                                        </span>
-                                        {% if image.is_featured %}
-                                            <span class="featured-badge">
-                                                <i class="fas fa-star"></i>
-                                                Featured
-                                            </span>
-                                        {% endif %}
-                                        {% if image.is_background %}
-                                            <span class="background-badge">
-                                                <i class="fas fa-image"></i>
-                                                Background
+                                    <div class="image-categories">
+                                        {% if image.all_categories %}
+                                            {% for cat in image.all_categories %}
+                                                <span class="category-badge category-{{ cat|lower|replace(' ', '-') }}">
+                                                    {{ cat }}
+                                                </span>
+                                            {% endfor %}
+                                        {% else %}
+                                            <span class="category-badge category-{{ image.category|lower|replace(' ', '-') }}">
+                                                {{ image.category }}
                                             </span>
                                         {% endif %}
                                     </div>
-                                    <!--<div class="image-details">
-                                        <span class="dimensions">{{ image.width }}×{{ image.height }}</span>
-                                        </div>-->
                                 </div>
 
-                                <div class="image-actions">
-                                    <button class="btn btn-small btn-success" onclick="editImage('{{ image.filename }}')">
+                                <div class="image-actions-compact">
+                                    <button class="btn-compact btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit">
                                         <i class="fas fa-edit"></i>
                                         Edit
                                     </button>
-                                    <a href="/admin/download-image/{{ image.filename }}" class="btn btn-small btn-info" download>
-                                        <i class="fas fa-download"></i>
-                                        Download
-                                    </a>
-                                    <!--
-                                    <button class="btn btn-small btn-primary" onclick="addToSlideshow('{{ image.filename }}')">
-                                        <i class="fas fa-plus"></i>
-                                        Add to Slideshow
-                                    </button>
-                                    -->
-                                    <button class="btn btn-small btn-featured{% if image.is_featured %} active{% endif %}" onclick="setAsFeatured('{{ image.filename }}')">
-                                        <i class="fas fa-star"></i>
-                                        Set as Featured
-                                    </button>
-                                    <button class="btn btn-small btn-hero" data-action="set-hero" data-filename="{{ image.filename }}" data-title="{{ image.title }}">
-                                        <i class="fas fa-home"></i>
-                                        Set as Hero
-                                    </button>
-                                    <button class="btn btn-small btn-warning" onclick="analyzeImage('{{ image.filename }}', '{{ image.title }}')">
-                                        <i class="fas fa-search"></i>
-                                        Analyze
-                                    </button>
-                                    <button class="btn btn-small btn-danger" onclick="deleteImage('{{ image.filename }}')">
+                                    <button class="btn-compact btn-delete" onclick="deleteImage('{{ image.filename }}')" title="Delete">
                                         <i class="fas fa-trash"></i>
                                         Delete
                                     </button>

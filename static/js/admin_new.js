@@ -1133,3 +1133,36 @@ function refreshCategoryButtons(categories) {
     }
 }
 
+
+
+
+// Helper functions for modal actions
+function setAsHeroFromModal(filename, title) {
+    // Call existing setAsHero function or implement inline
+    if (confirm(`Set "${title}" as the hero image?`)) {
+        fetch('/admin/set-hero', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ filename: filename })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Hero image updated successfully!', 'success');
+            } else {
+                showAlert('Failed to set hero image: ' + (data.error || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            showAlert('Error: ' + error.message, 'error');
+        });
+    }
+}
+
+function analyzeImageFromModal(filename, title) {
+    // Call existing analyzeImage function
+    analyzeImage(filename, title);
+}
+
