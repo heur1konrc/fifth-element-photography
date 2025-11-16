@@ -1,6 +1,20 @@
-# Changelog
+# CHANGELOG
 
 All notable changes to Fifth Element Photography website will be documented in this file.
+
+## [2.0.3] - 2024-11-15
+
+### Fixed
+- **Admin Category Display** - Image cards now show ALL assigned categories as badges (not just first one)
+- **Admin Button Sizing** - Edit and Delete buttons resized to fit properly without truncation
+- **Category Checkbox Layout** - Removed scroll box from edit modal, improved 2-column grid alignment
+
+### Changed
+- **Backend Data Field** - Renamed `categories` to `all_categories` in `scan_images()` to match template expectations
+- **Button Styling** - Reduced padding (6px/10px) and font size (12px) for compact fit
+- **Checkbox Container** - Cleaner layout with better spacing and no overflow scrolling
+
+---
 
 ## [2.0.2] - 2024-11-05
 
