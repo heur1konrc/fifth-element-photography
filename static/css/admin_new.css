@@ -1601,6 +1601,7 @@ select option {
 .category-checkbox-label {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 8px;
     padding: 10px 14px;
     cursor: pointer;
@@ -1627,6 +1628,7 @@ select option {
     color: #e0e0e0;
     font-size: 14px;
     user-select: none;
+    text-align: left;
 }
 
 .category-checkbox-label input[type="checkbox"]:checked + span {
