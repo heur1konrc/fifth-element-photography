@@ -348,13 +348,38 @@ def save_categories(categories):
         return False
 
 def load_image_categories():
-    """Load image category assignments"""
+    """Load image category assignments - supports both single and multi-category formats"""
     try:
         if os.path.exists('/data/image_categories.json'):
             with open('/data/image_categories.json', 'r') as f:
-                return json.load(f)
-    except:
-        pass
+                data = json.load(f)
+                
+                # Auto-migrate from old format (string) to new format (list)
+                needs_migration = False
+                for filename, categories in data.items():
+                    if isinstance(categories, str):
+                        needs_migration = True
+                        break
+                
+                if needs_migration:
+                    print("Migrating image_categories.json to multi-category format...")
+                    migrated_data = {}
+                    for filename, categories in data.items():
+                        if isinstance(categories, str):
+                            migrated_data[filename] = [categories]
+                        elif isinstance(categories, list):
+                            migrated_data[filename] = categories
+                        else:
+                            migrated_data[filename] = ['other']
+                    
+                    # Save migrated data
+                    save_image_categories(migrated_data)
+                    print(f"Migration complete: {len(migrated_data)} images migrated")
+                    return migrated_data
+                
+                return data
+    except Exception as e:
+        print(f"Error loading image categories: {e}")
     return {}
 
 def save_image_categories(assignments):
@@ -562,7 +587,14 @@ def scan_images():
             
             # Use saved category assignment or auto-detect
             if filename in image_categories:
-                category = image_categories[filename]
+                # Handle both old (string) and new (list) formats
+                categories = image_categories[filename]
+                if isinstance(categories, str):
+                    category = categories  # Old format compatibility
+                elif isinstance(categories, list) and len(categories) > 0:
+                    category = categories[0]  # Use first category for display
+                else:
+                    category = 'other'
             else:
                 # Auto-detect category based on filename
                 category = 'other'
@@ -608,10 +640,16 @@ def scan_images():
                 except:
                     pass
             
+            # Get all categories for this image (for frontend filtering)
+            all_cats = image_categories.get(filename, [category])
+            if isinstance(all_cats, str):
+                all_cats = [all_cats]
+            
             images.append({
                 'filename': filename,
                 'title': title,
-                'category': category,
+                'category': category,  # Primary category (first one)
+                'categories': all_cats,  # All categories for filtering
                 'description': description,
                 'is_background': is_background,
                 'is_featured': is_featured,
@@ -639,10 +677,18 @@ def index():
     images = scan_images()
     categories = sorted(load_categories())
     
-    # Get category counts
+    # Get category counts (count images in all their assigned categories)
     category_counts = {}
+    image_categories = load_image_categories()
     for category in categories:
-        category_counts[category] = len([img for img in images if img['category'] == category])
+        count = 0
+        for img in images:
+            img_cats = image_categories.get(img['filename'], [])
+            if isinstance(img_cats, str):
+                img_cats = [img_cats]
+            if category in img_cats:
+                count += 1
+        category_counts[category] = count
     
     # Get featured image from featured_image.json
     featured_image = None
@@ -1496,20 +1542,27 @@ def manage_categories():
     categories = sorted(load_categories())
     return jsonify({'categories': categories})
 
-@app.route('/admin/assign_category/<filename>', methods=['POST'])
+@app.route('/assign_category/<filename>', methods=['POST'])
 @require_admin_auth
 def assign_category(filename):
-    """Assign category to an image"""
-    new_category = request.form.get('category', '').strip().lower()
-    if new_category:
+    """Assign categories to an image (supports multiple categories)"""
+    # Get categories - can be single value or list
+    categories_input = request.form.getlist('categories')  # For checkboxes
+    if not categories_input:
+        categories_input = [request.form.get('category', '').strip().lower()]  # For dropdown (backward compat)
+    
+    # Filter out empty values
+    categories = [cat.strip().lower() for cat in categories_input if cat.strip()]
+    
+    if categories:
         image_categories = load_image_categories()
-        image_categories[filename] = new_category
+        image_categories[filename] = categories
         if save_image_categories(image_categories):
-            flash(f'Image "{filename}" assigned to category "{new_category}"')
+            flash(f'Image "{filename}" assigned to categories: {", ".join(categories)}')
         else:
             flash('Error saving category assignment')
     else:
-        flash('Please select a category')
+        flash('Please select at least one category')
     
     return redirect(url_for('admin'))
 
@@ -1538,12 +1591,22 @@ def edit_image(filename):
         
         all_categories = sorted(load_categories())
         
-        # Generate category options HTML
-        category_options = ""
-        current_category = image.get('category', 'other')
+        # Get current categories for this image
+        image_categories = load_image_categories()
+        current_categories = image_categories.get(filename, [])
+        if isinstance(current_categories, str):
+            current_categories = [current_categories]  # Convert old format
+        
+        # Generate category checkboxes HTML
+        category_checkboxes = ""
         for category in sorted(all_categories):
-            selected = 'selected' if category == current_category else ''
-            category_options += f'<option value="{category}" {selected}>{category.title()}</option>'
+            checked = 'checked' if category in current_categories else ''
+            category_checkboxes += f'''
+                <label class="category-checkbox-label">
+                    <input type="checkbox" name="categories" value="{category}" {checked}>
+                    <span>{category.title()}</span>
+                </label>
+            '''
         
         # Return HTML form for editing that matches modal styling
         form_html = f"""
@@ -1558,10 +1621,10 @@ def edit_image(filename):
                     <textarea id="description" name="description" rows="3">{image.get('description', '')}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="category">Category:</label>
-                    <select id="category" name="category">
-                        {category_options}
-                    </select>
+                    <label>Categories (select multiple):</label>
+                    <div class="category-checkboxes">
+                        {category_checkboxes}
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>
@@ -1587,14 +1650,15 @@ def update_image(filename):
         # Get form data
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
-        category = request.form.get('category', '').strip().lower()
+        categories_input = request.form.getlist('categories')  # Get multiple categories
         is_featured = request.form.get('is_featured') == 'on'
         is_background = request.form.get('is_background') == 'on'
         
-        # Update category assignment
-        if category:
+        # Update category assignment (multiple categories)
+        categories = [cat.strip().lower() for cat in categories_input if cat.strip()]
+        if categories:
             image_categories = load_image_categories()
-            image_categories[filename] = category
+            image_categories[filename] = categories
             save_image_categories(image_categories)
         
         # Update image descriptions

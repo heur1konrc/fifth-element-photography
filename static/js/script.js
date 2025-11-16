@@ -235,8 +235,15 @@ function filterImages(category) {
         filteredImages = allImages;
         galleryTitle.textContent = 'Portfolio Gallery';
     } else {
-        // Filter images by exact category match
-        filteredImages = allImages.filter(image => image.category === category);
+        // Filter images by category (supports multi-category)
+        filteredImages = allImages.filter(image => {
+            // Check if image has categories array (new format)
+            if (image.categories && Array.isArray(image.categories)) {
+                return image.categories.includes(category);
+            }
+            // Fallback to single category (old format)
+            return image.category === category;
+        });
         galleryTitle.textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Gallery`;
     }
     
