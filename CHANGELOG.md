@@ -2,6 +2,28 @@
 
 All notable changes to Fifth Element Photography website will be documented in this file.
 
+## [2.1.0] - 2024-11-16
+
+### Added
+- **Featured Image Badge** - Orange "FEATURED" overlay badge on admin image cards for easy identification
+- **Hero Image Badge** - Purple "HERO" overlay badge on admin image cards for easy identification
+- **Set as Featured Button** - Converted from checkbox to button in edit modal for immediate action
+- **Set as Hero Button** - Added button in edit modal for quick hero image assignment
+
+### Fixed
+- **Category Checkbox Alignment** - Left-aligned checkboxes and labels in edit modal (was centered)
+- **Set as Hero Route** - Fixed JavaScript to call correct `/set_hero_image` endpoint
+- **Set as Featured Route** - Fixed JavaScript to call correct `/toggle_featured` endpoint
+- **Admin Page Refresh** - Added automatic page reload after setting featured image to show updated badge
+- **CSS Grid Alignment** - Added `justify-items: start` to force left alignment of grid items
+
+### Changed
+- **Image Data Structure** - Added `is_hero` flag to image objects in `scan_images()`
+- **Featured Image UX** - Changed from checkbox (requires Save) to button (immediate action)
+- **Badge Positioning** - HERO badge positioned below FEATURED badge when both exist on same image
+
+---
+
 ## [2.0.3] - 2024-11-15
 
 ### Fixed
