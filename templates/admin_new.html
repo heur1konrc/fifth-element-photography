@@ -213,6 +213,16 @@
                                 
                                 <div class="image-preview">
                                     <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title }}" loading="lazy" decoding="async" style="background: #1a1a1a;">
+                                    {% if image.is_featured %}
+                                    <div class="status-badge featured-badge">
+                                        <i class="fas fa-star"></i> FEATURED
+                                    </div>
+                                    {% endif %}
+                                    {% if image.is_hero %}
+                                    <div class="status-badge hero-badge">
+                                        <i class="fas fa-home"></i> HERO
+                                    </div>
+                                    {% endif %}
                                     <div class="image-overlay">
                                         <div class="overlay-actions">
                                             <button class="action-btn edit-btn" onclick="editImage('{{ image.filename }}')" title="Edit">

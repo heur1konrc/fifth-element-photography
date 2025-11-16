@@ -570,6 +570,7 @@ def scan_images():
     image_titles = load_image_titles()
     background_images = load_background_images()
     featured_image_data = load_featured_image()
+    hero_image_data = load_hero_image()
     
     # Default categories mapping for auto-detection
     default_categories = {
@@ -622,6 +623,9 @@ def scan_images():
             # Check if image is the weekly featured image
             is_featured = featured_image_data and featured_image_data.get('filename') == filename
             
+            # Check if image is the hero image
+            is_hero = hero_image_data and hero_image_data.get('filename') == filename
+            
             # SINGLE SOURCE: Use description as the story (no separate featured_story)
             # Description and story are now the same field
             featured_story = description
@@ -653,6 +657,7 @@ def scan_images():
                 'description': description,
                 'is_background': is_background,
                 'is_featured': is_featured,
+                'is_hero': is_hero,
                 'story': featured_story,
                 'url': f'/images/{filename}',
                 'width': info['width'],
