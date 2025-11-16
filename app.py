@@ -649,7 +649,7 @@ def scan_images():
                 'filename': filename,
                 'title': title,
                 'category': category,  # Primary category (first one)
-                'categories': all_cats,  # All categories for filtering
+                'all_categories': all_cats,  # All categories for filtering
                 'description': description,
                 'is_background': is_background,
                 'is_featured': is_featured,
