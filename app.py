@@ -1626,12 +1626,6 @@ def edit_image(filename):
                         {category_checkboxes}
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="is_background" {"checked" if image.get('is_background') else ""}>
-                        Set as Background Image
-                    </label>
-                </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
