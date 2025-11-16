@@ -1596,6 +1596,8 @@ select option {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     padding: 12px 0;
+    justify-items: start;
+    align-items: start;
 }
 
 .category-checkbox-label {
