@@ -118,10 +118,11 @@
             <div class="featured-page-content">
                 <div class="featured-image-container">
                     {% if featured_image and featured_image.filename %}
-                    <img src="{{ url_for('serve_image', filename=featured_image.filename) }}" alt="{{ featured_image.title or 'Featured Image' }}" class="featured-image">
+                    <img src="{{ url_for('serve_image', filename=featured_image.filename) }}" alt="{{ featured_image.title or 'Featured Image' }}" class="featured-image" style="max-width: 90%; height: auto; margin: 0 auto; display: block;">
                     {% else %}
-                    <img src="{{ url_for('static', filename='images/placeholder-featured.jpg') }}" alt="Featured Image" class="featured-image">
+                    <img src="{{ url_for('static', filename='images/placeholder-featured.jpg') }}" alt="Featured Image" class="featured-image" style="max-width: 90%; height: auto; margin: 0 auto; display: block;">
                     {% endif %}
+                    <h3 style="text-align: center; margin-top: 15px; color: white;">{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
                 </div>
                 
                 <div class="featured-content">

@@ -122,10 +122,10 @@
                     
                         <div class="featured-content">
                             <div class="featured-image-container">
-                                <h3>{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
                                 <div class="featured-image">
-                                    <img src="{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}" alt="{{ featured_image.title if featured_image else "No Featured Image" }}">
+                                    <img src="{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}" alt="{{ featured_image.title if featured_image else "No Featured Image" }}" style="max-width: 80%; height: auto; margin: 0 auto; display: block;">
                                 </div>
+                                <h3 style="text-align: center; margin-top: 20px;">{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
                             </div>
                             
                             <!-- EXIF Data - Horizontal Layout Below Image -->
