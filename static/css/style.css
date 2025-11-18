@@ -1311,6 +1311,37 @@ textarea {
     color: #cccccc;
 }
 
+.description-content {
+    color: #cccccc;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.description-content p {
+    margin-bottom: 1rem;
+}
+
+.description-content h3 {
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    text-transform: none;
+}
+
+.description-content br {
+    display: block;
+    content: "";
+    margin-bottom: 0.5rem;
+}
+
+.description-content em {
+    font-style: italic;
+    color: #cccccc;
+}
+
 /* Adjust EXIF section for smaller space */
 .featured-info {
     padding-left: 1rem;

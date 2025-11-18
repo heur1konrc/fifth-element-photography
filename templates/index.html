@@ -186,7 +186,7 @@
                         
                         <div class="featured-story-section">
                             <h3 style="text-align: left; margin-bottom: 15px;">{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
-                            <p>{{ featured_image.description|safe if featured_image and featured_image.description else 'No description available for this image.' }}</p>
+                            <div class="description-content">{{ featured_image.description|safe if featured_image and featured_image.description else 'No description available for this image.' }}</div>
                         </div>
                         
                     

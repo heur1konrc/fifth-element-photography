@@ -127,7 +127,7 @@
                 <div class="featured-content">
                     <h3 style="text-align: left; margin-bottom: 15px; color: white;">{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
                     <div class="story-text">
-                <p>{{ featured_image.description|safe if featured_image and featured_image.description else "No description available." }}</p>
+                <div class="description-content">{{ featured_image.description|safe if featured_image and featured_image.description else "No description available." }}</div>
                     </div>
                     
                     <!-- Action Buttons -->
