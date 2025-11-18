@@ -113,7 +113,7 @@
         <!-- Featured Image Page Section -->
         <section id="featured" class="mobile-section">
             <div class="page-header">
-                <h1>FEATURED IMAGE OF THE WEEK</h1>
+                <h1 style="font-size: 1.5rem;">FEATURED IMAGE OF THE WEEK</h1>
             </div>
             <div class="featured-page-content">
                 <div class="featured-image-container">
@@ -122,10 +122,10 @@
                     {% else %}
                     <img src="{{ url_for('static', filename='images/placeholder-featured.jpg') }}" alt="Featured Image" class="featured-image" style="max-width: 90%; height: auto; margin: 0 auto; display: block;">
                     {% endif %}
-                    <h3 style="text-align: center; margin-top: 15px; color: white;">{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
                 </div>
                 
                 <div class="featured-content">
+                    <h3 style="text-align: left; margin-bottom: 15px; color: white;">{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
                     <div class="story-text">
                 <p>{{ featured_image.description|safe if featured_image and featured_image.description else "No description available." }}</p>
                     </div>

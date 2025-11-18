@@ -117,7 +117,7 @@
             <!-- FEATURED IMAGE Section -->
             <section class="content-section" id="featured-section">
                 <div class="featured-container">
-                    <h2 class="section-title featured-title">FEATURED IMAGE OF THE WEEK</h2>
+                    <h2 class="section-title featured-title" style="font-size: 1.5rem;">FEATURED IMAGE OF THE WEEK</h2>
                     
                     
                         <div class="featured-content">
@@ -125,7 +125,6 @@
                                 <div class="featured-image">
                                     <img src="{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}" alt="{{ featured_image.title if featured_image else "No Featured Image" }}" style="max-width: 80%; height: auto; margin: 0 auto; display: block;">
                                 </div>
-                                <h3 style="text-align: center; margin-top: 20px;">{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
                             </div>
                             
                             <!-- EXIF Data - Horizontal Layout Below Image -->
@@ -186,6 +185,7 @@
                         
                         
                         <div class="featured-story-section">
+                            <h3 style="text-align: left; margin-bottom: 15px;">{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
                             <p>{{ featured_image.description|safe if featured_image and featured_image.description else 'No description available for this image.' }}</p>
                         </div>
                         
