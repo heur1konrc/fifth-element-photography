@@ -125,9 +125,8 @@
                 </div>
                 
                 <div class="featured-content">
-                    <h3 class="story-title">The Story Behind this Image</h3>
                     <div class="story-text">
-                <p>{{ featured_image.story if featured_image and featured_image.story else "No featured image story available." }}</p>
+                <p>{{ featured_image.description|safe if featured_image and featured_image.description else "No description available." }}</p>
                     </div>
                     
                     <!-- Action Buttons -->

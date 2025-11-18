@@ -186,8 +186,7 @@
                         
                         
                         <div class="featured-story-section">
-                            <h4>The Story Behind this Image</h4>
-                            <p>{{ featured_image.story if featured_image and featured_image.story else 'No story available for this image.' }}</p>
+                            <p>{{ featured_image.description|safe if featured_image and featured_image.description else 'No description available for this image.' }}</p>
                         </div>
                         
                     

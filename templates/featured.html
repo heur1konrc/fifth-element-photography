@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ featured_image.title }} - Featured Image | Fifth Element Photography</title>
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="{{ featured_image.title }} - Featured Image of the Week">
+    <meta property="og:description" content="{{ featured_image.description[:160] if featured_image.description else 'Featured Image of the Week' }}">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://fifthelement.photos{{ featured_image.url }}">
+    
+    <link rel="stylesheet" href="/static/css/style.css?v=20241008-001">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="/static/images/logo.png" alt="Fifth Element Photography Logo">
+                </div>
+                <p>Madison WI</p>
+            </div>
+            
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">HOME</a></li>
+                <li><a href="/featured" class="nav-link active">FEATURED IMAGE</a></li>
+                <li><a href="/#about" class="nav-link">ABOUT</a></li>
+                <li><a href="/#contact" class="nav-link">CONTACT</a></li>
+            </ul>
+            
+            <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" style="background-color: none; color: #6799c2; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-family: 'Poppins', sans-serif; text-transform: uppercase; border: 1px solid #6799c2;">
+                BUY ME A COFFEE
+            </a>
+        </nav>
+        
+        <main class="main-content">
+            <section class="content-section active">
+                <div class="featured-container">
+                    <h2 class="section-title featured-title">FEATURED IMAGE OF THE WEEK</h2>
+                    
+                    <div class="featured-content">
+                        <div class="featured-image-container">
+                            <h3>{{ featured_image.title }}</h3>
+                            <div class="featured-image">
+                                <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
+                            </div>
+                        </div>
+                        
+                        <!-- EXIF Data -->
+                        {% if exif_data %}
+                        <div class="featured-exif-horizontal">
+                            {% if exif_data.model %}
+                            <div class="exif-item">
+                                <span class="exif-label">MODEL:</span>
+                                <span class="exif-value">{{ exif_data.model }}</span>
+                            </div>
+                            {% endif %}
+                            {% if exif_data.lens %}
+                            <div class="exif-item">
+                                <span class="exif-label">LENS:</span>
+                                <span class="exif-value">{{ exif_data.lens }}</span>
+                            </div>
+                            {% endif %}
+                            {% if exif_data.aperture %}
+                            <div class="exif-item">
+                                <span class="exif-label">APERTURE:</span>
+                                <span class="exif-value">{{ exif_data.aperture }}</span>
+                            </div>
+                            {% endif %}
+                            {% if exif_data.shutter_speed %}
+                            <div class="exif-item">
+                                <span class="exif-label">SHUTTER SPEED:</span>
+                                <span class="exif-value">{{ exif_data.shutter_speed }}</span>
+                            </div>
+                            {% endif %}
+                            {% if exif_data.iso %}
+                            <div class="exif-item">
+                                <span class="exif-label">ISO:</span>
+                                <span class="exif-value">{{ exif_data.iso }}</span>
+                            </div>
+                            {% endif %}
+                            {% if exif_data.focal_length %}
+                            <div class="exif-item">
+                                <span class="exif-label">FOCAL LENGTH:</span>
+                                <span class="exif-value">{{ exif_data.focal_length }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Action Buttons -->
+                        <div class="image-actions">
+                            <button class="action-btn" onclick="window.open('{{ featured_image.url }}', '_blank')">
+                                <span></span> View High Resolution (New Window)
+                            </button>
+                            <a href="{{ featured_image.url }}" download="{{ featured_image.filename }}" class="action-btn" style="text-decoration: none;">
+                                <span></span> Download Full Size Image
+                            </a>
+                            <button class="action-btn" onclick="shareOnSocial()">
+                                <span></span> Share on Social Media
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Story Section - NO HEADING, just description -->
+                    <div class="featured-story-section">
+                        <p>{{ featured_image.description|safe if featured_image.description else 'No description available for this image.' }}</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script>
+        function shareOnSocial() {
+            const url = window.location.href;
+            const title = "{{ featured_image.title }} - Fifth Element Photography";
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    url: url
+                });
+            } else {
+                // Fallback to Twitter
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank');
+            }
+        }
+    </script>
+</body>
+</html>
+

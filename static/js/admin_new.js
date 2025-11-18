@@ -1187,3 +1187,48 @@ function analyzeImageFromModal(filename, title) {
     analyzeImage(filename, title);
 }
 
+
+
+
+// Text formatting functions for description editor
+function formatText(textareaId, format) {
+    const textarea = document.getElementById(textareaId);
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    if (!selectedText) {
+        alert('Please select text to format');
+        return;
+    }
+    
+    let formattedText = '';
+    if (format === 'bold') {
+        formattedText = `<strong>${selectedText}</strong>`;
+    } else if (format === 'italic') {
+        formattedText = `<em>${selectedText}</em>`;
+    }
+    
+    textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+    textarea.focus();
+    textarea.setSelectionRange(start, start + formattedText.length);
+}
+
+function insertHeading(textareaId, level) {
+    const textarea = document.getElementById(textareaId);
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    if (!selectedText) {
+        alert('Please select text to format as heading');
+        return;
+    }
+    
+    const headingText = `<${level}>${selectedText}</${level}>`;
+    
+    textarea.value = textarea.value.substring(0, start) + headingText + textarea.value.substring(end);
+    textarea.focus();
+    textarea.setSelectionRange(start, start + headingText.length);
+}
+
