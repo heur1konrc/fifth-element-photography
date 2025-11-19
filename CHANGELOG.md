@@ -8,6 +8,7 @@ All notable changes to Fifth Element Photography website will be documented in t
 - **WYSIWYG Editor** - Integrated Quill rich text editor for description field in edit modal
 - **Real-time Formatting** - Select text and click Bold/Italic/Heading to see formatting instantly
 - **Download Image Button** - Added green "Download Image" button in edit modal for hi-res downloads
+- **Dark Theme for Quill** - Black background (#1a1a1a) with white text for editor visibility
 
 ### Changed
 - **Description Editor UX** - Replaced manual HTML toolbar with professional WYSIWYG editor (Quill)
@@ -22,10 +23,15 @@ All notable changes to Fifth Element Photography website will be documented in t
 - **Manual HTML Toolbar** - Removed B/I/H1/H2/H3 buttons (replaced by Quill)
 - **Newline Conversion** - Removed automatic newline-to-br conversion (Quill handles HTML natively)
 - **Story Heading** - Removed "THE STORY BEHIND THIS IMAGE" heading from featured page
+- **Mobile Featured Section Blue Separator** - Removed border-bottom line under heading
 
 ### Fixed
 - **HTML Formatting Display** - Fixed description HTML rendering (headings, paragraphs, line breaks now display correctly)
 - **CSS Specificity** - Added proper CSS rules for h3, br, em, p tags within description content
+- **Quill Editor Visibility** - Fixed white-on-white text issue with dark theme styling
+- **Mobile Featured Spacing** - Reduced heading-to-image gap from 30px to 15px
+- **Mobile Paragraph Spacing** - Reduced paragraph margins to 0.2em to eliminate excessive gaps
+- **Mobile Description Formatting** - Fixed double-spacing between paragraphs in featured section
 
 ---
 
