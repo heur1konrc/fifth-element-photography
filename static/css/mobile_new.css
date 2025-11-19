@@ -366,7 +366,26 @@ body {
 }
 
 .story-text p {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
+}
+
+/* Description content styling for featured section */
+.description-content {
+    color: #ccc;
+    line-height: 1.7;
+}
+
+.description-content p {
+    margin-bottom: 10px;
+}
+
+.description-content strong {
+    color: #fff;
+    font-weight: bold;
+}
+
+.description-content em {
+    font-style: italic;
 }
 
 /* Action Buttons */
@@ -424,9 +443,9 @@ body {
 /* Page Headers */
 .page-header {
     text-align: center;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid #6799c2;
+    margin-bottom: 15px;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .page-header h1 {
