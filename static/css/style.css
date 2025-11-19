@@ -1149,14 +1149,14 @@ textarea {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
 }
 
 /* Featured content - single column layout for larger image */
 .featured-content {
     display: block;
     background: #000000;
-    padding: 3rem 3rem 1rem 3rem;
+    padding: 1rem 3rem 1rem 3rem;
     border-radius: 12px;
 }
 
