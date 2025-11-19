@@ -2,6 +2,33 @@
 
 All notable changes to Fifth Element Photography website will be documented in this file.
 
+## [2.2.0] - 2024-11-18
+
+### Added
+- **WYSIWYG Editor** - Integrated Quill rich text editor for description field in edit modal
+- **Real-time Formatting** - Select text and click Bold/Italic/Heading to see formatting instantly
+- **Download Image Button** - Added green "Download Image" button in edit modal for hi-res downloads
+
+### Changed
+- **Description Editor UX** - Replaced manual HTML toolbar with professional WYSIWYG editor (Quill)
+- **Featured Image Layout** - Moved image title below action buttons, above description text
+- **Featured Heading Size** - Reduced "FEATURED IMAGE OF THE WEEK" font size from 2rem to 1.5rem
+- **Featured Section Spacing** - Reduced gap between heading and image (margin: 2rem → 0.5rem, padding: 3rem → 1rem)
+- **Featured Story Source** - Changed from separate story field to using image description field directly
+- **HTML Rendering** - Changed description container from `<p>` to `<div>` to support block-level HTML elements
+
+### Removed
+- **Featured Image Story Section** - Removed duplicate story editor from admin dashboard
+- **Manual HTML Toolbar** - Removed B/I/H1/H2/H3 buttons (replaced by Quill)
+- **Newline Conversion** - Removed automatic newline-to-br conversion (Quill handles HTML natively)
+- **Story Heading** - Removed "THE STORY BEHIND THIS IMAGE" heading from featured page
+
+### Fixed
+- **HTML Formatting Display** - Fixed description HTML rendering (headings, paragraphs, line breaks now display correctly)
+- **CSS Specificity** - Added proper CSS rules for h3, br, em, p tags within description content
+
+---
+
 ## [2.1.0] - 2024-11-16
 
 ### Added

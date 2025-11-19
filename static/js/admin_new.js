@@ -186,6 +186,9 @@ function backupSystem() {
 }
 
 // Individual Image Actions
+// Global Quill instance
+let quillEditor = null;
+
 function editImage(filename) {
     // Load edit form in modal
     fetch(`/edit_image/${filename}`)
@@ -193,11 +196,46 @@ function editImage(filename) {
         .then(html => {
             document.getElementById('editModalContent').innerHTML = html;
             openEditModal();
+            // Initialize Quill editor after modal content is loaded
+            initializeQuillEditor();
         })
         .catch(error => {
             console.error('Error:', error);
             alert('Error loading edit form. Please try again.');
         });
+}
+
+function initializeQuillEditor() {
+    const editorContainer = document.getElementById('quill-editor');
+    const hiddenTextarea = document.getElementById('description');
+    
+    if (!editorContainer || !hiddenTextarea) return;
+    
+    // Initialize Quill
+    quillEditor = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline'],
+                [{ 'header': [1, 2, 3, false] }],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['link'],
+                ['clean']
+            ]
+        },
+        placeholder: 'Enter image description...'
+    });
+    
+    // Load existing content
+    const existingContent = hiddenTextarea.value;
+    if (existingContent) {
+        quillEditor.root.innerHTML = existingContent;
+    }
+    
+    // Sync Quill content to hidden textarea on change
+    quillEditor.on('text-change', function() {
+        hiddenTextarea.value = quillEditor.root.innerHTML;
+    });
 }
 
 function addToSlideshow(filename) {
@@ -531,15 +569,7 @@ function saveImageChanges(event, filename) {
         return;
     }
     
-    // Auto-convert newlines to <br> tags in description field
-    const descriptionField = form.querySelector('textarea[name="description"]');
-    if (descriptionField) {
-        let description = descriptionField.value;
-        // Convert double newlines to paragraph breaks, single newlines to <br>
-        description = description.replace(/\n\n/g, '<br><br>');
-        description = description.replace(/\n/g, '<br>');
-        descriptionField.value = description;
-    }
+    // Quill editor automatically handles HTML formatting, no conversion needed
     
     const formData = new FormData(form);
     
@@ -1200,45 +1230,5 @@ function analyzeImageFromModal(filename, title) {
 
 
 
-// Text formatting functions for description editor
-function formatText(textareaId, format) {
-    const textarea = document.getElementById(textareaId);
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    
-    if (!selectedText) {
-        alert('Please select text to format');
-        return;
-    }
-    
-    let formattedText = '';
-    if (format === 'bold') {
-        formattedText = `<strong>${selectedText}</strong>`;
-    } else if (format === 'italic') {
-        formattedText = `<em>${selectedText}</em>`;
-    }
-    
-    textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
-    textarea.focus();
-    textarea.setSelectionRange(start, start + formattedText.length);
-}
-
-function insertHeading(textareaId, level) {
-    const textarea = document.getElementById(textareaId);
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    
-    if (!selectedText) {
-        alert('Please select text to format as heading');
-        return;
-    }
-    
-    const headingText = `<${level}>${selectedText}</${level}>`;
-    
-    textarea.value = textarea.value.substring(0, start) + headingText + textarea.value.substring(end);
-    textarea.focus();
-    textarea.setSelectionRange(start, start + headingText.length);
-}
+// Removed: Text formatting functions (replaced by Quill WYSIWYG editor)
 

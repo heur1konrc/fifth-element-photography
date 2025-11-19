@@ -1623,14 +1623,8 @@ def edit_image(filename):
                 </div>
                 <div class="form-group">
                     <label for="description">Description:</label>
-                    <div class="editor-toolbar">
-                        <button type="button" class="editor-btn" onclick="formatText('description', 'bold')" title="Bold"><strong>B</strong></button>
-                        <button type="button" class="editor-btn" onclick="formatText('description', 'italic')" title="Italic"><em>I</em></button>
-                        <button type="button" class="editor-btn" onclick="insertHeading('description', 'h1')" title="Heading 1">H1</button>
-                        <button type="button" class="editor-btn" onclick="insertHeading('description', 'h2')" title="Heading 2">H2</button>
-                        <button type="button" class="editor-btn" onclick="insertHeading('description', 'h3')" title="Heading 3">H3</button>
-                    </div>
-                    <textarea id="description" name="description" rows="6">{image.get('description', '')}</textarea>
+                    <div id="quill-editor" style="background: white; min-height: 200px;"></div>
+                    <textarea id="description" name="description" style="display: none;">{image.get('description', '')}</textarea>
                 </div>
                 <div class="form-group">
                     <label>Categories (select multiple):</label>
