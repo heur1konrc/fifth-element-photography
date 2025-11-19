@@ -376,7 +376,13 @@ body {
 }
 
 .description-content p {
-    margin-bottom: 10px;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 0.8em;
+}
+
+.description-content p:last-child {
+    margin-bottom: 0;
 }
 
 .description-content strong {
