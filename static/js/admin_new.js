@@ -531,6 +531,16 @@ function saveImageChanges(event, filename) {
         return;
     }
     
+    // Auto-convert newlines to <br> tags in description field
+    const descriptionField = form.querySelector('textarea[name="description"]');
+    if (descriptionField) {
+        let description = descriptionField.value;
+        // Convert double newlines to paragraph breaks, single newlines to <br>
+        description = description.replace(/\n\n/g, '<br><br>');
+        description = description.replace(/\n/g, '<br>');
+        descriptionField.value = description;
+    }
+    
     const formData = new FormData(form);
     
     const saveBtn = document.querySelector('#editModal .btn-primary');
