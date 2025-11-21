@@ -333,6 +333,38 @@ def debug_list_images():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/v3/debug/list-data')
+@login_required
+def debug_list_data():
+    """Diagnostic endpoint to list entire /data/ directory structure."""
+    import os
+    data_dir = '/data'
+    
+    try:
+        structure = {}
+        if os.path.exists(data_dir):
+            for item in os.listdir(data_dir):
+                item_path = os.path.join(data_dir, item)
+                if os.path.isdir(item_path):
+                    # List files in subdirectory
+                    subfiles = []
+                    for subitem in os.listdir(item_path):
+                        subitem_path = os.path.join(item_path, subitem)
+                        if os.path.isfile(subitem_path):
+                            subfiles.append(subitem)
+                    structure[item] = {'type': 'directory', 'files': subfiles, 'count': len(subfiles)}
+                elif os.path.isfile(item_path):
+                    structure[item] = {'type': 'file', 'size': os.path.getsize(item_path)}
+        
+        return jsonify({
+            'directory': data_dir,
+            'exists': os.path.exists(data_dir),
+            'structure': structure
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 # ==================== FRONT-END ROUTES ====================
 
 @app.route('/')
