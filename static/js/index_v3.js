@@ -60,8 +60,9 @@ function createImageCard(image) {
     const card = document.createElement('div');
     card.className = 'image-card';
     
-    // Build image URL
-    const imageUrl = `/data/${image.filename}`;
+    // Build image URL - use thumbnail for gallery, full image on click
+    const thumbnailUrl = `/data/thumbnails/${image.filename}`;
+    const fullImageUrl = `/data/${image.filename}`;
     
     // Build categories HTML
     let categoriesHtml = '';
@@ -75,7 +76,7 @@ function createImageCard(image) {
     
     // Build card HTML
     card.innerHTML = `
-        <img src="${imageUrl}" alt="${escapeHtml(image.title || 'Untitled')}" loading="lazy">
+        <img src="${thumbnailUrl}" alt="${escapeHtml(image.title || 'Untitled')}" loading="lazy">
         <div class="image-info">
             <h3 class="image-title">${escapeHtml(image.title || 'Untitled')}</h3>
             ${image.description ? `<p class="image-description">${escapeHtml(image.description)}</p>` : ''}

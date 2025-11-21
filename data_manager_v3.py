@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from datetime import datetime
+from PIL import Image
 
 
 class DataManagerV3:
@@ -38,6 +39,8 @@ class DataManagerV3:
         self.data_dir = Path(data_dir)
         # Images are stored directly in /data/, not in a subdirectory
         self.images_dir = self.data_dir
+        # Thumbnails stored in /data/thumbnails/
+        self.thumbnails_dir = self.data_dir / "thumbnails"
         
         # Data file paths - V3 uses separate files to avoid conflicts with old system
         self.metadata_file = self.data_dir / "image_metadata_v3.json"
@@ -48,6 +51,7 @@ class DataManagerV3:
         
         # Ensure directories exist
         self.images_dir.mkdir(parents=True, exist_ok=True)
+        self.thumbnails_dir.mkdir(parents=True, exist_ok=True)
         
         # Initialize data files if they don't exist
         self._initialize_data_files()
@@ -314,4 +318,68 @@ class DataManagerV3:
         """Get the hero image filename."""
         data = self._read_json(self.hero_file)
         return data.get("filename")
+    
+    # ==================== THUMBNAIL OPERATIONS ====================
+    
+    def generate_thumbnail(self, filename: str, max_width: int = 400) -> bool:
+        """
+        Generate a thumbnail for an image.
+        
+        Args:
+            filename: Name of the image file
+            max_width: Maximum width of thumbnail (default: 400px)
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            image_path = self.images_dir / filename
+            thumbnail_path = self.thumbnails_dir / filename
+            
+            # Skip if thumbnail already exists
+            if thumbnail_path.exists():
+                return True
+            
+            # Open and resize image
+            with Image.open(image_path) as img:
+                # Convert RGBA to RGB if necessary
+                if img.mode in ('RGBA', 'LA', 'P'):
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    if img.mode == 'P':
+                        img = img.convert('RGBA')
+                    background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+                    img = background
+                
+                # Calculate new dimensions maintaining aspect ratio
+                width, height = img.size
+                if width > max_width:
+                    new_width = max_width
+                    new_height = int((max_width / width) * height)
+                    img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                
+                # Save thumbnail
+                img.save(thumbnail_path, 'JPEG', quality=85, optimize=True)
+            
+            return True
+        except Exception as e:
+            print(f"Error generating thumbnail for {filename}: {e}")
+            return False
+    
+    def get_thumbnail_path(self, filename: str) -> Path:
+        """
+        Get the path to a thumbnail, generating it if it doesn't exist.
+        
+        Args:
+            filename: Name of the image file
+            
+        Returns:
+            Path to the thumbnail file
+        """
+        thumbnail_path = self.thumbnails_dir / filename
+        
+        # Generate thumbnail if it doesn't exist
+        if not thumbnail_path.exists():
+            self.generate_thumbnail(filename)
+        
+        return thumbnail_path
 

@@ -221,6 +221,8 @@ def upload_images_v3():
             
             try:
                 file.save(filepath)
+                # Generate thumbnail immediately after upload
+                data_manager.generate_thumbnail(filename)
                 uploaded.append(filename)
             except Exception as e:
                 errors.append(f'{filename}: {str(e)}')
@@ -302,6 +304,22 @@ def serve_image(filename):
     """Serve images from the data directory."""
     # Images are stored directly in /data/, not in /data/images/
     return send_from_directory('/data', filename)
+
+
+@app.route('/data/thumbnails/<filename>')
+def serve_thumbnail(filename):
+    """
+    Serve thumbnail images, generating on-demand if needed.
+    
+    This route automatically generates thumbnails for existing images
+    that don't have thumbnails yet, ensuring all images (old and new)
+    have optimized thumbnails for fast gallery loading.
+    """
+    # Get thumbnail path, generating if it doesn't exist
+    thumbnail_path = data_manager.get_thumbnail_path(filename)
+    
+    # Serve the thumbnail
+    return send_from_directory('/data/thumbnails', filename)
 
 
 # ==================== DIAGNOSTIC ROUTES (TEMPORARY) ====================

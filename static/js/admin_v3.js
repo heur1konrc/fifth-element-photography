@@ -162,7 +162,7 @@ const UI = {
 
         gallery.innerHTML = paginatedImages.map(image => `
             <div class="image-card" data-filename="${image.filename}">
-                <img src="/data/${image.filename}" alt="${image.title}" class="image-card-img">
+                <img src="/data/thumbnails/${image.filename}" alt="${image.title}" class="image-card-img">
                 <div class="image-card-content">
                     <div class="image-card-title">${image.title}</div>
                     <div class="image-card-categories">
