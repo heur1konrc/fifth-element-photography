@@ -47,8 +47,8 @@ graph TD
 
 ### Data Layer
 
--   **`/data/*.json`:** A set of JSON files used for data persistence. This includes image metadata, category assignments, and application settings. The `data_manager_v3.py` module is the sole interface to this data.
--   **`/data/images/`:** The directory where all uploaded image files are stored.
+-   **`/data/*.json`:** A set of JSON files used for data persistence. V3 uses separate metadata files (`image_metadata_v3.json`, `image_categories_v3.json`, `categories_v3.json`) to avoid conflicts with the old production system. The `data_manager_v3.py` module is the sole interface to this data.
+-   **`/data/`:** Image files are stored directly in the `/data/` directory (not in a subdirectory). This matches the existing production storage location.
 
 ## Data Flow
 
