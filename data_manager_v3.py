@@ -36,7 +36,8 @@ class DataManagerV3:
             data_dir: Path to the data directory (default: /data for Railway)
         """
         self.data_dir = Path(data_dir)
-        self.images_dir = self.data_dir / "images"
+        # Images are stored directly in /data/, not in a subdirectory
+        self.images_dir = self.data_dir
         
         # Data file paths - V3 uses separate files to avoid conflicts with old system
         self.metadata_file = self.data_dir / "image_metadata_v3.json"

@@ -162,7 +162,7 @@ const UI = {
 
         gallery.innerHTML = paginatedImages.map(image => `
             <div class="image-card" data-filename="${image.filename}">
-                <img src="/data/images/${image.filename}" alt="${image.title}" class="image-card-img">
+                <img src="/data/${image.filename}" alt="${image.title}" class="image-card-img">
                 <div class="image-card-content">
                     <div class="image-card-title">${image.title}</div>
                     <div class="image-card-categories">
@@ -235,7 +235,7 @@ const UI = {
             document.getElementById('edit-filename').value = filename;
             document.getElementById('edit-title').value = image.title;
             document.getElementById('edit-description').value = image.description;
-            document.getElementById('edit-image-preview').src = `/data/images/${filename}`;
+            document.getElementById('edit-image-preview').src = `/data/${filename}`;
 
             // Populate categories
             const categoriesContainer = document.getElementById('edit-categories');

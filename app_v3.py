@@ -296,10 +296,11 @@ def delete_category_v3(category_name):
 
 # ==================== STATIC FILE SERVING ====================
 
-@app.route('/data/images/<filename>')
+@app.route('/data/<filename>')
 def serve_image(filename):
     """Serve images from the data directory."""
-    return send_from_directory('/data/images', filename)
+    # Images are stored directly in /data/, not in /data/images/
+    return send_from_directory('/data', filename)
 
 
 # ==================== DIAGNOSTIC ROUTES (TEMPORARY) ====================

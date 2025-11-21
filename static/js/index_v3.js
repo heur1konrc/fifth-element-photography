@@ -61,7 +61,7 @@ function createImageCard(image) {
     card.className = 'image-card';
     
     // Build image URL
-    const imageUrl = `/data/images/${image.filename}`;
+    const imageUrl = `/data/${image.filename}`;
     
     // Build categories HTML
     let categoriesHtml = '';
