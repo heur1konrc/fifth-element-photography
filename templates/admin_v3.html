@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard V3 - Fifth Element Photography</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_v3.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-content">
+            <h1>Fifth Element Photography - Admin V3</h1>
+            <div class="header-actions">
+                <span class="version-badge">v3.0.0-alpha</span>
+                <a href="{{ url_for('logout_v3') }}" class="btn-logout">Logout</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="admin-container">
+        
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <button id="btn-upload" class="btn btn-primary">
+                    <span class="icon">📤</span> Upload Images
+                </button>
+                <button id="btn-manage-categories" class="btn btn-secondary">
+                    <span class="icon">🏷️</span> Manage Categories
+                </button>
+            </div>
+            
+            <div class="toolbar-right">
+                <select id="filter-category" class="select-filter">
+                    <option value="all">All Categories</option>
+                </select>
+                
+                <select id="sort-order" class="select-sort">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="name_asc">Name (A-Z)</option>
+                    <option value="name_desc">Name (Z-A)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Image Gallery -->
+        <div id="image-gallery" class="image-gallery">
+            <div class="loading">Loading images...</div>
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="pagination"></div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Upload Images</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">📁</div>
+                    <p>Drag and drop images here or click to browse</p>
+                    <input type="file" id="file-input" multiple accept="image/*" style="display: none;">
+                    <button id="btn-browse" class="btn btn-primary">Browse Files</button>
+                </div>
+                <div id="upload-preview" class="upload-preview"></div>
+                <div id="upload-status" class="upload-status"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-upload-confirm" class="btn btn-primary">Upload</button>
+                <button class="btn btn-secondary modal-close">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Image Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>Edit Image</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="edit-layout">
+                    <div class="edit-preview">
+                        <img id="edit-image-preview" src="" alt="Image preview">
+                    </div>
+                    <div class="edit-form">
+                        <div class="form-group">
+                            <label for="edit-title">Title</label>
+                            <input type="text" id="edit-title" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="edit-description">Description</label>
+                            <textarea id="edit-description" class="form-textarea" rows="6"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Categories</label>
+                            <div id="edit-categories" class="category-checkboxes"></div>
+                        </div>
+                        
+                        <input type="hidden" id="edit-filename">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-save-image" class="btn btn-primary">Save Changes</button>
+                <button id="btn-delete-image" class="btn btn-danger">Delete Image</button>
+                <button class="btn btn-secondary modal-close">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Categories Modal -->
+    <div id="categories-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Manage Categories</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="new-category-name">Add New Category</label>
+                    <div class="input-group">
+                        <input type="text" id="new-category-name" class="form-input" placeholder="Category name">
+                        <button id="btn-add-category" class="btn btn-primary">Add</button>
+                    </div>
+                </div>
+                
+                <div class="category-list">
+                    <h3>Current Categories</h3>
+                    <div id="current-categories" class="categories-grid"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification"></div>
+
+    <script src="{{ url_for('static', filename='js/admin_v3.js') }}"></script>
+</body>
+</html>
+
