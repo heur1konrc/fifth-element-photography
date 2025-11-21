@@ -655,6 +655,17 @@ document.getElementById('btn-bulk-delete').addEventListener('click', async () =>
     }
 });
 
+/**
+ * Backup button - download full backup
+ */
+document.getElementById('btn-backup').addEventListener('click', () => {
+    if (confirm('Create a backup of all images and data? This may take a moment for large galleries.')) {
+        // Open backup URL in new window to trigger download
+        window.location.href = '/api/v3/backup/create';
+        UI.showNotification('Creating backup... Download will start shortly.');
+    }
+});
+
 // ==================== INITIALIZATION ====================
 
 /**
