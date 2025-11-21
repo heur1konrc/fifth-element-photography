@@ -614,7 +614,8 @@ document.getElementById('btn-bulk-assign-confirm').addEventListener('click', asy
         // Deselect all and reload
         document.querySelectorAll('.image-checkbox').forEach(cb => cb.checked = false);
         updateSelectedImages();
-        await loadImages();
+        await loadCategories(); // Reload category counts
+        await loadImages(); // Reload gallery
     } catch (error) {
         UI.showNotification('Error assigning categories: ' + error.message, true);
     }
@@ -647,7 +648,8 @@ document.getElementById('btn-bulk-delete').addEventListener('click', async () =>
         // Deselect all and reload
         document.querySelectorAll('.image-checkbox').forEach(cb => cb.checked = false);
         updateSelectedImages();
-        await loadImages();
+        await loadCategories(); // Reload category counts
+        await loadImages(); // Reload gallery
     } catch (error) {
         UI.showNotification('Error deleting images: ' + error.message, true);
     }
