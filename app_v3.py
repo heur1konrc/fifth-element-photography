@@ -297,6 +297,44 @@ def delete_category_v3(category_name):
         return jsonify({'error': 'Category not found'}), 404
 
 
+@app.route('/api/v3/images/bulk/assign-categories', methods=['POST'])
+@login_required
+def bulk_assign_categories_v3():
+    """
+    Assign categories to multiple images at once.
+    
+    Request Body:
+        {
+            "filenames": ["image1.jpg", "image2.jpg", ...],
+            "categories": ["category1", "category2", ...]
+        }
+    
+    Returns:
+        JSON success message with count of updated images
+    """
+    data = request.get_json()
+    filenames = data.get('filenames', [])
+    categories = data.get('categories', [])
+    
+    if not filenames:
+        return jsonify({'error': 'No images selected'}), 400
+    
+    if not categories:
+        return jsonify({'error': 'No categories selected'}), 400
+    
+    # Assign categories to each image
+    success_count = 0
+    for filename in filenames:
+        if data_manager.assign_categories(filename, categories):
+            success_count += 1
+    
+    return jsonify({
+        'success': True,
+        'message': f'Assigned categories to {success_count} image(s)',
+        'count': success_count
+    })
+
+
 # ==================== STATIC FILE SERVING ====================
 
 @app.route('/data/<filename>')

@@ -15,7 +15,8 @@ const AppState = {
     currentSort: 'newest',
     currentPage: 1,
     imagesPerPage: 24,
-    selectedFiles: []
+    selectedFiles: [],
+    selectedImages: [] // For bulk operations
 };
 
 // ==================== API FUNCTIONS ====================
@@ -110,6 +111,19 @@ const API = {
         });
         if (!response.ok) throw new Error('Failed to delete category');
         return await response.json();
+    },
+
+    /**
+     * Bulk assign categories to multiple images
+     */
+    async bulkAssignCategories(filenames, categories) {
+        const response = await fetch('/api/v3/images/bulk/assign-categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filenames, categories })
+        });
+        if (!response.ok) throw new Error('Failed to assign categories');
+        return await response.json();
     }
 };
 
@@ -162,6 +176,7 @@ const UI = {
 
         gallery.innerHTML = paginatedImages.map(image => `
             <div class="image-card" data-filename="${image.filename}">
+                <input type="checkbox" class="image-checkbox" data-filename="${image.filename}">
                 <img src="/data/thumbnails/${image.filename}" alt="${image.title}" class="image-card-img">
                 <div class="image-card-content">
                     <div class="image-card-title">${image.title}</div>
@@ -174,11 +189,21 @@ const UI = {
             </div>
         `).join('');
 
-        // Add click handlers
+        // Add click handlers for image cards (not checkboxes)
         document.querySelectorAll('.image-card').forEach(card => {
-            card.addEventListener('click', () => {
+            card.addEventListener('click', (e) => {
+                // Don't open edit modal if clicking checkbox
+                if (e.target.classList.contains('image-checkbox')) return;
                 const filename = card.dataset.filename;
                 UI.openEditModal(filename);
+            });
+        });
+
+        // Add checkbox change handlers
+        document.querySelectorAll('.image-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                e.stopPropagation();
+                updateSelectedImages();
             });
         });
 
@@ -508,6 +533,124 @@ document.querySelectorAll('.modal').forEach(modal => {
             modal.classList.remove('active');
         }
     });
+});
+
+// ==================== BULK ACTIONS ====================
+
+/**
+ * Update selected images state and UI
+ */
+function updateSelectedImages() {
+    const checkboxes = document.querySelectorAll('.image-checkbox:checked');
+    AppState.selectedImages = Array.from(checkboxes).map(cb => cb.dataset.filename);
+    
+    const count = AppState.selectedImages.length;
+    const bulkBar = document.getElementById('bulk-actions-bar');
+    const countSpan = document.getElementById('selected-count');
+    
+    if (count > 0) {
+        bulkBar.style.display = 'flex';
+        countSpan.textContent = `${count} image${count > 1 ? 's' : ''} selected`;
+    } else {
+        bulkBar.style.display = 'none';
+    }
+}
+
+/**
+ * Select all images on current page
+ */
+document.getElementById('btn-select-all').addEventListener('click', () => {
+    document.querySelectorAll('.image-checkbox').forEach(cb => cb.checked = true);
+    updateSelectedImages();
+});
+
+/**
+ * Deselect all images
+ */
+document.getElementById('btn-deselect-all').addEventListener('click', () => {
+    document.querySelectorAll('.image-checkbox').forEach(cb => cb.checked = false);
+    updateSelectedImages();
+});
+
+/**
+ * Open bulk assign categories modal
+ */
+document.getElementById('btn-bulk-assign-categories').addEventListener('click', () => {
+    if (AppState.selectedImages.length === 0) return;
+    
+    // Update count in modal
+    document.getElementById('bulk-assign-count').textContent = AppState.selectedImages.length;
+    
+    // Populate categories
+    const container = document.getElementById('bulk-assign-categories');
+    container.innerHTML = AppState.categories.map(cat => `
+        <label class="category-checkbox-label">
+            <input type="checkbox" value="${cat.name}">
+            <span>${cat.name}</span>
+        </label>
+    `).join('');
+    
+    // Show modal
+    document.getElementById('bulk-assign-modal').classList.add('active');
+});
+
+/**
+ * Confirm bulk category assignment
+ */
+document.getElementById('btn-bulk-assign-confirm').addEventListener('click', async () => {
+    const checkboxes = document.querySelectorAll('#bulk-assign-categories input:checked');
+    const categories = Array.from(checkboxes).map(cb => cb.value);
+    
+    if (categories.length === 0) {
+        UI.showNotification('Please select at least one category', true);
+        return;
+    }
+    
+    try {
+        const result = await API.bulkAssignCategories(AppState.selectedImages, categories);
+        UI.showNotification(result.message);
+        document.getElementById('bulk-assign-modal').classList.remove('active');
+        
+        // Deselect all and reload
+        document.querySelectorAll('.image-checkbox').forEach(cb => cb.checked = false);
+        updateSelectedImages();
+        await loadImages();
+    } catch (error) {
+        UI.showNotification('Error assigning categories: ' + error.message, true);
+    }
+});
+
+/**
+ * Bulk delete images
+ */
+document.getElementById('btn-bulk-delete').addEventListener('click', async () => {
+    if (AppState.selectedImages.length === 0) return;
+    
+    const count = AppState.selectedImages.length;
+    if (!confirm(`Delete ${count} selected image${count > 1 ? 's' : ''}? This cannot be undone.`)) {
+        return;
+    }
+    
+    try {
+        let successCount = 0;
+        for (const filename of AppState.selectedImages) {
+            try {
+                await API.deleteImage(filename);
+                successCount++;
+            } catch (error) {
+                console.error(`Failed to delete ${filename}:`, error);
+            }
+        }
+        
+        UI.showNotification(`Deleted ${successCount} of ${count} image(s)`);
+        
+        // Deselect all and reload
+        document.querySelectorAll('.image-checkbox').forEach(cb => cb.checked = false);
+        updateSelectedImages();
+        await loadImages();
+    } catch (error) {
+        UI.showNotification('Error deleting images: ' + error.message, true);
+    }
 });
 
 // ==================== INITIALIZATION ====================
