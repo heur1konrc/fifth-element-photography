@@ -38,12 +38,12 @@ class DataManagerV3:
         self.data_dir = Path(data_dir)
         self.images_dir = self.data_dir / "images"
         
-        # Data file paths
-        self.metadata_file = self.data_dir / "image_metadata.json"
-        self.categories_file = self.data_dir / "image_categories.json"
-        self.category_list_file = self.data_dir / "categories.json"
-        self.featured_file = self.data_dir / "featured_image.json"
-        self.hero_file = self.data_dir / "hero_image.json"
+        # Data file paths - V3 uses separate files to avoid conflicts with old system
+        self.metadata_file = self.data_dir / "image_metadata_v3.json"
+        self.categories_file = self.data_dir / "image_categories_v3.json"
+        self.category_list_file = self.data_dir / "categories_v3.json"
+        self.featured_file = self.data_dir / "featured_image_v3.json"
+        self.hero_file = self.data_dir / "hero_image_v3.json"
         
         # Ensure directories exist
         self.images_dir.mkdir(parents=True, exist_ok=True)
