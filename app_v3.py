@@ -20,7 +20,8 @@ app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-producti
 data_manager = DataManagerV3(data_dir=os.environ.get('DATA_DIR', '/data'))
 
 # Configuration
-UPLOAD_FOLDER = '/data/images'
+# Images are stored directly in /data/, not in /data/images/
+UPLOAD_FOLDER = '/data'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
