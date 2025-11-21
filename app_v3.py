@@ -302,6 +302,37 @@ def serve_image(filename):
     return send_from_directory('/data/images', filename)
 
 
+# ==================== DIAGNOSTIC ROUTES (TEMPORARY) ====================
+
+@app.route('/api/v3/debug/list-images')
+@login_required
+def debug_list_images():
+    """Diagnostic endpoint to list all files in /data/images/ directory."""
+    import os
+    images_dir = '/data/images'
+    
+    try:
+        files = []
+        if os.path.exists(images_dir):
+            for filename in os.listdir(images_dir):
+                filepath = os.path.join(images_dir, filename)
+                if os.path.isfile(filepath):
+                    files.append({
+                        'filename': filename,
+                        'size': os.path.getsize(filepath),
+                        'is_image': filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))
+                    })
+        
+        return jsonify({
+            'directory': images_dir,
+            'exists': os.path.exists(images_dir),
+            'total_files': len(files),
+            'files': files
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 # ==================== FRONT-END ROUTES ====================
 
 @app.route('/')
