@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fifth Element Photography V3 - Test Front-End</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index_v3.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <h1>Fifth Element Photography</h1>
+            <p class="tagline">Test Front-End V3</p>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="gallery-container">
+            <h2>Image Gallery</h2>
+            <div id="image-gallery" class="image-gallery">
+                <div class="loading">Loading images...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; 2024 Fifth Element Photography | V3.0.0-alpha</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/index_v3.js') }}"></script>
+</body>
+</html>
+

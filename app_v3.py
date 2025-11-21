@@ -84,7 +84,6 @@ def admin_v3():
 # ==================== IMAGE API ROUTES ====================
 
 @app.route('/api/v3/images', methods=['GET'])
-@login_required
 def get_images_v3():
     """
     Get all images with metadata and categories.
