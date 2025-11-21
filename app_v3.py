@@ -388,6 +388,30 @@ def debug_list_images():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/v3/debug/categories-data')
+@login_required
+def debug_categories_data():
+    """Diagnostic endpoint to view raw category data file."""
+    try:
+        categories_file = '/data/image_categories_v3.json'
+        if os.path.exists(categories_file):
+            with open(categories_file, 'r') as f:
+                data = json.load(f)
+            return jsonify({
+                'file': categories_file,
+                'exists': True,
+                'total_entries': len(data),
+                'data': data
+            })
+        else:
+            return jsonify({
+                'file': categories_file,
+                'exists': False
+            })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/v3/debug/list-data')
 @login_required
 def debug_list_data():
