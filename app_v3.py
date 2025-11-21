@@ -10,6 +10,7 @@ from flask import Flask, render_template, request, jsonify, send_from_directory,
 from werkzeug.utils import secure_filename
 from data_manager_v3 import DataManagerV3
 import os
+import json
 from functools import wraps
 
 # Initialize Flask app
