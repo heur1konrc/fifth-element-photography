@@ -193,6 +193,31 @@ class DataManagerV3:
         self._write_json(self.categories_file, category_data)
         return True
     
+    def assign_categories(self, filenames: List[str], categories: List[str]) -> int:
+        """
+        Assign categories to multiple images at once.
+        
+        Args:
+            filenames: List of image filenames
+            categories: List of category names to assign
+            
+        Returns:
+            Number of images successfully updated
+        """
+        category_data = self._read_json(self.categories_file)
+        success_count = 0
+        
+        for filename in filenames:
+            # Get existing categories for this image
+            existing = category_data.get(filename, [])
+            # Add new categories (avoid duplicates)
+            updated = list(set(existing + categories))
+            category_data[filename] = updated
+            success_count += 1
+        
+        self._write_json(self.categories_file, category_data)
+        return success_count
+    
     def delete_image(self, filename: str) -> bool:
         """
         Delete an image and all its associated data.
