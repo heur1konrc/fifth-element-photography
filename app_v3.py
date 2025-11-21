@@ -413,6 +413,51 @@ def debug_categories_data():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/v3/debug/cleanup-categories', methods=['POST'])
+@login_required
+def debug_cleanup_categories():
+    """Cleanup corrupted category data - remove invalid entries."""
+    try:
+        categories_file = '/data/image_categories_v3.json'
+        if not os.path.exists(categories_file):
+            return jsonify({'error': 'Categories file not found'}), 404
+        
+        # Read current data
+        with open(categories_file, 'r') as f:
+            data = json.load(f)
+        
+        # Get list of actual image files
+        images_dir = '/data'
+        valid_filenames = set()
+        for filename in os.listdir(images_dir):
+            filepath = os.path.join(images_dir, filename)
+            if os.path.isfile(filepath) and filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+                valid_filenames.add(filename)
+        
+        # Filter out invalid entries
+        cleaned_data = {}
+        removed_count = 0
+        for key, value in data.items():
+            if key in valid_filenames:
+                cleaned_data[key] = value
+            else:
+                removed_count += 1
+        
+        # Write cleaned data back
+        with open(categories_file, 'w') as f:
+            json.dump(cleaned_data, f, indent=2, ensure_ascii=False)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Cleaned up category data',
+            'removed_entries': removed_count,
+            'remaining_entries': len(cleaned_data),
+            'valid_images': len(valid_filenames)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/v3/debug/list-data')
 @login_required
 def debug_list_data():
