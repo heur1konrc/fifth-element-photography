@@ -322,11 +322,8 @@ def bulk_assign_categories_v3():
     if not categories:
         return jsonify({'error': 'No categories selected'}), 400
     
-    # Assign categories to each image
-    success_count = 0
-    for filename in filenames:
-        if data_manager.assign_categories(filename, categories):
-            success_count += 1
+    # Assign categories to all images at once
+    success_count = data_manager.assign_categories(filenames, categories)
     
     return jsonify({
         'success': True,
