@@ -6,11 +6,14 @@ Clean, well-documented Flask application for Admin V3.
 All routes are organized and documented.
 """
 
-from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for, send_file
 from werkzeug.utils import secure_filename
 from data_manager_v3 import DataManagerV3
 import os
 import json
+import zipfile
+import tempfile
+from datetime import datetime
 from functools import wraps
 
 # Initialize Flask app
@@ -297,6 +300,72 @@ def delete_category_v3(category_name):
     else:
         return jsonify({'error': 'Category not found'}), 404
 
+
+# ==================== BACKUP ROUTES ====================
+
+@app.route('/api/v3/backup/create')
+@login_required
+def create_backup_v3():
+    """
+    Create a backup of all V3 data (metadata files and images).
+    Returns a downloadable zip file.
+    
+    Returns:
+        ZIP file download containing:
+        - All V3 metadata JSON files
+        - All image files from /data/
+        - All thumbnails from /data/thumbnails/
+    """
+    try:
+        # Create temporary file for the zip
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.zip')
+        temp_file.close()
+        
+        with zipfile.ZipFile(temp_file.name, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            # Add V3 metadata files
+            metadata_files = [
+                '/data/image_metadata_v3.json',
+                '/data/image_categories_v3.json',
+                '/data/categories_v3.json'
+            ]
+            
+            for filepath in metadata_files:
+                if os.path.exists(filepath):
+                    arcname = os.path.basename(filepath)
+                    zipf.write(filepath, arcname=f'metadata/{arcname}')
+            
+            # Add all image files from /data/
+            images_dir = '/data'
+            if os.path.exists(images_dir):
+                for filename in os.listdir(images_dir):
+                    filepath = os.path.join(images_dir, filename)
+                    if os.path.isfile(filepath) and filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+                        zipf.write(filepath, arcname=f'images/{filename}')
+            
+            # Add all thumbnails from /data/thumbnails/
+            thumbnails_dir = '/data/thumbnails'
+            if os.path.exists(thumbnails_dir):
+                for filename in os.listdir(thumbnails_dir):
+                    filepath = os.path.join(thumbnails_dir, filename)
+                    if os.path.isfile(filepath):
+                        zipf.write(filepath, arcname=f'thumbnails/{filename}')
+        
+        # Generate filename with timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        download_name = f'fifth_element_backup_v3_{timestamp}.zip'
+        
+        return send_file(
+            temp_file.name,
+            as_attachment=True,
+            download_name=download_name,
+            mimetype='application/zip'
+        )
+    
+    except Exception as e:
+        return jsonify({'error': f'Backup failed: {str(e)}'}), 500
+
+
+# ==================== BULK OPERATIONS ROUTES ====================
 
 @app.route('/api/v3/images/bulk/assign-categories', methods=['POST'])
 @login_required
