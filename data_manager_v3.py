@@ -11,6 +11,7 @@ make future data storage changes easier.
 """
 
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Dict, List, Optional, Any
