@@ -418,7 +418,7 @@ class DataManagerV3:
     
     def get_exif_data(self, filename: str) -> Dict[str, Any]:
         """
-        Extract EXIF data from an image.
+        Extract EXIF data from an image (using same method as production).
         
         Args:
             filename: Name of the image file
@@ -431,106 +431,187 @@ class DataManagerV3:
             
             image_path = self.images_dir / filename
             if not image_path.exists():
-                return {}
+                return self._get_default_exif()
             
+            logging.info(f"Extracting EXIF from: {image_path}")
+            
+            # Open image and get EXIF data using _getexif() (same as production)
             with Image.open(image_path) as img:
-                exif_data = {}
-                
-                # Get raw EXIF data (use getexif() instead of deprecated _getexif())
-                exif = img.getexif()
-                if not exif:
-                    return {}
-                
-                # Convert to human-readable format
-                for tag_id, value in exif.items():
-                    tag = TAGS.get(tag_id, tag_id)
-                    exif_data[tag] = value
-                
-                # Also get EXIF IFD data (where camera settings are stored)
-                try:
-                    from PIL.ExifTags import IFD
-                    exif_ifd = exif.get_ifd(IFD.Exif)
-                    if exif_ifd:
-                        for tag_id, value in exif_ifd.items():
-                            tag = TAGS.get(tag_id, tag_id)
-                            exif_data[tag] = value
-                except Exception as e:
-                    logging.warning(f"Could not read EXIF IFD: {e}")
-                
-                # Log all available tags for debugging
-                logging.info(f"Available EXIF tags for {filename}: {list(exif_data.keys())[:20]}")
-                
-                # Extract commonly used fields
-                result = {}
-                
-                # Camera model (skip make as it's redundant)
-                if 'Model' in exif_data:
-                    result['camera'] = str(exif_data['Model']).strip()
-                
-                # Lens
-                if 'LensModel' in exif_data:
-                    result['lens'] = str(exif_data['LensModel']).strip()
-                elif 'LensMake' in exif_data:
-                    result['lens'] = str(exif_data['LensMake']).strip()
-                
-                # Aperture
-                if 'FNumber' in exif_data:
-                    f_number = exif_data['FNumber']
-                    if isinstance(f_number, tuple):
-                        result['aperture'] = f"f/{f_number[0]/f_number[1]:.1f}"
-                    else:
-                        result['aperture'] = f"f/{f_number:.1f}"
-                elif 'ApertureValue' in exif_data:
-                    result['aperture'] = f"f/{exif_data['ApertureValue']}"
-                
-                # Shutter speed
-                if 'ExposureTime' in exif_data:
-                    exp_time = exif_data['ExposureTime']
-                    if isinstance(exp_time, tuple):
-                        if exp_time[0] < exp_time[1]:
-                            result['shutter_speed'] = f"{exp_time[0]}/{exp_time[1]}s"
-                        else:
-                            result['shutter_speed'] = f"{exp_time[0]/exp_time[1]:.2f}s"
-                    else:
-                        result['shutter_speed'] = f"{exp_time}s"
-                elif 'ShutterSpeedValue' in exif_data:
-                    result['shutter_speed'] = str(exif_data['ShutterSpeedValue'])
-                
-                # ISO
-                if 'ISOSpeedRatings' in exif_data:
-                    iso_val = exif_data['ISOSpeedRatings']
-                    if isinstance(iso_val, tuple):
-                        result['iso'] = f"ISO {iso_val[0]}"
-                    else:
-                        result['iso'] = f"ISO {iso_val}"
-                elif 'PhotographicSensitivity' in exif_data:
-                    result['iso'] = f"ISO {exif_data['PhotographicSensitivity']}"
-                
-                # Focal length
-                if 'FocalLength' in exif_data:
-                    focal = exif_data['FocalLength']
-                    if isinstance(focal, tuple):
-                        result['focal_length'] = f"{focal[0]/focal[1]:.0f}mm"
-                    else:
-                        result['focal_length'] = f"{focal:.0f}mm"
-                
-                # Date taken
-                if 'DateTimeOriginal' in exif_data:
-                    result['date_taken'] = str(exif_data['DateTimeOriginal'])
-                elif 'DateTime' in exif_data:
-                    result['date_taken'] = str(exif_data['DateTime'])
-                
-                # Image dimensions
-                if 'ExifImageWidth' in exif_data and 'ExifImageHeight' in exif_data:
-                    result['dimensions'] = f"{exif_data['ExifImageWidth']} x {exif_data['ExifImageHeight']}"
-                elif img.size:
-                    result['dimensions'] = f"{img.size[0]} x {img.size[1]}"
-                
-                return result
-                
+                exif_data = img._getexif()
+            
+            if not exif_data:
+                logging.info("No EXIF data found in image")
+                return self._get_default_exif()
+            
+            # Convert EXIF data to readable format
+            exif = {}
+            for tag_id, value in exif_data.items():
+                tag = TAGS.get(tag_id, tag_id)
+                exif[tag] = value
+            
+            logging.info(f"Found EXIF tags: {list(exif.keys())[:20]}")
+            
+            # Return formatted EXIF data matching template expectations
+            return {
+                'camera': self._get_camera_info(exif),
+                'lens': self._get_lens_info(exif),
+                'aperture': self._get_aperture_info(exif),
+                'shutter_speed': self._get_shutter_speed_info(exif),
+                'iso': self._get_iso_info(exif),
+                'focal_length': self._get_focal_length_info(exif),
+                'date_taken': self._get_date_taken(exif),
+                'dimensions': self._get_dimensions(exif)
+            }
+        
         except Exception as e:
             logging.error(f"Error extracting EXIF from {filename}: {e}")
             import traceback
             logging.error(traceback.format_exc())
-            return {}
+            return self._get_default_exif()
+    
+    def _get_camera_info(self, exif: Dict) -> str:
+        """Extract camera information from EXIF"""
+        make = exif.get('Make', '').strip()
+        model = exif.get('Model', '').strip()
+        
+        if make and model:
+            # Remove make from model if it's already included
+            if make.lower() in model.lower():
+                return model
+            else:
+                return f"{make} {model}"
+        elif model:
+            return model
+        elif make:
+            return make
+        else:
+            return 'Unavailable'
+    
+    def _get_lens_info(self, exif: Dict) -> str:
+        """Extract lens information from EXIF"""
+        # Try different lens fields
+        lens_fields = ['LensModel', 'Lens', 'LensInfo', 'LensMake']
+        
+        for field in lens_fields:
+            lens = exif.get(field)
+            if lens:
+                if isinstance(lens, str):
+                    return lens.strip()
+                elif isinstance(lens, bytes):
+                    try:
+                        return lens.decode('utf-8').strip()
+                    except:
+                        continue
+        
+        return 'Unavailable'
+    
+    def _get_aperture_info(self, exif: Dict) -> str:
+        """Extract aperture information from EXIF"""
+        # Try FNumber first, then ApertureValue
+        f_number = exif.get('FNumber')
+        if f_number:
+            try:
+                if isinstance(f_number, tuple) and len(f_number) == 2:
+                    aperture = f_number[0] / f_number[1]
+                    return f"f/{aperture:.1f}"
+                else:
+                    # Handle direct float/string values
+                    aperture = float(f_number)
+                    return f"f/{aperture:.1f}"
+            except:
+                pass
+        
+        # Try ApertureValue as backup
+        aperture_value = exif.get('ApertureValue')
+        if aperture_value:
+            try:
+                aperture = float(aperture_value)
+                return f"f/{aperture:.1f}"
+            except:
+                pass
+        
+        return 'Unavailable'
+    
+    def _get_shutter_speed_info(self, exif: Dict) -> str:
+        """Extract shutter speed information from EXIF"""
+        exposure_time = exif.get('ExposureTime')
+        if exposure_time:
+            if isinstance(exposure_time, tuple) and len(exposure_time) == 2:
+                if exposure_time[0] == 1:
+                    return f"1/{exposure_time[1]}s"
+                else:
+                    speed = exposure_time[0] / exposure_time[1]
+                    if speed >= 1:
+                        return f"{speed:.1f}s"
+                    else:
+                        return f"1/{int(1/speed)}s"
+            elif hasattr(exposure_time, '__float__'):  # Handle IFDRational and other numeric types
+                speed = float(exposure_time)
+                if speed >= 1:
+                    return f"{speed:.1f}s"
+                else:
+                    return f"1/{int(1/speed)}s"
+            elif isinstance(exposure_time, (int, float)):
+                if exposure_time >= 1:
+                    return f"{exposure_time:.1f}s"
+                else:
+                    return f"1/{int(1/exposure_time)}s"
+        
+        return 'Unavailable'
+    
+    def _get_iso_info(self, exif: Dict) -> str:
+        """Extract ISO information from EXIF"""
+        iso_fields = ['ISOSpeedRatings', 'ISO', 'PhotographicSensitivity']
+        
+        for field in iso_fields:
+            iso = exif.get(field)
+            if iso:
+                if isinstance(iso, (list, tuple)) and len(iso) > 0:
+                    return f"ISO {iso[0]}"
+                elif isinstance(iso, (int, float)):
+                    return f"ISO {int(iso)}"
+        
+        return 'Unavailable'
+    
+    def _get_focal_length_info(self, exif: Dict) -> str:
+        """Extract focal length information from EXIF"""
+        focal_length = exif.get('FocalLength')
+        if focal_length:
+            if isinstance(focal_length, tuple) and len(focal_length) == 2:
+                fl = focal_length[0] / focal_length[1]
+                return f"{fl:.0f}mm"
+            elif hasattr(focal_length, '__float__'):  # Handle IFDRational and other numeric types
+                return f"{float(focal_length):.0f}mm"
+            elif isinstance(focal_length, (int, float)):
+                return f"{focal_length:.0f}mm"
+        
+        return 'Unavailable'
+    
+    def _get_date_taken(self, exif: Dict) -> str:
+        """Extract date taken from EXIF"""
+        date_taken = exif.get('DateTimeOriginal') or exif.get('DateTime')
+        if date_taken:
+            return str(date_taken)
+        return 'Unavailable'
+    
+    def _get_dimensions(self, exif: Dict) -> str:
+        """Extract image dimensions from EXIF"""
+        width = exif.get('ExifImageWidth')
+        height = exif.get('ExifImageHeight')
+        if width and height:
+            return f"{width} x {height}"
+        return 'Unavailable'
+    
+    def _get_default_exif(self) -> Dict[str, str]:
+        """Return default EXIF data when extraction fails"""
+        return {
+            'camera': 'Unavailable',
+            'lens': 'Unavailable',
+            'aperture': 'Unavailable',
+            'shutter_speed': 'Unavailable',
+            'iso': 'Unavailable',
+            'focal_length': 'Unavailable',
+            'date_taken': 'Unavailable',
+            'dimensions': 'Unavailable'
+        }
 
