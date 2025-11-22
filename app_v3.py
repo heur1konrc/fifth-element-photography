@@ -6,7 +6,7 @@ Clean, well-documented Flask application for Admin V3.
 All routes are organized and documented.
 """
 
-from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for, send_file
+from flask import Flask, render_template, request, jsonify, send_from_directory, session, redirect, url_for, send_file, Response
 from werkzeug.utils import secure_filename
 from data_manager_v3 import DataManagerV3
 import os
@@ -375,21 +375,24 @@ def create_backup_v3():
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         download_name = f'fifth_element_backup_v3_{timestamp}.tar.gz'
         
-        # Schedule cleanup of temp file after response is sent
-        @atexit.register
-        def cleanup():
+        # Create a streaming response for large files
+        def generate():
+            with open(temp_path, 'rb') as f:
+                while True:
+                    chunk = f.read(8192)  # 8KB chunks
+                    if not chunk:
+                        break
+                    yield chunk
+            # Clean up temp file after streaming completes
             try:
-                if os.path.exists(temp_path):
-                    os.unlink(temp_path)
+                os.unlink(temp_path)
             except:
                 pass
         
-        return send_file(
-            temp_path,
-            as_attachment=True,
-            download_name=download_name,
-            mimetype='application/gzip'
-        )
+        response = Response(generate(), mimetype='application/gzip')
+        response.headers['Content-Disposition'] = f'attachment; filename="{download_name}"'
+        response.headers['Content-Length'] = str(file_size)
+        return response
     
     except Exception as e:
         # Clean up temp file on error
