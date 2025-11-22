@@ -446,6 +446,17 @@ class DataManagerV3:
                     tag = TAGS.get(tag_id, tag_id)
                     exif_data[tag] = value
                 
+                # Also get EXIF IFD data (where camera settings are stored)
+                try:
+                    from PIL.ExifTags import IFD
+                    exif_ifd = exif.get_ifd(IFD.Exif)
+                    if exif_ifd:
+                        for tag_id, value in exif_ifd.items():
+                            tag = TAGS.get(tag_id, tag_id)
+                            exif_data[tag] = value
+                except Exception as e:
+                    logging.warning(f"Could not read EXIF IFD: {e}")
+                
                 # Log all available tags for debugging
                 logging.info(f"Available EXIF tags for {filename}: {list(exif_data.keys())[:20]}")
                 
