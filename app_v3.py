@@ -307,26 +307,24 @@ def delete_category_v3(category_name):
 @login_required
 def create_backup_v3():
     """
-    Create a backup of all V3 data (metadata files and images).
-    Returns a downloadable tar.gz file.
+    Create a backup of all V3 data and save to /data/backups/.
+    Returns JSON with download URL.
     
     Returns:
-        TAR.GZ file download containing:
-        - All V3 metadata JSON files
-        - All image files from /data/
-        - All thumbnails from /data/thumbnails/
+        JSON with backup filename and download URL
     """
     try:
+        # Create backups directory if it doesn't exist
+        backups_dir = '/data/backups'
+        os.makedirs(backups_dir, exist_ok=True)
+        
         # Create backup filename
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         backup_filename = f'fifth_element_backup_v3_{timestamp}.tar.gz'
+        backup_path = os.path.join(backups_dir, backup_filename)
         
-        # Create temporary file using mkstemp (same as working old code)
-        temp_fd, temp_path = tempfile.mkstemp(suffix='.tar.gz')
-        os.close(temp_fd)  # Close the file descriptor immediately
-        
-        # Create tar.gz archive
-        with tarfile.open(temp_path, 'w:gz') as tar:
+        # Create tar.gz archive directly in /data/backups/
+        with tarfile.open(backup_path, 'w:gz') as tar:
             # Add V3 metadata files
             metadata_files = [
                 '/data/image_metadata_v3.json',
@@ -357,8 +355,18 @@ def create_backup_v3():
                         arcname = os.path.join('thumbnails', filename)
                         tar.add(filepath, arcname=arcname)
         
-        # Send file using simple send_file (same as working old code)
-        return send_file(temp_path, as_attachment=True, download_name=backup_filename)
+        # Get file size
+        file_size = os.path.getsize(backup_path)
+        file_size_mb = file_size / (1024 * 1024)
+        
+        # Return JSON with download URL
+        return jsonify({
+            'success': True,
+            'filename': backup_filename,
+            'download_url': f'/data/backups/{backup_filename}',
+            'size_bytes': file_size,
+            'size_mb': round(file_size_mb, 2)
+        })
         
     except Exception as e:
         return jsonify({'error': f'Backup failed: {str(e)}'}), 500
@@ -424,6 +432,12 @@ def serve_thumbnail(filename):
     
     # Serve the thumbnail
     return send_from_directory('/data/thumbnails', filename)
+
+
+@app.route('/data/backups/<filename>')
+def serve_backup(filename):
+    """Serve backup files from /data/backups/ directory."""
+    return send_from_directory('/data/backups', filename)
 
 
 # ==================== DIAGNOSTIC ROUTES (TEMPORARY) ====================

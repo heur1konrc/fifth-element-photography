@@ -656,13 +656,29 @@ document.getElementById('btn-bulk-delete').addEventListener('click', async () =>
 });
 
 /**
- * Backup button - download full backup
+ * Backup button - create backup and show download link
  */
-document.getElementById('btn-backup').addEventListener('click', () => {
+document.getElementById('btn-backup').addEventListener('click', async () => {
     if (confirm('Create a backup of all images and data? This may take a moment for large galleries.')) {
-        // Open backup URL in new window to trigger download
-        window.location.href = '/api/v3/backup/create';
-        UI.showNotification('Creating backup... Download will start shortly.');
+        try {
+            UI.showNotification('Creating backup... Please wait.');
+            
+            const response = await fetch('/api/v3/backup/create');
+            const data = await response.json();
+            
+            if (data.success) {
+                // Show success message with download link
+                const message = `Backup created successfully!\n\nFile: ${data.filename}\nSize: ${data.size_mb} MB\n\nClick OK to download.`;
+                if (confirm(message)) {
+                    window.location.href = data.download_url;
+                }
+                UI.showNotification(`Backup ready: ${data.filename} (${data.size_mb} MB)`);
+            } else {
+                UI.showNotification('Backup failed: ' + (data.error || 'Unknown error'), true);
+            }
+        } catch (error) {
+            UI.showNotification('Error creating backup: ' + error.message, true);
+        }
     }
 });
 
