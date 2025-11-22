@@ -1,6 +1,6 @@
 """
 Flask Application V3 - Fifth Element Photography
-Version: 3.0.0-alpha
+Version: 3.0.1
 
 Clean, well-documented Flask application for Admin V3.
 All routes are organized and documented.

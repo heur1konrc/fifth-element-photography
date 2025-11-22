@@ -1,6 +1,6 @@
 """
 Data Manager V3 - Fifth Element Photography
-Version: 3.0.0-alpha
+Version: 3.0.1
 
 This module provides a clean interface for all data persistence operations.
 It handles reading from and writing to JSON data files, isolating the
