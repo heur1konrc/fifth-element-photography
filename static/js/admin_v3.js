@@ -379,30 +379,57 @@ async function loadCategories() {
 }
 
 /**
- * Handle filter change
+ * Setup all event listeners
  */
-document.getElementById('filter-category').addEventListener('change', async (e) => {
-    AppState.currentFilter = e.target.value;
-    AppState.currentPage = 1;
-    await loadImages();
-});
+function setupEventListeners() {
+    /**
+     * Handle category filter change
+     */
+    document.getElementById('filter-category').addEventListener('change', async (e) => {
+        AppState.currentFilter = e.target.value;
+        AppState.currentPage = 1;
+        await loadImages();
+    });
 
-/**
- * Handle sort change
- */
-document.getElementById('sort-order').addEventListener('change', async (e) => {
-    AppState.currentSort = e.target.value;
-    AppState.currentPage = 1;
-    await loadImages();
-});
+    /**
+     * Handle sort change
+     */
+    document.getElementById('sort-order').addEventListener('change', async (e) => {
+        AppState.currentSort = e.target.value;
+        AppState.currentPage = 1;
+        await loadImages();
+    });
 
-/**
- * Handle search input
- */
-document.getElementById('search-box').addEventListener('input', (e) => {
-    AppState.searchQuery = e.target.value.toLowerCase().trim();
-    UI.renderGallery(getFilteredAndSortedImages());
-});
+    /**
+     * Handle search input
+     */
+    document.getElementById('search-box').addEventListener('input', (e) => {
+        AppState.searchQuery = e.target.value.toLowerCase().trim();
+        UI.renderGallery(getFilteredAndSortedImages());
+    });
+
+    /**
+     * Handle upload button
+     */
+    document.getElementById('btn-upload').addEventListener('click', () => {
+        UI.showModal('upload-modal');
+    });
+
+    /**
+     * Handle manage categories button
+     */
+    document.getElementById('btn-manage-categories').addEventListener('click', () => {
+        UI.renderCategoriesModal();
+        UI.showModal('categories-modal');
+    });
+
+    /**
+     * Handle browse files button
+     */
+    document.getElementById('btn-browse').addEventListener('click', () => {
+        document.getElementById('file-input').click();
+    });
+}
 
 /**
  * Get filtered and sorted images based on current state
@@ -442,27 +469,7 @@ function getFilteredAndSortedImages() {
     return filtered;
 }
 
-/**
- * Handle upload button
- */
-document.getElementById('btn-upload').addEventListener('click', () => {
-    UI.showModal('upload-modal');
-});
 
-/**
- * Handle manage categories button
- */
-document.getElementById('btn-manage-categories').addEventListener('click', () => {
-    UI.renderCategoriesModal();
-    UI.showModal('categories-modal');
-});
-
-/**
- * Handle browse files button
- */
-document.getElementById('btn-browse').addEventListener('click', () => {
-    document.getElementById('file-input').click();
-});
 
 /**
  * Handle file selection
@@ -869,6 +876,7 @@ async function deleteBackup(filename) {
  * Initialize the application
  */
 async function init() {
+    setupEventListeners();
     await loadCategories();
     await loadImages();
 }
