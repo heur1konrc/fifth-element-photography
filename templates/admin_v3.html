@@ -32,7 +32,10 @@
                 </button>
                 
                 <button id="btn-backup" class="btn btn-success">
-                    <span class="icon">💾</span> Backup System
+                    <span class="icon">💾</span> Create Backup
+                </button>
+                <button id="btn-manage-backups" class="btn btn-secondary">
+                    <span class="icon">📦</span> Manage Backups
                 </button>
             </div>
             
@@ -202,6 +205,29 @@
             </div>
             <div class="modal-footer">
                 <a id="btn-download-backup" href="#" class="btn btn-primary" download>Download Backup</a>
+                <button class="btn btn-secondary modal-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Backups Modal -->
+    <div id="manage-backups-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>📦 Manage Backups</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="backups-summary" style="margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+                    <strong>Total Backups:</strong> <span id="backups-count">0</span> &nbsp;|&nbsp; 
+                    <strong>Total Size:</strong> <span id="backups-total-size">0</span> MB
+                </div>
+                <div id="backups-list" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Backups will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-refresh-backups" class="btn btn-secondary">Refresh</button>
                 <button class="btn btn-secondary modal-close">Close</button>
             </div>
         </div>

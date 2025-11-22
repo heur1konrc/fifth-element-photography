@@ -686,6 +686,97 @@ document.getElementById('btn-backup').addEventListener('click', async () => {
     }
 });
 
+/**
+ * Manage Backups button - open backups management modal
+ */
+document.getElementById('btn-manage-backups').addEventListener('click', async () => {
+    document.getElementById('manage-backups-modal').classList.add('active');
+    await loadBackupsList();
+});
+
+/**
+ * Refresh backups list
+ */
+document.getElementById('btn-refresh-backups').addEventListener('click', async () => {
+    await loadBackupsList();
+});
+
+/**
+ * Load and display backups list
+ */
+async function loadBackupsList() {
+    try {
+        const response = await fetch('/api/v3/backup/list');
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update summary
+            document.getElementById('backups-count').textContent = data.total_count;
+            document.getElementById('backups-total-size').textContent = data.total_size_mb;
+            
+            // Build backups list HTML
+            const listContainer = document.getElementById('backups-list');
+            
+            if (data.backups.length === 0) {
+                listContainer.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No backups found</p>';
+                return;
+            }
+            
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<thead><tr style="border-bottom: 2px solid #ddd; text-align: left;">';
+            html += '<th style="padding: 10px;">Filename</th>';
+            html += '<th style="padding: 10px;">Date</th>';
+            html += '<th style="padding: 10px;">Size</th>';
+            html += '<th style="padding: 10px;">Actions</th>';
+            html += '</tr></thead><tbody>';
+            
+            data.backups.forEach(backup => {
+                html += '<tr style="border-bottom: 1px solid #eee;">';
+                html += `<td style="padding: 10px; font-family: monospace; font-size: 12px;">${backup.filename}</td>`;
+                html += `<td style="padding: 10px;">${backup.created}</td>`;
+                html += `<td style="padding: 10px;">${backup.size_mb} MB</td>`;
+                html += '<td style="padding: 10px;">';
+                html += `<a href="${backup.download_url}" class="btn btn-sm btn-primary" download style="margin-right: 5px;">Download</a>`;
+                html += `<button class="btn btn-sm btn-danger" onclick="deleteBackup('${backup.filename}')">Delete</button>`;
+                html += '</td>';
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            listContainer.innerHTML = html;
+        } else {
+            UI.showNotification('Failed to load backups: ' + (data.error || 'Unknown error'), true);
+        }
+    } catch (error) {
+        UI.showNotification('Error loading backups: ' + error.message, true);
+    }
+}
+
+/**
+ * Delete a backup file
+ */
+async function deleteBackup(filename) {
+    if (!confirm(`Delete backup: ${filename}?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/v3/backup/delete/${filename}`, {
+            method: 'DELETE'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            UI.showNotification(`✓ Backup deleted: ${filename}`);
+            await loadBackupsList(); // Refresh the list
+        } else {
+            UI.showNotification('Failed to delete backup: ' + (data.error || 'Unknown error'), true);
+        }
+    } catch (error) {
+        UI.showNotification('Error deleting backup: ' + error.message, true);
+    }
+}
+
 // ==================== INITIALIZATION ====================
 
 /**

@@ -303,6 +303,87 @@ def delete_category_v3(category_name):
 
 # ==================== BACKUP ROUTES ====================
 
+@app.route('/api/v3/backup/list')
+@login_required
+def list_backups_v3():
+    """
+    List all existing backups with metadata.
+    
+    Returns:
+        JSON with list of backups (filename, size, date)
+    """
+    try:
+        backups_dir = '/data/backups'
+        backups = []
+        total_size = 0
+        
+        if os.path.exists(backups_dir):
+            for filename in os.listdir(backups_dir):
+                if filename.endswith('.tar.gz'):
+                    filepath = os.path.join(backups_dir, filename)
+                    stat = os.stat(filepath)
+                    size_bytes = stat.st_size
+                    size_mb = size_bytes / (1024 * 1024)
+                    total_size += size_bytes
+                    
+                    backups.append({
+                        'filename': filename,
+                        'size_bytes': size_bytes,
+                        'size_mb': round(size_mb, 2),
+                        'created': datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S'),
+                        'download_url': f'/data/backups/{filename}'
+                    })
+            
+            # Sort by creation time, newest first
+            backups.sort(key=lambda x: x['created'], reverse=True)
+        
+        total_size_mb = total_size / (1024 * 1024)
+        
+        return jsonify({
+            'success': True,
+            'backups': backups,
+            'total_count': len(backups),
+            'total_size_mb': round(total_size_mb, 2)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to list backups: {str(e)}'}), 500
+
+
+@app.route('/api/v3/backup/delete/<filename>', methods=['DELETE'])
+@login_required
+def delete_backup_v3(filename):
+    """
+    Delete a specific backup file.
+    
+    Args:
+        filename: Name of the backup file to delete
+    
+    Returns:
+        JSON success message
+    """
+    try:
+        # Security: only allow deleting .tar.gz files
+        if not filename.endswith('.tar.gz'):
+            return jsonify({'error': 'Invalid file type'}), 400
+        
+        backups_dir = '/data/backups'
+        filepath = os.path.join(backups_dir, filename)
+        
+        if not os.path.exists(filepath):
+            return jsonify({'error': 'Backup file not found'}), 404
+        
+        os.remove(filepath)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Backup {filename} deleted successfully'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to delete backup: {str(e)}'}), 500
+
+
 @app.route('/api/v3/backup/create')
 @login_required
 def create_backup_v3():
