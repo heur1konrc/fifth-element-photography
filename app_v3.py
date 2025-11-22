@@ -316,19 +316,16 @@ def create_backup_v3():
         - All image files from /data/
         - All thumbnails from /data/thumbnails/
     """
-    import atexit
-    import logging
-    
     try:
-        # Create temporary file for the tar.gz
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.tar.gz')
-        temp_path = temp_file.name
-        temp_file.close()
+        # Create backup filename
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_filename = f'fifth_element_backup_v3_{timestamp}.tar.gz'
         
-        logging.info(f"Backup: Creating tar.gz at {temp_path}")
-        file_count = 0
+        # Create temporary file using mkstemp (same as working old code)
+        temp_fd, temp_path = tempfile.mkstemp(suffix='.tar.gz')
+        os.close(temp_fd)  # Close the file descriptor immediately
         
-        # Create the tar.gz archive
+        # Create tar.gz archive
         with tarfile.open(temp_path, 'w:gz') as tar:
             # Add V3 metadata files
             metadata_files = [
@@ -341,8 +338,6 @@ def create_backup_v3():
                 if os.path.exists(filepath):
                     arcname = os.path.join('metadata', os.path.basename(filepath))
                     tar.add(filepath, arcname=arcname)
-                    file_count += 1
-                    logging.info(f"Backup: Added {arcname}")
             
             # Add all image files from /data/
             images_dir = '/data'
@@ -352,7 +347,6 @@ def create_backup_v3():
                     if os.path.isfile(filepath) and filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
                         arcname = os.path.join('images', filename)
                         tar.add(filepath, arcname=arcname)
-                        file_count += 1
             
             # Add all thumbnails from /data/thumbnails/
             thumbnails_dir = '/data/thumbnails'
@@ -362,46 +356,11 @@ def create_backup_v3():
                     if os.path.isfile(filepath):
                         arcname = os.path.join('thumbnails', filename)
                         tar.add(filepath, arcname=arcname)
-                        file_count += 1
         
-        # Verify the tar.gz was created successfully
-        file_size = os.path.getsize(temp_path) if os.path.exists(temp_path) else 0
-        logging.info(f"Backup: Created tar.gz with {file_count} files, size {file_size} bytes")
+        # Send file using simple send_file (same as working old code)
+        return send_file(temp_path, as_attachment=True, download_name=backup_filename)
         
-        if not os.path.exists(temp_path) or file_size == 0:
-            raise Exception(f"Backup file was not created or is empty (size: {file_size}, files: {file_count})")
-        
-        # Generate filename with timestamp
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        download_name = f'fifth_element_backup_v3_{timestamp}.tar.gz'
-        
-        # Create a streaming response for large files
-        def generate():
-            with open(temp_path, 'rb') as f:
-                while True:
-                    chunk = f.read(8192)  # 8KB chunks
-                    if not chunk:
-                        break
-                    yield chunk
-            # Clean up temp file after streaming completes
-            try:
-                os.unlink(temp_path)
-            except:
-                pass
-        
-        response = Response(generate(), mimetype='application/gzip')
-        response.headers['Content-Disposition'] = f'attachment; filename="{download_name}"'
-        response.headers['Content-Length'] = str(file_size)
-        return response
-    
     except Exception as e:
-        # Clean up temp file on error
-        logging.error(f"Backup failed: {str(e)}")
-        if 'temp_path' in locals() and os.path.exists(temp_path):
-            try:
-                os.unlink(temp_path)
-            except:
-                pass
         return jsonify({'error': f'Backup failed: {str(e)}'}), 500
 
 
