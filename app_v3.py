@@ -13,6 +13,7 @@ import os
 import json
 import tarfile
 import tempfile
+import logging
 from datetime import datetime
 from functools import wraps
 
