@@ -438,6 +438,7 @@ class DataManagerV3:
             # Open image and get EXIF data using _getexif() (same as production)
             with Image.open(image_path) as img:
                 exif_data = img._getexif()
+                img_size = img.size  # Get actual pixel dimensions
             
             if not exif_data:
                 logging.info("No EXIF data found in image")
@@ -460,7 +461,7 @@ class DataManagerV3:
                 'iso': self._get_iso_info(exif),
                 'focal_length': self._get_focal_length_info(exif),
                 'date_taken': self._get_date_taken(exif),
-                'dimensions': self._get_dimensions(exif)
+                'dimensions': self._get_dimensions(exif, img_size)
             }
         
         except Exception as e:
@@ -588,18 +589,32 @@ class DataManagerV3:
         return 'Unavailable'
     
     def _get_date_taken(self, exif: Dict) -> str:
-        """Extract date taken from EXIF"""
+        """Extract date taken from EXIF and format it human-readable"""
         date_taken = exif.get('DateTimeOriginal') or exif.get('DateTime')
         if date_taken:
-            return str(date_taken)
+            try:
+                # EXIF format: "2025:02:02 00:50:29"
+                from datetime import datetime
+                dt = datetime.strptime(str(date_taken), '%Y:%m:%d %H:%M:%S')
+                # Format as "February 2, 2025 at 12:50 AM"
+                return dt.strftime('%B %d, %Y at %I:%M %p')
+            except:
+                # If parsing fails, return as-is
+                return str(date_taken)
         return 'Unavailable'
     
-    def _get_dimensions(self, exif: Dict) -> str:
-        """Extract image dimensions from EXIF"""
+    def _get_dimensions(self, exif: Dict, img_size: tuple = None) -> str:
+        """Extract image dimensions from EXIF or image file"""
+        # Try EXIF first
         width = exif.get('ExifImageWidth')
         height = exif.get('ExifImageHeight')
         if width and height:
             return f"{width} x {height}"
+        
+        # Fall back to actual image size
+        if img_size and len(img_size) == 2:
+            return f"{img_size[0]} x {img_size[1]}"
+        
         return 'Unavailable'
     
     def _get_default_exif(self) -> Dict[str, str]:
