@@ -435,8 +435,8 @@ class DataManagerV3:
             with Image.open(image_path) as img:
                 exif_data = {}
                 
-                # Get raw EXIF data
-                exif = img._getexif()
+                # Get raw EXIF data (use getexif() instead of deprecated _getexif())
+                exif = img.getexif()
                 if not exif:
                     return {}
                 
