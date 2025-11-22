@@ -656,7 +656,7 @@ document.getElementById('btn-bulk-delete').addEventListener('click', async () =>
 });
 
 /**
- * Backup button - create backup and auto-download
+ * Backup button - create backup and show download modal
  */
 document.getElementById('btn-backup').addEventListener('click', async () => {
     if (confirm('Create a backup of all images and data? This may take a moment for large galleries.')) {
@@ -667,17 +667,16 @@ document.getElementById('btn-backup').addEventListener('click', async () => {
             const data = await response.json();
             
             if (data.success) {
-                // Automatically trigger download
+                // Show modal with download button
+                document.getElementById('backup-filename').textContent = data.filename;
+                document.getElementById('backup-size').textContent = data.size_mb;
+                document.getElementById('btn-download-backup').href = data.download_url;
+                document.getElementById('backup-success-modal').classList.add('active');
+                
+                // Also auto-trigger download
                 window.location.href = data.download_url;
                 
-                // Show success message
-                UI.showNotification(`✓ Backup created: ${data.filename} (${data.size_mb} MB) - Download starting...`);
-                
-                // Also show alert with download link in case auto-download fails
-                setTimeout(() => {
-                    alert(`Backup created successfully!\n\nFile: ${data.filename}\nSize: ${data.size_mb} MB\n\nIf download didn't start, click OK to download manually.`);
-                    window.location.href = data.download_url;
-                }, 2000);
+                UI.showNotification(`✓ Backup created: ${data.filename} (${data.size_mb} MB)`);
             } else {
                 UI.showNotification('Backup failed: ' + (data.error || 'Unknown error'), true);
             }
