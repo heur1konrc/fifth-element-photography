@@ -327,24 +327,12 @@ def list_backups_v3():
                     size_mb = size_bytes / (1024 * 1024)
                     total_size += size_bytes
                     
-                    # Check if there's a corresponding .s3url file
-                    s3url_file = os.path.join(backups_dir, f'{filename}.s3url')
-                    s3_url = None
-                    if os.path.exists(s3url_file):
-                        try:
-                            with open(s3url_file, 'r') as f:
-                                s3_url = f.read().strip()
-                        except:
-                            pass
-                    
                     backups.append({
                         'filename': filename,
                         'size_bytes': size_bytes,
                         'size_mb': round(size_mb, 2),
                         'created': datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%m-%d %H:%M:%S'),
-                        'download_url': s3_url if s3_url else f'/data/backups/{filename}',
-                        's3_url': s3_url,
-                        'local_url': f'/data/backups/{filename}'
+                        'download_url': f'/data/backups/{filename}'
                     })
             
             # Sort by creation time, newest first
@@ -417,9 +405,33 @@ def create_backup_v3():
         backup_filename = f'fifth_element_backup_v3_{timestamp}.tar.gz'
         backup_path = os.path.join(backups_dir, backup_filename)
         
-        # Create tar.gz archive directly in /data/backups/
+        # Get current directory (where app files are)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Create tar.gz archive with code/config only (NO images, NO /data)
         with tarfile.open(backup_path, 'w:gz') as tar:
-            # Add V3 metadata files
+            # Add main application files
+            main_files = [
+                'app_v3.py',
+                'data_manager_v3.py',
+                'requirements.txt',
+                'Procfile',
+                '.gitignore'
+            ]
+            
+            for filename in main_files:
+                filepath = os.path.join(current_dir, filename)
+                if os.path.exists(filepath):
+                    tar.add(filepath, arcname=filename)
+            
+            # Add directories (templates, static)
+            directories = ['templates', 'static']
+            for dirname in directories:
+                dirpath = os.path.join(current_dir, dirname)
+                if os.path.exists(dirpath):
+                    tar.add(dirpath, arcname=dirname)
+            
+            # Add V3 metadata files only (no images)
             metadata_files = [
                 '/data/image_metadata_v3.json',
                 '/data/image_categories_v3.json',
@@ -430,56 +442,16 @@ def create_backup_v3():
                 if os.path.exists(filepath):
                     arcname = os.path.join('metadata', os.path.basename(filepath))
                     tar.add(filepath, arcname=arcname)
-            
-            # Add all image files from /data/
-            images_dir = '/data'
-            if os.path.exists(images_dir):
-                for filename in os.listdir(images_dir):
-                    filepath = os.path.join(images_dir, filename)
-                    if os.path.isfile(filepath) and filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
-                        arcname = os.path.join('images', filename)
-                        tar.add(filepath, arcname=arcname)
-            
-            # Add all thumbnails from /data/thumbnails/
-            thumbnails_dir = '/data/thumbnails'
-            if os.path.exists(thumbnails_dir):
-                for filename in os.listdir(thumbnails_dir):
-                    filepath = os.path.join(thumbnails_dir, filename)
-                    if os.path.isfile(filepath):
-                        arcname = os.path.join('thumbnails', filename)
-                        tar.add(filepath, arcname=arcname)
         
         # Get file size
         file_size = os.path.getsize(backup_path)
         file_size_mb = file_size / (1024 * 1024)
         
-        # Upload to S3 for reliable large file downloads
-        import subprocess
-        try:
-            result = subprocess.run(
-                ['manus-upload-file', backup_path],
-                capture_output=True,
-                text=True,
-                check=True
-            )
-            s3_url = result.stdout.strip()
-            logging.info(f"Backup uploaded to S3: {s3_url}")
-            
-            # Save S3 URL to a file for future reference
-            s3url_file = f'{backup_path}.s3url'
-            with open(s3url_file, 'w') as f:
-                f.write(s3_url)
-        except Exception as e:
-            logging.error(f"S3 upload failed: {str(e)}")
-            s3_url = None
-        
-        # Return JSON with both local and S3 URLs
+        # Return JSON with download URL
         return jsonify({
             'success': True,
             'filename': backup_filename,
-            'download_url': s3_url if s3_url else f'/data/backups/{backup_filename}',
-            's3_url': s3_url,
-            'local_url': f'/data/backups/{backup_filename}',
+            'download_url': f'/data/backups/{backup_filename}',
             'size_bytes': file_size,
             'size_mb': round(file_size_mb, 2)
         })

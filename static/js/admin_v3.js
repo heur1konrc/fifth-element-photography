@@ -731,16 +731,12 @@ async function loadBackupsList() {
             html += '</tr></thead><tbody>';
             
             data.backups.forEach(backup => {
-                const isS3 = backup.s3_url ? true : false;
-                const downloadLabel = isS3 ? 'Download (S3)' : 'Download (Local)';
-                const downloadTitle = isS3 ? 'Direct S3 download - no timeout' : 'Local download - may timeout on large files';
-                
                 html += '<tr style="border-bottom: 1px solid #eee;">';
                 html += `<td style="padding: 10px; font-family: monospace; font-size: 12px;">${backup.filename}</td>`;
                 html += `<td style="padding: 10px;">${backup.created}</td>`;
-                html += `<td style="padding: 10px;">${backup.size_mb} MB${isS3 ? ' <span style="color: green; font-size: 11px;">✓ S3</span>' : ''}</td>`;
+                html += `<td style="padding: 10px;">${backup.size_mb} MB</td>`;
                 html += '<td style="padding: 10px;">';
-                html += `<a href="${backup.download_url}" class="btn btn-sm btn-primary" download title="${downloadTitle}" style="margin-right: 5px;">${downloadLabel}</a>`;
+                html += `<a href="${backup.download_url}" class="btn btn-sm btn-primary" download style="margin-right: 5px;">Download</a>`;
                 html += `<button class="btn btn-sm btn-danger" onclick="deleteBackup('${backup.filename}')">Delete</button>`;
                 html += '</td>';
                 html += '</tr>';
