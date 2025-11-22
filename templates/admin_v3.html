@@ -40,6 +40,8 @@
             </div>
             
             <div class="toolbar-right">
+                <input type="text" id="search-box" class="search-input" placeholder="🔍 Search images...">
+                
                 <select id="filter-category" class="select-filter">
                     <option value="all">All Categories</option>
                 </select>
@@ -129,6 +131,18 @@
                         <div class="form-group">
                             <label>Categories</label>
                             <div id="edit-categories" class="category-checkboxes"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="featured-checkbox-label">
+                                <input type="checkbox" id="edit-featured" class="featured-checkbox">
+                                <span class="featured-text">⭐ Mark as Featured Image</span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>EXIF Data</label>
+                            <div id="edit-exif" class="exif-data"></div>
                         </div>
                         
                         <input type="hidden" id="edit-filename">

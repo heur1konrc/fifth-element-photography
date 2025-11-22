@@ -157,7 +157,28 @@ body {
     font-size: 1.2rem;
 }
 
-/* ==================== SELECT INPUTS ==================== */
+/* ==================== SEARCH & SELECT INPUTS ==================== */
+
+.search-input {
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: white;
+    width: 250px;
+    transition: all 0.3s;
+}
+
+.search-input:hover {
+    border-color: #667eea;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    width: 300px;
+}
 
 .select-filter,
 .select-sort {
@@ -436,8 +457,37 @@ body {
 
 .category-checkboxes {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+}
+
+.exif-data {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 6px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.exif-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.exif-item:last-child {
+    border-bottom: none;
+}
+
+.exif-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.exif-value {
+    color: #212529;
+    text-align: right;
 }
 
 .category-checkbox {
@@ -532,15 +582,87 @@ body {
 }
 
 /* ==================== BULK ACTIONS ==================== */
-
 .image-checkbox {
     position: absolute;
     top: 10px;
     left: 10px;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
     z-index: 10;
+}
+
+.download-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.2s;
+    z-index: 10;
+}
+
+.image-card:hover .download-btn {
+    opacity: 1;
+}
+
+.download-btn:hover {
+    transform: scale(1.1);
+    background: rgba(102, 126, 234, 1);
+}
+
+.featured-badge {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 193, 7, 0.95);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 18px;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.featured-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    background: #fff9e6;
+    border: 2px solid #ffc107;
+    border-radius: 6px;
+    transition: background 0.3s;
+}
+
+.featured-checkbox-label:hover {
+    background: #fff3cd;
+}
+
+.featured-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.featured-text {
+    font-weight: 600;
+    color: #856404;
+    font-size: 1rem;
+}
+
+.image-checkbox {
     accent-color: #667eea;
 }
 

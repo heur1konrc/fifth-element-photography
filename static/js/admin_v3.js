@@ -13,6 +13,7 @@ const AppState = {
     categories: [],
     currentFilter: 'all',
     currentSort: 'newest',
+    searchQuery: '',
     currentPage: 1,
     imagesPerPage: 24,
     selectedFiles: [],
@@ -177,6 +178,8 @@ const UI = {
         gallery.innerHTML = paginatedImages.map(image => `
             <div class="image-card" data-filename="${image.filename}">
                 <input type="checkbox" class="image-checkbox" data-filename="${image.filename}">
+                <a href="/data/${image.filename}" download="${image.filename}" class="download-btn" title="Download Hi-Res" onclick="event.stopPropagation()">⬇️</a>
+                ${image.featured ? '<div class="featured-badge" title="Featured Image">⭐</div>' : ''}
                 <img src="/data/thumbnails/${image.filename}" alt="${image.title}" class="image-card-img">
                 <div class="image-card-content">
                     <div class="image-card-title">${image.title}</div>
@@ -260,6 +263,7 @@ const UI = {
             document.getElementById('edit-filename').value = filename;
             document.getElementById('edit-title').value = image.title;
             document.getElementById('edit-description').value = image.description;
+            document.getElementById('edit-featured').checked = image.featured || false;
             document.getElementById('edit-image-preview').src = `/data/${filename}`;
 
             // Populate categories
@@ -271,6 +275,39 @@ const UI = {
                     ${cat.name}
                 </label>
             `).join('');
+            
+            // Load and display EXIF data
+            try {
+                const exifResponse = await fetch(`/api/v3/images/${filename}/exif`);
+                const exifData = await exifResponse.json();
+                const exifContainer = document.getElementById('edit-exif');
+                
+                if (Object.keys(exifData).length === 0) {
+                    exifContainer.innerHTML = '<p style="color: #999; font-style: italic;">No EXIF data available</p>';
+                } else {
+                    const exifLabels = {
+                        'camera_make': 'Camera Make',
+                        'camera_model': 'Camera Model',
+                        'lens': 'Lens',
+                        'aperture': 'Aperture',
+                        'shutter_speed': 'Shutter Speed',
+                        'iso': 'ISO',
+                        'focal_length': 'Focal Length',
+                        'date_taken': 'Date Taken',
+                        'dimensions': 'Dimensions'
+                    };
+                    
+                    exifContainer.innerHTML = Object.entries(exifData)
+                        .map(([key, value]) => `
+                            <div class="exif-item">
+                                <span class="exif-label">${exifLabels[key] || key}:</span>
+                                <span class="exif-value">${value}</span>
+                            </div>
+                        `).join('');
+                }
+            } catch (error) {
+                document.getElementById('edit-exif').innerHTML = '<p style="color: #999;">Could not load EXIF data</p>';
+            }
 
             UI.showModal('edit-modal');
         } catch (error) {
@@ -356,6 +393,52 @@ document.getElementById('sort-order').addEventListener('change', async (e) => {
     AppState.currentPage = 1;
     await loadImages();
 });
+
+/**
+ * Handle search input
+ */
+document.getElementById('search-box').addEventListener('input', (e) => {
+    AppState.searchQuery = e.target.value.toLowerCase().trim();
+    UI.renderGallery(getFilteredAndSortedImages());
+});
+
+/**
+ * Get filtered and sorted images based on current state
+ */
+function getFilteredAndSortedImages() {
+    let filtered = AppState.images;
+    
+    // Apply category filter
+    if (AppState.currentFilter !== 'all') {
+        filtered = filtered.filter(img => img.categories.includes(AppState.currentFilter));
+    }
+    
+    // Apply search filter
+    if (AppState.searchQuery) {
+        filtered = filtered.filter(img => {
+            const searchText = `${img.filename} ${img.title} ${img.description}`.toLowerCase();
+            return searchText.includes(AppState.searchQuery);
+        });
+    }
+    
+    // Apply sorting
+    filtered = [...filtered].sort((a, b) => {
+        switch (AppState.currentSort) {
+            case 'newest':
+                return new Date(b.upload_date) - new Date(a.upload_date);
+            case 'oldest':
+                return new Date(a.upload_date) - new Date(b.upload_date);
+            case 'name_asc':
+                return a.filename.localeCompare(b.filename);
+            case 'name_desc':
+                return b.filename.localeCompare(a.filename);
+            default:
+                return 0;
+        }
+    });
+    
+    return filtered;
+}
 
 /**
  * Handle upload button
@@ -457,12 +540,13 @@ document.getElementById('btn-save-image').addEventListener('click', async () => 
     const filename = document.getElementById('edit-filename').value;
     const title = document.getElementById('edit-title').value;
     const description = document.getElementById('edit-description').value;
+    const featured = document.getElementById('edit-featured').checked;
     
     const categories = Array.from(document.querySelectorAll('#edit-categories input:checked'))
         .map(input => input.value);
 
     try {
-        await API.updateImage(filename, { title, description, categories });
+        await API.updateImage(filename, { title, description, categories, featured });
         UI.showNotification('Image updated successfully');
         UI.hideModal('edit-modal');
         await loadImages();

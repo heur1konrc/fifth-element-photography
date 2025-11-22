@@ -140,6 +140,22 @@ def get_image_v3(filename):
     return jsonify(image)
 
 
+@app.route('/api/v3/images/<filename>/exif', methods=['GET'])
+@login_required
+def get_image_exif_v3(filename):
+    """
+    Get EXIF data for an image.
+    
+    Args:
+        filename: Image filename
+    
+    Returns:
+        JSON object with EXIF data
+    """
+    exif_data = data_manager.get_exif_data(filename)
+    return jsonify(exif_data)
+
+
 @app.route('/api/v3/images/<filename>', methods=['PUT'])
 @login_required
 def update_image_v3(filename):
@@ -162,11 +178,12 @@ def update_image_v3(filename):
     data = request.get_json()
     
     # Update metadata if provided
-    if 'title' in data or 'description' in data:
-        data_manager.update_image_metadata(
+    if 'title' in data or 'description' in data or 'featured' in data:
+        success = data_manager.update_image_metadata(
             filename,
             title=data.get('title'),
-            description=data.get('description')
+            description=data.get('description'),
+            featured=data.get('featured')
         )
     
     # Update categories if provided

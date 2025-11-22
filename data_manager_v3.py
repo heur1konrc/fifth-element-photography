@@ -147,11 +147,12 @@ class DataManagerV3:
             'filename': filename,
             'title': metadata.get(filename, {}).get('title', Path(filename).stem),
             'description': metadata.get(filename, {}).get('description', ''),
-            'categories': categories.get(filename, [])
+            'categories': categories.get(filename, []),
+            'featured': metadata.get(filename, {}).get('featured', False)
         }
     
     def update_image_metadata(self, filename: str, title: Optional[str] = None, 
-                             description: Optional[str] = None) -> bool:
+                             description: Optional[str] = None, featured: Optional[bool] = None) -> bool:
         """
         Update an image's title and/or description.
         
@@ -173,6 +174,9 @@ class DataManagerV3:
         
         if description is not None:
             metadata[filename]['description'] = description
+        
+        if featured is not None:
+            metadata[filename]['featured'] = featured
         
         self._write_json(self.metadata_file, metadata)
         return True
@@ -407,4 +411,91 @@ class DataManagerV3:
             self.generate_thumbnail(filename)
         
         return thumbnail_path
+    
+    # ==================== EXIF OPERATIONS ====================
+    
+    def get_exif_data(self, filename: str) -> Dict[str, Any]:
+        """
+        Extract EXIF data from an image.
+        
+        Args:
+            filename: Name of the image file
+            
+        Returns:
+            Dictionary of EXIF data with human-readable keys
+        """
+        try:
+            from PIL.ExifTags import TAGS
+            
+            image_path = self.images_dir / filename
+            if not image_path.exists():
+                return {}
+            
+            with Image.open(image_path) as img:
+                exif_data = {}
+                
+                # Get raw EXIF data
+                exif = img._getexif()
+                if not exif:
+                    return {}
+                
+                # Convert to human-readable format
+                for tag_id, value in exif.items():
+                    tag = TAGS.get(tag_id, tag_id)
+                    exif_data[tag] = value
+                
+                # Extract commonly used fields
+                result = {}
+                
+                # Camera make and model
+                if 'Make' in exif_data:
+                    result['camera_make'] = str(exif_data['Make']).strip()
+                if 'Model' in exif_data:
+                    result['camera_model'] = str(exif_data['Model']).strip()
+                
+                # Lens
+                if 'LensModel' in exif_data:
+                    result['lens'] = str(exif_data['LensModel']).strip()
+                
+                # Exposure settings
+                if 'FNumber' in exif_data:
+                    f_number = exif_data['FNumber']
+                    if isinstance(f_number, tuple):
+                        result['aperture'] = f"f/{f_number[0]/f_number[1]:.1f}"
+                    else:
+                        result['aperture'] = f"f/{f_number:.1f}"
+                
+                if 'ExposureTime' in exif_data:
+                    exp_time = exif_data['ExposureTime']
+                    if isinstance(exp_time, tuple):
+                        if exp_time[0] < exp_time[1]:
+                            result['shutter_speed'] = f"{exp_time[0]}/{exp_time[1]}s"
+                        else:
+                            result['shutter_speed'] = f"{exp_time[0]/exp_time[1]:.2f}s"
+                    else:
+                        result['shutter_speed'] = f"{exp_time}s"
+                
+                if 'ISOSpeedRatings' in exif_data:
+                    result['iso'] = f"ISO {exif_data['ISOSpeedRatings']}"
+                
+                if 'FocalLength' in exif_data:
+                    focal = exif_data['FocalLength']
+                    if isinstance(focal, tuple):
+                        result['focal_length'] = f"{focal[0]/focal[1]:.0f}mm"
+                    else:
+                        result['focal_length'] = f"{focal:.0f}mm"
+                
+                # Date taken
+                if 'DateTimeOriginal' in exif_data:
+                    result['date_taken'] = str(exif_data['DateTimeOriginal'])
+                
+                # Image dimensions
+                if 'ExifImageWidth' in exif_data and 'ExifImageHeight' in exif_data:
+                    result['dimensions'] = f"{exif_data['ExifImageWidth']} x {exif_data['ExifImageHeight']}"
+                
+                return result
+                
+        except Exception as e:
+            print(f"Error extracting EXIF from {filename}: {e}")
+            return {}
 
