@@ -445,27 +445,33 @@ class DataManagerV3:
                     tag = TAGS.get(tag_id, tag_id)
                     exif_data[tag] = value
                 
+                # Log all available tags for debugging
+                logging.info(f"Available EXIF tags for {filename}: {list(exif_data.keys())[:20]}")
+                
                 # Extract commonly used fields
                 result = {}
                 
-                # Camera make and model
-                if 'Make' in exif_data:
-                    result['camera_make'] = str(exif_data['Make']).strip()
+                # Camera model (skip make as it's redundant)
                 if 'Model' in exif_data:
-                    result['camera_model'] = str(exif_data['Model']).strip()
+                    result['camera'] = str(exif_data['Model']).strip()
                 
                 # Lens
                 if 'LensModel' in exif_data:
                     result['lens'] = str(exif_data['LensModel']).strip()
+                elif 'LensMake' in exif_data:
+                    result['lens'] = str(exif_data['LensMake']).strip()
                 
-                # Exposure settings
+                # Aperture
                 if 'FNumber' in exif_data:
                     f_number = exif_data['FNumber']
                     if isinstance(f_number, tuple):
                         result['aperture'] = f"f/{f_number[0]/f_number[1]:.1f}"
                     else:
                         result['aperture'] = f"f/{f_number:.1f}"
+                elif 'ApertureValue' in exif_data:
+                    result['aperture'] = f"f/{exif_data['ApertureValue']}"
                 
+                # Shutter speed
                 if 'ExposureTime' in exif_data:
                     exp_time = exif_data['ExposureTime']
                     if isinstance(exp_time, tuple):
@@ -475,10 +481,20 @@ class DataManagerV3:
                             result['shutter_speed'] = f"{exp_time[0]/exp_time[1]:.2f}s"
                     else:
                         result['shutter_speed'] = f"{exp_time}s"
+                elif 'ShutterSpeedValue' in exif_data:
+                    result['shutter_speed'] = str(exif_data['ShutterSpeedValue'])
                 
+                # ISO
                 if 'ISOSpeedRatings' in exif_data:
-                    result['iso'] = f"ISO {exif_data['ISOSpeedRatings']}"
+                    iso_val = exif_data['ISOSpeedRatings']
+                    if isinstance(iso_val, tuple):
+                        result['iso'] = f"ISO {iso_val[0]}"
+                    else:
+                        result['iso'] = f"ISO {iso_val}"
+                elif 'PhotographicSensitivity' in exif_data:
+                    result['iso'] = f"ISO {exif_data['PhotographicSensitivity']}"
                 
+                # Focal length
                 if 'FocalLength' in exif_data:
                     focal = exif_data['FocalLength']
                     if isinstance(focal, tuple):
@@ -489,10 +505,14 @@ class DataManagerV3:
                 # Date taken
                 if 'DateTimeOriginal' in exif_data:
                     result['date_taken'] = str(exif_data['DateTimeOriginal'])
+                elif 'DateTime' in exif_data:
+                    result['date_taken'] = str(exif_data['DateTime'])
                 
                 # Image dimensions
                 if 'ExifImageWidth' in exif_data and 'ExifImageHeight' in exif_data:
                     result['dimensions'] = f"{exif_data['ExifImageWidth']} x {exif_data['ExifImageHeight']}"
+                elif img.size:
+                    result['dimensions'] = f"{img.size[0]} x {img.size[1]}"
                 
                 return result
                 

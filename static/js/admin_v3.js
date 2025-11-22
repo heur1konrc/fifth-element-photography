@@ -289,8 +289,7 @@ const UI = {
                     exifContainer.innerHTML = '<p style="color: #999; font-style: italic;">No EXIF data available</p>';
                 } else {
                     const exifLabels = {
-                        'camera_make': 'Camera Make',
-                        'camera_model': 'Camera Model',
+                        'camera': 'Camera',
                         'lens': 'Lens',
                         'aperture': 'Aperture',
                         'shutter_speed': 'Shutter Speed',
