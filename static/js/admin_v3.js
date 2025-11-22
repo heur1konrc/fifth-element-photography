@@ -162,10 +162,13 @@ const UI = {
     /**
      * Render image gallery
      */
-    renderGallery() {
+    renderGallery(imagesToRender = null) {
         const gallery = document.getElementById('image-gallery');
         
-        if (AppState.images.length === 0) {
+        // Use provided images or default to AppState.images
+        const images = imagesToRender || AppState.images;
+        
+        if (images.length === 0) {
             gallery.innerHTML = '<div class="loading">No images found</div>';
             return;
         }
@@ -173,7 +176,7 @@ const UI = {
         // Pagination
         const startIndex = (AppState.currentPage - 1) * AppState.imagesPerPage;
         const endIndex = startIndex + AppState.imagesPerPage;
-        const paginatedImages = AppState.images.slice(startIndex, endIndex);
+        const paginatedImages = images.slice(startIndex, endIndex);
 
         gallery.innerHTML = paginatedImages.map(image => `
             <div class="image-card" data-filename="${image.filename}">

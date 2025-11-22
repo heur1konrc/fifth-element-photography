@@ -120,6 +120,7 @@ class DataManagerV3:
                     'title': metadata.get(filename.name, {}).get('title', filename.stem),
                     'description': metadata.get(filename.name, {}).get('description', ''),
                     'categories': categories.get(filename.name, []),
+                    'featured': metadata.get(filename.name, {}).get('featured', False),
                     'upload_date': datetime.fromtimestamp(filename.stat().st_mtime).isoformat()
                 }
                 images.append(image_data)
@@ -496,6 +497,8 @@ class DataManagerV3:
                 return result
                 
         except Exception as e:
-            print(f"Error extracting EXIF from {filename}: {e}")
+            logging.error(f"Error extracting EXIF from {filename}: {e}")
+            import traceback
+            logging.error(traceback.format_exc())
             return {}
 
