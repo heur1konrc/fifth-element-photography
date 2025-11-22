@@ -429,6 +429,92 @@ function setupEventListeners() {
     document.getElementById('btn-browse').addEventListener('click', () => {
         document.getElementById('file-input').click();
     });
+
+    /**
+     * Handle save image
+     */
+    document.getElementById('btn-save-image').addEventListener('click', async () => {
+        const filename = document.getElementById('edit-filename').value;
+        const title = document.getElementById('edit-title').value;
+        const description = document.getElementById('edit-description').value;
+        const featured = document.getElementById('edit-featured').checked;
+        
+        const categories = Array.from(document.querySelectorAll('#edit-categories input:checked'))
+            .map(input => input.value);
+
+        try {
+            await API.updateImage(filename, { title, description, categories, featured });
+            UI.showNotification('Image updated successfully');
+            UI.hideModal('edit-modal');
+            await loadImages();
+            await loadCategories();
+        } catch (error) {
+            UI.showNotification('Error updating image: ' + error.message, true);
+        }
+    });
+
+    /**
+     * Handle delete image
+     */
+    document.getElementById('btn-delete-image').addEventListener('click', async () => {
+        const filename = document.getElementById('edit-filename').value;
+        
+        if (confirm(`Delete "${filename}"? This action cannot be undone.`)) {
+            try {
+                await API.deleteImage(filename);
+                UI.showNotification('Image deleted successfully');
+                UI.hideModal('edit-modal');
+                await loadImages();
+                await loadCategories();
+            } catch (error) {
+                UI.showNotification('Error deleting image: ' + error.message, true);
+            }
+        }
+    });
+
+    /**
+     * Handle add category
+     */
+    document.getElementById('btn-add-category').addEventListener('click', async () => {
+        const input = document.getElementById('new-category-name');
+        const categoryName = input.value.trim();
+        
+        if (!categoryName) {
+            UI.showNotification('Please enter a category name', true);
+            return;
+        }
+
+        try {
+            await API.createCategory(categoryName);
+            UI.showNotification('Category created successfully');
+            input.value = '';
+            await loadCategories();
+            UI.renderCategoriesModal();
+            UI.populateCategoryFilter();
+        } catch (error) {
+            UI.showNotification('Error creating category: ' + error.message, true);
+        }
+    });
+
+    /**
+     * Handle modal close buttons
+     */
+    document.querySelectorAll('.modal-close').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.closest('.modal').classList.remove('active');
+        });
+    });
+
+    /**
+     * Close modal on background click
+     */
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
 }
 
 /**
@@ -542,91 +628,7 @@ document.getElementById('btn-upload-confirm').addEventListener('click', async ()
     }
 });
 
-/**
- * Handle save image
- */
-document.getElementById('btn-save-image').addEventListener('click', async () => {
-    const filename = document.getElementById('edit-filename').value;
-    const title = document.getElementById('edit-title').value;
-    const description = document.getElementById('edit-description').value;
-    const featured = document.getElementById('edit-featured').checked;
-    
-    const categories = Array.from(document.querySelectorAll('#edit-categories input:checked'))
-        .map(input => input.value);
 
-    try {
-        await API.updateImage(filename, { title, description, categories, featured });
-        UI.showNotification('Image updated successfully');
-        UI.hideModal('edit-modal');
-        await loadImages();
-        await loadCategories();
-    } catch (error) {
-        UI.showNotification('Error updating image: ' + error.message, true);
-    }
-});
-
-/**
- * Handle delete image
- */
-document.getElementById('btn-delete-image').addEventListener('click', async () => {
-    const filename = document.getElementById('edit-filename').value;
-    
-    if (confirm(`Delete "${filename}"? This action cannot be undone.`)) {
-        try {
-            await API.deleteImage(filename);
-            UI.showNotification('Image deleted successfully');
-            UI.hideModal('edit-modal');
-            await loadImages();
-            await loadCategories();
-        } catch (error) {
-            UI.showNotification('Error deleting image: ' + error.message, true);
-        }
-    }
-});
-
-/**
- * Handle add category
- */
-document.getElementById('btn-add-category').addEventListener('click', async () => {
-    const input = document.getElementById('new-category-name');
-    const categoryName = input.value.trim();
-    
-    if (!categoryName) {
-        UI.showNotification('Please enter a category name', true);
-        return;
-    }
-
-    try {
-        await API.createCategory(categoryName);
-        UI.showNotification('Category created successfully');
-        input.value = '';
-        await loadCategories();
-        UI.renderCategoriesModal();
-        UI.populateCategoryFilter();
-    } catch (error) {
-        UI.showNotification('Error creating category: ' + error.message, true);
-    }
-});
-
-/**
- * Handle modal close buttons
- */
-document.querySelectorAll('.modal-close').forEach(btn => {
-    btn.addEventListener('click', () => {
-        btn.closest('.modal').classList.remove('active');
-    });
-});
-
-/**
- * Close modal on background click
- */
-document.querySelectorAll('.modal').forEach(modal => {
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.classList.remove('active');
-        }
-    });
-});
 
 // ==================== BULK ACTIONS ====================
 
