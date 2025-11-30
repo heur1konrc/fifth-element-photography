@@ -609,22 +609,43 @@ document.getElementById('btn-upload-confirm').addEventListener('click', async ()
         return;
     }
 
+    const statusDiv = document.getElementById('upload-status');
+    const uploadBtn = document.getElementById('btn-upload-confirm');
+    
     try {
+        // Show progress
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Uploading...';
+        statusDiv.innerHTML = `<p>Uploading ${AppState.selectedFiles.length} file(s)... Please wait.</p>`;
+        
         const result = await API.uploadImages(AppState.selectedFiles);
         
+        // Show results
         if (result.errors.length > 0) {
+            statusDiv.innerHTML = `<p style="color: orange;">✓ Uploaded ${result.uploaded.length} files. ✗ ${result.errors.length} failed.</p>`;
             UI.showNotification(`Uploaded ${result.uploaded.length} files. ${result.errors.length} errors.`, true);
         } else {
+            statusDiv.innerHTML = `<p style="color: green;">✓ Successfully uploaded ${result.uploaded.length} file(s)!</p>`;
             UI.showNotification(`Successfully uploaded ${result.uploaded.length} files`);
         }
 
-        UI.hideModal('upload-modal');
-        AppState.selectedFiles = [];
-        document.getElementById('upload-preview').innerHTML = '';
-        document.getElementById('file-input').value = '';
+        // Wait a moment to show success, then close
+        setTimeout(() => {
+            UI.hideModal('upload-modal');
+            AppState.selectedFiles = [];
+            document.getElementById('upload-preview').innerHTML = '';
+            document.getElementById('file-input').value = '';
+            statusDiv.innerHTML = '';
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'Upload';
+        }, 1500);
+        
         await loadImages();
     } catch (error) {
+        statusDiv.innerHTML = `<p style="color: red;">✗ Error: ${error.message}</p>`;
         UI.showNotification('Error uploading files: ' + error.message, true);
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = 'Upload';
     }
 });
 
