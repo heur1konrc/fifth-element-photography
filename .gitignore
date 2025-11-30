@@ -208,3 +208,4 @@ __marimo__/
 data/admin_users.json
 data/reset_tokens.json
 test_data/
+.github-credentials

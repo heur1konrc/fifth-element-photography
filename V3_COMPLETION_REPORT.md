@@ -169,7 +169,12 @@ Python Files:
 
 ## Version History
 
-### Version 3.0.1 (Current)
+### Version 3.0.2 (Current)
+- ✅ Upload limit increased to 100MB (from 16MB)
+- ✅ File browser optimized for faster opening
+- ✅ All previous v3.0.1 features
+
+### Version 3.0.1
 - ✅ EXIF data extraction (all 8 fields)
 - ✅ Human-readable date formatting
 - ✅ Image dimensions from file
@@ -249,6 +254,12 @@ When ready to replace old admin:
 **Documentation:** This file + inline code comments  
 **Backup Strategy:** Railway automatic backups (includes images)  
 **Code Backups:** `/api/v3/backup/create` endpoint (code-only, tar.gz)
+
+**GitHub Access:**
+- Repository: https://github.com/heur1konrc/fifth-element-photography
+- Username: heur1konrc
+- Personal Access Token: See `.github-credentials` (local file, not in repo)
+- Push command: `git push origin v3-staging` (after configuring credentials)
 
 **Key Contacts:**
 - Development: Manus AI
