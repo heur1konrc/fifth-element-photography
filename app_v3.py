@@ -29,7 +29,7 @@ data_manager = DataManagerV3(data_dir=os.environ.get('DATA_DIR', '/data'))
 UPLOAD_FOLDER = '/data'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100MB max file size
 
 # Admin credentials (in production, use environment variables)
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
