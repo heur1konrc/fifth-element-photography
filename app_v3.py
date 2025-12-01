@@ -720,7 +720,10 @@ def lumaprints_upload():
         })
     
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Lumaprints upload error: {error_details}")
+        return jsonify({'error': str(e), 'details': error_details}), 500
 
 
 @app.route('/api/v3/lumaprints/images')
