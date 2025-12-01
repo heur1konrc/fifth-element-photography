@@ -125,6 +125,28 @@ const API = {
         });
         if (!response.ok) throw new Error('Failed to assign categories');
         return await response.json();
+    },
+
+    /**
+     * Set an image as the hero image
+     */
+    async setHeroImage(filename) {
+        const response = await fetch(`/api/v3/images/${filename}/set-hero`, {
+            method: 'POST'
+        });
+        if (!response.ok) throw new Error('Failed to set hero image');
+        return await response.json();
+    },
+
+    /**
+     * Set an image as the featured image
+     */
+    async setFeaturedImage(filename) {
+        const response = await fetch(`/api/v3/images/${filename}/set-featured`, {
+            method: 'POST'
+        });
+        if (!response.ok) throw new Error('Failed to set featured image');
+        return await response.json();
     }
 };
 
@@ -182,6 +204,7 @@ const UI = {
             <div class="image-card" data-filename="${image.filename}">
                 <input type="checkbox" class="image-checkbox" data-filename="${image.filename}">
                 <a href="/data/${image.filename}" download="${image.filename}" class="download-btn" title="Download Hi-Res" onclick="event.stopPropagation()">⬇️</a>
+                ${image.is_hero ? '<div class="hero-badge" title="Hero Image">🏆</div>' : ''}
                 ${image.featured ? '<div class="featured-badge" title="Featured Image">⭐</div>' : ''}
                 <img src="/data/thumbnails/${image.filename}" alt="${image.title}" class="image-card-img">
                 <div class="image-card-content">
@@ -266,6 +289,7 @@ const UI = {
             document.getElementById('edit-filename').value = filename;
             document.getElementById('edit-title').value = image.title;
             document.getElementById('edit-description').value = image.description;
+            document.getElementById('edit-hero').checked = image.is_hero || false;
             document.getElementById('edit-featured').checked = image.featured || false;
             document.getElementById('edit-image-preview').src = `/data/${filename}`;
 
@@ -472,13 +496,25 @@ function setupEventListeners() {
         const filename = document.getElementById('edit-filename').value;
         const title = document.getElementById('edit-title').value;
         const description = document.getElementById('edit-description').value;
+        const isHero = document.getElementById('edit-hero').checked;
         const featured = document.getElementById('edit-featured').checked;
         
         const categories = Array.from(document.querySelectorAll('#edit-categories input:checked'))
             .map(input => input.value);
 
         try {
+            // Update basic metadata
             await API.updateImage(filename, { title, description, categories, featured });
+            
+            // Set hero image if checked
+            if (isHero) {
+                await API.setHeroImage(filename);
+            }
+            
+            // Set featured image if checked
+            if (featured) {
+                await API.setFeaturedImage(filename);
+            }
             UI.showNotification('Image updated successfully');
             UI.hideModal('edit-modal');
             await loadImages();

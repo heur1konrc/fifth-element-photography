@@ -260,6 +260,27 @@ body {
     font-size: 0.875rem;
 }
 
+/* Hero and Featured Badges */
+.hero-badge,
+.featured-badge {
+    position: absolute;
+    top: 10px;
+    font-size: 1.5rem;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.hero-badge {
+    left: 10px;
+}
+
+.featured-badge {
+    left: 50px;
+}
+
 .loading {
     text-align: center;
     padding: 3rem;
