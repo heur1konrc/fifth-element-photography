@@ -425,6 +425,7 @@ textarea {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 255, 0.9);
+    overflow: hidden;
 }
 
 .modal-content {
