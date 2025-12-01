@@ -979,8 +979,10 @@ def set_featured_image(filename):
 
 @app.route('/')
 def index_v3():
-    """Simple test front-end for V3."""
-    return render_template('index_v3.html')
+    """V3 frontend with production layout."""
+    categories = [cat['name'] for cat in data_manager.get_all_categories()]
+    featured_image = data_manager.get_featured_image()
+    return render_template('index_v3.html', categories=categories, featured_image=featured_image)
 
 
 # ==================== RUN APPLICATION ====================
