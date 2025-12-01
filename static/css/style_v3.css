@@ -429,16 +429,17 @@ textarea {
 
 .modal-content {
     position: relative;
-    margin: 2vh auto;
+    margin: 0 auto;
     padding: 10px;
     width: 90vw;
     max-width: 1200px;
-    max-height: 96vh;
-    overflow-y: hidden;
+    height: 100vh;
+    overflow: hidden;
     text-align: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
 }
 
 .close {
@@ -457,17 +458,19 @@ textarea {
 }
 
 .modal-image {
-    max-width: 100%;
-    max-height: calc(96vh - 200px);
+    max-width: 90vw;
+    max-height: calc(100vh - 220px);
     width: auto;
     height: auto;
     border-radius: 8px;
     background: transparent;
     object-fit: contain;
+    flex-shrink: 1;
 }
 
 .modal-info {
     margin-top: 10px;
+    flex-shrink: 0;
 }
 
 .modal-info h4 {
@@ -500,6 +503,7 @@ textarea {
     display: flex;
     justify-content: center;
     gap: 15px;
+    flex-shrink: 0;
 }
 
 .btn-order-print {
