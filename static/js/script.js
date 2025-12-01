@@ -15,6 +15,7 @@ const closeModal = document.querySelector('.close');
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
+    loadCategories();
     loadImages();
     setupEventListeners();
 });
@@ -51,7 +52,7 @@ async function setHeroImage() {
         const heroResponse = await fetch('/api/v3/hero-image');
         const heroData = await heroResponse.json();
         
-        if (heroData.filename) {
+        if (heroData.success && heroData.hero_image) {
             // Use the selected hero image
             heroImage.style.backgroundImage = `url('/data/${heroData.hero_image.filename}')`;
         } else {

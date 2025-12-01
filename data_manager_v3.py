@@ -354,13 +354,13 @@ class DataManagerV3:
     
     # ==================== THUMBNAIL OPERATIONS ====================
     
-    def generate_thumbnail(self, filename: str, max_width: int = 400) -> bool:
+    def generate_thumbnail(self, filename: str, max_width: int = 800) -> bool:
         """
         Generate a thumbnail for an image.
         
         Args:
             filename: Name of the image file
-            max_width: Maximum width of thumbnail (default: 400px)
+            max_width: Maximum width of thumbnail (default: 800px)
             
         Returns:
             True if successful, False otherwise
@@ -391,7 +391,7 @@ class DataManagerV3:
                     img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
                 
                 # Save thumbnail
-                img.save(thumbnail_path, 'JPEG', quality=85, optimize=True)
+                img.save(thumbnail_path, 'JPEG', quality=95, optimize=True)
             
             return True
         except Exception as e:
