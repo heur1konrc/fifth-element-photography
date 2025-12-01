@@ -246,7 +246,7 @@ function createGalleryItem(image) {
     item.addEventListener('click', () => openImageModal(image));
     
     const img = document.createElement('img');
-    img.src = image.thumbnail_url || image.url || `/uploads/thumbnails/${image.filename}`;
+    img.src = image.thumbnail_url || image.url || `/data/thumbnails/${image.filename}`;
     img.alt = image.title || 'Untitled';
     img.loading = 'lazy';
     
@@ -337,7 +337,7 @@ function openImageModal(image) {
     modalBody.innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;">
             <div>
-                <img src="${image.url || `/uploads/images/${image.filename}`}" alt="${escapeHtml(image.title || 'Untitled')}" 
+                <img src="${image.url || `/data/${image.filename}`}" alt="${escapeHtml(image.title || 'Untitled')}" 
                      style="width: 100%; height: auto; border: 1px solid var(--color-border);">
             </div>
             <div style="padding: 1rem 0;">
@@ -473,7 +473,7 @@ function displayFeaturedImage() {
     container.innerHTML = `
         <div class="featured-content">
             <div class="featured-image-container">
-                <img src="${image.url || `/uploads/images/${image.filename}`}" alt="${escapeHtml(image.title || 'Featured Image')}">
+                <img src="${image.url || `/data/${image.filename}`}" alt="${escapeHtml(image.title || 'Featured Image')}">
             </div>
             <div class="featured-details">
                 <h2 class="featured-title">${escapeHtml(image.title || 'Untitled')}</h2>
