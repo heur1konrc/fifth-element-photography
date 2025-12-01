@@ -15,7 +15,7 @@ TEMPLATES = {
     "1:1": {
         "canvas": {
             "subcategory": "0.75in Stretched Canvas",
-            "sizes": [(8, 8), (10, 10), (12, 12), (14, 14), (16, 16), (18, 18), (20, 20), (24, 24), (30, 30), (36, 36), (40, 40)],
+            "sizes": [(8, 8), (10, 10), (12, 12), (14, 14)],
             "options": [
                 ("Canvas Border", "Mirror Wrap"),
                 ("Canvas Hanging Hardware", "Sawtooth Hanger installed"),
@@ -24,7 +24,7 @@ TEMPLATES = {
         },
         "art_paper": {
             "subcategories": ["Hot Press Fine Art Paper", "Semi-Glossy Fine Art Paper", "Glossy Fine Art Paper"],
-            "sizes": [(8, 8), (10, 10), (12, 12), (14, 14), (16, 16), (18, 18), (20, 20), (24, 24), (30, 30), (36, 36)],
+            "sizes": [(8, 8), (10, 10), (12, 12), (14, 14)],
             "options": [
                 ("Bleed Size", "0.25in Bleed (0.25in on each side)")
             ]
