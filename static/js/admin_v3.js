@@ -450,10 +450,10 @@ function setupEventListeners() {
     });
 
     /**
-     * Handle Lumaprints mapping button
+     * Handle Lumaprints/Shopify mapping button - navigate to dedicated page
      */
     document.getElementById('btn-lumaprints').addEventListener('click', () => {
-        openLumaprintsModal();
+        window.location.href = '/admin_v3/shopify-mapping';
     });
 
     /**

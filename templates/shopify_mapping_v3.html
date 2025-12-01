@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopify Product Mapping - Fifth Element Photography V3</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_v3.css') }}">
+    <style>
+        .shopify-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .shopify-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .shopify-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        
+        .shopify-header p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-link {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: #667eea;
+            color: white;
+        }
+        
+        .nav-link:hover {
+            background: #5568d3;
+        }
+        
+        .stats-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .mappings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        
+        .mapping-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .mapping-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .mapping-card-image {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: #f5f5f5;
+        }
+        
+        .mapping-card-content {
+            padding: 15px;
+        }
+        
+        .mapping-card-filename {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+            word-break: break-all;
+            font-size: 0.85em;
+        }
+        
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-label {
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9em;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #4CAF50;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.9em;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .save-btn:hover {
+            background: #5568d3;
+        }
+        
+        .save-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .status-message {
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 0.85em;
+            text-align: center;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="shopify-container">
+        <div class="nav-links">
+            <a href="{{ url_for('admin_v3') }}" class="nav-link">← Back to Admin</a>
+        </div>
+        
+        <div class="shopify-header">
+            <h1>🛍️ Shopify Product Mapping</h1>
+            <p>Manage ORDER PRINTS functionality and map images to Shopify products</p>
+        </div>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="total-images">0</div>
+                <div class="stat-label">Total Images</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="enabled-count">0</div>
+                <div class="stat-label">ORDER PRINTS Enabled</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="mapped-count">0</div>
+                <div class="stat-label">Mapped to Shopify</div>
+            </div>
+        </div>
+        
+        <div class="mappings-grid" id="mappings-grid">
+            <!-- Cards will be loaded via JavaScript -->
+        </div>
+    </div>
+    
+    <script>
+        let allImages = [];
+        
+        async function loadImages() {
+            try {
+                const response = await fetch('/api/v3/images');
+                allImages = await response.json();
+                renderCards();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading images:', error);
+            }
+        }
+        
+        function renderCards() {
+            const grid = document.getElementById('mappings-grid');
+            grid.innerHTML = allImages.map(image => `
+                <div class="mapping-card" data-filename="${image.filename}">
+                    <img src="${image.url}" 
+                         alt="${image.filename}" 
+                         class="mapping-card-image">
+                    
+                    <div class="mapping-card-content">
+                        <div class="mapping-card-filename">${image.filename}</div>
+                        
+                        <div class="toggle-group">
+                            <span class="toggle-label">ORDER PRINTS</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" 
+                                       class="enable-toggle" 
+                                       ${image.order_prints_enabled ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Shopify Product Handle</label>
+                            <input type="text" 
+                                   class="product-handle-input" 
+                                   value="${image.shopify_product_handle || ''}"
+                                   placeholder="e.g., sunset-over-madison">
+                        </div>
+                        
+                        <button class="save-btn" onclick="saveMapping(this)">Save Changes</button>
+                        <div class="status-message" style="display: none;"></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function saveMapping(button) {
+            const card = button.closest('.mapping-card');
+            const filename = card.dataset.filename;
+            const enabled = card.querySelector('.enable-toggle').checked;
+            const productHandle = card.querySelector('.product-handle-input').value.trim();
+            const statusEl = card.querySelector('.status-message');
+            
+            button.disabled = true;
+            button.textContent = 'Saving...';
+            statusEl.style.display = 'none';
+            
+            try {
+                const response = await fetch(`/api/v3/images/${encodeURIComponent(filename)}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        shopify_product_handle: productHandle || null,
+                        order_prints_enabled: enabled
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusEl.textContent = '✓ Saved!';
+                    statusEl.className = 'status-message status-success';
+                    statusEl.style.display = 'block';
+                    
+                    updateStats();
+                    
+                    setTimeout(() => {
+                        statusEl.style.display = 'none';
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Failed to save');
+                }
+            } catch (error) {
+                statusEl.textContent = 'Error: ' + error.message;
+                statusEl.className = 'status-message status-error';
+                statusEl.style.display = 'block';
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Save Changes';
+            }
+        }
+        
+        function updateStats() {
+            const cards = document.querySelectorAll('.mapping-card');
+            let enabledCount = 0;
+            let mappedCount = 0;
+            
+            cards.forEach(card => {
+                if (card.querySelector('.enable-toggle').checked) {
+                    enabledCount++;
+                }
+                if (card.querySelector('.product-handle-input').value.trim()) {
+                    mappedCount++;
+                }
+            });
+            
+            document.getElementById('total-images').textContent = cards.length;
+            document.getElementById('enabled-count').textContent = enabledCount;
+            document.getElementById('mapped-count').textContent = mappedCount;
+        }
+        
+        // Load images on page load
+        loadImages();
+    </script>
+</body>
+</html>

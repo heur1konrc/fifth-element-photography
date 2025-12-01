@@ -1055,6 +1055,13 @@ def bulk_import_shopify():
         return jsonify({'error': f'Failed to process CSV: {str(e)}'}), 500
 
 
+@app.route('/admin_v3/shopify-mapping')
+@login_required
+def shopify_mapping_v3():
+    """Shopify product mapping page."""
+    return render_template('shopify_mapping_v3.html')
+
+
 @app.route('/')
 def index_v3():
     """V3 frontend with production layout."""
