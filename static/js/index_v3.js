@@ -192,7 +192,10 @@ async function loadImages() {
         const response = await fetch('/api/v3/images');
         const data = await response.json();
         
-        if (data.success) {
+        if (Array.isArray(data)) {
+            AppState.images = data;
+            displayGallery();
+        } else if (data.success) {
             AppState.images = data.images;
             displayGallery();
         }
