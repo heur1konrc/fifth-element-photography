@@ -458,7 +458,7 @@ textarea {
 
 .modal-image {
     max-width: 100%;
-    max-height: calc(96vh - 150px);
+    max-height: calc(96vh - 200px);
     width: auto;
     height: auto;
     border-radius: 8px;
