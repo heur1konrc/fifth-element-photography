@@ -5,72 +5,574 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fifth Element Photography - Capturing the Quintessence</title>
     
-    <link rel="stylesheet" href="/static/css/style_v3.css?v=20241201-005">
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:title" content="Fifth Element Photography - Featured Image of the Week">
+    <meta property="og:description" content="Professional photography with artistic vision and technical excellence">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fifth-element-photography-production.up.railway.app/#featured">
+    
+    
+    <meta property="og:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}">
+    <meta property="og:image:alt" content="{{ featured_image.title if featured_image else "No Featured Image" }}">
+    
+    <meta property="og:site_name" content="Fifth Element Photography">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Fifth Element Photography - Featured Image of the Week">
+    <meta name="twitter:description" content="Professional photography with artistic vision and technical excellence">
+    
+    <meta name="twitter:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}">
+    
+    
+    <link rel="stylesheet" href="/static/css/style.css?v=20241008-001">
+    <link rel="stylesheet" href="/static/css/lumaprints_styles.css">
+    <link rel="stylesheet" href="/static/css/lumaprints_interface.css">
+    <link rel="stylesheet" href="/static/css/shopify-modal.css">
 </head>
 <body>
-    <!-- Top Navigation with Centered Logo -->
-    <nav class="top-nav">
-        <div class="nav-left">
-            <a href="#home" class="nav-link">HOME</a>
-            <a href="#featured" class="nav-link">FEATURED IMAGE</a>
-        </div>
-        <div class="nav-logo">
-            <img src="/static/images/logo-horizontal.png" alt="Fifth Element Photography">
-        </div>
-        <div class="nav-right">
-            <a href="#about" class="nav-link">ABOUT</a>
-            <a href="#contact" class="nav-link">CONTACT</a>
-            <a href="https://buymeacoffee.com/fifthelement" class="nav-link" target="_blank">BUY ME A COFFEE</a>
-        </div>
-    </nav>
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+    
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <!--<br>ADDED PAGE BREAK TO LOWER LOGO DISPLAY -->
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="/static/images/logo.png" alt="Fifth Element Photography Logo">
+                </div>
+                <!--<h1>FIFTH ELEMENT</h1>
+                <p>PHOTOGRAPHY</p>-->
+                <p>Madison WI</p>
+            </div>
+            
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active" data-section="home">HOME</a></li>
+                <li><a href="#" class="nav-link" data-section="featured">FEATURED IMAGE</a></li>
+                <li><a href="#" class="nav-link" data-section="about">ABOUT</a></li>
+                <li><a href="#" class="nav-link" data-section="contact">CONTACT</a></li>
+                <!-- CART menu item hidden v2.0.0 - will be restored when ordering is re-implemented -->
+                <!-- <li><a href="/checkout" class="nav-link cart-link" id="cartLink">
+                    <i class="fas fa-shopping-cart"></i> CART <span id="cartCount" class="cart-count">0</span>
+                </a></li> -->
+            </ul>
+            <br>
+             <!--<button onclick="window.location.href='https://buymeacoffee.com/fifthelementphotography'">BUY ME A COFFEE</button>
+                <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" style="background-color: blue; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">BUY ME A COFFEE</a>-->
+             <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" style="background-color: none; color: #6799c2; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-family: 'Poppins', sans-serif; text-transform: uppercase; border: 1px solid #6799c2;">
+  BUY ME A COFFEE</a>
+            
+        </nav>
+         
+        <main class="main-content">
+            <!-- HOME Section -->
+            <section class="content-section active" id="home-section">
+                <div class="hero">
+                    <div class="hero-image" id="heroImage">
+                        <div class="hero-overlay">
+                            <img src="/static/images/TaglineWhite.png" alt="Tagline" class="hero-tagline-image">
+                        </div>
+                    </div>
+                </div>
+           
+                <div class="gallery">
+                    <div class="gallery-header">
+                        <h3 id="galleryTitle">Portfolio Gallery</h3>
+                        <p class="gallery-subtitle">Click any image to view details and order prints</p>
+                        <div class="category-filters">
+                            <a href="#" class="category-link active" data-category="all">ALL</a>
+                            {% for category in categories|sort %}
+                            <a href="#" class="category-link" data-category="{{ category }}">{{ category.upper() }}</a>
+                            {% endfor %}
+                        </div>
+                        <div class="image-count" id="imageCount">Loading...</div>
+                    </div>
+                    
+                    <div class="masonry-grid" id="imageGrid">
+                        <div class="loading">Loading images...</div>
+                    </div>
+                    
+                    <!-- Pagination Controls -->
+                    <div class="pagination-container" id="paginationContainer" style="display: none;">
+                        <div class="pagination-info">
+                            <span id="paginationInfo">Page 1 of 1</span>
+                        </div>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" id="prevPageBtn" disabled>← Previous</button>
+                            <div class="page-numbers" id="pageNumbers"></div>
+                            <button class="pagination-btn" id="nextPageBtn">Next →</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-    <!-- Featured Gallery - Staggered Grid -->
-    <section class="featured-gallery">
-        <div class="featured-grid" id="featuredGrid">
-            <!-- Featured images will be loaded here -->
+            <!-- FEATURED IMAGE Section -->
+            <section class="content-section" id="featured-section">
+                <div class="featured-container">
+                    <h2 class="section-title featured-title" style="font-size: 1.5rem;">FEATURED IMAGE OF THE WEEK</h2>
+                    
+                    
+                        <div class="featured-content">
+                            <div class="featured-image-container">
+                                <div class="featured-image">
+                                    <img src="{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}" alt="{{ featured_image.title if featured_image else "No Featured Image" }}" style="max-width: 80%; height: auto; margin: 0 auto; display: block;">
+                                </div>
+                            </div>
+                            
+                            <!-- EXIF Data - Horizontal Layout Below Image -->
+                            {% if featured_exif %}
+                            <div class="featured-exif-horizontal">
+                                {% if featured_exif.model %}
+                                <div class="exif-item">
+                                    <span class="exif-label">Model:</span>
+                                    <span class="exif-value">{{ featured_exif.model }}</span>
+                                </div>
+                                {% endif %}
+                                {% if featured_exif.lens %}
+                                <div class="exif-item">
+                                    <span class="exif-label">Lens:</span>
+                                    <span class="exif-value">{{ featured_exif.lens }}</span>
+                                </div>
+                                {% endif %}
+                                {% if featured_exif.aperture %}
+                                <div class="exif-item">
+                                    <span class="exif-label">Aperture:</span>
+                                    <span class="exif-value">{{ featured_exif.aperture }}</span>
+                                </div>
+                                {% endif %}
+                                {% if featured_exif.shutter_speed %}
+                                <div class="exif-item">
+                                    <span class="exif-label">Shutter Speed:</span>
+                                    <span class="exif-value">{{ featured_exif.shutter_speed }}</span>
+                                </div>
+                                {% endif %}
+                                {% if featured_exif.iso %}
+                                <div class="exif-item">
+                                    <span class="exif-label">ISO:</span>
+                                    <span class="exif-value">{{ featured_exif.iso }}</span>
+                                </div>
+                                {% endif %}
+                                {% if featured_exif.focal_length %}
+                                <div class="exif-item">
+                                    <span class="exif-label">Focal Length:</span>
+                                    <span class="exif-value">{{ featured_exif.focal_length }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <!-- Action Buttons -->
+                            <div class="image-actions">
+                                <button class="action-btn" onclick="viewFullscreen('{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}', '{{ featured_image.title if featured_image else "No Featured Image" }}')">
+                                    <span></span> View High Resolution (New Window)
+                                </button>
+                                <button class="action-btn" onclick="downloadImage('{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}', 'IMG_8653_2_1.jpg')">
+                                    <span></span> Download Full Size Image
+                                </button>
+                                <button class="action-btn" onclick="shareOnSocial('{{ featured_image.title if featured_image else "No Featured Image" }}', '{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}')">
+                                    <span></span> Share on Social Media
+                                </button>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="featured-story-section">
+                            <h3 style="text-align: left; margin-bottom: 15px;">{{ featured_image.title if featured_image else "No Featured Image" }}</h3>
+                            <div class="description-content">{{ featured_image.description|safe if featured_image and featured_image.description else 'No description available for this image.' }}</div>
+                        </div>
+                        
+                    
+                </div>
+            </section>
+
+            <!-- ABOUT Section -->
+            <section class="content-section" id="about-section">
+                <div class="about-container">
+                    <h2 class="section-title">Fifth Element Photography</h2>
+                        <h2 class="section-subtitle">CAPTURING THE QUINTESSENCE - DEPLOY TEST</h2>
+                        <!--<h2 class="section-subtitle">quintessence [kwin-<b>tes</b>-uhns]: noun the most perfect embodiment of something</h2>
+                        <center><em><p><color: #6799c2>quintessence [kwin-<b>tes</b>-uhns]</color:>: noun the most perfect embodiment of something</p></em></center><br>-->
+                        <center><em><p><span style="color:#6799c2;">quintessence</span> [kwin-<b>tes</b>-uhns]: noun; the essence of a thing in its purest form</p></em></center><br>
+                    
+                    <div class="about-content">
+                        <div class="about-image">
+                            
+                                <img src="/about/Parfreys.png" alt="About Fifth Element Photography">
+                            
+                        </div>
+                        <div class="about-text">
+                            
+                                <p><h3>The Art of the Unseen</h3>
+<br><br>
+<p>Born under the wide skies of South Central Wisconsin, my life has been a canvas of different hues and disciplines. A musician's ear for harmony and feel for rhythm, a teacher's patience, and a business owner's drive have all shaped the artist and the person I am today. Yet, it is through the lens of a camera that my spirit finds its truest voice. My camera is not just a tool; it's a silent partner on a constant expedition, always in search of the next story to tell.
+<br><br>
+I chase the unseen, the fleeting moments hidden within the commonplace. My eye is captivated by the elegant geometry and stark lines of architectural design, and I find a profound truth in the timeless beauty of black and white. I am just as comfortable in the hushed stillness of my studio as I am out in the elements, where the pursuit of the perfect shot might mean getting soaked or muddy. I have learned to embrace the quiet hours of waiting, when a subject may never appear, because the simple act of being present in nature is a gift for the soul.
+<br><br>
+My greatest joy lies not only in my own creations but in the act of collaborating. If you have a dream, a vision that yearns to be captured, let's embark on that journey together. Every image in my portfolio is available for purchase, and your support through tips and donations helps sustain this creative expedition, allowing me to continue to seek and capture these moments.
+<br>
+<em>Rick</em>
+</p></p>
+                            
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CONTACT Section -->
+            <section class="content-section" id="contact-section">
+                <div class="contact-container">
+                    <h2 class="section-title">Contact</h2>
+                    <div class="contact-content">
+                        <div class="contact-info">
+                            <h3>Get In Touch</h3>
+                            <p>Ready to capture your special moments? Let's discuss your photography needs.</p>
+                            
+                            <div class="contact-details">
+                                <div class="contact-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>info@fifthelement.photos</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>(608) 219-6066</span>
+                                </div>
+                                <div class="contact-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>Madison, Wisconsin</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="contact-form">
+    <h3>Send a Message</h3>
+    <form>
+        <div class="form-group">
+            <input type="text" placeholder="Your Name" required>
         </div>
-    </section>
-
-    <!-- About Section -->
-    <section class="about-section" id="about">
-        <h2 class="about-title">QUINTESSENCE [KWIN-TES-UHNS]: <span class="about-subtitle">NOUN; THE ESSENCE OF A THING IN ITS PUREST FORM</span></h2>
-        <p class="about-text">
-            Fifth Element Photography is founded on the principle of seeking and revealing the <em>quintessence</em>—the essence of a thing in its purest, 
-            most perfect form. While the traditional four elements define our physical world, the "Fifth Element" or "aether", represents the ethereal, 
-            the spirit, and the essential nature that lies beneath the surface. My mission is to move beyond mere documentation and employ an 
-            artistic vision to capture the quintessence of every subject, transforming fleeting moments into timeless images that resonate with 
-            profound, unadulterated character within and of itself. I humbly invite you to join me on this quest.
-        </p>
-    </section>
-
-    <!-- Category Slides -->
-    <section class="category-slides-section">
-        <h2 class="section-title">Explore by Category</h2>
+        <div class="form-group">
+            <input type="email" placeholder="Your Email" required>
+        </div>
+        <div class="form-group">
+            <input type="tel" placeholder="Your Phone Number">
+        </div>
         
-        <!-- Category Navigation -->
-        <div class="category-nav" id="categoryNav">
-            <!-- Category buttons will be loaded here -->
+        <div class="form-group">
+            <label for="shoot-type">What type of shoot are you interested in?</label>
+            <select id="shoot-type" name="shoot-type">
+                <option value="" disabled selected>Select an option</option>
+                <option value="portrait">Portrait</option>
+                <option value="public-event">Public Event</option>
+                <option value="corporate-event">Corporate Event</option>
+                <option value="business-headshots">Business Headshots</option>
+                <option value="promotional-headshots">Promotional Headshots</option>
+                <option value="band-promotion">Band Promotion</option>
+                <option value="product-promotion">Product Promotion</option>
+                <option value="graduation">Graduation</option>
+                <option value="other">Other</option>
+            </select>
         </div>
 
-        <!-- Category Slide Container -->
-        <div class="category-slide-container" id="categorySlideContainer">
-            <!-- Selected category images will be displayed here -->
+        <div class="form-group">
+            <label for="budget">What is your budget?</label>
+            <select id="budget" name="budget">
+                <option value="" disabled selected>Select an option</option>
+                <option value="500">Up to $500</option>
+                <option value="550-750">$550 - $750</option>
+                <option value="800-1000">$800 - $1,000</option>
+                <option value="not-sure">I am not sure, looking for a quote</option>
+            </select>
         </div>
-    </section>
 
-    <!-- Image Modal -->
-    <div id="imageModal" class="modal">
-        <span class="close">&times;</span>
-        <div class="modal-content-wrapper">
-            <img class="modal-image" id="modalImage">
-            <div class="modal-info">
-                <h2 id="modalTitle"></h2>
-                <p id="modalCategory"></p>
-                <p id="modalDescription"></p>
+        <div class="form-group">
+            <label for="how-heard">How did you hear about us?</label>
+            <input type="text" id="how-heard" name="how-heard" placeholder="e.g., Social Media, Referral, etc.">
+        </div>
+
+        <div class="form-group">
+            <textarea placeholder="Your Message" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Send Message</button>
+    </form>
+</div>
+                        
+                        <!-- CONTACT Section
+                        <div class="contact-form">
+                            <h3>Send a Message</h3>
+                            <form>
+                                <div class="form-group">
+                                    <input type="text" placeholder="Your Name" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" placeholder="Your Email" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" placeholder="Subject">
+                                </div>
+                                <div class="form-group">
+                                    <textarea placeholder="Your Message" rows="5" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Send Message</button>
+                            </form>
+                        </div> -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Image Modal - Updated with Order Form Section -->
+    <div class="modal" id="imageModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            
+            <!-- Main Image View -->
+            <div class="modal-main-view" id="modalMainView">
+                <img class="modal-image" id="modalImage">
+                <div class="modal-info">
+                    <h4 id="modalTitle"></h4>
+                    <p id="modalCategory"></p>
+                    <div style="text-align: center; margin-top: 20px; padding: 20px;">
+                        <button onclick="openOrderWizard()" class="btn order-photos-btn">🛒 ORDER PRINTS</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Form Section (initially hidden) -->
+            <!-- Order Form Section (initially hidden) -->
+            <div class="modal-new-order-form" id="modalOrderForm" style="display: none;">
+                <div class="new-order-form-header">
+                    <button class="btn-back" id="backToImageBtn" onclick="showImageView()">
+                        <span class="btn-icon">←</span>
+                        Back to Image
+                    </button>
+                    <h2 class="section-title" style="text-align: center; margin: 20px 0;">ORDER FORM</h2>
+                </div>
+                
+                <div class="new-order-form-content">
+                    <div class="order-content">
+                        <!-- Left Column: Image Details -->
+                        <div class="order-info">
+                            <h3>Image Details</h3>
+                            <div id="orderImageDetails">
+                                <!-- Image details will be populated dynamically -->
+                            </div>
+                            <div class="order-image-preview" id="orderImagePreview">
+                                <!-- Image thumbnail will be shown here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Right Column: Order Form -->
+                        <div class="order-form">
+                            <h3>Place Order</h3>
+                            <form id="orderForm" action="/test_order_submit" method="POST">
+                                <div class="form-group">
+                                    <input type="email" id="order_email" name="email" placeholder="Your Email" required style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_first_name" name="first_name" placeholder="First Name" required style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_last_name" name="last_name" placeholder="Last Name" required style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_address" name="address" placeholder="Address" required style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_city" name="city" placeholder="City" required style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_state" name="state" placeholder="State" required style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" id="order_zip" name="zip_code" placeholder="Zip Code" required style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important;">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <select id="order_country" name="country" required style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important;">
+                                        <option value="">Select Country</option>
+                                        <option value="United States">United States</option>
+                                        <option value="Canada">Canada</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="tel" id="order_phone" name="phone" placeholder="Phone Number" style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important;">
+                                </div>
+                                
+                                <div class="form-group">
+                                               <select id="order-product" name="product" required style="background: rgba(255, 255, 255, 0.1) !important; border: 2px solid rgba(255, 255, 255, 0.3) !important; color: #fff !important; border-radius: 4px !important; padding: 10px !important;">
+                                        <option value="">Select a product...</option>
+                                        <option value="canvas_075|12x12" data-sku="101001" data-options="1,5">Canvas Print 0.75" (12x12) - $1.00</option>
+                                        <option value="canvas_125|12x12" data-sku="101002" data-options="1,5">Canvas Print 1.25" (12x12) - $1.00</option>
+                                        <option value="metal|12x12" data-sku="106001" data-options="1">Metal Print (12x12) - $1.00</option>
+                                        <option value="paper|12x12" data-sku="103001" data-options="36">Fine Art Paper (12x12) - $1.00</option>
+                                        <option value="framed_canvas|12x12" data-sku="102001" data-options="1,5">Framed Canvas (12x12) - $1.00</option>
+                                    </select>
+                                </div>
+
+                                <!-- Order Summary Section -->
+                                <div class="order-summary-section" style="margin-top: 20px; padding: 20px; border: 2px solid #4285f4; border-radius: 8px;">
+                                    <h3 style="color: #fff;">Order Summary</h3>
+                                    <p class="total-price"><strong>Total: <span id="order-total-price">$1.00</span></strong></p>
+                                    <div id="order-breakdown" style="font-size: 0.9em; color: #ccc; margin-bottom: 15px;">
+                                        <div>Product: 12x12 Canvas Print</div>
+                                        <div>Image: 12x12_Sparrow.jpg</div>
+                                    </div>
+                                    <div style="color: #ccc; font-size: 0.9em; margin-top: 10px;">
+                                        Payment will be processed separately
+                                    </div>
+                                </div>
+
+                <!-- Submit button -->
+                <button type="submit" id="order-submit-order">Submit Order to OrderDesk</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="/static/js/script_v3.js?v=20241201-003"></script>
+    <!-- Mobile Cart Floating Action Button -->
+    <a href="/checkout" class="mobile-cart-fab" id="mobileCartFab">
+        <i class="fas fa-shopping-cart"></i>
+        <span id="mobileCartCount" class="cart-count">0</span>
+    </a>
+
+    
+    <script src="/static/js/script.js?v=20241008-001"></script>
+    <script src="/static/js/lumaprints_pricing.js"></script>
+    <script src="/static/js/lumaprints_inline_ordering.js"></script>
+    <script src="/static/js/shopify-config.js"></script>
+    <script src="/static/js/shopify-integration.js"></script>
+    
+    <script>
+        // Order Form Integration for OrderDesk
+        const staticPrice = 1.00;
+        const staticProduct = '12x12 Canvas Print';
+        const staticImage = 'https://fifthelement.photos/images/12x12_Sparrow.jpg';
+        const staticSku = '101001';  // Canvas Print 0.75" SKU
+        const staticLumaprintsOptions = '1,5';  // Lumaprints option IDs
+        
+        // Add order data when form is submitted
+        document.addEventListener('DOMContentLoaded', function() {
+            const orderForm = document.getElementById('orderForm');
+            if (orderForm) {
+                orderForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Get selected product data
+                    const productSelect = document.getElementById('order-product');
+                    const selectedOption = productSelect.selectedOptions[0];
+                    const productSku = selectedOption ? selectedOption.dataset.sku : staticSku;
+                    const productOptions = selectedOption ? selectedOption.dataset.options : staticLumaprintsOptions;
+                    const productName = selectedOption ? selectedOption.textContent.split(' - ')[0] : staticProduct;
+                    
+                    // Add Lumaprints product data for OrderDesk
+                    const formData = new FormData(orderForm);
+                    formData.append('product_sku', productSku);
+                    formData.append('lumaprints_options', productOptions);
+                    formData.append('product_price', staticPrice.toFixed(2));
+                    formData.append('product_name', productName);
+                    formData.append('image_url', staticImage);
+                    
+                    // Submit via AJAX
+                    fetch('/test_order_submit', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('OrderDesk Response Debug:', data.debug_info);
+                        console.log('Full Response:', data);
+                        
+                        if (data.status === 'success') {
+                            // Show success message
+                            alert(`Order submitted successfully!\nOrderDesk Order ID: ${data.orderdesk_order_id}\n\nThank you for your order. You will receive a confirmation email shortly.`);
+                            // Close the modal
+                            closeImageModal();
+                        } else {
+                            alert(`Order submission failed: ${data.message}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while submitting your order. Please try again.');
+                    });
+                });
+            }
+        });
+        
+        // Update cart count in navigation
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('lumaprintsCart') || '[]');
+            const cartCount = document.getElementById('cartCount');
+            const cartLink = document.getElementById('cartLink');
+            const mobileCartCount = document.getElementById('mobileCartCount');
+            const mobileCartFab = document.getElementById('mobileCartFab');
+            
+            if (cart.length > 0) {
+                // Update sidebar cart
+                if (cartCount) {
+                    cartCount.textContent = cart.length;
+                    cartCount.style.display = 'inline';
+                }
+                if (cartLink) {
+                    cartLink.style.opacity = '1';
+                }
+                
+                // Update mobile floating cart
+                if (mobileCartCount) {
+                    mobileCartCount.textContent = cart.length;
+                    mobileCartCount.style.display = 'flex';
+                }
+                if (mobileCartFab) {
+                    mobileCartFab.style.display = 'flex';
+                }
+            } else {
+                // Hide sidebar cart count
+                if (cartCount) {
+                    cartCount.style.display = 'none';
+                }
+                if (cartLink) {
+                    cartLink.style.opacity = '0.6';
+                }
+                
+                // Hide mobile cart count but keep button visible
+                if (mobileCartCount) {
+                    mobileCartCount.style.display = 'none';
+                }
+            }
+        }
+        
+        // Update cart count on page load and when localStorage changes
+        document.addEventListener('DOMContentLoaded', updateCartCount);
+        window.addEventListener('storage', updateCartCount);
+        
+        // Update cart count periodically in case of same-page updates
+        setInterval(updateCartCount, 1000);
+        
+        // Handle order print click
+        function handleOrderClick() {
+            // Redirect to new PayPal-integrated order form
+            window.open('/test_order_form', '_blank');
+        }
+    </script>
+    <script src="/static/js/mobile-enhanced.js?v=20241015-002"></script>
+    <script src="/static/js/mobile-image-modal.js?v=20241015-002"></script>
 </body>
 </html>
