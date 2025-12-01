@@ -457,6 +457,65 @@ function setupEventListeners() {
     });
 
     /**
+     * Handle Bulk Import Shopify button
+     */
+    document.getElementById('btn-bulk-import-shopify').addEventListener('click', () => {
+        UI.showModal('bulk-import-shopify-modal');
+    });
+
+    /**
+     * Handle Bulk Import Upload button
+     */
+    document.getElementById('btn-bulk-import-upload').addEventListener('click', async () => {
+        const fileInput = document.getElementById('bulk-import-csv');
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            UI.showNotification('Please select a CSV file', true);
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        try {
+            const response = await fetch('/api/v3/bulk-import-shopify', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                const message = `
+                    <div style="color: #28a745;">
+                        <strong>✓ Import Complete!</strong><br>
+                        Updated: ${result.updated} images<br>
+                        Errors: ${result.errors}
+                    </div>
+                `;
+                document.getElementById('bulk-import-message').innerHTML = message;
+                document.getElementById('bulk-import-result').style.display = 'block';
+                
+                UI.showNotification(`Successfully imported ${result.updated} images`);
+                
+                // Reload images after 2 seconds
+                setTimeout(() => {
+                    UI.hideModal('bulk-import-shopify-modal');
+                    loadImages();
+                }, 2000);
+            } else {
+                throw new Error(result.error || 'Import failed');
+            }
+        } catch (error) {
+            UI.showNotification('Error importing CSV: ' + error.message, true);
+            const message = `<div style="color: #dc3545;"><strong>✗ Error:</strong> ${error.message}</div>`;
+            document.getElementById('bulk-import-message').innerHTML = message;
+            document.getElementById('bulk-import-result').style.display = 'block';
+        }
+    });
+
+    /**
      * Handle Lumaprints upload button
      */
     document.getElementById('btn-lumaprints-upload').addEventListener('click', () => {

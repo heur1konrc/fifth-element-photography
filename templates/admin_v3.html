@@ -41,6 +41,10 @@
                 <button id="btn-lumaprints" class="btn btn-primary">
                     <span class="icon">🖼️</span> Lumaprints Mapping
                 </button>
+                
+                <button id="btn-bulk-import-shopify" class="btn btn-warning">
+                    <span class="icon">📊</span> Bulk Import Shopify
+                </button>
             </div>
             
             <div class="toolbar-right">
@@ -224,6 +228,40 @@
             </div>
             <div class="modal-footer">
                 <button id="btn-bulk-assign-confirm" class="btn btn-primary">Assign to Selected</button>
+                <button class="btn btn-secondary modal-close">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Import Shopify Modal -->
+    <div id="bulk-import-shopify-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Bulk Import Shopify Product Handles</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-description">Upload a CSV file to set Shopify product handles for multiple images at once.</p>
+                
+                <div class="form-group">
+                    <label>CSV File Format:</label>
+                    <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-size: 12px;">filename,shopify_product_handle,order_prints_enabled
+image1.jpg,sunset-over-madison,true
+image2.jpg,autumn-leaves,false
+image3.jpg,mountain-view,true</pre>
+                </div>
+                
+                <div class="form-group">
+                    <label for="bulk-import-csv">Select CSV File:</label>
+                    <input type="file" id="bulk-import-csv" accept=".csv" class="form-input">
+                </div>
+                
+                <div id="bulk-import-result" style="margin-top: 15px; display: none;">
+                    <div id="bulk-import-message"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-bulk-import-upload" class="btn btn-primary">Upload & Import</button>
                 <button class="btn btn-secondary modal-close">Cancel</button>
             </div>
         </div>

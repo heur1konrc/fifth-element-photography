@@ -979,6 +979,82 @@ def set_featured_image(filename):
 
 # ==================== FRONT-END ROUTES ====================
 
+@app.route('/api/v3/bulk-import-shopify', methods=['POST'])
+@login_required
+def bulk_import_shopify():
+    """
+    Bulk import Shopify product handles from CSV.
+    
+    Expected CSV format:
+    filename,shopify_product_handle,order_prints_enabled
+    image1.jpg,product-handle-1,true
+    image2.jpg,product-handle-2,false
+    
+    Returns:
+        JSON with success/error counts
+    """
+    import csv
+    import io
+    
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+    
+    if not file.filename.endswith('.csv'):
+        return jsonify({'error': 'File must be a CSV'}), 400
+    
+    try:
+        # Read CSV file
+        stream = io.StringIO(file.stream.read().decode('UTF8'), newline=None)
+        csv_reader = csv.DictReader(stream)
+        
+        success_count = 0
+        error_count = 0
+        errors = []
+        
+        for row in csv_reader:
+            try:
+                filename = row.get('filename', '').strip()
+                handle = row.get('shopify_product_handle', '').strip()
+                enabled_str = row.get('order_prints_enabled', 'false').strip().lower()
+                enabled = enabled_str in ['true', '1', 'yes']
+                
+                if not filename:
+                    error_count += 1
+                    errors.append(f"Row missing filename")
+                    continue
+                
+                # Update image metadata
+                success = data_manager.update_image_metadata(
+                    filename,
+                    shopify_product_handle=handle if handle else None,
+                    order_prints_enabled=enabled
+                )
+                
+                if success:
+                    success_count += 1
+                else:
+                    error_count += 1
+                    errors.append(f"Failed to update {filename}")
+                    
+            except Exception as e:
+                error_count += 1
+                errors.append(f"Error processing row: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'updated': success_count,
+            'errors': error_count,
+            'error_details': errors[:10]  # Return first 10 errors
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to process CSV: {str(e)}'}), 500
+
+
 @app.route('/')
 def index_v3():
     """V3 frontend with production layout."""
