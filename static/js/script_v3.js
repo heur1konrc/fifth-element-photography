@@ -22,8 +22,15 @@ document.addEventListener('DOMContentLoaded', function() {
 // Load images from API
 async function loadImages() {
     try {
-        const response = await fetch('/api/images');
+        const response = await fetch('/api/v3/images');
         allImages = await response.json();
+        
+        // Build image data map for quick lookup
+        imageDataMap = {};
+        allImages.forEach(img => {
+            const filename = img.url.split('/').pop();
+            imageDataMap[filename] = img;
+        });
         
         if (allImages.length > 0) {
             // Set hero image (selected or random)
@@ -48,7 +55,7 @@ async function loadImages() {
 async function setHeroImage() {
     try {
         // First, try to get the selected hero image from API
-        const heroResponse = await fetch('/api/hero_image');
+        const heroResponse = await fetch('/api/v3/hero_image');
         const heroData = await heroResponse.json();
         
         if (heroData.filename) {
@@ -310,10 +317,33 @@ function showSection(sectionName) {
 }
 
 // Open image modal
-function openModal(imageUrl, title, category) {
+// Store current image data globally
+let currentImageData = null;
+let imageDataMap = {}; // Map of filename -> image data
+
+function openModal(imageUrl, title, category, imageData = null) {
+    // If imageData not provided, try to look it up from the map
+    if (!imageData) {
+        const filename = imageUrl.split('/').pop();
+        imageData = imageDataMap[filename];
+    }
     modalImage.src = imageUrl;
     modalTitle.textContent = title;
     modalCategory.innerHTML = '<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>';
+    
+    // Store image data for order prints
+    currentImageData = imageData;
+    
+    // Show/hide ORDER PRINTS button based on order_prints_enabled
+    const orderButton = document.querySelector('.order-photos-btn');
+    if (orderButton) {
+        if (imageData && imageData.order_prints_enabled && imageData.shopify_product_handle) {
+            orderButton.style.display = 'inline-block';
+        } else {
+            orderButton.style.display = 'none';
+        }
+    }
+    
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
 }
@@ -654,17 +684,48 @@ function showImageView() {
     document.getElementById('modalMainView').style.display = 'block';
 }
 
+// Open Shopify product modal with handle directly (bypassing URL lookup)
+function openShopifyProductModalWithHandle(productHandle, imageTitle) {
+    // Show loading state
+    showLoadingModal(imageTitle);
+
+    // Fetch product using Storefront API
+    fetchProductByHandle(productHandle)
+        .then(product => {
+            if (!product) {
+                closeShopifyModal();
+                alert('Product not found. Please contact support.');
+                console.error('Product not found:', productHandle);
+                return;
+            }
+
+            console.log('Product loaded:', product);
+            
+            // Create and show product modal
+            displayProductModal(product, imageTitle);
+        })
+        .catch(error => {
+            closeShopifyModal();
+            console.error('Error fetching product:', error);
+            alert('Error loading product. Please try again.');
+        });
+}
+
 function openOrderWizard() {
     // Get the current image URL and title from the modal
     const imageElement = document.getElementById('modalImage');
     const titleElement = document.getElementById('modalTitle');
     
-    if (imageElement && imageElement.src && titleElement) {
+    if (imageElement && imageElement.src && titleElement && currentImageData) {
         const imageUrl = imageElement.src;
         const imageTitle = titleElement.textContent;
         
-        // Open Shopify product modal
-        openShopifyProductModal(imageUrl, imageTitle);
+        // Use the shopify_product_handle from the image data
+        if (currentImageData.shopify_product_handle) {
+            openShopifyProductModalWithHandle(currentImageData.shopify_product_handle, imageTitle);
+        } else {
+            alert('This image is not yet available for purchase. Please check back soon!');
+        }
     } else {
         console.error('No image selected');
         alert('Please select an image first');
