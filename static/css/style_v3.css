@@ -36,7 +36,7 @@ body {
 }
 
 .nav-logo img {
-    height: 60px;
+    height: 80px;
     width: auto;
 }
 
@@ -49,20 +49,7 @@ body {
 }
 
 .nav-link:hover {
-    color: #fff;
-}
-
-/* Tagline Section */
-.tagline-section {
-    text-align: center;
-    padding: 60px 20px;
-    background-color: #000;
-}
-
-.tagline-image {
-    max-width: 800px;
-    width: 100%;
-    height: auto;
+    color: #4a90e2;
 }
 
 /* Featured Gallery - Staggered Grid */
@@ -117,7 +104,7 @@ body {
 
 .about-title {
     font-size: 20px;
-    color: #d4a574;
+    color: #4a90e2;
     letter-spacing: 2px;
     margin-bottom: 30px;
     font-weight: normal;
@@ -137,7 +124,7 @@ body {
 }
 
 .about-text em {
-    color: #d4a574;
+    color: #4a90e2;
     font-style: italic;
 }
 
@@ -151,7 +138,7 @@ body {
     text-align: center;
     font-size: 28px;
     margin-bottom: 40px;
-    color: #d4a574;
+    color: #4a90e2;
     letter-spacing: 2px;
 }
 
@@ -167,8 +154,8 @@ body {
 .category-btn {
     padding: 12px 30px;
     background-color: transparent;
-    border: 2px solid #d4a574;
-    color: #d4a574;
+    border: 2px solid #4a90e2;
+    color: #4a90e2;
     cursor: pointer;
     font-size: 14px;
     letter-spacing: 1px;
@@ -178,7 +165,7 @@ body {
 
 .category-btn:hover,
 .category-btn.active {
-    background-color: #d4a574;
+    background-color: #4a90e2;
     color: #000;
 }
 
@@ -261,7 +248,7 @@ body {
 }
 
 .close:hover {
-    color: #d4a574;
+    color: #4a90e2;
 }
 
 .modal-content-wrapper {
@@ -286,7 +273,7 @@ body {
 .modal-info h2 {
     font-size: 28px;
     margin-bottom: 15px;
-    color: #d4a574;
+    color: #4a90e2;
 }
 
 .modal-info p {
