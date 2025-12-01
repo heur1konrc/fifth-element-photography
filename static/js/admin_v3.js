@@ -424,6 +424,41 @@ function setupEventListeners() {
     });
 
     /**
+     * Handle Lumaprints mapping button
+     */
+    document.getElementById('btn-lumaprints').addEventListener('click', () => {
+        openLumaprintsModal();
+    });
+
+    /**
+     * Handle Lumaprints upload button
+     */
+    document.getElementById('btn-lumaprints-upload').addEventListener('click', () => {
+        uploadLumaprintsFile();
+    });
+
+    /**
+     * Handle Lumaprints image selection
+     */
+    document.getElementById('lumaprints-image-select').addEventListener('change', () => {
+        onLumaprintsImageChange();
+    });
+
+    /**
+     * Handle Lumaprints apply mapping
+     */
+    document.getElementById('btn-lumaprints-apply-all').addEventListener('click', () => {
+        applyLumaprintsMapping();
+    });
+
+    /**
+     * Handle Lumaprints download
+     */
+    document.getElementById('btn-lumaprints-download').addEventListener('click', () => {
+        downloadLumaprintsFile();
+    });
+
+    /**
      * Handle browse files button
      */
     document.getElementById('btn-browse').addEventListener('click', () => {
@@ -893,6 +928,263 @@ async function deleteBackup(filename) {
     } catch (error) {
         UI.showNotification('Error deleting backup: ' + error.message, true);
     }
+}
+
+// ==================== LUMAPRINTS MAPPING ====================
+
+const LumaprintsState = {
+    unmappedProducts: [],
+    availableImages: [],
+    selectedImage: null,
+    mappings: []
+};
+
+/**
+ * Open Lumaprints mapping modal
+ */
+function openLumaprintsModal() {
+    UI.showModal('lumaprints-modal');
+    // Reset to step 1
+    document.getElementById('lumaprints-step-1').style.display = 'block';
+    document.getElementById('lumaprints-step-2').style.display = 'none';
+    document.getElementById('lumaprints-step-3').style.display = 'none';
+}
+
+/**
+ * Upload and process Lumaprints Excel file
+ */
+async function uploadLumaprintsFile() {
+    const fileInput = document.getElementById('lumaprints-file-input');
+    const statusDiv = document.getElementById('lumaprints-upload-status');
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+        UI.showNotification('Please select a file', true);
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    
+    if (!file.name.endsWith('.xlsx')) {
+        UI.showNotification('File must be .xlsx format', true);
+        return;
+    }
+    
+    statusDiv.innerHTML = '<p>Processing file...</p>';
+    
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch('/api/v3/lumaprints/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            LumaprintsState.unmappedProducts = data.unmapped_products;
+            statusDiv.innerHTML = `<p style="color: green;">✓ File processed! Found ${data.unmapped_count} unmapped products.</p>`;
+            
+            // Load available images
+            await loadLumaprintsImages();
+            
+            // Move to step 2
+            setTimeout(() => {
+                document.getElementById('lumaprints-step-1').style.display = 'none';
+                document.getElementById('lumaprints-step-2').style.display = 'block';
+                displayUnmappedProducts();
+            }, 1000);
+        } else {
+            statusDiv.innerHTML = `<p style="color: red;">✗ Error: ${data.error}</p>`;
+        }
+    } catch (error) {
+        statusDiv.innerHTML = `<p style="color: red;">✗ Error: ${error.message}</p>`;
+    }
+}
+
+/**
+ * Load available images with aspect ratios
+ */
+async function loadLumaprintsImages() {
+    try {
+        const response = await fetch('/api/v3/lumaprints/images');
+        const data = await response.json();
+        
+        LumaprintsState.availableImages = data.images;
+        
+        // Populate image select dropdown
+        const select = document.getElementById('lumaprints-image-select');
+        select.innerHTML = '<option value="">-- Select Image --</option>';
+        
+        data.images.forEach(img => {
+            const option = document.createElement('option');
+            option.value = img.filename;
+            option.textContent = `${img.title || img.filename} (${img.aspect_ratio} - ${img.dimensions})`;
+            option.dataset.aspectRatio = img.aspect_ratio;
+            option.dataset.dimensions = img.dimensions;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        UI.showNotification('Error loading images: ' + error.message, true);
+    }
+}
+
+/**
+ * Display unmapped products
+ */
+function displayUnmappedProducts() {
+    const countElem = document.getElementById('lumaprints-unmapped-count');
+    const listElem = document.getElementById('lumaprints-products-list');
+    
+    countElem.textContent = `Found ${LumaprintsState.unmappedProducts.length} unmapped products.`;
+    
+    if (LumaprintsState.unmappedProducts.length === 0) {
+        listElem.innerHTML = '<p>No unmapped products found!</p>';
+        return;
+    }
+    
+    // Show first 10 products as preview
+    const preview = LumaprintsState.unmappedProducts.slice(0, 10);
+    listElem.innerHTML = `
+        <h4>Preview (first 10 products):</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f0f0f0;">
+                    <th style="padding: 8px; border: 1px solid #ddd;">Product Name</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Size</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Product Type</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Existing Filename</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${preview.map(p => `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${p.product_name || ''}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${p.size || 'Unknown'}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${p.option1 || ''}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${p.existing_filename || 'None'}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        ${LumaprintsState.unmappedProducts.length > 10 ? `<p style="margin-top: 10px; font-style: italic;">... and ${LumaprintsState.unmappedProducts.length - 10} more products</p>` : ''}
+    `;
+}
+
+/**
+ * Handle image selection change
+ */
+function onLumaprintsImageChange() {
+    const select = document.getElementById('lumaprints-image-select');
+    const infoDiv = document.getElementById('lumaprints-image-info');
+    
+    if (!select.value) {
+        infoDiv.innerHTML = '';
+        return;
+    }
+    
+    const option = select.options[select.selectedIndex];
+    const aspectRatio = option.dataset.aspectRatio;
+    const dimensions = option.dataset.dimensions;
+    
+    infoDiv.innerHTML = `
+        <strong>Aspect Ratio:</strong> ${aspectRatio} &nbsp;|&nbsp; 
+        <strong>Dimensions:</strong> ${dimensions}
+    `;
+}
+
+/**
+ * Apply mapping to all unmapped products
+ */
+async function applyLumaprintsMapping() {
+    const imageSelect = document.getElementById('lumaprints-image-select');
+    const productType = document.getElementById('lumaprints-product-type').value;
+    const subcategory = document.getElementById('lumaprints-subcategory').value;
+    
+    if (!imageSelect.value) {
+        UI.showNotification('Please select an image', true);
+        return;
+    }
+    
+    const selectedOption = imageSelect.options[imageSelect.selectedIndex];
+    const aspectRatio = selectedOption.dataset.aspectRatio;
+    const imageFilename = imageSelect.value;
+    
+    // Build mappings for all unmapped products
+    const mappings = [];
+    
+    for (const product of LumaprintsState.unmappedProducts) {
+        // Use existing filename from Column P or selected image
+        const filename = product.existing_filename || imageFilename;
+        
+        // Determine subcategory based on product type
+        let finalSubcategory = subcategory;
+        if (productType === 'canvas') {
+            finalSubcategory = '0.75in Stretched Canvas';
+        }
+        
+        // Use parsed size from product
+        const width = product.width || 12;
+        const length = product.length || 18;
+        
+        // Get options based on product type
+        let options = [];
+        if (productType === 'canvas') {
+            options = [
+                ['Canvas Border', 'Mirror Wrap'],
+                ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
+                ['Canvas Finish', 'Semi-Glossy']
+            ];
+        } else {
+            options = [
+                ['Bleed Size', '0.25in Bleed (0.25in on each side)']
+            ];
+        }
+        
+        mappings.push({
+            row: product.row,
+            data: {
+                product_handling: 'Update',
+                image_filename: filename,
+                subcategory: finalSubcategory,
+                width: width,
+                length: length,
+                options: options
+            }
+        });
+    }
+    
+    // Send mappings to backend
+    try {
+        const response = await fetch('/api/v3/lumaprints/apply-mapping', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ mappings: mappings })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            UI.showNotification(`✓ Successfully mapped ${data.mapped_count} products!`);
+            
+            // Move to step 3
+            document.getElementById('lumaprints-step-2').style.display = 'none';
+            document.getElementById('lumaprints-step-3').style.display = 'block';
+            document.getElementById('lumaprints-mapped-count').textContent = data.mapped_count;
+        } else {
+            UI.showNotification('Error applying mapping: ' + data.error, true);
+        }
+    } catch (error) {
+        UI.showNotification('Error: ' + error.message, true);
+    }
+}
+
+/**
+ * Download mapped Excel file
+ */
+function downloadLumaprintsFile() {
+    window.location.href = '/api/v3/lumaprints/download';
 }
 
 // ==================== INITIALIZATION ====================

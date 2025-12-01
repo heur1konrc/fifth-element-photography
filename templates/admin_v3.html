@@ -37,6 +37,10 @@
                 <button id="btn-manage-backups" class="btn btn-secondary">
                     <span class="icon">📦</span> Manage Backups
                 </button>
+                
+                <button id="btn-lumaprints" class="btn btn-primary">
+                    <span class="icon">🖼️</span> Lumaprints Mapping
+                </button>
             </div>
             
             <div class="toolbar-right">
@@ -242,6 +246,81 @@
             </div>
             <div class="modal-footer">
                 <button id="btn-refresh-backups" class="btn btn-secondary">Refresh</button>
+                <button class="btn btn-secondary modal-close">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lumaprints Mapping Modal -->
+    <div id="lumaprints-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>🖼️ Lumaprints Bulk Mapping</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Step 1: Upload Excel -->
+                <div id="lumaprints-step-1" class="lumaprints-step">
+                    <h3>Step 1: Upload Lumaprints Excel File</h3>
+                    <p>Upload the .xlsx file exported from Lumaprints.</p>
+                    <input type="file" id="lumaprints-file-input" accept=".xlsx" style="margin: 20px 0;">
+                    <button id="btn-lumaprints-upload" class="btn btn-primary">Upload & Process</button>
+                    <div id="lumaprints-upload-status" style="margin-top: 10px;"></div>
+                </div>
+
+                <!-- Step 2: Map Products -->
+                <div id="lumaprints-step-2" class="lumaprints-step" style="display: none;">
+                    <h3>Step 2: Map Unmapped Products</h3>
+                    <p id="lumaprints-unmapped-count"></p>
+                    
+                    <div style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 4px;">
+                        <h4>Bulk Mapping Form</h4>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label><strong>Select Image:</strong></label>
+                            <select id="lumaprints-image-select" class="select-filter" style="width: 100%; margin-top: 5px;">
+                                <option value="">-- Select Image --</option>
+                            </select>
+                            <div id="lumaprints-image-info" style="margin-top: 10px; font-size: 0.9em; color: #666;"></div>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label><strong>Product Type:</strong></label>
+                            <select id="lumaprints-product-type" class="select-filter" style="width: 100%; margin-top: 5px;">
+                                <option value="art_paper">Art Paper (Hot Press / Semi-Glossy / Glossy)</option>
+                                <option value="canvas">Canvas (0.75in Stretched)</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label><strong>Subcategory (for Art Paper):</strong></label>
+                            <select id="lumaprints-subcategory" class="select-filter" style="width: 100%; margin-top: 5px;">
+                                <option value="Hot Press Fine Art Paper">Hot Press Fine Art Paper</option>
+                                <option value="Semi-Glossy Fine Art Paper">Semi-Glossy Fine Art Paper</option>
+                                <option value="Glossy Fine Art Paper">Glossy Fine Art Paper</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <button id="btn-lumaprints-apply-all" class="btn btn-success">Apply to All Unmapped</button>
+                            <button id="btn-lumaprints-preview" class="btn btn-secondary">Preview Changes</button>
+                        </div>
+                    </div>
+
+                    <div id="lumaprints-products-list" style="max-height: 400px; overflow-y: auto; margin-top: 20px;">
+                        <!-- Unmapped products will be listed here -->
+                    </div>
+                </div>
+
+                <!-- Step 3: Download -->
+                <div id="lumaprints-step-3" class="lumaprints-step" style="display: none;">
+                    <h3>Step 3: Download Mapped File</h3>
+                    <p>✓ Successfully mapped <span id="lumaprints-mapped-count">0</span> products!</p>
+                    <p>Download the updated Excel file and upload it to Lumaprints.</p>
+                    <button id="btn-lumaprints-download" class="btn btn-primary">Download Excel File</button>
+                </div>
+            </div>
+            <div class="modal-footer">
                 <button class="btn btn-secondary modal-close">Close</button>
             </div>
         </div>

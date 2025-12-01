@@ -677,6 +677,147 @@ def debug_list_data():
         return jsonify({'error': str(e)}), 500
 
 
+# ==================== LUMAPRINTS MAPPING ROUTES ====================
+
+@app.route('/api/v3/lumaprints/upload', methods=['POST'])
+@login_required
+def lumaprints_upload():
+    """Upload Lumaprints Excel file for processing"""
+    import lumaprints_mapper as lm
+    
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        if not file.filename.endswith('.xlsx'):
+            return jsonify({'error': 'File must be .xlsx format'}), 400
+        
+        # Save uploaded file temporarily
+        temp_path = os.path.join('/tmp', 'lumaprints_upload.xlsx')
+        file.save(temp_path)
+        
+        # Load and process
+        wb, ws = lm.load_excel(temp_path)
+        
+        # Sort by Column A (keeping header)
+        lm.sort_by_column_a(ws)
+        
+        # Get unmapped products
+        unmapped = lm.get_unmapped_products(ws)
+        
+        # Save sorted workbook
+        sorted_path = os.path.join('/tmp', 'lumaprints_sorted.xlsx')
+        lm.save_excel(wb, sorted_path)
+        
+        return jsonify({
+            'success': True,
+            'unmapped_count': len(unmapped),
+            'unmapped_products': unmapped[:50]  # Limit to first 50 for display
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v3/lumaprints/images')
+@login_required
+def lumaprints_get_images():
+    """Get available images with aspect ratios"""
+    import lumaprints_mapper as lm
+    
+    try:
+        images = lm.get_available_images()
+        return jsonify({'images': images})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v3/lumaprints/apply-mapping', methods=['POST'])
+@login_required
+def lumaprints_apply_mapping():
+    """Apply mapping to products"""
+    import lumaprints_mapper as lm
+    
+    try:
+        data = request.json
+        mappings = data.get('mappings', [])
+        
+        if not mappings:
+            return jsonify({'error': 'No mappings provided'}), 400
+        
+        # Load sorted workbook
+        sorted_path = os.path.join('/tmp', 'lumaprints_sorted.xlsx')
+        if not os.path.exists(sorted_path):
+            return jsonify({'error': 'No Excel file loaded. Please upload first.'}), 400
+        
+        wb, ws = lm.load_excel(sorted_path)
+        
+        # Apply each mapping
+        for mapping in mappings:
+            row = mapping.get('row')
+            mapping_data = mapping.get('data')
+            if row and mapping_data:
+                lm.apply_mapping(ws, row, mapping_data)
+        
+        # Save updated workbook
+        output_path = os.path.join('/tmp', 'lumaprints_mapped.xlsx')
+        lm.save_excel(wb, output_path)
+        
+        return jsonify({
+            'success': True,
+            'mapped_count': len(mappings),
+            'download_ready': True
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v3/lumaprints/download')
+@login_required
+def lumaprints_download():
+    """Download mapped Excel file"""
+    try:
+        output_path = os.path.join('/tmp', 'lumaprints_mapped.xlsx')
+        
+        if not os.path.exists(output_path):
+            return jsonify({'error': 'No mapped file available'}), 404
+        
+        return send_file(
+            output_path,
+            as_attachment=True,
+            download_name='lumaprints_mapped.xlsx',
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/v3/lumaprints/template')
+@login_required
+def lumaprints_get_template():
+    """Get mapping template for aspect ratio and product type"""
+    import lumaprints_mapper as lm
+    
+    try:
+        aspect_ratio = request.args.get('aspect_ratio', '3:2')
+        product_type = request.args.get('product_type', 'art_paper')
+        width = int(request.args.get('width', 12))
+        length = int(request.args.get('length', 18))
+        
+        template = lm.generate_mapping_template(aspect_ratio, product_type, (width, length))
+        
+        return jsonify({'template': template})
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 # ==================== FRONT-END ROUTES ====================
 
 @app.route('/')
