@@ -766,11 +766,24 @@ def lumaprints_apply_mapping():
         wb, ws = lm.load_excel(sorted_path)
         
         # Apply each mapping
-        for mapping in mappings:
+        processed_rows = []
+        skipped_rows = []
+        
+        for i, mapping in enumerate(mappings):
             row = mapping.get('row')
             mapping_data = mapping.get('data')
+            
+            print(f"Processing mapping {i+1}/{len(mappings)}: row={row}, has_data={bool(mapping_data)}")
+            
             if row and mapping_data:
                 lm.apply_mapping(ws, row, mapping_data)
+                processed_rows.append(row)
+                print(f"  ✓ Applied mapping to row {row}")
+            else:
+                skipped_rows.append({'index': i, 'row': row, 'has_data': bool(mapping_data)})
+                print(f"  ✗ Skipped mapping {i}: row={row}, has_data={bool(mapping_data)}")
+        
+        print(f"\nSummary: Processed {len(processed_rows)} rows, Skipped {len(skipped_rows)} rows")
         
         # Save updated workbook
         output_path = os.path.join('/tmp', 'lumaprints_mapped.xlsx')
