@@ -3,59 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fifth Element Photography</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index_v3.css') }}">
+    <title>Fifth Element Photography - Capturing the Quintessence</title>
+    
+    <link rel="stylesheet" href="/static/css/style.css?v=20241008-001">
 </head>
 <body>
     <!-- Top Navigation -->
-    <nav class="top-nav">
-        <div class="nav-container">
-            <div class="logo">
-                <img src="{{ url_for('static', filename='images/logo-horizontal.png') }}" alt="Fifth Element Photography">
+    <nav class="top-nav-bar">
+        <div class="top-nav-container">
+            <div class="top-nav-logo">
+                <img src="/static/images/logo-horizontal.png" alt="Fifth Element Photography">
             </div>
-            <ul class="nav-menu">
-                <li><a href="#home" class="active">HOME</a></li>
-                <li><a href="#featured">FEATURED IMAGE</a></li>
-                <li><a href="#about">ABOUT</a></li>
-                <li><a href="#contact">CONTACT</a></li>
+            <ul class="top-nav-menu">
+                <li><a href="#home" class="nav-link active" data-section="home">HOME</a></li>
+                <li><a href="#featured" class="nav-link" data-section="featured">FEATURED IMAGE</a></li>
+                <li><a href="#about" class="nav-link" data-section="about">ABOUT</a></li>
+                <li><a href="#contact" class="nav-link" data-section="contact">CONTACT</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero" id="hero">
-        <div class="hero-overlay">
-            <h1 class="hero-tagline">Capturing the Quintessence</h1>
-        </div>
-    </section>
-
-    <!-- Portfolio Section -->
-    <section class="portfolio">
-        <div class="container">
-            <h2 class="portfolio-title">PORTFOLIO GALLERY</h2>
-            <p class="portfolio-subtitle">Click any image to view details and order prints</p>
-            
-            <!-- Category Filters -->
-            <div class="category-filters" id="categoryFilters">
-                <button class="filter-btn active" data-category="all">ALL</button>
+    <main class="main-content-full">
+        <!-- HOME Section -->
+        <section class="content-section active" id="home-section">
+            <div class="hero">
+                <div class="hero-image" id="heroImage">
+                    <div class="hero-overlay">
+                        <img src="/static/images/TaglineWhite.png" alt="Tagline" class="hero-tagline-image">
+                    </div>
+                </div>
             </div>
-
-            <!-- Image Count -->
-            <div class="image-count" id="imageCount">Loading...</div>
-
-            <!-- Gallery Grid -->
-            <div class="gallery-grid" id="gallery">
-                <div class="loading">Loading images...</div>
+       
+            <div class="gallery">
+                <div class="gallery-header">
+                    <h3 id="galleryTitle">Portfolio Gallery</h3>
+                    <p class="gallery-subtitle">Click any image to view details and order prints</p>
+                    <div class="category-filters" id="categoryFilters">
+                        <a href="#" class="category-link active" data-category="all">ALL</a>
+                    </div>
+                    <div class="image-count" id="imageCount">Loading...</div>
+                </div>
+                
+                <div class="masonry-grid" id="imageGrid">
+                    <div class="loading">Loading images...</div>
+                </div>
+                
+                <!-- Pagination Controls -->
+                <div class="pagination-container" id="paginationContainer" style="display: none;">
+                    <div class="pagination-info">
+                        <span id="paginationInfo">Page 1 of 1</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="pagination-btn" id="prevPageBtn" disabled>← Previous</button>
+                        <div class="page-numbers" id="pageNumbers"></div>
+                        <button class="pagination-btn" id="nextPageBtn">Next →</button>
+                    </div>
+                </div>
             </div>
+        </section>
+    </main>
 
-            <!-- Pagination -->
-            <div class="pagination" id="pagination"></div>
-        </div>
-    </section>
-
-    <script src="{{ url_for('static', filename='js/index_v3.js') }}"></script>
+    <script src="/static/js/script.js?v=20241008-001"></script>
 </body>
 </html>
