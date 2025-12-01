@@ -1094,15 +1094,15 @@ function onLumaprintsImageChange() {
  * Applies ALL product types (Canvas + all Art Paper types) at once
  */
 async function applyLumaprintsMapping() {
-    const imageSelect = document.getElementById('lumaprints-image-select');
+    const imageInput = document.getElementById('lumaprints-image-input');
     const aspectRatio = document.getElementById('lumaprints-aspect-ratio').value;
     
-    if (!imageSelect.value) {
-        UI.showNotification('Please select an image', true);
+    const imageFilename = imageInput.value.trim();
+    
+    if (!imageFilename) {
+        UI.showNotification('Please enter an image filename', true);
         return;
     }
-    
-    const imageFilename = imageSelect.value;
     
     // Build mappings for all unmapped products
     const mappings = [];
