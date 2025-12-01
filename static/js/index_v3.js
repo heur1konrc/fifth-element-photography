@@ -126,8 +126,9 @@ async function loadHeroImage() {
 
 function displayHeroImage() {
     const heroImage = document.getElementById('heroImage');
-    if (AppState.heroImage && AppState.heroImage.url) {
-        heroImage.style.backgroundImage = `url("${AppState.heroImage.url}")`;
+    if (AppState.heroImage) {
+        const imageUrl = AppState.heroImage.url || `/data/${AppState.heroImage.filename}`;
+        heroImage.style.backgroundImage = `url("${imageUrl}")`;
     }
 }
 
