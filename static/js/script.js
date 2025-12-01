@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Load images from API
 async function loadImages() {
     try {
-        const response = await fetch('/api/images');
+        const response = await fetch('/api/v3/images');
         allImages = await response.json();
         
         if (allImages.length > 0) {
@@ -48,12 +48,12 @@ async function loadImages() {
 async function setHeroImage() {
     try {
         // First, try to get the selected hero image from API
-        const heroResponse = await fetch('/api/hero_image');
+        const heroResponse = await fetch('/api/v3/hero-image');
         const heroData = await heroResponse.json();
         
         if (heroData.filename) {
             // Use the selected hero image
-            heroImage.style.backgroundImage = `url('/images/${heroData.filename}')`;
+            heroImage.style.backgroundImage = `url('/data/${heroData.hero_image.filename}')`;
         } else {
             // Fallback to random hero image
             setRandomHeroImage();
@@ -69,7 +69,7 @@ async function setHeroImage() {
 function setRandomHeroImage() {
     if (allImages.length > 0) {
         const randomImage = allImages[Math.floor(Math.random() * allImages.length)];
-        heroImage.style.backgroundImage = `url('${randomImage.url}')`;
+        heroImage.style.backgroundImage = `url('/data/${randomImage.filename}')`;
     }
 }
 
@@ -105,11 +105,11 @@ function displayImages(images) {
     const imageHTML = images.map(image => {
         const sizeClass = getRandomSize();
         return `
-            <div class="image-item ${sizeClass}" onclick="openModal('${image.url}', '${image.title}', '${image.category}')">
-                <img src="${image.url}" alt="${image.title}" loading="lazy">
+            <div class="image-item ${sizeClass}" onclick="openModal('/data/${image.filename}', '${image.title}', '${(image.categories && image.categories.length > 0) ? image.categories[0] : "Uncategorized"}')">
+                <img src="/data/thumbnails/${image.filename}" alt="${image.title}" loading="lazy">
                 <div class="image-overlay">
                     <div class="image-title">${image.title}</div>
-                    <div class="image-category">${image.category.toUpperCase()}</div>
+                    <div class="image-category">${(image.categories && image.categories.length > 0) ? image.categories[0].toUpperCase() : "UNCATEGORIZED"}</div>
                 </div>
             </div>
         `;
