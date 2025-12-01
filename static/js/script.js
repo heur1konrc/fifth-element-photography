@@ -25,6 +25,12 @@ async function loadImages() {
         const response = await fetch('/api/v3/images');
         allImages = await response.json();
         
+        // Build image data map for quick lookup
+        window.imageDataMap = {};
+        allImages.forEach(img => {
+            imageDataMap[img.filename] = img;
+        });
+        
         if (allImages.length > 0) {
             // Set hero image (selected or random)
             setHeroImage();
@@ -311,9 +317,27 @@ function showSection(sectionName) {
 
 // Open image modal
 function openModal(imageUrl, title, category) {
+    // Get image data from map
+    const filename = imageUrl.split('/').pop();
+    const imageData = window.imageDataMap ? window.imageDataMap[filename] : null;
+    
     modalImage.src = imageUrl;
     modalTitle.textContent = title;
     modalCategory.innerHTML = '<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>';
+    
+    // Store image data globally for order prints
+    window.currentImageData = imageData;
+    
+    // Show/hide ORDER PRINTS button based on order_prints_enabled
+    const orderButton = document.querySelector('.order-photos-btn');
+    if (orderButton) {
+        if (imageData && imageData.order_prints_enabled && imageData.shopify_product_handle) {
+            orderButton.style.display = 'inline-block';
+        } else {
+            orderButton.style.display = 'none';
+        }
+    }
+    
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
 }
@@ -655,18 +679,21 @@ function showImageView() {
 }
 
 function openOrderWizard() {
-    // Get the current image URL and title from the modal
-    const imageElement = document.getElementById('modalImage');
-    const titleElement = document.getElementById('modalTitle');
-    
-    if (imageElement && imageElement.src && titleElement) {
-        const imageUrl = imageElement.src;
-        const imageTitle = titleElement.textContent;
-        
-        // Open Shopify product modal
-        openShopifyProductModal(imageUrl, imageTitle);
-    } else {
-        console.error('No image selected');
-        alert('Please select an image first');
+    // Check if we have image data with Shopify handle
+    if (!window.currentImageData) {
+        alert('Image data not available. Please try refreshing the page.');
+        return;
     }
+    
+    const imageData = window.currentImageData;
+    
+    // Check if order prints is enabled and has Shopify handle
+    if (!imageData.order_prints_enabled || !imageData.shopify_product_handle) {
+        alert('Print ordering is not yet available for this image.');
+        return;
+    }
+    
+    // Open Shopify product page in new tab
+    const shopifyUrl = `https://fifth-element-photography.myshopify.com/products/${imageData.shopify_product_handle}`;
+    window.open(shopifyUrl, '_blank');
 }
