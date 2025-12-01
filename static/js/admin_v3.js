@@ -291,6 +291,8 @@ const UI = {
             document.getElementById('edit-description').value = image.description;
             document.getElementById('edit-hero').checked = image.is_hero || false;
             document.getElementById('edit-featured').checked = image.featured || false;
+            document.getElementById('edit-shopify-handle').value = image.shopify_product_handle || '';
+            document.getElementById('edit-order-prints').checked = image.order_prints_enabled || false;
             document.getElementById('edit-image-preview').src = `/data/${filename}`;
 
             // Populate categories
@@ -498,13 +500,22 @@ function setupEventListeners() {
         const description = document.getElementById('edit-description').value;
         const isHero = document.getElementById('edit-hero').checked;
         const featured = document.getElementById('edit-featured').checked;
+        const shopifyHandle = document.getElementById('edit-shopify-handle').value;
+        const orderPrintsEnabled = document.getElementById('edit-order-prints').checked;
         
         const categories = Array.from(document.querySelectorAll('#edit-categories input:checked'))
             .map(input => input.value);
 
         try {
             // Update basic metadata
-            await API.updateImage(filename, { title, description, categories, featured });
+            await API.updateImage(filename, { 
+                title, 
+                description, 
+                categories, 
+                featured,
+                shopify_product_handle: shopifyHandle,
+                order_prints_enabled: orderPrintsEnabled
+            });
             
             // Set hero image if checked
             if (isHero) {
