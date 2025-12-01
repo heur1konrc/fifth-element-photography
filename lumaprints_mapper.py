@@ -7,8 +7,8 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 from PIL import Image
 import os
+import json
 from typing import List, Dict, Tuple
-from data_manager_v3 import get_all_images
 
 # Product templates for different aspect ratios
 TEMPLATES = {
@@ -213,34 +213,28 @@ def get_image_aspect_ratio(filename: str, images_dir: str = "/home/ubuntu/fifth-
         return "unknown"
 
 
-def get_available_images() -> List[Dict]:
+def get_available_images(ws=None) -> List[Dict]:
     """
-    Get list of available images from the gallery
-    Returns list with filename, dimensions, and aspect ratio
+    Get list of available images from Lumaprints Excel file (Column P)
+    Returns list with unique filenames
     """
-    images = get_all_images()
+    if ws is None:
+        return []
     
+    filenames_set = set()
     available = []
-    for img in images:
-        filename = img.get("filename", "")
-        dimensions = img.get("dimensions", "")
-        
-        # Parse dimensions
-        if dimensions and "x" in dimensions:
-            try:
-                width, height = map(int, dimensions.split("x"))
-                aspect_ratio = detect_aspect_ratio(width, height)
-            except:
-                aspect_ratio = "unknown"
-        else:
-            aspect_ratio = "unknown"
-        
-        available.append({
-            "filename": filename,
-            "title": img.get("title", filename),
-            "dimensions": dimensions,
-            "aspect_ratio": aspect_ratio
-        })
+    
+    # Read all filenames from Column P (16)
+    for row in range(2, ws.max_row + 1):
+        filename = ws.cell(row, 16).value  # Column P
+        if filename and filename not in filenames_set:
+            filenames_set.add(filename)
+            available.append({
+                "filename": filename,
+                "title": filename.replace('_', ' ').replace('.jpg', '').replace('.png', ''),
+                "aspect_ratio": "3:2",  # Default, user will select
+                "dimensions": "Unknown"
+            })
     
     return available
 

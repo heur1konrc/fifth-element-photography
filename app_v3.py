@@ -729,11 +729,17 @@ def lumaprints_upload():
 @app.route('/api/v3/lumaprints/images')
 @login_required
 def lumaprints_get_images():
-    """Get available images with aspect ratios"""
+    """Get available images from loaded Excel file"""
     import lumaprints_mapper as lm
     
     try:
-        images = lm.get_available_images()
+        # Load the sorted workbook
+        sorted_path = os.path.join('/tmp', 'lumaprints_sorted.xlsx')
+        if not os.path.exists(sorted_path):
+            return jsonify({'error': 'No Excel file loaded. Please upload first.'}), 400
+        
+        wb, ws = lm.load_excel(sorted_path)
+        images = lm.get_available_images(ws)
         return jsonify({'images': images})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
