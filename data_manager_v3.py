@@ -152,11 +152,15 @@ class DataManagerV3:
             'description': metadata.get(filename, {}).get('description', ''),
             'categories': categories.get(filename, []),
             'featured': metadata.get(filename, {}).get('featured', False),
-            'is_hero': metadata.get(filename, {}).get('is_hero', False)
+            'is_hero': metadata.get(filename, {}).get('is_hero', False),
+            'order_prints_enabled': metadata.get(filename, {}).get('order_prints_enabled', False),
+            'shopify_product_handle': metadata.get(filename, {}).get('shopify_product_handle', '')
         }
     
     def update_image_metadata(self, filename: str, title: Optional[str] = None, 
-                             description: Optional[str] = None, featured: Optional[bool] = None) -> bool:
+                             description: Optional[str] = None, featured: Optional[bool] = None,
+                             order_prints_enabled: Optional[bool] = None,
+                             shopify_product_handle: Optional[str] = None) -> bool:
         """
         Update an image's title and/or description.
         
@@ -164,6 +168,8 @@ class DataManagerV3:
             filename: Image filename
             title: New title (optional)
             description: New description (optional)
+            featured: Featured flag (optional)
+            order_prints_enabled: Enable/disable order prints (optional)
             
         Returns:
             True if successful, False otherwise
@@ -181,6 +187,12 @@ class DataManagerV3:
         
         if featured is not None:
             metadata[filename]['featured'] = featured
+        
+        if order_prints_enabled is not None:
+            metadata[filename]['order_prints_enabled'] = order_prints_enabled
+        
+        if shopify_product_handle is not None:
+            metadata[filename]['shopify_product_handle'] = shopify_product_handle
         
         self._write_json(self.metadata_file, metadata)
         return True

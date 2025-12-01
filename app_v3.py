@@ -201,12 +201,14 @@ def update_image_v3(filename):
     data = request.get_json()
     
     # Update metadata if provided
-    if 'title' in data or 'description' in data or 'featured' in data:
+    if 'title' in data or 'description' in data or 'featured' in data or 'order_prints_enabled' in data or 'shopify_product_handle' in data:
         success = data_manager.update_image_metadata(
             filename,
             title=data.get('title'),
             description=data.get('description'),
-            featured=data.get('featured')
+            featured=data.get('featured'),
+            order_prints_enabled=data.get('order_prints_enabled'),
+            shopify_product_handle=data.get('shopify_product_handle')
         )
     
     # Update categories if provided
