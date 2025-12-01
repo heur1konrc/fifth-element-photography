@@ -24,6 +24,23 @@ app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-producti
 # Initialize data manager
 data_manager = DataManagerV3(data_dir=os.environ.get('DATA_DIR', '/data'))
 
+# Regenerate thumbnails on startup
+print("Checking and regenerating thumbnails...")
+images_dir = data_manager.images_dir
+if images_dir.exists():
+    image_files = [f for f in os.listdir(images_dir) 
+                   if f.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp'))
+                   and os.path.isfile(images_dir / f)]
+    print(f"Found {len(image_files)} images, regenerating thumbnails...")
+    for filename in image_files:
+        try:
+            data_manager.generate_thumbnail(filename)
+        except Exception as e:
+            print(f"Error generating thumbnail for {filename}: {e}")
+    print("Thumbnail regeneration complete")
+else:
+    print("Images directory not found, skipping thumbnail generation")
+
 # Configuration
 # Images are stored directly in /data/, not in /data/images/
 UPLOAD_FOLDER = '/data'

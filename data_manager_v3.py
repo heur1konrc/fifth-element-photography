@@ -369,9 +369,9 @@ class DataManagerV3:
             image_path = self.images_dir / filename
             thumbnail_path = self.thumbnails_dir / filename
             
-            # Skip if thumbnail already exists
+            # Delete existing thumbnail to force regeneration at new quality
             if thumbnail_path.exists():
-                return True
+                thumbnail_path.unlink()
             
             # Open and resize image
             with Image.open(image_path) as img:
