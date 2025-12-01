@@ -15,7 +15,6 @@ const closeModal = document.querySelector('.close');
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    loadCategories();
     loadImages();
     setupEventListeners();
 });
