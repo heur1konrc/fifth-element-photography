@@ -437,7 +437,12 @@ function setupEventListeners() {
         uploadLumaprintsFile();
     });
 
-
+    /**
+     * Handle Add Another Mapping button
+     */
+    document.getElementById('btn-add-mapping-row').addEventListener('click', () => {
+        addMappingRow();
+    });
 
     /**
      * Handle Lumaprints apply mapping
@@ -1039,6 +1044,9 @@ function displayUnmappedProducts() {
         return;
     }
     
+    // Initialize mapping rows with first row
+    initializeMappingRows();
+    
     // Show first 10 products as preview
     const preview = LumaprintsState.unmappedProducts.slice(0, 10);
     listElem.innerHTML = `
@@ -1046,7 +1054,7 @@ function displayUnmappedProducts() {
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr style="background: #f0f0f0;">
-                    <th style="padding: 8px; border: 1px solid #ddd;">Product Name</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Title</th>
                     <th style="padding: 8px; border: 1px solid #ddd;">Size</th>
                     <th style="padding: 8px; border: 1px solid #ddd;">Product Type</th>
                     <th style="padding: 8px; border: 1px solid #ddd;">Existing Filename</th>
@@ -1065,6 +1073,108 @@ function displayUnmappedProducts() {
         </table>
         ${LumaprintsState.unmappedProducts.length > 10 ? `<p style="margin-top: 10px; font-style: italic;">... and ${LumaprintsState.unmappedProducts.length - 10} more products</p>` : ''}
     `;
+}
+
+/**
+ * Get unique product titles from unmapped products
+ */
+function getUniqueProductTitles() {
+    const titles = new Set();
+    LumaprintsState.unmappedProducts.forEach(p => {
+        if (p.product_name) {
+            titles.add(p.product_name);
+        }
+    });
+    return Array.from(titles).sort();
+}
+
+/**
+ * Initialize mapping rows with first empty row
+ */
+function initializeMappingRows() {
+    const container = document.getElementById('lumaprints-mapping-rows');
+    container.innerHTML = '';
+    addMappingRow();
+}
+
+/**
+ * Add a new mapping row
+ */
+function addMappingRow() {
+    const container = document.getElementById('lumaprints-mapping-rows');
+    const rowIndex = container.children.length;
+    const titles = getUniqueProductTitles();
+    
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'mapping-row';
+    rowDiv.style.cssText = 'margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: white;';
+    rowDiv.dataset.rowIndex = rowIndex;
+    
+    rowDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong>Mapping #${rowIndex + 1}</strong>
+            ${rowIndex > 0 ? `<button class="btn-remove-row" data-row-index="${rowIndex}" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">× Remove</button>` : ''}
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+            <label><strong>Product Title:</strong></label>
+            <select class="mapping-title-select" data-row-index="${rowIndex}" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="">-- Select Product Title --</option>
+                ${titles.map(title => `<option value="${title}">${title}</option>`).join('')}
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+            <label><strong>Image Filename:</strong></label>
+            <input type="text" class="mapping-filename-input" data-row-index="${rowIndex}" placeholder="e.g., IMG_1234.jpg" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;" />
+        </div>
+        
+        <div style="margin-bottom: 10px;">
+            <label><strong>Aspect Ratio:</strong></label>
+            <select class="mapping-aspect-select" data-row-index="${rowIndex}" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;">
+                <option value="3:2">3:2 (Landscape/Portrait) - 5 sizes</option>
+                <option value="1:1">1:1 (Square) - 4 sizes</option>
+            </select>
+        </div>
+    `;
+    
+    container.appendChild(rowDiv);
+    
+    // Add event listener for remove button
+    const removeBtn = rowDiv.querySelector('.btn-remove-row');
+    if (removeBtn) {
+        removeBtn.addEventListener('click', () => removeMappingRow(rowIndex));
+    }
+}
+
+/**
+ * Remove a mapping row
+ */
+function removeMappingRow(rowIndex) {
+    const container = document.getElementById('lumaprints-mapping-rows');
+    const row = container.querySelector(`[data-row-index="${rowIndex}"]`);
+    if (row) {
+        row.remove();
+        // Renumber remaining rows
+        renumberMappingRows();
+    }
+}
+
+/**
+ * Renumber mapping rows after removal
+ */
+function renumberMappingRows() {
+    const container = document.getElementById('lumaprints-mapping-rows');
+    const rows = container.querySelectorAll('.mapping-row');
+    rows.forEach((row, index) => {
+        row.dataset.rowIndex = index;
+        row.querySelector('strong').textContent = `Mapping #${index + 1}`;
+        
+        // Update data attributes
+        row.querySelectorAll('[data-row-index]').forEach(elem => {
+            elem.dataset.rowIndex = index;
+        });
+    });
 }
 
 /**
@@ -1094,21 +1204,58 @@ function onLumaprintsImageChange() {
  * Applies ALL product types (Canvas + all Art Paper types) at once
  */
 async function applyLumaprintsMapping() {
-    const imageInput = document.getElementById('lumaprints-image-input');
-    const aspectRatio = document.getElementById('lumaprints-aspect-ratio').value;
+    // Collect all mapping rows
+    const container = document.getElementById('lumaprints-mapping-rows');
+    const rows = container.querySelectorAll('.mapping-row');
     
-    const imageFilename = imageInput.value.trim();
+    // Validate and collect mappings
+    const userMappings = [];
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const titleSelect = row.querySelector('.mapping-title-select');
+        const filenameInput = row.querySelector('.mapping-filename-input');
+        const aspectSelect = row.querySelector('.mapping-aspect-select');
+        
+        const title = titleSelect.value.trim();
+        const filename = filenameInput.value.trim();
+        const aspectRatio = aspectSelect.value;
+        
+        // Skip empty rows
+        if (!title && !filename) {
+            continue;
+        }
+        
+        // Validate required fields
+        if (!title) {
+            UI.showNotification(`Mapping #${i + 1}: Please select a product title`, true);
+            return;
+        }
+        if (!filename) {
+            UI.showNotification(`Mapping #${i + 1}: Please enter an image filename`, true);
+            return;
+        }
+        
+        userMappings.push({ title, filename, aspectRatio });
+    }
     
-    if (!imageFilename) {
-        UI.showNotification('Please enter an image filename', true);
+    if (userMappings.length === 0) {
+        UI.showNotification('Please add at least one mapping', true);
         return;
     }
     
-    // Build mappings for all unmapped products
+    // Build mappings for products
     const mappings = [];
     
     for (const product of LumaprintsState.unmappedProducts) {
-        const filename = product.existing_filename || imageFilename;
+        // Find matching user mapping by title
+        const userMapping = userMappings.find(m => m.title === product.product_name);
+        
+        if (!userMapping) {
+            // Skip products that don't have a mapping
+            continue;
+        }
+        
+        const filename = userMapping.filename;
         const width = product.width || 12;
         const length = product.length || 18;
         

@@ -270,29 +270,23 @@
 
                 <!-- Step 2: Map Products -->
                 <div id="lumaprints-step-2" class="lumaprints-step" style="display: none;">
-                    <h3>Step 2: Map Unmapped Products</h3>
+                    <h3>Step 2: Map Images to Products</h3>
                     <p id="lumaprints-unmapped-count"></p>
                     
                     <div style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 4px;">
-                        <h4>Bulk Mapping Form</h4>
-                        <p style="color: #666; font-size: 0.9em;">This will apply ALL product types (Canvas + all Art Paper types) to all unmapped products in one shot.</p>
+                        <h4>Batch Mapping Form</h4>
+                        <p style="color: #666; font-size: 0.9em;">Map multiple images to their products at once. Each mapping applies to ALL product types (Canvas + all Art Paper types) for that title.</p>
                         
-                        <div style="margin-bottom: 15px;">
-                            <label><strong>Image Filename:</strong></label>
-                            <input type="text" id="lumaprints-image-input" placeholder="Enter image filename (e.g., IMG_1234.jpg)" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;" />
-                            <small style="color: #666; display: block; margin-top: 5px;">Enter the exact filename as it appears in your Lumaprints Library</small>
+                        <div id="lumaprints-mapping-rows" style="margin-bottom: 15px;">
+                            <!-- Mapping rows will be added here -->
                         </div>
 
-                        <div style="margin-bottom: 15px;">
-                            <label><strong>Aspect Ratio:</strong></label>
-                            <select id="lumaprints-aspect-ratio" class="select-filter" style="width: 100%; margin-top: 5px;">
-                                <option value="3:2">3:2 (Landscape/Portrait) - 5 sizes</option>
-                                <option value="1:1">1:1 (Square) - 4 sizes</option>
-                            </select>
+                        <div style="margin-bottom: 20px;">
+                            <button id="btn-add-mapping-row" class="btn btn-secondary">+ Add Another Mapping</button>
                         </div>
 
                         <div style="margin-top: 20px; padding: 10px; background: #e8f5e9; border-radius: 4px;">
-                            <strong>Will apply:</strong>
+                            <strong>Each mapping will apply:</strong>
                             <ul style="margin: 10px 0; padding-left: 20px;">
                                 <li>0.75in Stretched Canvas (all sizes)</li>
                                 <li>Hot Press Fine Art Paper (all sizes)</li>
@@ -302,7 +296,7 @@
                         </div>
 
                         <div style="margin-top: 20px;">
-                            <button id="btn-lumaprints-apply-all" class="btn btn-success btn-large">✓ Apply to All Unmapped Products</button>
+                            <button id="btn-lumaprints-apply-all" class="btn btn-success btn-large">✓ Apply All Mappings</button>
                         </div>
                     </div>
 

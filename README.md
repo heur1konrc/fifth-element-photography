@@ -27,6 +27,7 @@ A professional photography portfolio website with comprehensive admin management
 - **Hero Image Configuration** - Manage main hero image display
 - **About Page Management** - Update bio and profile information
 - **Password Recovery** - Secure password reset functionality
+- **Lumaprints Bulk Mapping** - Multi-image batch processing with dropdown title selection ✨ *NEW*
 
 ### E-Commerce Integration
 - **Unified Order Form** - Single order form system for both desktop and mobile
@@ -130,14 +131,15 @@ The application uses Railway for production deployment with automatic builds tri
 - **v1.4**: Desktop order system fix and unified ordering
 - **v2.0.0**: Shopify integration and Lumaprints removal
 - **v2.0.1**: Category management fixes, pagination, and UI improvements
-- **v2.0.2**: EXIF data and story fixes, shipping configuration (Current)
+- **v2.0.2**: EXIF data and story fixes, shipping configuration
+- **v2.0.3**: Multi-image batch mapping for Lumaprints bulk processing (Current)
 
 ---
 
-*Last Updated: November 5, 2024*
-*Current Version: v2.0.2*
+*Last Updated: November 30, 2024*
+*Current Version: v2.0.3*
 *Shopify Integration: Complete ✅*
-*Shopify Product Mapping: 8 products mapped (In Progress)*
+*Lumaprints Bulk Mapping: Multi-image batch processing ✅*
 *Shipping Configuration: 4-tier profile system implemented ✅*
 *Featured Image EXIF: Dynamic extraction ✅*
 *Featured Image Story: Dynamic loading ✅*
