@@ -123,6 +123,8 @@ class DataManagerV3:
                     'categories': categories.get(filename.name, []),
                     'featured': metadata.get(filename.name, {}).get('featured', False),
                     'is_hero': metadata.get(filename.name, {}).get('is_hero', False),
+                    'order_prints_enabled': metadata.get(filename.name, {}).get('order_prints_enabled', False),
+                    'shopify_product_handle': metadata.get(filename.name, {}).get('shopify_product_handle', ''),
                     'upload_date': datetime.fromtimestamp(filename.stat().st_mtime).isoformat()
                 }
                 images.append(image_data)
