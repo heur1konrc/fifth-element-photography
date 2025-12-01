@@ -170,10 +170,13 @@ def apply_mapping(ws, row: int, mapping_data: Dict) -> None:
     - length: product length in inches
     - options: list of (name, value) tuples
     """
+    # Column P (16) - Image Filename (Lumaprints Library)
+    ws.cell(row, 16).value = mapping_data.get("image_filename", "")
+    
     # Column S (19) - Product Handling
     ws.cell(row, 19).value = mapping_data.get("product_handling", "Update")
     
-    # Column T (20) - Image Filename
+    # Column T (20) - Image Filename (Mapping)
     ws.cell(row, 20).value = mapping_data.get("image_filename", "")
     
     # Column U (21) - Subcategory
