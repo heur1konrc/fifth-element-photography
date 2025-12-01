@@ -44,11 +44,8 @@ function extractCategories() {
 function loadFeaturedGallery() {
     const featuredGrid = document.getElementById('featuredGrid');
     
-    // Get featured images, or first 12 if none marked as featured
-    let featuredImages = allImages.filter(img => img.featured);
-    if (featuredImages.length === 0) {
-        featuredImages = allImages.slice(0, 12);
-    }
+    // Show first 12 images in featured gallery
+    let featuredImages = allImages.slice(0, 12);
     
     featuredGrid.innerHTML = '';
     
