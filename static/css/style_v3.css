@@ -84,14 +84,7 @@ body {
     transform: scale(1.05);
 }
 
-/* Stagger effect - alternating heights */
-.featured-item:nth-child(6n+1) {
-    grid-row: span 2;
-}
-
-.featured-item:nth-child(6n+4) {
-    grid-row: span 2;
-}
+/* No stagger - uniform grid */
 
 /* About Section */
 .about-section {
