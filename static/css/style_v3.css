@@ -429,12 +429,12 @@ textarea {
 
 .modal-content {
     position: relative;
-    margin: auto;
+    margin: 2vh auto;
     padding: 10px;
-    width: 95vw;
-    max-width: 95vw; max-height: 60vw;
-    top: 50%; aspect-ratio: 3/2;
-    transform: translateY(-50%);
+    width: 90vw;
+    max-width: 1200px;
+    max-height: 96vh;
+    overflow-y: auto;
     text-align: center;
 }
 
@@ -454,8 +454,10 @@ textarea {
 }
 
 .modal-image {
-    max-width: 100%; max-height: 80vh;
-    max-height: 85vh;
+    max-width: 100%;
+    max-height: 70vh;
+    width: auto;
+    height: auto;
     border-radius: 8px;
     background: transparent;
     object-fit: contain;
