@@ -1,7 +1,7 @@
 # Admin V3 Completion Report
 **Fifth Element Photography - Admin System V3**  
-**Version:** 3.0.1  
-**Completion Date:** November 21, 2025  
+**Version:** 3.1.0  
+**Completion Date:** November 30, 2025  
 **Status:** ✅ All Features Implemented and Tested
 
 ---
@@ -96,6 +96,56 @@ Admin V3 has been successfully implemented with all four missing features from t
 
 ---
 
+### 5. ✅ Lumaprints Bulk Mapping Tool
+**Status:** COMPLETE
+
+**Purpose:** Automate the process of mapping images to Lumaprints products without manually editing Excel files.
+
+**Workflow:**
+1. Upload images to Lumaprints Library
+2. Export Excel file from Lumaprints
+3. Upload Excel to Admin V3 Lumaprints tool
+4. Tool automatically sorts by Product Name (Column A) and identifies "Unmapped" products
+5. Enter image filename and select aspect ratio (3:2 or 1:1)
+6. Click "Apply to All Unmapped Products"
+7. Tool fills ALL product types at once:
+   - 0.75in Stretched Canvas
+   - Hot Press Fine Art Paper
+   - Semi-Glossy Fine Art Paper
+   - Glossy Fine Art Paper
+8. Download updated Excel file
+9. Upload to Lumaprints to complete mapping
+
+**Features:**
+- Automatic sorting by Product Name (preserves header row)
+- Filters for "Unmapped" products only
+- Manual filename input (for new images not yet in library)
+- Aspect ratio selection (3:2 or 1:1)
+- Batch application of all product types in one click
+- Size templates:
+  - **3:2:** 8x12, 12x18, 16x24, 20x30, 24x36 (5 sizes)
+  - **1:1:** 8x8, 10x10, 12x12, 14x14 (4 sizes)
+- Automatic product type detection from existing product names
+- Fills both Column P (Existing Linked Image) and Column T (Image Filename)
+- Sets Column S (Product Handling) to "Update"
+- Applies correct subcategory and options based on product type
+
+**Key Files:**
+- `lumaprints_mapper.py` - Backend Excel processing logic
+- `app_v3.py` - API endpoints for upload, process, apply, download (lines 723-806)
+- `admin_v3.html` - Lumaprints modal UI (lines 262-304)
+- `admin_v3.js` - Frontend logic for mapping workflow (lines 1027-1184)
+
+**Known Issue:**
+- Lumaprints may show some products as "In Progress" indefinitely (server-side timeout)
+- **Workaround:** Re-upload the same Excel file - stuck products usually complete on second upload
+- This is a Lumaprints server issue, not a tool issue
+
+**Extensibility:**
+To add new product types (Metal, Acrylic, etc.), simply update the TEMPLATES in `lumaprints_mapper.py` and they'll automatically be included in future mappings.
+
+---
+
 ## Technical Fixes Applied
 
 ### Issue 1: Event Listeners Not Attaching
@@ -169,7 +219,14 @@ Python Files:
 
 ## Version History
 
-### Version 3.0.2 (Current)
+### Version 3.1.0 (Current)
+- ✅ **Lumaprints Bulk Mapping Tool** - Automate product mapping for Lumaprints
+- ✅ Upload progress feedback for multi-file uploads
+- ✅ Upload limit increased to 100MB (from 16MB)
+- ✅ File browser optimized for faster opening
+- ✅ All previous v3.0.x features
+
+### Version 3.0.2
 - ✅ Upload limit increased to 100MB (from 16MB)
 - ✅ File browser optimized for faster opening
 - ✅ All previous v3.0.1 features
