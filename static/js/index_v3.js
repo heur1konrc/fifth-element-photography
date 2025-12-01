@@ -21,8 +21,8 @@ async function loadHeroImage() {
         const data = await response.json();
         
         if (data.success && data.hero_image) {
-            const heroSection = document.getElementById('heroSection');
-            heroSection.style.backgroundImage = `url('/data/${data.hero_image.filename}')`;
+            const hero = document.getElementById('hero');
+            hero.style.backgroundImage = `url('/data/${data.hero_image.filename}')`;
         }
     } catch (error) {
         console.error('Error loading hero image:', error);
@@ -63,18 +63,18 @@ async function loadImages() {
 // Render Filters
 function renderFilters() {
     const filtersContainer = document.getElementById('categoryFilters');
-    filtersContainer.innerHTML = '<button class="filter-btn active" data-category="all">All</button>';
+    filtersContainer.innerHTML = '<button class="filter-btn active" data-category="all">ALL</button>';
     
     state.categories.forEach(category => {
         const btn = document.createElement('button');
         btn.className = 'filter-btn';
         btn.dataset.category = category;
-        btn.textContent = category;
+        btn.textContent = category.toUpperCase();
         btn.addEventListener('click', () => filterByCategory(category));
         filtersContainer.appendChild(btn);
     });
     
-    // Add event listener to "All" button
+    // Add event listener to "ALL" button
     filtersContainer.querySelector('[data-category="all"]').addEventListener('click', () => filterByCategory('all'));
 }
 
@@ -106,8 +106,12 @@ function renderGallery() {
     const gallery = document.getElementById('gallery');
     const filteredImages = getFilteredImages();
     
+    // Update image count
+    document.getElementById('imageCount').textContent = `${filteredImages.length} images`;
+    
     if (filteredImages.length === 0) {
         gallery.innerHTML = '<div class="loading">No images found</div>';
+        document.getElementById('pagination').innerHTML = '';
         return;
     }
     
@@ -121,9 +125,9 @@ function renderGallery() {
     gallery.innerHTML = pageImages.map(image => `
         <div class="gallery-item">
             <img src="/data/thumbnails/${image.filename}" alt="${image.title}" loading="lazy">
-            <div class="gallery-overlay">
-                <div class="gallery-title">${image.title}</div>
-                <div class="gallery-category">${image.categories && image.categories.length > 0 ? image.categories[0] : 'Uncategorized'}</div>
+            <div class="gallery-item-overlay">
+                <div class="gallery-item-title">${image.title}</div>
+                <div class="gallery-item-category">${image.categories && image.categories.length > 0 ? image.categories[0] : 'Uncategorized'}</div>
             </div>
         </div>
     `).join('');
