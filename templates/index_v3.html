@@ -3,31 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fifth Element Photography V3 - Test Front-End</title>
+    <title>Fifth Element Photography - Capturing the Quintessence</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Professional photography portfolio showcasing artistic vision and technical excellence">
+    <meta name="keywords" content="photography, portfolio, fifth element, professional photographer">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Fifth Element Photography">
+    <meta property="og:description" content="Capturing the Quintessence">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{{ url_for('static', filename='images/logo-square.png') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo-square.png') }}">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index_v3.css') }}">
 </head>
 <body>
+    <!-- Navigation Header -->
     <header class="site-header">
-        <div class="header-content">
-            <h1>Fifth Element Photography</h1>
-            <p class="tagline">Test Front-End V3</p>
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/logo-horizontal.png') }}" alt="Fifth Element Photography" class="logo-horizontal">
+            </div>
+            
+            <nav class="main-nav">
+                <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#home" class="nav-link active" data-section="home">Home</a></li>
+                    <li><a href="#portfolio" class="nav-link" data-section="portfolio">Portfolio</a></li>
+                    <li><a href="#featured" class="nav-link" data-section="featured">Featured</a></li>
+                    <li><a href="#about" class="nav-link" data-section="about">About</a></li>
+                    <li><a href="#contact" class="nav-link" data-section="contact">Contact</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="main-content">
-        <div class="gallery-container">
-            <h2>Image Gallery</h2>
-            <div id="image-gallery" class="image-gallery">
-                <div class="loading">Loading images...</div>
+        <!-- HOME Section -->
+        <section class="section active" id="home-section">
+            <div class="hero-container">
+                <div class="hero-image" id="heroImage">
+                    <!-- Hero image will be loaded dynamically from admin -->
+                </div>
+                <div class="hero-overlay">
+                    <img src="{{ url_for('static', filename='images/tagline.png') }}" alt="Capturing the Quintessence" class="hero-tagline">
+                </div>
             </div>
-        </div>
+        </section>
+
+        <!-- PORTFOLIO Section -->
+        <section class="section" id="portfolio-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Portfolio</h2>
+                    <p class="section-subtitle">Explore my collection of captured moments</p>
+                </div>
+
+                <!-- Category Filters -->
+                <div class="category-filters" id="categoryFilters">
+                    <button class="filter-btn active" data-category="all">All</button>
+                    <!-- Categories will be loaded dynamically -->
+                </div>
+
+                <!-- Image Gallery -->
+                <div class="gallery-grid" id="galleryGrid">
+                    <div class="loading">Loading images...</div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination">
+                    <!-- Pagination controls will be generated dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURED Section -->
+        <section class="section" id="featured-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Featured Image</h2>
+                    <p class="section-subtitle">This week's highlighted photograph</p>
+                </div>
+
+                <div class="featured-content" id="featuredContent">
+                    <div class="loading">Loading featured image...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT Section -->
+        <section class="section" id="about-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">About</h2>
+                    <p class="section-subtitle">The photographer behind the lens</p>
+                </div>
+
+                <div class="about-content">
+                    <div class="about-bio" id="aboutBio">
+                        <!-- Bio will be loaded from admin -->
+                        <div class="loading">Loading bio...</div>
+                    </div>
+
+                    <div class="about-equipment">
+                        <h3>Equipment</h3>
+                        <div id="equipmentList">
+                            <!-- Equipment list will be loaded from admin -->
+                        </div>
+                    </div>
+
+                    <div class="about-gallery">
+                        <h3>In the Field</h3>
+                        <div class="field-images" id="fieldImages">
+                            <!-- Field images will be loaded from admin -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT Section -->
+        <section class="section" id="contact-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Contact</h2>
+                    <p class="section-subtitle">Let's create something together</p>
+                </div>
+
+                <div class="contact-content">
+                    <form class="contact-form" id="contactForm">
+                        <!-- Contact form fields will be added in next phase -->
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="6" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
     </main>
 
+    <!-- Footer -->
     <footer class="site-footer">
-        <p>&copy; 2024 Fifth Element Photography | V3.0.0-alpha</p>
+        <div class="container">
+            <p>&copy; 2024 Fifth Element Photography. All rights reserved.</p>
+            <p class="tagline">Capturing the Quintessence</p>
+        </div>
     </footer>
 
+    <!-- Image Modal -->
+    <div class="modal" id="imageModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
     <script src="{{ url_for('static', filename='js/index_v3.js') }}"></script>
 </body>
 </html>
-

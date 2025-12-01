@@ -122,6 +122,7 @@ class DataManagerV3:
                     'description': metadata.get(filename.name, {}).get('description', ''),
                     'categories': categories.get(filename.name, []),
                     'featured': metadata.get(filename.name, {}).get('featured', False),
+                    'is_hero': metadata.get(filename.name, {}).get('is_hero', False),
                     'upload_date': datetime.fromtimestamp(filename.stat().st_mtime).isoformat()
                 }
                 images.append(image_data)
@@ -150,7 +151,8 @@ class DataManagerV3:
             'title': metadata.get(filename, {}).get('title', Path(filename).stem),
             'description': metadata.get(filename, {}).get('description', ''),
             'categories': categories.get(filename, []),
-            'featured': metadata.get(filename, {}).get('featured', False)
+            'featured': metadata.get(filename, {}).get('featured', False),
+            'is_hero': metadata.get(filename, {}).get('is_hero', False)
         }
     
     def update_image_metadata(self, filename: str, title: Optional[str] = None, 

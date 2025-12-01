@@ -840,6 +840,118 @@ def lumaprints_get_template():
         return jsonify({'error': str(e)}), 500
 
 
+# ==================== FRONTEND SPECIAL IMAGE ROUTES ====================
+
+@app.route('/api/v3/hero-image', methods=['GET'])
+def get_hero_image():
+    """
+    Get the current hero image (marked with is_hero flag).
+    Returns the first image marked as hero, or None if no hero image is set.
+    """
+    images = data_manager.get_all_images()
+    
+    # Find image marked as hero
+    hero_image = next((img for img in images if img.get('is_hero', False)), None)
+    
+    if hero_image:
+        return jsonify({
+            'success': True,
+            'hero_image': hero_image
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': 'No hero image set'
+        })
+
+
+@app.route('/api/v3/featured-image', methods=['GET'])
+def get_featured_image():
+    """
+    Get the current featured image (marked with featured flag).
+    Returns the first image marked as featured, or None if no featured image is set.
+    """
+    images = data_manager.get_all_images()
+    
+    # Find image marked as featured
+    featured_image = next((img for img in images if img.get('featured', False)), None)
+    
+    if featured_image:
+        return jsonify({
+            'success': True,
+            'featured_image': featured_image
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': 'No featured image set'
+        })
+
+
+@app.route('/api/v3/images/<filename>/set-hero', methods=['POST'])
+@login_required
+def set_hero_image(filename):
+    """
+    Set an image as the hero image.
+    Clears any existing hero image first.
+    """
+    try:
+        # First, clear any existing hero images
+        metadata = data_manager._read_json(data_manager.metadata_file)
+        for fname in metadata:
+            if metadata[fname].get('is_hero', False):
+                metadata[fname]['is_hero'] = False
+        
+        # Set new hero image
+        if filename not in metadata:
+            metadata[filename] = {}
+        
+        metadata[filename]['is_hero'] = True
+        data_manager._write_json(data_manager.metadata_file, metadata)
+        
+        return jsonify({
+            'success': True,
+            'message': f'{filename} set as hero image'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@app.route('/api/v3/images/<filename>/set-featured', methods=['POST'])
+@login_required
+def set_featured_image(filename):
+    """
+    Set an image as the featured image.
+    Clears any existing featured image first.
+    """
+    try:
+        # First, clear any existing featured images
+        metadata = data_manager._read_json(data_manager.metadata_file)
+        for fname in metadata:
+            if metadata[fname].get('featured', False):
+                metadata[fname]['featured'] = False
+        
+        # Set new featured image
+        if filename not in metadata:
+            metadata[filename] = {}
+        
+        metadata[filename]['featured'] = True
+        data_manager._write_json(data_manager.metadata_file, metadata)
+        
+        return jsonify({
+            'success': True,
+            'message': f'{filename} set as featured image'
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 # ==================== FRONT-END ROUTES ====================
 
 @app.route('/')
