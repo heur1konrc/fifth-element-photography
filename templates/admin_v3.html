@@ -275,35 +275,35 @@
                     
                     <div style="margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 4px;">
                         <h4>Bulk Mapping Form</h4>
+                        <p style="color: #666; font-size: 0.9em;">This will apply ALL product types (Canvas + all Art Paper types) to all unmapped products in one shot.</p>
                         
                         <div style="margin-bottom: 15px;">
-                            <label><strong>Select Image:</strong></label>
+                            <label><strong>Select Image Filename:</strong></label>
                             <select id="lumaprints-image-select" class="select-filter" style="width: 100%; margin-top: 5px;">
                                 <option value="">-- Select Image --</option>
                             </select>
-                            <div id="lumaprints-image-info" style="margin-top: 10px; font-size: 0.9em; color: #666;"></div>
                         </div>
 
                         <div style="margin-bottom: 15px;">
-                            <label><strong>Product Type:</strong></label>
-                            <select id="lumaprints-product-type" class="select-filter" style="width: 100%; margin-top: 5px;">
-                                <option value="art_paper">Art Paper (Hot Press / Semi-Glossy / Glossy)</option>
-                                <option value="canvas">Canvas (0.75in Stretched)</option>
+                            <label><strong>Aspect Ratio:</strong></label>
+                            <select id="lumaprints-aspect-ratio" class="select-filter" style="width: 100%; margin-top: 5px;">
+                                <option value="3:2">3:2 (Landscape/Portrait) - 5 sizes</option>
+                                <option value="1:1">1:1 (Square) - 4 sizes</option>
                             </select>
                         </div>
 
-                        <div style="margin-bottom: 15px;">
-                            <label><strong>Subcategory (for Art Paper):</strong></label>
-                            <select id="lumaprints-subcategory" class="select-filter" style="width: 100%; margin-top: 5px;">
-                                <option value="Hot Press Fine Art Paper">Hot Press Fine Art Paper</option>
-                                <option value="Semi-Glossy Fine Art Paper">Semi-Glossy Fine Art Paper</option>
-                                <option value="Glossy Fine Art Paper">Glossy Fine Art Paper</option>
-                            </select>
+                        <div style="margin-top: 20px; padding: 10px; background: #e8f5e9; border-radius: 4px;">
+                            <strong>Will apply:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                <li>0.75in Stretched Canvas (all sizes)</li>
+                                <li>Hot Press Fine Art Paper (all sizes)</li>
+                                <li>Semi-Glossy Fine Art Paper (all sizes)</li>
+                                <li>Glossy Fine Art Paper (all sizes)</li>
+                            </ul>
                         </div>
 
                         <div style="margin-top: 20px;">
-                            <button id="btn-lumaprints-apply-all" class="btn btn-success">Apply to All Unmapped</button>
-                            <button id="btn-lumaprints-preview" class="btn btn-secondary">Preview Changes</button>
+                            <button id="btn-lumaprints-apply-all" class="btn btn-success btn-large">✓ Apply to All Unmapped Products</button>
                         </div>
                     </div>
 

@@ -437,12 +437,7 @@ function setupEventListeners() {
         uploadLumaprintsFile();
     });
 
-    /**
-     * Handle Lumaprints image selection
-     */
-    document.getElementById('lumaprints-image-select').addEventListener('change', () => {
-        onLumaprintsImageChange();
-    });
+
 
     /**
      * Handle Lumaprints apply mapping
@@ -1096,47 +1091,59 @@ function onLumaprintsImageChange() {
 
 /**
  * Apply mapping to all unmapped products
+ * Applies ALL product types (Canvas + all Art Paper types) at once
  */
 async function applyLumaprintsMapping() {
     const imageSelect = document.getElementById('lumaprints-image-select');
-    const productType = document.getElementById('lumaprints-product-type').value;
-    const subcategory = document.getElementById('lumaprints-subcategory').value;
+    const aspectRatio = document.getElementById('lumaprints-aspect-ratio').value;
     
     if (!imageSelect.value) {
         UI.showNotification('Please select an image', true);
         return;
     }
     
-    const selectedOption = imageSelect.options[imageSelect.selectedIndex];
-    const aspectRatio = selectedOption.dataset.aspectRatio;
     const imageFilename = imageSelect.value;
     
     // Build mappings for all unmapped products
     const mappings = [];
     
     for (const product of LumaprintsState.unmappedProducts) {
-        // Use existing filename from Column P or selected image
         const filename = product.existing_filename || imageFilename;
-        
-        // Determine subcategory based on product type
-        let finalSubcategory = subcategory;
-        if (productType === 'canvas') {
-            finalSubcategory = '0.75in Stretched Canvas';
-        }
-        
-        // Use parsed size from product
         const width = product.width || 12;
         const length = product.length || 18;
         
-        // Get options based on product type
+        // Determine subcategory and options based on product option1
+        let subcategory = '';
         let options = [];
-        if (productType === 'canvas') {
+        
+        const option1Lower = (product.option1 || '').toLowerCase();
+        
+        // Match product type from option1
+        if (option1Lower.includes('canvas') || option1Lower.includes('stretched')) {
+            subcategory = '0.75in Stretched Canvas';
             options = [
                 ['Canvas Border', 'Mirror Wrap'],
                 ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
                 ['Canvas Finish', 'Semi-Glossy']
             ];
+        } else if (option1Lower.includes('hot') && option1Lower.includes('press')) {
+            subcategory = 'Hot Press Fine Art Paper';
+            options = [
+                ['Bleed Size', '0.25in Bleed (0.25in on each side)']
+            ];
+        } else if (option1Lower.includes('semi') && option1Lower.includes('gloss')) {
+            subcategory = 'Semi-Glossy Fine Art Paper';
+            options = [
+                ['Bleed Size', '0.25in Bleed (0.25in on each side)']
+            ];
+        } else if (option1Lower.includes('gloss') && !option1Lower.includes('semi')) {
+            subcategory = 'Glossy Fine Art Paper';
+            options = [
+                ['Bleed Size', '0.25in Bleed (0.25in on each side)']
+            ];
         } else {
+            // Default to Hot Press if can't determine
+            subcategory = 'Hot Press Fine Art Paper';
             options = [
                 ['Bleed Size', '0.25in Bleed (0.25in on each side)']
             ];
@@ -1147,7 +1154,7 @@ async function applyLumaprintsMapping() {
             data: {
                 product_handling: 'Update',
                 image_filename: filename,
-                subcategory: finalSubcategory,
+                subcategory: subcategory,
                 width: width,
                 length: length,
                 options: options
