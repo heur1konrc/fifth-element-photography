@@ -1296,7 +1296,7 @@ textarea {
     font-size: 1.2rem;
     font-weight: 600;
     margin-top: 1.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     text-transform: none;
 }
 
@@ -1345,7 +1345,7 @@ textarea {
 }
 
 .description-content p {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     line-height: 1.6;
 }
 
