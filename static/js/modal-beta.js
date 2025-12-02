@@ -36,6 +36,10 @@ function openModalBeta(imageData) {
     
     // Show/hide ORDER PRINTS button based on Shopify mapping
     const orderBtn = document.getElementById('btnOrderPrints');
+    console.log('Image data:', imageData);
+    console.log('order_prints_enabled:', imageData.order_prints_enabled);
+    console.log('shopify_product_handle:', imageData.shopify_product_handle);
+    
     if (imageData.order_prints_enabled && imageData.shopify_product_handle) {
         orderBtn.style.display = 'block';
     } else {
