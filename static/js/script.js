@@ -1,6 +1,7 @@
 // Global variables
 let allImages = [];
 let currentCategory = 'all';
+let imageDataMap = {};
 
 // DOM elements
 const imageGrid = document.getElementById('imageGrid');
@@ -102,10 +103,11 @@ function displayImages(images) {
         return sizeClasses[0]; // fallback
     }
 
-    const imageHTML = images.map(image => {
+    const imageHTML = images.map((image, index) => {
         const sizeClass = getRandomSize();
+        imageDataMap[index] = image; // Store full image data
         return `
-            <div class="image-item ${sizeClass}" onclick="openModal('${image.url}', '${image.title}', '${image.category}')">
+            <div class="image-item ${sizeClass}" onclick="openModal(${index})">
                 <img src="${image.url}" alt="${image.title}" loading="lazy">
                 <div class="image-overlay">
                     <div class="image-title">${image.title}</div>
@@ -310,12 +312,14 @@ function showSection(sectionName) {
 }
 
 // Open image modal
-function openModal(imageUrl, title, category) {
-    modalImage.src = imageUrl;
-    modalTitle.textContent = title;
-    modalCategory.innerHTML = '<span class="brand-main">FIFTH ELEMENT</span><br><span class="brand-sub">PHOTOGRAPHY</span>';
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
+function openModal(imageIndex) {
+    const imageData = imageDataMap[imageIndex];
+    if (!imageData) return;
+    
+    // Call beta modal with full image data
+    if (window.openModalBeta) {
+        window.openModalBeta(imageData);
+    }
 }
 
 // Close modal

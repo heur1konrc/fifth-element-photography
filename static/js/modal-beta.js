@@ -103,7 +103,5 @@ document.getElementById('btnOrderPrints').onclick = function() {
     }
 };
 
-// Override the existing openModal function to use beta modal
-window.openModal = function(imageData) {
-    openModalBeta(imageData);
-};
+// Expose openModalBeta globally
+window.openModalBeta = openModalBeta;
