@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="/static/css/lumaprints_styles.css">
     <link rel="stylesheet" href="/static/css/lumaprints_interface.css">
     <link rel="stylesheet" href="/static/css/shopify-modal.css">
+    <link rel="stylesheet" href="/static/css/modal-beta.css">
 </head>
 <body>
     <!-- Mobile Menu Button -->
@@ -328,8 +329,11 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
         </main>
     </div>
 
-    <!-- Image Modal - Updated with Order Form Section -->
-    <div class="modal" id="imageModal">
+    <!-- OLD MODAL - COMMENTED OUT FOR BETA TESTING -->
+    <!-- <div class="modal" id="imageModal"> -->
+    
+    <!-- BETA MODAL -->
+    {% include 'modal_beta.html' %}
         <div class="modal-content">
             <span class="close">&times;</span>
             
@@ -445,7 +449,8 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
+    <!-- END OLD MODAL -->
 
     <!-- Mobile Cart Floating Action Button -->
     <a href="/checkout" class="mobile-cart-fab" id="mobileCartFab">
@@ -459,6 +464,7 @@ My greatest joy lies not only in my own creations but in the act of collaboratin
     <script src="/static/js/lumaprints_inline_ordering.js"></script>
     <script src="/static/js/shopify-config.js"></script>
     <script src="/static/js/shopify-integration.js"></script>
+    <script src="/static/js/modal-beta.js"></script>
     
     <script>
         // Order Form Integration for OrderDesk
