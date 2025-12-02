@@ -18,8 +18,8 @@ function openModalBeta(imageData) {
     document.getElementById('modalBetaImage').src = imageData.url || '';
     document.getElementById('modalBetaImage').alt = imageData.title || 'Image';
     
-    // Populate EXIF data
-    document.getElementById('exifModel').textContent = imageData.camera_model || 'Unavailable';
+    // Populate EXIF data (using same field names as featured image)
+    document.getElementById('exifModel').textContent = imageData.model || 'Unavailable';
     document.getElementById('exifLens').textContent = imageData.lens || 'Unavailable';
     document.getElementById('exifAperture').textContent = imageData.aperture || 'Unavailable';
     document.getElementById('exifShutter').textContent = imageData.shutter_speed || 'Unavailable';
