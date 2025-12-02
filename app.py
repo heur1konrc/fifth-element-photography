@@ -2090,9 +2090,9 @@ def extract_exif_data(image_path):
         
         print(f"Extracting EXIF from: {image_path}")
         
-        # Open image and get EXIF data using newer getexif() method
+        # Open image and get EXIF data
         with Image.open(image_path) as img:
-            exif_data = img.getexif()
+            exif_data = img._getexif()
             
         if not exif_data:
             print("No EXIF data found in image")
@@ -2286,14 +2286,23 @@ def get_iso_info(exif):
 def get_focal_length_info(exif):
     """Extract focal length information from EXIF"""
     focal_length = exif.get('FocalLength')
+    print(f"[FOCAL] FocalLength value: {focal_length}, type: {type(focal_length)}")
+    
     if focal_length:
-        if isinstance(focal_length, tuple) and len(focal_length) == 2:
-            fl = focal_length[0] / focal_length[1]
-            return f"{fl:.0f}mm"
-        elif hasattr(focal_length, '__float__'):  # Handle IFDRational and other numeric types
-            return f"{float(focal_length):.0f}mm"
-        elif isinstance(focal_length, (int, float)):
-            return f"{focal_length:.0f}mm"
+        try:
+            if isinstance(focal_length, tuple) and len(focal_length) == 2:
+                fl = focal_length[0] / focal_length[1]
+                return f"{fl:.0f}mm"
+            elif isinstance(focal_length, str):
+                # Handle string values
+                fl = float(focal_length)
+                return f"{fl:.0f}mm"
+            elif hasattr(focal_length, '__float__'):  # Handle IFDRational and other numeric types
+                return f"{float(focal_length):.0f}mm"
+            elif isinstance(focal_length, (int, float)):
+                return f"{focal_length:.0f}mm"
+        except Exception as e:
+            print(f"[FOCAL] Error converting focal length: {e}")
     
     return 'Unavailable'
 
