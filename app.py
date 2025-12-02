@@ -2090,9 +2090,9 @@ def extract_exif_data(image_path):
         
         print(f"Extracting EXIF from: {image_path}")
         
-        # Open image and get EXIF data
+        # Open image and get EXIF data using newer getexif() method
         with Image.open(image_path) as img:
-            exif_data = img._getexif()
+            exif_data = img.getexif()
             
         if not exif_data:
             print("No EXIF data found in image")
