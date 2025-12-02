@@ -1349,8 +1349,8 @@ textarea {
 }
 
 .description-content p {
-    margin-bottom: 1.2rem;
-    line-height: 1.8;
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
 }
 
 /* Adjust EXIF section for smaller space */
