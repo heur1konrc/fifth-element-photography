@@ -29,12 +29,20 @@
 .modal-beta-close {
     position: absolute;
     top: 15px;
-    right: 25px;
+    right: 15px;
     color: #fff;
     font-size: 35px;
     font-weight: bold;
     cursor: pointer;
     z-index: 10001;
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .modal-beta-close:hover,

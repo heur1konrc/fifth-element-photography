@@ -659,9 +659,15 @@ function showImageView() {
 }
 
 function openOrderWizard() {
-    // Get the current image URL and title from the modal
-    const imageElement = document.getElementById('modalImage');
-    const titleElement = document.getElementById('modalTitle');
+    // Get the current image URL and title from the modal (try both old and beta modal)
+    let imageElement = document.getElementById('modalImage');
+    let titleElement = document.getElementById('modalTitle');
+    
+    // If old modal elements not found, try beta modal
+    if (!imageElement || !imageElement.src) {
+        imageElement = document.getElementById('modalBetaImage');
+        titleElement = document.getElementById('modalBetaTitle');
+    }
     
     if (imageElement && imageElement.src && titleElement) {
         const imageUrl = imageElement.src;

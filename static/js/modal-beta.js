@@ -34,13 +34,13 @@ function openModalBeta(imageData) {
         descriptionDiv.innerHTML = '<p>No description available for this image.</p>';
     }
     
-    // Show/hide ORDER PRINTS button based on Shopify mapping
+    // Show/hide ORDER PRINTS button based on Shopify mapping (same logic as old modal)
     const orderBtn = document.getElementById('btnOrderPrints');
-    console.log('Image data:', imageData);
-    console.log('order_prints_enabled:', imageData.order_prints_enabled);
-    console.log('shopify_product_handle:', imageData.shopify_product_handle);
     
-    if (imageData.order_prints_enabled && imageData.shopify_product_handle) {
+    // Check if this image has a Shopify product mapping
+    const productHandle = typeof getProductHandleFromUrl === 'function' ? getProductHandleFromUrl(imageData.url) : null;
+    
+    if (productHandle) {
         orderBtn.style.display = 'block';
     } else {
         orderBtn.style.display = 'none';
@@ -99,11 +99,14 @@ document.getElementById('btnShare').onclick = function() {
     }
 };
 
-// ORDER PRINTS button
+// ORDER PRINTS button - use same function as old modal
 document.getElementById('btnOrderPrints').onclick = function() {
-    if (currentImageDataBeta && currentImageDataBeta.shopify_product_handle) {
-        const shopifyUrl = `https://fifth-element-photography.myshopify.com/products/${currentImageDataBeta.shopify_product_handle}`;
-        window.open(shopifyUrl, '_blank');
+    // Call the existing openOrderWizard function from script.js
+    if (typeof openOrderWizard === 'function') {
+        openOrderWizard();
+    } else {
+        console.error('openOrderWizard function not found');
+        alert('Order function not available. Please refresh the page.');
     }
 };
 
