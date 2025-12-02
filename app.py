@@ -2294,9 +2294,15 @@ def get_focal_length_info(exif):
                 fl = focal_length[0] / focal_length[1]
                 return f"{fl:.0f}mm"
             elif isinstance(focal_length, str):
-                # Handle string values
-                fl = float(focal_length)
-                return f"{fl:.0f}mm"
+                # Handle string values - may already have 'mm' suffix
+                focal_str = focal_length.strip()
+                if focal_str.endswith('mm'):
+                    # Already formatted, return as-is
+                    return focal_str
+                else:
+                    # Parse and format
+                    fl = float(focal_str)
+                    return f"{fl:.0f}mm"
             elif hasattr(focal_length, '__float__'):  # Handle IFDRational and other numeric types
                 return f"{float(focal_length):.0f}mm"
             elif isinstance(focal_length, (int, float)):
