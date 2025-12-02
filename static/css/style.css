@@ -1342,6 +1342,17 @@ textarea {
     color: #cccccc;
 }
 
+.description-content strong,
+.description-content b {
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.description-content p {
+    margin-bottom: 1.2rem;
+    line-height: 1.8;
+}
+
 /* Adjust EXIF section for smaller space */
 .featured-info {
     padding-left: 1rem;
