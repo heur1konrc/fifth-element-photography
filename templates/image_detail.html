@@ -75,6 +75,15 @@
             background: #357ae8;
             transform: translateY(-2px);
         }
+        
+        /* Fix description text formatting */
+        .modal-beta-description {
+            font-weight: normal;
+        }
+        
+        .modal-beta-description p {
+            font-weight: normal;
+        }
     </style>
     
     <!-- Include Shopify and order form scripts -->
@@ -99,27 +108,27 @@
                 <div class="modal-beta-exif">
                     <div class="exif-item">
                         <span class="exif-label">MODEL:</span>
-                        <span class="exif-value">{{ image.exif.model if image.exif and image.exif.model else 'Unavailable' }}</span>
+                        <span class="exif-value">{{ image.model if image.model else 'Unavailable' }}</span>
                     </div>
                     <div class="exif-item">
                         <span class="exif-label">LENS:</span>
-                        <span class="exif-value">{{ image.exif.lens if image.exif and image.exif.lens else 'Unavailable' }}</span>
+                        <span class="exif-value">{{ image.lens if image.lens else 'Unavailable' }}</span>
                     </div>
                     <div class="exif-item">
                         <span class="exif-label">APERTURE:</span>
-                        <span class="exif-value">{{ image.exif.aperture if image.exif and image.exif.aperture else 'Unavailable' }}</span>
+                        <span class="exif-value">{{ image.aperture if image.aperture else 'Unavailable' }}</span>
                     </div>
                     <div class="exif-item">
                         <span class="exif-label">SHUTTER SPEED:</span>
-                        <span class="exif-value">{{ image.exif.shutter_speed if image.exif and image.exif.shutter_speed else 'Unavailable' }}</span>
+                        <span class="exif-value">{{ image.shutter_speed if image.shutter_speed else 'Unavailable' }}</span>
                     </div>
                     <div class="exif-item">
                         <span class="exif-label">ISO:</span>
-                        <span class="exif-value">{{ image.exif.iso if image.exif and image.exif.iso else 'Unavailable' }}</span>
+                        <span class="exif-value">{{ image.iso if image.iso else 'Unavailable' }}</span>
                     </div>
                     <div class="exif-item">
                         <span class="exif-label">FOCAL LENGTH:</span>
-                        <span class="exif-value">{{ image.exif.focal_length if image.exif and image.exif.focal_length else 'Unavailable' }}</span>
+                        <span class="exif-value">{{ image.focal_length if image.focal_length else 'Unavailable' }}</span>
                     </div>
                 </div>
                 
