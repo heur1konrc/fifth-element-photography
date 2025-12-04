@@ -171,7 +171,7 @@ function showLoadingModal(title) {
             <div class="shopify-modal-content">
                 <div class="shopify-modal-header">
                     <h2>${title}</h2>
-                    <button class="shopify-modal-close" onclick="closeShopifyModal()">&times;</button>
+                    <button class="shopify-modal-close">&times;</button>
                 </div>
                 <div id="shopify-product-component" class="shopify-loading">
                     <p>Loading product options...</p>
@@ -183,6 +183,12 @@ function showLoadingModal(title) {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     document.getElementById('shopify-product-modal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    
+    // Add event listener to close button
+    const closeBtn = document.querySelector('.shopify-modal-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', window.closeShopifyModal);
+    }
 }
 
 // Display product modal with badge-style variant selectors
