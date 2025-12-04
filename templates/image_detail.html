@@ -22,6 +22,9 @@
     <meta property="twitter:description" content="{{ (image.description|striptags)[:200] if image.description else 'Professional photography by Fifth Element Photography' }}">
     <meta property="twitter:image" content="{{ request.url_root.rstrip('/') }}{{ image.url }}">
     
+    <!-- Import modal-beta CSS -->
+    <link rel="stylesheet" href="/static/css/modal-beta.css">
+    
     <style>
         * {
             margin: 0;
@@ -31,88 +34,46 @@
         
         body {
             font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #000;
+            background: #1a1a1a;
             color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 40px 20px;
         }
         
-        .container {
-            max-width: 1200px;
+        /* Override modal styles for full page */
+        .modal-beta-content {
+            position: relative;
+            background: #1a1a1a;
+            border-radius: 0;
+            max-width: 1400px;
             width: 100%;
-            text-align: center;
+            margin: 0 auto;
+            padding: 40px;
+            box-shadow: none;
         }
         
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
+        .modal-beta-close {
+            display: none; /* No close button needed on full page */
         }
         
-        .image-container {
-            margin: 30px 0;
-        }
-        
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(255,255,255,0.1);
-        }
-        
-        .description {
-            margin: 30px 0;
-            line-height: 1.7;
-            color: #e0e0e0;
-        }
-        
-        .btn {
-            display: inline-block;
+        /* Additional button styles */
+        .btn-view-gallery {
             background: #4285f4;
-            color: white;
+            color: #fff;
+            font-size: 1rem;
             padding: 15px 30px;
+            margin-bottom: 15px;
+            width: 100%;
             text-decoration: none;
+            display: block;
+            text-align: center;
             border-radius: 4px;
-            font-size: 1.1rem;
-            margin: 10px;
             transition: all 0.3s ease;
         }
         
-        .btn:hover {
+        .btn-view-gallery:hover {
             background: #357ae8;
             transform: translateY(-2px);
-        }
-        
-        .btn-order {
-            background: #4285f4;
-        }
-        
-        .btn-order:hover {
-            background: #357ae8;
-        }
-        
-        .btn-coffee {
-            background: none;
-            color: #6799c2;
-            border: 1px solid #6799c2;
-            text-transform: uppercase;
-        }
-        
-        .btn-coffee:hover {
-            background: #6799c2;
-            color: #000;
-        }
-        
-        .logo {
-            margin-top: 50px;
-            opacity: 0.7;
-        }
-        
-        .logo img {
-            max-width: 200px;
         }
     </style>
     
@@ -127,30 +88,69 @@
     </script>
 </head>
 <body>
-    <div class="container">
-        <h1>{{ image.title }}</h1>
-        
-        <div class="image-container">
-            <img src="{{ image.url }}" alt="{{ image.title }}">
-        </div>
-        
-        {% if image.description %}
-        <div class="description">
-            {{ image.description|safe }}
-        </div>
-        {% endif %}
-        
-        <div>
-            <a href="/?image={{ image.filename }}" class="btn">View in Gallery</a>
-            {% if has_shopify_product %}
-            <a href="#" onclick="openOrderForm('{{ image.filename }}'); return false;" class="btn btn-order">🖼️ ORDER PRINTS</a>
-            {% endif %}
-            <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" class="btn btn-coffee">☕ BUY ME A COFFEE</a>
-            <a href="{{ image.url }}" download="{{ image.filename }}" class="btn">Download Image</a>
-        </div>
-        
-        <div class="logo">
-            <img src="/static/images/logo.png" alt="Fifth Element Photography">
+    <div class="modal-beta-content">
+        <div class="modal-beta-layout">
+            <!-- Left Column: Image and EXIF -->
+            <div class="modal-beta-left">
+                <h2 class="modal-beta-title">{{ image.title }}</h2>
+                <img class="modal-beta-image" src="{{ image.url }}" alt="{{ image.title }}">
+                
+                <!-- EXIF Data -->
+                <div class="modal-beta-exif">
+                    <div class="exif-item">
+                        <span class="exif-label">MODEL:</span>
+                        <span class="exif-value">{{ image.exif.model if image.exif and image.exif.model else 'Unavailable' }}</span>
+                    </div>
+                    <div class="exif-item">
+                        <span class="exif-label">LENS:</span>
+                        <span class="exif-value">{{ image.exif.lens if image.exif and image.exif.lens else 'Unavailable' }}</span>
+                    </div>
+                    <div class="exif-item">
+                        <span class="exif-label">APERTURE:</span>
+                        <span class="exif-value">{{ image.exif.aperture if image.exif and image.exif.aperture else 'Unavailable' }}</span>
+                    </div>
+                    <div class="exif-item">
+                        <span class="exif-label">SHUTTER SPEED:</span>
+                        <span class="exif-value">{{ image.exif.shutter_speed if image.exif and image.exif.shutter_speed else 'Unavailable' }}</span>
+                    </div>
+                    <div class="exif-item">
+                        <span class="exif-label">ISO:</span>
+                        <span class="exif-value">{{ image.exif.iso if image.exif and image.exif.iso else 'Unavailable' }}</span>
+                    </div>
+                    <div class="exif-item">
+                        <span class="exif-label">FOCAL LENGTH:</span>
+                        <span class="exif-value">{{ image.exif.focal_length if image.exif and image.exif.focal_length else 'Unavailable' }}</span>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="modal-beta-actions">
+                    <button class="btn-beta btn-beta-primary" onclick="window.open('{{ image.url }}', '_blank')">View High Resolution (New Window)</button>
+                    <a href="{{ image.url }}" download="{{ image.filename }}" class="btn-beta btn-beta-primary" style="text-decoration: none; display: block; text-align: center;">Download Full Size Image</a>
+                </div>
+            </div>
+            
+            <!-- Right Column: Description and Order Button -->
+            <div class="modal-beta-right">
+                {% if image.description %}
+                <div class="modal-beta-description">
+                    {{ image.description|safe }}
+                </div>
+                {% endif %}
+                
+                <a href="/?image={{ image.filename }}" class="btn-view-gallery">← View in Gallery</a>
+                
+                {% if has_shopify_product %}
+                <button class="btn-beta btn-beta-order" onclick="openOrderForm('{{ image.filename }}')">🛒 ORDER PRINTS</button>
+                {% endif %}
+                
+                <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" class="btn-beta btn-beta-coffee" style="text-decoration: none; display: block; text-align: center;">☕ BUY ME A COFFEE</a>
+                
+                <!-- Logo -->
+                <div class="modal-beta-logo">
+                    <img src="/static/images/modal-logo.png" alt="Fifth Element Photography">
+                </div>
+            </div>
         </div>
     </div>
 </body>
