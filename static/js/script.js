@@ -18,6 +18,64 @@ const closeModal = document.querySelector('.close');
 document.addEventListener('DOMContentLoaded', function() {
     loadImages();
     setupEventListeners();
+    
+    // Check for URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get('category');
+    const imageParam = urlParams.get('image');
+    const orderParam = urlParams.get('order');
+    
+    // Handle category filter
+    if (categoryParam) {
+        // Wait for images to load, then filter
+        setTimeout(() => {
+            filterImages(categoryParam);
+            // Update active category link
+            const categoryLinks = document.querySelectorAll('.category-link');
+            categoryLinks.forEach(link => {
+                if (link.getAttribute('data-category') === categoryParam) {
+                    categoryLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        }, 500);
+    }
+    
+    // Handle image modal opening
+    if (imageParam) {
+        console.log('Image parameter found:', imageParam);
+        setTimeout(() => {
+            console.log('All images loaded:', allImages.length);
+            // Find the image in allImages array (case-insensitive)
+            const image = allImages.find(img => {
+                const match = img.filename.toLowerCase() === imageParam.toLowerCase();
+                if (match) console.log('Found matching image:', img);
+                return match;
+            });
+            
+            if (image) {
+                console.log('Opening modal for image:', image.filename);
+                openModalBeta(image);
+                
+                // If order parameter is present, open order form
+                if (orderParam === 'true') {
+                    console.log('Order parameter is true, opening order form');
+                    setTimeout(() => {
+                        const orderBtn = document.querySelector('.btn-beta-order');
+                        if (orderBtn) {
+                            console.log('Clicking order button');
+                            orderBtn.click();
+                        } else {
+                            console.log('Order button not found');
+                        }
+                    }, 1000);
+                }
+            } else {
+                console.log('Image not found in allImages array');
+                console.log('Available filenames:', allImages.map(img => img.filename));
+            }
+        }, 1000);
+    }
 });
 
 // Load images from API
