@@ -76,13 +76,22 @@
             transform: translateY(-2px);
         }
         
-        /* Fix description text formatting */
-        .modal-beta-description {
-            font-weight: normal;
+        /* Fix ALL text formatting - override bold everywhere */
+        body, body * {
+            font-weight: normal !important;
         }
         
-        .modal-beta-description p {
-            font-weight: normal;
+        /* Only keep bold for specific elements that should be bold */
+        .modal-beta-title {
+            font-weight: 600 !important;
+        }
+        
+        .exif-label {
+            font-weight: 600 !important;
+        }
+        
+        .modal-beta-description strong {
+            font-weight: 600 !important;
         }
     </style>
     
