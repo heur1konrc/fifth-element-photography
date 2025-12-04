@@ -134,34 +134,13 @@
         });
         
         function openOrderForm(filename) {
-            // Open Shopify modal directly on this page
-            if (window.currentShopifyProductId) {
-                // Create modal if it doesn't exist
-                let modal = document.getElementById('shopifyOrderModal');
-                if (!modal) {
-                    modal = document.createElement('div');
-                    modal.id = 'shopifyOrderModal';
-                    modal.className = 'modal-beta';
-                    modal.style.display = 'none';
-                    modal.innerHTML = `
-                        <div class="modal-beta-content" style="max-width: 800px; margin: 50px auto;">
-                            <span class="modal-beta-close" onclick="closeShopifyModal()">&times;</span>
-                            <h2 class="modal-beta-title">${window.currentImageTitle}</h2>
-                            <div id="shopifyProductContainer"></div>
-                        </div>
-                    `;
-                    document.body.appendChild(modal);
-                }
-                
-                // Load Shopify product
-                const container = document.getElementById('shopifyProductContainer');
-                if (container && typeof loadShopifyProduct === 'function') {
-                    loadShopifyProduct(window.currentShopifyProductId, container);
-                }
-                
-                // Show modal
-                modal.style.display = 'flex';
+            // Use the openShopifyProductModal function from shopify-integration.js
+            if (typeof openShopifyProductModal === 'function') {
+                const imageUrl = '{{ image.url }}';
+                const imageTitle = window.currentImageTitle || '{{ image.title }}';
+                openShopifyProductModal(imageUrl, imageTitle);
             } else {
+                console.error('openShopifyProductModal function not found');
                 alert('Product not available for ordering. Please contact us.');
             }
         }
