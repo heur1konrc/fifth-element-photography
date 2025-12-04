@@ -136,31 +136,13 @@
         });
         
         function openOrderForm(filename) {
-            // Use the same modal system as homepage (modal-beta.js)
-            if (typeof openModalBeta === 'function') {
-                const imageData = {
-                    filename: '{{ image.filename }}',
-                    title: '{{ image.title }}',
-                    url: '{{ image.url }}',
-                    category: '{{ image.category }}',
-                    description: {{ image.description|tojson if image.description else '""'|safe }},
-                    model: '{{ image.model if image.model else "" }}',
-                    lens: '{{ image.lens if image.lens else "" }}',
-                    aperture: '{{ image.aperture if image.aperture else "" }}',
-                    shutter_speed: '{{ image.shutter_speed if image.shutter_speed else "" }}',
-                    iso: '{{ image.iso if image.iso else "" }}',
-                    focal_length: '{{ image.focal_length if image.focal_length else "" }}'
-                };
-                openModalBeta(imageData);
-                // Automatically open the order form
-                setTimeout(() => {
-                    const orderBtn = document.querySelector('.btn-beta-order');
-                    if (orderBtn) {
-                        orderBtn.click();
-                    }
-                }, 500);
+            // Call openShopifyProductModal directly (same as homepage order wizard)
+            if (typeof openShopifyProductModal === 'function') {
+                const imageUrl = '{{ image.url }}';
+                const imageTitle = '{{ image.title }}';
+                openShopifyProductModal(imageUrl, imageTitle);
             } else {
-                console.error('openModalBeta function not found');
+                console.error('openShopifyProductModal function not found');
                 alert('Product not available for ordering. Please contact us.');
             }
         }
