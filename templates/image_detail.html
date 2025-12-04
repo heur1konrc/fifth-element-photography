@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ image.title }} - Fifth Element Photography</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:title" content="{{ image.title }} - Fifth Element Photography">
+    <meta property="og:description" content="{{ image.description[:200] if image.description else 'Professional photography by Fifth Element Photography' }}">
+    <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ image.url }}">
+    <meta property="og:image:width" content="{{ image.width }}">
+    <meta property="og:image:height" content="{{ image.height }}">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.url }}">
+    <meta property="twitter:title" content="{{ image.title }} - Fifth Element Photography">
+    <meta property="twitter:description" content="{{ image.description[:200] if image.description else 'Professional photography by Fifth Element Photography' }}">
+    <meta property="twitter:image" content="{{ request.url_root.rstrip('/') }}{{ image.url }}">
+    
+    <script>
+        // Redirect to main gallery with modal open
+        window.location.href = '/?image={{ image.filename }}';
+    </script>
+</head>
+<body>
+    <p>Redirecting to gallery...</p>
+    <p>If you are not redirected automatically, <a href="/?image={{ image.filename }}">click here</a>.</p>
+</body>
+</html>

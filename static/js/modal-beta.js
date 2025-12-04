@@ -88,15 +88,30 @@ document.getElementById('btnDownload').onclick = function() {
 
 // Share on Social Media
 document.getElementById('btnShare').onclick = function() {
-    if (navigator.share && currentImageDataBeta) {
-        navigator.share({
-            title: currentImageDataBeta.title || 'Fifth Element Photography',
-            text: 'Check out this image from Fifth Element Photography',
-            url: window.location.href
-        }).catch(err => console.log('Error sharing:', err));
-    } else {
-        alert('Sharing not supported on this browser');
+    if (!currentImageDataBeta) {
+        alert('No image selected');
+        return;
     }
+    
+    // Get the full image URL and create shareable page URL
+    const imageUrl = window.location.origin + currentImageDataBeta.url;
+    const sharePageUrl = window.location.origin + '/photo/' + currentImageDataBeta.filename;
+    const title = encodeURIComponent(currentImageDataBeta.title || 'Fifth Element Photography');
+    const description = encodeURIComponent('Check out this image from Fifth Element Photography');
+    
+    // Create share menu
+    const shareMenu = document.createElement('div');
+    shareMenu.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; padding: 20px; border-radius: 8px; z-index: 10002; box-shadow: 0 4px 20px rgba(0,0,0,0.5);';
+    shareMenu.innerHTML = `
+        <h3 style="color: #fff; margin-bottom: 15px; font-family: Poppins, sans-serif;">Share on Social Media</h3>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sharePageUrl)}" target="_blank" style="background: #4267B2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-family: Poppins, sans-serif;">Share on Facebook</a>
+            <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(sharePageUrl)}&text=${title}" target="_blank" style="background: #1DA1F2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-family: Poppins, sans-serif;">Share on Twitter</a>
+            <a href="https://pinterest.com/pin/create/button/?url=${encodeURIComponent(sharePageUrl)}&media=${encodeURIComponent(imageUrl)}&description=${title}" target="_blank" style="background: #E60023; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-family: Poppins, sans-serif;">Share on Pinterest</a>
+            <button onclick="this.parentElement.parentElement.remove()" style="background: #666; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-family: Poppins, sans-serif;">Cancel</button>
+        </div>
+    `;
+    document.body.appendChild(shareMenu);
 };
 
 // ORDER PRINTS button - use same function as old modal

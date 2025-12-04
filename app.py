@@ -870,6 +870,17 @@ def featured():
                          featured_image=featured_image,
                          exif_data=exif_data)
 
+@app.route('/photo/<filename>')
+def image_detail(filename):
+    """Individual image page with Open Graph meta tags for social sharing"""
+    images = scan_images()
+    image = next((img for img in images if img['filename'] == filename), None)
+    
+    if not image:
+        return redirect(url_for('index'))
+    
+    return render_template('image_detail.html', image=image)
+
 @app.route('/api/images')
 def api_images():
     """API endpoint for images"""
