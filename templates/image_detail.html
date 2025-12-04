@@ -13,6 +13,7 @@
     <meta property="og:image" content="{{ request.url_root.rstrip('/') }}{{ image.url }}">
     <meta property="og:image:width" content="{{ image.width }}">
     <meta property="og:image:height" content="{{ image.height }}">
+    <meta property="og:site_name" content="Fifth Element Photography">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
@@ -21,13 +22,102 @@
     <meta property="twitter:description" content="{{ (image.description|striptags)[:200] if image.description else 'Professional photography by Fifth Element Photography' }}">
     <meta property="twitter:image" content="{{ request.url_root.rstrip('/') }}{{ image.url }}">
     
-    <script>
-        // Redirect to main gallery with modal open
-        window.location.href = '/?image={{ image.filename }}';
-    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .image-container {
+            margin: 30px 0;
+        }
+        
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(255,255,255,0.1);
+        }
+        
+        .description {
+            margin: 30px 0;
+            line-height: 1.7;
+            color: #e0e0e0;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #4285f4;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #357ae8;
+            transform: translateY(-2px);
+        }
+        
+        .logo {
+            margin-top: 50px;
+            opacity: 0.7;
+        }
+        
+        .logo img {
+            max-width: 200px;
+        }
+    </style>
 </head>
 <body>
-    <p>Redirecting to gallery...</p>
-    <p>If you are not redirected automatically, <a href="/?image={{ image.filename }}">click here</a>.</p>
+    <div class="container">
+        <h1>{{ image.title }}</h1>
+        
+        <div class="image-container">
+            <img src="{{ image.url }}" alt="{{ image.title }}">
+        </div>
+        
+        {% if image.description %}
+        <div class="description">
+            {{ image.description|safe }}
+        </div>
+        {% endif %}
+        
+        <div>
+            <a href="/?image={{ image.filename }}" class="btn">View in Gallery</a>
+            <a href="{{ image.url }}" download="{{ image.filename }}" class="btn">Download Image</a>
+        </div>
+        
+        <div class="logo">
+            <img src="/static/images/logo.png" alt="Fifth Element Photography">
+        </div>
+    </div>
 </body>
 </html>
