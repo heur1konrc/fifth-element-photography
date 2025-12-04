@@ -879,7 +879,21 @@ def image_detail(filename):
     if not image:
         return redirect(url_for('index'))
     
-    return render_template('image_detail.html', image=image)
+    # Check if image has Shopify product mapping
+    has_shopify_product = False
+    try:
+        db_path = '/data/lumaprints_pricing.db'
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        cursor.execute("SELECT shopify_product_handle FROM shopify_mappings WHERE image_filename = ?", (filename,))
+        result = cursor.fetchone()
+        conn.close()
+        if result and result[0]:
+            has_shopify_product = True
+    except Exception as e:
+        print(f"Error checking Shopify mapping: {e}")
+    
+    return render_template('image_detail.html', image=image, has_shopify_product=has_shopify_product)
 
 @app.route('/api/images')
 def api_images():

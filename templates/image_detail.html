@@ -86,6 +86,14 @@
             transform: translateY(-2px);
         }
         
+        .btn-order {
+            background: #4285f4;
+        }
+        
+        .btn-order:hover {
+            background: #357ae8;
+        }
+        
         .logo {
             margin-top: 50px;
             opacity: 0.7;
@@ -95,6 +103,16 @@
             max-width: 200px;
         }
     </style>
+    
+    <!-- Include Shopify and order form scripts -->
+    <script src="/static/js/shopify-config.js"></script>
+    <script src="/static/js/shopify-integration.js"></script>
+    <script>
+        function openOrderForm(filename) {
+            // Redirect to gallery with modal and order form open
+            window.location.href = '/?image=' + encodeURIComponent(filename) + '&order=true';
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -112,6 +130,9 @@
         
         <div>
             <a href="/?image={{ image.filename }}" class="btn">View in Gallery</a>
+            {% if has_shopify_product %}
+            <a href="#" onclick="openOrderForm('{{ image.filename }}'); return false;" class="btn btn-order">🖼️ ORDER PRINTS</a>
+            {% endif %}
             <a href="{{ image.url }}" download="{{ image.filename }}" class="btn">Download Image</a>
         </div>
         
