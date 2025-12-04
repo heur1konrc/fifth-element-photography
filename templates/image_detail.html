@@ -110,15 +110,27 @@
             const filename = '{{ image.filename }}';
             const title = '{{ image.title }}';
             
-            // Find or create Shopify product ID from mapping
-            if (typeof shopifyProductMappings !== 'undefined') {
-                const mapping = shopifyProductMappings[filename];
-                if (mapping) {
-                    window.currentShopifyProductId = mapping.product_id;
-                    window.currentImageTitle = title;
-                    window.currentImageFilename = filename;
+            // Wait for shopifyProductMappings to be available (with retry)
+            function initializeShopifyProduct(retries = 0) {
+                if (typeof shopifyProductMappings !== 'undefined') {
+                    const mapping = shopifyProductMappings[filename];
+                    if (mapping) {
+                        window.currentShopifyProductId = mapping.product_id;
+                        window.currentImageTitle = title;
+                        window.currentImageFilename = filename;
+                        console.log('Shopify product initialized:', window.currentShopifyProductId);
+                    } else {
+                        console.warn('No Shopify mapping found for:', filename);
+                    }
+                } else if (retries < 10) {
+                    // Retry after 100ms if mappings not loaded yet
+                    setTimeout(() => initializeShopifyProduct(retries + 1), 100);
+                } else {
+                    console.error('shopifyProductMappings not loaded after retries');
                 }
             }
+            
+            initializeShopifyProduct();
         });
         
         function openOrderForm(filename) {
