@@ -481,7 +481,8 @@ class LumaprintsPricing {
 if (typeof window.lumaprintsPricing === 'undefined') {
     window.lumaprintsPricing = new LumaprintsPricing();
 }
-const lumaprintsPricing = window.lumaprintsPricing;
+// Use window.lumaprintsPricing directly to avoid const declaration issues
+var lumaprintsPricing = window.lumaprintsPricing;
 
 // Function to add print ordering to gallery modals
 function addPrintOrderingToModal(imageFilename, imageTitle, modalElement) {
