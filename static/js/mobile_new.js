@@ -478,12 +478,6 @@ function openImageModal(galleryItem) {
     document.body.style.overflow = 'hidden'; // Prevent background scrolling
 }
 
-function closeImageModal() {
-    const modal = document.getElementById('imageModal');
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto'; // Restore scrolling
-}
-
 function filterByModalCategory() {
     // Close modal
     closeImageModal();
