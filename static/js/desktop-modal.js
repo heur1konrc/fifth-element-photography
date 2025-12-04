@@ -18,9 +18,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadImages();
     setupEventListeners();
     
-    // Check for category parameter in URL
+    // Check for URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const categoryParam = urlParams.get('category');
+    const imageParam = urlParams.get('image');
+    const orderParam = urlParams.get('order');
+    
+    // Handle category filter
     if (categoryParam) {
         // Wait for images to load, then filter
         setTimeout(() => {
@@ -34,6 +38,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }, 500);
+    }
+    
+    // Handle image modal opening
+    if (imageParam) {
+        setTimeout(() => {
+            // Find the image in allImages array
+            const image = allImages.find(img => img.filename === imageParam);
+            if (image) {
+                openModalBeta(image);
+                
+                // If order parameter is present, open order form
+                if (orderParam === 'true') {
+                    setTimeout(() => {
+                        const orderBtn = document.querySelector('.btn-beta-order');
+                        if (orderBtn) {
+                            orderBtn.click();
+                        }
+                    }, 1000);
+                }
+            }
+        }, 1000);
     }
 });
 
