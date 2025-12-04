@@ -17,6 +17,24 @@ const closeModal = document.querySelector('.close');
 document.addEventListener('DOMContentLoaded', function() {
     loadImages();
     setupEventListeners();
+    
+    // Check for category parameter in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get('category');
+    if (categoryParam) {
+        // Wait for images to load, then filter
+        setTimeout(() => {
+            filterImages(categoryParam);
+            // Update active category link
+            const categoryLinks = document.querySelectorAll('.category-link');
+            categoryLinks.forEach(link => {
+                if (link.getAttribute('data-category') === categoryParam) {
+                    categoryLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        }, 500);
+    }
 });
 
 // Load images from API
@@ -446,6 +464,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update active link
             categoryLinks.forEach(l => l.classList.remove('active'));
             this.classList.add('active');
+            
+            // Update URL with category parameter
+            const url = new URL(window.location);
+            if (category === 'all') {
+                url.searchParams.delete('category');
+            } else {
+                url.searchParams.set('category', category);
+            }
+            window.history.pushState({}, '', url);
             
             // Filter images using the correct function
             filterImages(category);
