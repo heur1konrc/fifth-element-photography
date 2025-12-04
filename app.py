@@ -1660,6 +1660,11 @@ def edit_image(filename):
                 </label>
             '''
         
+        # Extract actual filename and extension
+        import os
+        actual_filename = image.get('url', '').split('/')[-1]  # Get filename from URL
+        filename_without_ext, file_ext = os.path.splitext(actual_filename)
+        
         # Return HTML form for editing that matches modal styling
         form_html = f"""
         <div class="edit-form">
@@ -1667,6 +1672,17 @@ def edit_image(filename):
                 <div class="form-group">
                     <label for="title">Title:</label>
                     <input type="text" id="title" name="title" value="{image.get('title', '')}" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_filename">Filename:</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="text" id="new_filename" name="new_filename" value="{filename_without_ext}" 
+                               pattern="[a-zA-Z0-9_-]+" 
+                               title="Only letters, numbers, hyphens, and underscores allowed"
+                               style="flex: 1;">
+                        <span style="color: #999;">{file_ext}</span>
+                    </div>
+                    <small style="color: #999; display: block; margin-top: 5px;">Only letters, numbers, hyphens, and underscores. Extension will be preserved.</small>
                 </div>
                 <div class="form-group">
                     <label for="description">Description:</label>
@@ -1711,12 +1727,119 @@ def edit_image(filename):
 def update_image(filename):
     """Update image metadata and sync description with featured story"""
     try:
+        import os
+        import shutil
+        import re
+        
         # Get form data
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
+        new_filename_base = request.form.get('new_filename', '').strip()
         categories_input = request.form.getlist('categories')  # Get multiple categories
         is_featured = request.form.get('is_featured') == 'on'
         is_background = request.form.get('is_background') == 'on'
+        
+        # Handle file renaming if new filename provided
+        actual_old_filename = filename
+        actual_new_filename = filename
+        
+        if new_filename_base:
+            # Get current file info
+            images = scan_images()
+            image = next((img for img in images if img['filename'] == filename), None)
+            if image:
+                current_file_url = image.get('url', '')
+                current_actual_filename = current_file_url.split('/')[-1]
+                _, file_ext = os.path.splitext(current_actual_filename)
+                
+                # Validate new filename (only alphanumeric, hyphens, underscores)
+                if not re.match(r'^[a-zA-Z0-9_-]+$', new_filename_base):
+                    return jsonify({'success': False, 'message': 'Invalid filename. Only letters, numbers, hyphens, and underscores allowed.'}), 400
+                
+                new_actual_filename = new_filename_base + file_ext
+                
+                # Only rename if filename actually changed
+                if current_actual_filename != new_actual_filename:
+                    old_path = os.path.join(IMAGES_FOLDER, current_actual_filename)
+                    new_path = os.path.join(IMAGES_FOLDER, new_actual_filename)
+                    
+                    # Check if new filename already exists
+                    if os.path.exists(new_path):
+                        return jsonify({'success': False, 'message': f'File {new_actual_filename} already exists.'}), 400
+                    
+                    # Rename the actual file
+                    try:
+                        shutil.move(old_path, new_path)
+                        print(f"[RENAME] Renamed {current_actual_filename} to {new_actual_filename}")
+                        actual_old_filename = current_actual_filename
+                        actual_new_filename = new_actual_filename
+                    except Exception as rename_error:
+                        print(f"[RENAME ERROR] {rename_error}")
+                        return jsonify({'success': False, 'message': f'Error renaming file: {str(rename_error)}'}), 500
+        
+        # If file was renamed, update all references in databases
+        if actual_old_filename != actual_new_filename:
+            print(f"[RENAME] Updating database references from {actual_old_filename} to {actual_new_filename}")
+            
+            # Update categories
+            image_categories = load_image_categories()
+            if actual_old_filename in image_categories:
+                image_categories[actual_new_filename] = image_categories.pop(actual_old_filename)
+                save_image_categories(image_categories)
+            
+            # Update descriptions
+            image_descriptions = load_image_descriptions()
+            if actual_old_filename in image_descriptions:
+                image_descriptions[actual_new_filename] = image_descriptions.pop(actual_old_filename)
+                save_image_descriptions(image_descriptions)
+            
+            # Update titles
+            image_titles = load_image_titles()
+            if actual_old_filename in image_titles:
+                image_titles[actual_new_filename] = image_titles.pop(actual_old_filename)
+                save_image_titles(image_titles)
+            
+            # Update Shopify mappings
+            try:
+                db_path = '/data/lumaprints_pricing.db'
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                cursor.execute("UPDATE shopify_mappings SET image_filename = ? WHERE image_filename = ?", 
+                             (actual_new_filename, actual_old_filename))
+                conn.commit()
+                conn.close()
+                print(f"[RENAME] Updated Shopify mappings")
+            except Exception as db_error:
+                print(f"[RENAME] Warning: Could not update Shopify mappings: {db_error}")
+            
+            # Update featured image setting if this was the featured image
+            try:
+                if os.path.exists(FEATURED_FILE):
+                    with open(FEATURED_FILE, 'r') as f:
+                        featured_settings = json.load(f)
+                    if featured_settings.get('featured_image') == actual_old_filename:
+                        featured_settings['featured_image'] = actual_new_filename
+                        with open(FEATURED_FILE, 'w') as f:
+                            json.dump(featured_settings, f)
+                        print(f"[RENAME] Updated featured image setting")
+            except Exception as featured_error:
+                print(f"[RENAME] Warning: Could not update featured image: {featured_error}")
+            
+            # Update background image setting if this was the background
+            try:
+                if os.path.exists(ABOUT_FILE):
+                    with open(ABOUT_FILE, 'r') as f:
+                        about_settings = json.load(f)
+                    if about_settings.get('background_image') == actual_old_filename:
+                        about_settings['background_image'] = actual_new_filename
+                        with open(ABOUT_FILE, 'w') as f:
+                            json.dump(about_settings, f)
+                        print(f"[RENAME] Updated background image setting")
+            except Exception as about_error:
+                print(f"[RENAME] Warning: Could not update background image: {about_error}")
+            
+            # Use new filename for subsequent operations
+            filename = actual_new_filename
         
         # Update category assignment (multiple categories)
         categories = [cat.strip().lower() for cat in categories_input if cat.strip()]
