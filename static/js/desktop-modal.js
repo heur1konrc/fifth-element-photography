@@ -1,6 +1,10 @@
-// Global variables
-let allImages = [];
-let currentCategory = 'all';
+// Global variables (use existing if already declared by script.js)
+if (typeof allImages === 'undefined') {
+    var allImages = [];
+}
+if (typeof currentCategory === 'undefined') {
+    var currentCategory = 'all';
+}
 
 // DOM elements
 const imageGrid = document.getElementById('imageGrid');
