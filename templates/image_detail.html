@@ -102,8 +102,10 @@
     </style>
     
     <!-- Include Shopify and order form scripts -->
+    <script src="/static/js/script.js"></script>
     <script src="/static/js/shopify-config.js"></script>
     <script src="/static/js/shopify-integration.js"></script>
+    <script src="/static/js/modal-beta.js"></script>
     <script>
         // Initialize Shopify integration when page loads
         document.addEventListener('DOMContentLoaded', function() {
@@ -135,13 +137,31 @@
         });
         
         function openOrderForm(filename) {
-            // Use the openShopifyProductModal function from shopify-integration.js
-            if (typeof openShopifyProductModal === 'function') {
-                const imageUrl = '{{ image.url }}';
-                const imageTitle = window.currentImageTitle || '{{ image.title }}';
-                openShopifyProductModal(imageUrl, imageTitle);
+            // Use the same modal system as homepage (modal-beta.js)
+            if (typeof openModalBeta === 'function') {
+                const imageData = {
+                    filename: '{{ image.filename }}',
+                    title: '{{ image.title }}',
+                    url: '{{ image.url }}',
+                    category: '{{ image.category }}',
+                    description: {{ image.description|tojson if image.description else '""'|safe }},
+                    model: '{{ image.model if image.model else "" }}',
+                    lens: '{{ image.lens if image.lens else "" }}',
+                    aperture: '{{ image.aperture if image.aperture else "" }}',
+                    shutter_speed: '{{ image.shutter_speed if image.shutter_speed else "" }}',
+                    iso: '{{ image.iso if image.iso else "" }}',
+                    focal_length: '{{ image.focal_length if image.focal_length else "" }}'
+                };
+                openModalBeta(imageData);
+                // Automatically open the order form
+                setTimeout(() => {
+                    const orderBtn = document.querySelector('.btn-beta-order');
+                    if (orderBtn) {
+                        orderBtn.click();
+                    }
+                }, 500);
             } else {
-                console.error('openShopifyProductModal function not found');
+                console.error('openModalBeta function not found');
                 alert('Product not available for ordering. Please contact us.');
             }
         }
