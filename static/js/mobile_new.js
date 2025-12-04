@@ -734,11 +734,29 @@ function downloadImage() {
     }
 }
 
-// Share Image - Shows share menu
-function shareImage() {
-    const shareMenu = document.getElementById('shareMenu');
-    if (shareMenu) {
-        shareMenu.style.display = 'flex';
+// Copy Share URL - Copies photo URL to clipboard
+function copyShareUrl() {
+    if (currentImageData && currentImageData.url) {
+        const actualFilename = currentImageData.url.split('/').pop();
+        const photoUrl = `${window.location.origin}/photo/${actualFilename}`;
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(photoUrl).then(() => {
+            // Show success feedback
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ URL COPIED!';
+            btn.style.background = '#4CAF50';
+            
+            // Reset after 2 seconds
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+            }, 2000);
+        }).catch(err => {
+            // Fallback for older browsers
+            alert('Copy this URL: ' + photoUrl);
+        });
     }
 }
 

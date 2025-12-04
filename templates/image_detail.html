@@ -105,8 +105,13 @@
     <script src="/static/js/shopify-integration.js"></script>
     <script>
         function openOrderForm(filename) {
-            // Redirect to gallery with modal and order form open
-            window.location.href = '/?image=' + encodeURIComponent(filename) + '&order=true';
+            // Redirect to gallery with category, image, and order form open
+            const category = '{{ image.category if image.category else "" }}';
+            let url = '/?image=' + encodeURIComponent(filename) + '&order=true';
+            if (category) {
+                url = '/?category=' + encodeURIComponent(category) + '&image=' + encodeURIComponent(filename) + '&order=true';
+            }
+            window.location.href = url;
         }
     </script>
 </head>
