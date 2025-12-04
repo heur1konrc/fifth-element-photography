@@ -333,7 +333,7 @@ function updateOptionAvailability() {
 }
 
 // Select an option value
-function selectOption(optionIndex, value) {
+window.selectOption = function(optionIndex, value) {
     const badge = document.querySelector(`[data-option-index="${optionIndex}"][data-option-value="${value}"]`);
     
     // Don't allow selecting disabled options
@@ -457,7 +457,7 @@ function addToCart() {
 }
 
 // Close Shopify product modal
-function closeShopifyModal() {
+window.closeShopifyModal = function() {
     const modal = document.getElementById('shopify-product-modal');
     if (modal) {
         modal.remove();
