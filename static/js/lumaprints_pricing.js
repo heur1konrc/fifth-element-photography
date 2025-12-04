@@ -477,8 +477,11 @@ class LumaprintsPricing {
     }
 }
 
-// Initialize the pricing system
-const lumaprintsPricing = new LumaprintsPricing();
+// Initialize the pricing system (only if not already initialized)
+if (typeof window.lumaprintsPricing === 'undefined') {
+    window.lumaprintsPricing = new LumaprintsPricing();
+}
+const lumaprintsPricing = window.lumaprintsPricing;
 
 // Function to add print ordering to gallery modals
 function addPrintOrderingToModal(imageFilename, imageTitle, modalElement) {
