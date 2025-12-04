@@ -104,14 +104,61 @@
     <script src="/static/js/shopify-config.js"></script>
     <script src="/static/js/shopify-integration.js"></script>
     <script>
-        function openOrderForm(filename) {
-            // Redirect to gallery with category, image, and order form open
-            const category = '{{ image.category if image.category else "" }}';
-            let url = '/?image=' + encodeURIComponent(filename) + '&order=true';
-            if (category) {
-                url = '/?category=' + encodeURIComponent(category) + '&image=' + encodeURIComponent(filename) + '&order=true';
+        // Initialize Shopify integration when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load Shopify product for this image
+            const filename = '{{ image.filename }}';
+            const title = '{{ image.title }}';
+            
+            // Find or create Shopify product ID from mapping
+            if (typeof shopifyProductMappings !== 'undefined') {
+                const mapping = shopifyProductMappings[filename];
+                if (mapping) {
+                    window.currentShopifyProductId = mapping.product_id;
+                    window.currentImageTitle = title;
+                    window.currentImageFilename = filename;
+                }
             }
-            window.location.href = url;
+        });
+        
+        function openOrderForm(filename) {
+            // Open Shopify modal directly on this page
+            if (window.currentShopifyProductId) {
+                // Create modal if it doesn't exist
+                let modal = document.getElementById('shopifyOrderModal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'shopifyOrderModal';
+                    modal.className = 'modal-beta';
+                    modal.style.display = 'none';
+                    modal.innerHTML = `
+                        <div class="modal-beta-content" style="max-width: 800px; margin: 50px auto;">
+                            <span class="modal-beta-close" onclick="closeShopifyModal()">&times;</span>
+                            <h2 class="modal-beta-title">${window.currentImageTitle}</h2>
+                            <div id="shopifyProductContainer"></div>
+                        </div>
+                    `;
+                    document.body.appendChild(modal);
+                }
+                
+                // Load Shopify product
+                const container = document.getElementById('shopifyProductContainer');
+                if (container && typeof loadShopifyProduct === 'function') {
+                    loadShopifyProduct(window.currentShopifyProductId, container);
+                }
+                
+                // Show modal
+                modal.style.display = 'flex';
+            } else {
+                alert('Product not available for ordering. Please contact us.');
+            }
+        }
+        
+        function closeShopifyModal() {
+            const modal = document.getElementById('shopifyOrderModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
         }
     </script>
 </head>
