@@ -56,6 +56,10 @@ function closeModalBeta() {
     modalBeta.style.display = 'none';
     document.body.style.overflow = 'auto';
     currentImageDataBeta = null;
+    
+    // Remove any open share menus
+    const shareMenus = document.querySelectorAll('[data-share-menu]');
+    shareMenus.forEach(menu => menu.remove());
 }
 
 // Event listeners
@@ -101,6 +105,7 @@ document.getElementById('btnShare').onclick = function() {
     
     // Create share menu
     const shareMenu = document.createElement('div');
+    shareMenu.setAttribute('data-share-menu', 'true');
     shareMenu.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a1a; padding: 20px; border-radius: 8px; z-index: 10002; box-shadow: 0 4px 20px rgba(0,0,0,0.5);';
     shareMenu.innerHTML = `
         <h3 style="color: #fff; margin-bottom: 15px; font-family: Poppins, sans-serif;">Share on Social Media</h3>
