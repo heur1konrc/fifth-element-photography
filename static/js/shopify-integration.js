@@ -185,31 +185,34 @@ function showLoadingModal(title) {
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     
-    // Add event listener to close button with multiple methods
-    setTimeout(() => {
-        const closeBtn = document.querySelector('.shopify-modal-close');
-        if (closeBtn) {
-            // Method 1: Direct event listener
-            closeBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                window.closeShopifyModal();
-            });
-            
-            // Method 2: Set onclick property as backup
-            closeBtn.onclick = function(e) {
-                e.preventDefault();
-                window.closeShopifyModal();
-            };
+    // Attach close handlers immediately
+    const closeBtn = document.querySelector('.shopify-modal-close');
+    if (closeBtn) {
+        console.log('Attaching close button handler');
+        closeBtn.onclick = function() {
+            console.log('Close button clicked');
+            window.closeShopifyModal();
+            return false;
+        };
+    }
+    
+    // Click on backdrop to close
+    modal.onclick = function(e) {
+        if (e.target === modal) {
+            console.log('Backdrop clicked');
+            window.closeShopifyModal();
         }
-        
-        // Method 3: Click on backdrop to close
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                window.closeShopifyModal();
-            }
-        });
-    }, 100);
+    };
+    
+    // ESC key to close
+    const escHandler = function(e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            console.log('ESC key pressed');
+            window.closeShopifyModal();
+            document.removeEventListener('keydown', escHandler);
+        }
+    };
+    document.addEventListener('keydown', escHandler);
 }
 
 // Display product modal with badge-style variant selectors
