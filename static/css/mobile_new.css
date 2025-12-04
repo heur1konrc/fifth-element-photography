@@ -1178,3 +1178,171 @@ body.modal-open {
 .order-prints-btn:hover {
     background: #3367d6 !important;
 }
+
+/* Mobile Modal EXIF Data Styling */
+.modal-exif-section {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+}
+
+.exif-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.exif-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.exif-label {
+    font-size: 0.7rem;
+    color: #4a9eff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.exif-value {
+    font-size: 0.85rem;
+    color: #e0e0e0;
+    font-weight: normal;
+}
+
+/* Mobile Modal Description Section */
+.modal-description-section {
+    padding: 15px 0;
+    margin: 15px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-description-section .description-content {
+    color: #ccc;
+    line-height: 1.6;
+    font-size: 0.9rem;
+}
+
+/* Update Modal Actions for Multiple Buttons */
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.modal-actions button,
+.modal-actions a {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: block;
+}
+
+.view-highres-btn {
+    background: #4a9eff;
+    color: #fff;
+    border: 2px solid #4a9eff;
+}
+
+.view-highres-btn:hover {
+    background: #357ae8;
+    color: #fff;
+}
+
+.download-btn {
+    background: #4a9eff;
+    color: #fff;
+    border: 2px solid #4a9eff;
+}
+
+.download-btn:hover {
+    background: #357ae8;
+    color: #fff;
+}
+
+.order-prints-btn {
+    background: transparent;
+    color: #4a9eff;
+    border: 2px solid #4a9eff;
+}
+
+.order-prints-btn:hover {
+    background: #4a9eff;
+    color: #000;
+}
+
+.share-btn {
+    background: transparent;
+    color: #6799c2;
+    border: 2px solid #6799c2;
+}
+
+.share-btn:hover {
+    background: #6799c2;
+    color: #fff;
+}
+
+.coffee-btn {
+    background: #333;
+    color: #fff;
+    border: 2px solid #555;
+}
+
+.coffee-btn:hover {
+    background: #444;
+    border-color: #6799c2;
+}
+
+/* Social Share Menu */
+.share-menu {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #1a1a1a;
+    padding: 20px;
+    border-top: 2px solid #4a9eff;
+    z-index: 10002;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.share-option {
+    width: 100%;
+    padding: 15px;
+    background: transparent;
+    color: #4a9eff;
+    border: 2px solid #4a9eff;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.share-option:hover {
+    background: #4a9eff;
+    color: #000;
+}
+
+.share-cancel {
+    color: #999;
+    border-color: #666;
+}
+
+.share-cancel:hover {
+    background: #666;
+    color: #fff;
+}

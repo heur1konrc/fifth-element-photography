@@ -415,6 +415,9 @@ function showMobileMessage(message, type) {
 // Image Modal Functionality
 let currentImageCategory = '';
 
+// Store current image data globally for sharing and download
+let currentImageData = {};
+
 function openImageModal(galleryItem) {
     const modal = document.getElementById('imageModal');
     const modalImage = document.getElementById('modalImage');
@@ -425,15 +428,50 @@ function openImageModal(galleryItem) {
     const img = galleryItem.querySelector('.gallery-image');
     const title = galleryItem.getAttribute('data-image-title');
     const category = galleryItem.getAttribute('data-image-category');
+    const filename = galleryItem.getAttribute('data-image-filename');
+    const imageUrl = galleryItem.getAttribute('data-image-url');
+    const description = galleryItem.getAttribute('data-image-description');
     
-    // Store current category for filtering
+    // Get EXIF data
+    const exifModel = galleryItem.getAttribute('data-exif-model');
+    const exifLens = galleryItem.getAttribute('data-exif-lens');
+    const exifAperture = galleryItem.getAttribute('data-exif-aperture');
+    const exifShutter = galleryItem.getAttribute('data-exif-shutter');
+    const exifIso = galleryItem.getAttribute('data-exif-iso');
+    const exifFocal = galleryItem.getAttribute('data-exif-focal');
+    
+    // Store current category and image data for filtering and sharing
     currentImageCategory = category;
+    currentImageData = {
+        title: title,
+        filename: filename,
+        url: imageUrl,
+        description: description
+    };
     
     // Update modal content
     modalImage.src = img.src;
     modalImage.alt = img.alt;
     modalTitle.textContent = title || 'Untitled';
     modalCategory.textContent = category || 'Uncategorized';
+    
+    // Update EXIF data
+    document.getElementById('exifModel').textContent = exifModel;
+    document.getElementById('exifLens').textContent = exifLens;
+    document.getElementById('exifAperture').textContent = exifAperture;
+    document.getElementById('exifShutter').textContent = exifShutter;
+    document.getElementById('exifIso').textContent = exifIso;
+    document.getElementById('exifFocal').textContent = exifFocal;
+    
+    // Update description if available
+    const descriptionSection = document.getElementById('modalDescriptionSection');
+    const descriptionContent = document.getElementById('modalDescription');
+    if (description && description.trim() !== '') {
+        descriptionContent.innerHTML = description;
+        descriptionSection.style.display = 'block';
+    } else {
+        descriptionSection.style.display = 'none';
+    }
     
     // Show modal
     modal.style.display = 'block';
@@ -680,4 +718,77 @@ function closeImageModal() {
 // Legacy function for compatibility
 function openOrderForm() {
     showMobileOrderForm();
+}
+
+
+// View High Resolution - Opens image in new window
+function viewHighResolution() {
+    if (currentImageData && currentImageData.url) {
+        window.open(currentImageData.url, '_blank');
+    }
+}
+
+// Download Image - Triggers download of full size image
+function downloadImage() {
+    if (currentImageData && currentImageData.url && currentImageData.filename) {
+        const link = document.createElement('a');
+        link.href = currentImageData.url;
+        link.download = currentImageData.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// Share Image - Shows share menu
+function shareImage() {
+    const shareMenu = document.getElementById('shareMenu');
+    if (shareMenu) {
+        shareMenu.style.display = 'flex';
+    }
+}
+
+// Close Share Menu
+function closeShareMenu() {
+    const shareMenu = document.getElementById('shareMenu');
+    if (shareMenu) {
+        shareMenu.style.display = 'none';
+    }
+}
+
+// Share to Facebook
+function shareToFacebook() {
+    if (currentImageData && currentImageData.filename) {
+        // Extract actual filename from URL path (e.g., /images/dragonfly-on-gladiole-1a85efd5.jpeg)
+        const actualFilename = currentImageData.url.split('/').pop();
+        const photoUrl = `${window.location.origin}/photo/${actualFilename}`;
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(photoUrl)}`;
+        window.open(facebookUrl, '_blank', 'width=600,height=400');
+        closeShareMenu();
+    }
+}
+
+// Share to Twitter
+function shareToTwitter() {
+    if (currentImageData && currentImageData.filename) {
+        const actualFilename = currentImageData.url.split('/').pop();
+        const photoUrl = `${window.location.origin}/photo/${actualFilename}`;
+        const text = `Check out this photo: ${currentImageData.title}`;
+        const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(photoUrl)}&text=${encodeURIComponent(text)}`;
+        window.open(twitterUrl, '_blank', 'width=600,height=400');
+        closeShareMenu();
+    }
+}
+
+// Share to Pinterest
+function shareToPinterest() {
+    if (currentImageData && currentImageData.filename) {
+        const actualFilename = currentImageData.url.split('/').pop();
+        const photoUrl = `${window.location.origin}/photo/${actualFilename}`;
+        const imageUrl = `${window.location.origin}${currentImageData.url}`;
+        const description = currentImageData.description || currentImageData.title;
+        const pinterestUrl = `https://pinterest.com/pin/create/button/?url=${encodeURIComponent(photoUrl)}&media=${encodeURIComponent(imageUrl)}&description=${encodeURIComponent(description)}`;
+        window.open(pinterestUrl, '_blank', 'width=600,height=400');
+        closeShareMenu();
+    }
 }

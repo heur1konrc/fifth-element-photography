@@ -102,7 +102,20 @@
                 <div class="gallery-grid">
                     <!-- Gallery images from admin -->
                     {% for image in images %}
-                    <div class="gallery-item" data-image-id="{{ loop.index0 }}" data-image-title="{{ image.title or image.filename }}" data-image-category="{{ image.category or 'Uncategorized' }}" onclick="openImageModal(this)">
+                    <div class="gallery-item" 
+                         data-image-id="{{ loop.index0 }}" 
+                         data-image-title="{{ image.title or image.filename }}" 
+                         data-image-category="{{ image.category or 'Uncategorized' }}"
+                         data-image-filename="{{ image.filename }}"
+                         data-image-url="{{ url_for('serve_image', filename=image.filename) }}"
+                         data-image-description="{{ image.description|striptags if image.description else '' }}"
+                         data-exif-model="{{ image.model if image.model else 'Unavailable' }}"
+                         data-exif-lens="{{ image.lens if image.lens else 'Unavailable' }}"
+                         data-exif-aperture="{{ image.aperture if image.aperture else 'Unavailable' }}"
+                         data-exif-shutter="{{ image.shutter_speed if image.shutter_speed else 'Unavailable' }}"
+                         data-exif-iso="{{ image.iso if image.iso else 'Unavailable' }}"
+                         data-exif-focal="{{ image.focal_length if image.focal_length else 'Unavailable' }}"
+                         onclick="openImageModal(this)">
                         <img src="{{ url_for("serve_image", filename=image.filename) }}" alt="{{ image.title or image.filename }}" class="gallery-image">
                     </div>
                     {% endfor %}
@@ -258,15 +271,65 @@
             <div class="modal-info">
                 <div class="modal-title-section">
                     <div class="modal-title-row">
-                        
                         <span id="modalTitle" class="title-value">Image Title</span>
                         <span id="modalCategory" class="category-badge" onclick="filterByModalCategory()">Category</span>
                     </div>
                 </div>
-            <div class="modal-actions">
-                <button onclick="openOrderWizard()" class="order-prints-btn">ORDER PRINTS</button>
+                
+                <!-- EXIF Data Section -->
+                <div class="modal-exif-section" id="modalExifSection">
+                    <div class="exif-grid">
+                        <div class="exif-item">
+                            <span class="exif-label">MODEL:</span>
+                            <span class="exif-value" id="exifModel">Unavailable</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="exif-label">LENS:</span>
+                            <span class="exif-value" id="exifLens">Unavailable</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="exif-label">APERTURE:</span>
+                            <span class="exif-value" id="exifAperture">Unavailable</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="exif-label">SHUTTER:</span>
+                            <span class="exif-value" id="exifShutter">Unavailable</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="exif-label">ISO:</span>
+                            <span class="exif-value" id="exifIso">Unavailable</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="exif-label">FOCAL:</span>
+                            <span class="exif-value" id="exifFocal">Unavailable</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Description Section -->
+                <div class="modal-description-section" id="modalDescriptionSection" style="display: none;">
+                    <div class="description-content" id="modalDescription"></div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="modal-actions">
+                    <button onclick="viewHighResolution()" class="view-highres-btn">🔍 VIEW HIGH RESOLUTION</button>
+                    <button onclick="downloadImage()" class="download-btn">⬇️ DOWNLOAD FULL SIZE</button>
+                    <button onclick="openOrderWizard()" class="order-prints-btn">🛒 ORDER PRINTS</button>
+                    <button onclick="shareImage()" class="share-btn">📤 SHARE</button>
+                    <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" class="coffee-btn">☕ BUY ME A COFFEE</a>
+                </div>
+            </div>
+            
+            <!-- Social Share Menu (hidden by default) -->
+            <div class="share-menu" id="shareMenu" style="display: none;">
+                <button onclick="shareToFacebook()" class="share-option">📘 Facebook</button>
+                <button onclick="shareToTwitter()" class="share-option">🐦 Twitter</button>
+                <button onclick="shareToPinterest()" class="share-option">📌 Pinterest</button>
+                <button onclick="closeShareMenu()" class="share-option share-cancel">Cancel</button>
             </div>
         </div>
+    </div>
         
         <!-- Mobile Order Form Section (initially hidden) -->
         <div class="mobile-order-form" id="mobileOrderForm" style="display: none;">
