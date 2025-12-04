@@ -870,14 +870,26 @@ def featured():
                          featured_image=featured_image,
                          exif_data=exif_data)
 
-@app.route('/photo/<filename>')
+@app.route('/photo/<path:filename>')
 def image_detail(filename):
     """Individual image page with Open Graph meta tags for social sharing"""
+    from urllib.parse import unquote
+    
+    # URL decode the filename
+    filename = unquote(filename)
+    
+    print(f"[IMAGE_DETAIL] Looking for filename: {filename}")
+    
     images = scan_images()
     image = next((img for img in images if img['filename'] == filename), None)
     
     if not image:
+        print(f"[IMAGE_DETAIL] Image not found. Available images: {[img['filename'] for img in images[:5]]}")
         return redirect(url_for('index'))
+    
+    print(f"[IMAGE_DETAIL] Found image: {image['title']}")
+    print(f"[IMAGE_DETAIL] Image URL: {image.get('url', 'NO URL')}")
+    print(f"[IMAGE_DETAIL] Image dimensions: {image.get('width', 'NO WIDTH')}x{image.get('height', 'NO HEIGHT')}")
     
     # Check if image has Shopify product mapping
     has_shopify_product = False
