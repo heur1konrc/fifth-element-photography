@@ -181,14 +181,35 @@ function showLoadingModal(title) {
     `;
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-    document.getElementById('shopify-product-modal').style.display = 'flex';
+    const modal = document.getElementById('shopify-product-modal');
+    modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
     
-    // Add event listener to close button
-    const closeBtn = document.querySelector('.shopify-modal-close');
-    if (closeBtn) {
-        closeBtn.addEventListener('click', window.closeShopifyModal);
-    }
+    // Add event listener to close button with multiple methods
+    setTimeout(() => {
+        const closeBtn = document.querySelector('.shopify-modal-close');
+        if (closeBtn) {
+            // Method 1: Direct event listener
+            closeBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                window.closeShopifyModal();
+            });
+            
+            // Method 2: Set onclick property as backup
+            closeBtn.onclick = function(e) {
+                e.preventDefault();
+                window.closeShopifyModal();
+            };
+        }
+        
+        // Method 3: Click on backdrop to close
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                window.closeShopifyModal();
+            }
+        });
+    }, 100);
 }
 
 // Display product modal with badge-style variant selectors
