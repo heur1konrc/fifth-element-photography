@@ -1,4 +1,33 @@
-/* BETA MODAL STYLES */
+/* CRITICAL FIX: Override all bold text */
+.modal-beta-content,
+.modal-beta-content *,
+.modal-beta-layout,
+.modal-beta-layout *,
+body .modal-beta-content,
+body .modal-beta-content * {
+    font-weight: 400 !important;
+}
+
+/* Selectively apply bold only where needed */
+.modal-beta-title,
+body .modal-beta-title {
+    font-weight: 600 !important;
+}
+
+.exif-label,
+body .exif-label {
+    font-weight: 600 !important;
+}
+
+.modal-beta-description strong,
+body .modal-beta-description strong {
+    font-weight: 600 !important;
+}
+
+.btn-beta,
+body .btn-beta {
+    font-weight: 500 !important;
+}
 
 .modal-beta {
     display: none;
@@ -101,9 +130,8 @@
     font-size: 0.75rem;
     font-weight: 600;
     color: #4285f4;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
     margin-bottom: 5px;
+    letter-spacing: 0.5px;
 }
 
 .exif-value {
@@ -179,24 +207,23 @@
 }
 
 .btn-beta-coffee {
-    background: none;
-    color: #6799c2;
-    border: 1px solid #6799c2;
+    background: #333;
+    color: #fff;
     font-size: 1rem;
     padding: 15px 30px;
     margin-bottom: 30px;
     width: 100%;
-    text-transform: uppercase;
+    border: 2px solid #555;
 }
 
 .btn-beta-coffee:hover {
-    background: #6799c2;
-    color: #000;
-    transform: translateY(-2px);
+    background: #444;
+    border-color: #6799c2;
 }
 
 .modal-beta-logo {
-    text-align: right;
+    text-align: center;
+    margin-top: auto;
 }
 
 .modal-beta-logo img {
