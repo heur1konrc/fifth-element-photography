@@ -42,21 +42,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Handle image modal opening
     if (imageParam) {
+        console.log('Image parameter found:', imageParam);
         setTimeout(() => {
-            // Find the image in allImages array
-            const image = allImages.find(img => img.filename === imageParam);
+            console.log('All images loaded:', allImages.length);
+            // Find the image in allImages array (case-insensitive)
+            const image = allImages.find(img => {
+                const match = img.filename.toLowerCase() === imageParam.toLowerCase();
+                if (match) console.log('Found matching image:', img);
+                return match;
+            });
+            
             if (image) {
+                console.log('Opening modal for image:', image.filename);
                 openModalBeta(image);
                 
                 // If order parameter is present, open order form
                 if (orderParam === 'true') {
+                    console.log('Order parameter is true, opening order form');
                     setTimeout(() => {
                         const orderBtn = document.querySelector('.btn-beta-order');
                         if (orderBtn) {
+                            console.log('Clicking order button');
                             orderBtn.click();
+                        } else {
+                            console.log('Order button not found');
                         }
                     }, 1000);
                 }
+            } else {
+                console.log('Image not found in allImages array');
+                console.log('Available filenames:', allImages.map(img => img.filename));
             }
         }, 1000);
     }
