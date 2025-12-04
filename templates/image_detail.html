@@ -22,6 +22,11 @@
     <meta property="twitter:description" content="{{ (image.description|striptags)[:200] if image.description else 'Professional photography by Fifth Element Photography' }}">
     <meta property="twitter:image" content="{{ request.url_root.rstrip('/') }}{{ image.url }}">
     
+    <!-- Import Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Import modal-beta CSS -->
     <link rel="stylesheet" href="/static/css/modal-beta.css">
     
