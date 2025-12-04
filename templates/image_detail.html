@@ -110,23 +110,23 @@
             const filename = '{{ image.filename }}';
             const title = '{{ image.title }}';
             
-            // Wait for shopifyProductMappings to be available (with retry)
-            function initializeShopifyProduct(retries = 0) {
-                if (typeof shopifyProductMappings !== 'undefined') {
-                    const mapping = shopifyProductMappings[filename];
-                    if (mapping) {
-                        window.currentShopifyProductId = mapping.product_id;
+            // Wait for PRODUCT_MAPPING to be available (with retry)
+            async function initializeShopifyProduct(retries = 0) {
+                if (typeof PRODUCT_MAPPING !== 'undefined' && Object.keys(PRODUCT_MAPPING).length > 0) {
+                    const productHandle = PRODUCT_MAPPING[filename];
+                    if (productHandle) {
+                        window.currentShopifyProductId = productHandle;
                         window.currentImageTitle = title;
                         window.currentImageFilename = filename;
                         console.log('Shopify product initialized:', window.currentShopifyProductId);
                     } else {
                         console.warn('No Shopify mapping found for:', filename);
                     }
-                } else if (retries < 10) {
-                    // Retry after 100ms if mappings not loaded yet
-                    setTimeout(() => initializeShopifyProduct(retries + 1), 100);
+                } else if (retries < 20) {
+                    // Retry after 200ms if mappings not loaded yet (async API call)
+                    setTimeout(() => initializeShopifyProduct(retries + 1), 200);
                 } else {
-                    console.error('shopifyProductMappings not loaded after retries');
+                    console.error('PRODUCT_MAPPING not loaded after retries');
                 }
             }
             
