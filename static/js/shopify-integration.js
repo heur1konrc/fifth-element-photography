@@ -488,10 +488,16 @@ function addToCart() {
 
 // Close Shopify product modal
 window.closeShopifyModal = function() {
+    console.log('closeShopifyModal called');
     const modal = document.getElementById('shopify-product-modal');
+    console.log('Modal element:', modal);
     if (modal) {
+        console.log('Removing modal');
         modal.remove();
         document.body.style.overflow = 'auto';
+        console.log('Modal removed');
+    } else {
+        console.error('Modal element not found!');
     }
     
     // Clean up global state
