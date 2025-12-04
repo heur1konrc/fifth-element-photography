@@ -178,6 +178,23 @@
     transform: translateY(-2px);
 }
 
+.btn-beta-coffee {
+    background: none;
+    color: #6799c2;
+    border: 1px solid #6799c2;
+    font-size: 1rem;
+    padding: 15px 30px;
+    margin-bottom: 30px;
+    width: 100%;
+    text-transform: uppercase;
+}
+
+.btn-beta-coffee:hover {
+    background: #6799c2;
+    color: #000;
+    transform: translateY(-2px);
+}
+
 .modal-beta-logo {
     text-align: right;
 }

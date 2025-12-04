@@ -94,6 +94,18 @@
             background: #357ae8;
         }
         
+        .btn-coffee {
+            background: none;
+            color: #6799c2;
+            border: 1px solid #6799c2;
+            text-transform: uppercase;
+        }
+        
+        .btn-coffee:hover {
+            background: #6799c2;
+            color: #000;
+        }
+        
         .logo {
             margin-top: 50px;
             opacity: 0.7;
@@ -133,6 +145,7 @@
             {% if has_shopify_product %}
             <a href="#" onclick="openOrderForm('{{ image.filename }}'); return false;" class="btn btn-order">🖼️ ORDER PRINTS</a>
             {% endif %}
+            <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" class="btn btn-coffee">☕ BUY ME A COFFEE</a>
             <a href="{{ image.url }}" download="{{ image.filename }}" class="btn">Download Image</a>
         </div>
         
