@@ -15,6 +15,7 @@ from werkzeug.utils import secure_filename
 import uuid
 import hashlib
 import secrets
+from thumbnail_helper import generate_thumbnail_for_image
 
 # Lumaprints integration imports
 # REMOVED v2.0.0: from lumaprints_api import get_lumaprints_client, get_pricing_calculator
@@ -1325,6 +1326,13 @@ def upload_image():
         
         filepath = os.path.join(IMAGES_FOLDER, filename)
         file.save(filepath)
+        
+        # Generate thumbnail automatically
+        try:
+            generate_thumbnail_for_image(filename)
+        except Exception as thumb_error:
+            print(f"Warning: Failed to generate thumbnail for {filename}: {thumb_error}")
+        
         flash(f'Image "{filename}" uploaded successfully!')
     else:
         flash('Invalid file type. Please upload JPG, PNG, or GIF files.')
@@ -2032,6 +2040,13 @@ def upload_images_new():
                 
                 filepath = os.path.join(IMAGES_FOLDER, filename)
                 file.save(filepath)
+                
+                # Generate thumbnail automatically
+                try:
+                    generate_thumbnail_for_image(filename)
+                except Exception as thumb_error:
+                    print(f"Warning: Failed to generate thumbnail for {filename}: {thumb_error}")
+                
                 uploaded_files.append(filename)
             else:
                 failed_files.append(file.filename if file.filename else 'Unknown file')
