@@ -699,18 +699,27 @@ def index():
     og_description = "Professional photography with artistic vision and technical excellence"
     
     if category_param and category_param != 'all':
-        # Filter images by category to find first image
-        for img in images:
-            # Check all_categories field (new format) or category field (old format)
-            img_cats = img.get('all_categories', [])
-            if not img_cats:
-                # Fallback to single category field
-                img_cats = [img.get('category', '')]
-            if category_param in img_cats:
-                og_image = img
-                og_title = f"Fifth Element Photography - {category_param.title()} Gallery"
-                og_description = f"Explore {category_param} photography with artistic vision and technical excellence"
-                break
+        # Check if we have a static OG image for this category
+        og_image_path = f"/static/og-images/{category_param}.png"
+        static_og_path = os.path.join(os.path.dirname(__file__), f"static/og-images/{category_param}.png")
+        
+        if os.path.exists(static_og_path):
+            # Use static OG image for this category
+            og_image = {'url': og_image_path, 'title': f"{category_param.title()} Gallery"}
+        else:
+            # Fallback: try to find first image in category from persistent storage
+            for img in images:
+                # Check all_categories field (new format) or category field (old format)
+                img_cats = img.get('all_categories', [])
+                if not img_cats:
+                    # Fallback to single category field
+                    img_cats = [img.get('category', '')]
+                if category_param in img_cats:
+                    og_image = img
+                    break
+        
+        og_title = f"Fifth Element Photography - {category_param.title()} Gallery"
+        og_description = f"Explore {category_param} photography with artistic vision and technical excellence"
     
     # Get category counts (count images in all their assigned categories)
     category_counts = {}
