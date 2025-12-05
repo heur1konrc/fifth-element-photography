@@ -649,6 +649,11 @@ def scan_images():
             if isinstance(all_cats, str):
                 all_cats = [all_cats]
             
+            # Check if thumbnail exists for this image
+            thumb_filename = f"thumb_{filename}"
+            thumb_path = os.path.join(os.path.dirname(__file__), f"static/thumbnails/{thumb_filename}")
+            thumbnail_url = f'/static/thumbnails/{thumb_filename}' if os.path.exists(thumb_path) else None
+            
             images.append({
                 'filename': filename,
                 'title': title,
@@ -660,6 +665,7 @@ def scan_images():
                 'is_hero': is_hero,
                 'story': featured_story,
                 'url': f'/images/{filename}',
+                'thumbnail_url': thumbnail_url,
                 'width': info['width'],
                 'height': info['height'],
                 'display_order': display_order,

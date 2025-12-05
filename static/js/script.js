@@ -181,9 +181,11 @@ function displayImages(images) {
     const imageHTML = images.map((image, index) => {
         const sizeClass = getRandomSize();
         imageDataMap[index] = image; // Store full image data
+        // Use thumbnail if available, otherwise use full image
+        const displayUrl = image.thumbnail_url || image.url;
         return `
             <div class="image-item ${sizeClass}" onclick="openModal(${index})">
-                <img src="${image.url}" alt="${image.title}" loading="lazy">
+                <img src="${displayUrl}" alt="${image.title}" loading="lazy">
                 <div class="image-overlay">
                     <div class="image-title">${image.title}</div>
                     <div class="image-category">${image.category.toUpperCase()}</div>
