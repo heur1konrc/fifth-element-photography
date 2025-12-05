@@ -655,6 +655,14 @@ def scan_images():
             thumb_path = os.path.join(os.path.dirname(__file__), f"static/thumbnails/{thumb_filename}")
             thumbnail_url = f'/static/thumbnails/{thumb_filename}' if os.path.exists(thumb_path) else None
             
+            # Get EXIF data from database (instant retrieval)
+            exif_data = None
+            try:
+                from exif_db_helper import get_exif_from_db
+                exif_data = get_exif_from_db(filename)
+            except Exception as e:
+                print(f"Warning: Failed to get EXIF for {filename}: {e}")
+            
             images.append({
                 'filename': filename,
                 'title': title,
@@ -670,14 +678,13 @@ def scan_images():
                 'width': info['width'],
                 'height': info['height'],
                 'display_order': display_order,
-                # EXIF data removed from gallery scan for performance
-                # EXIF is extracted on-demand when viewing individual images
-                'model': None,
-                'lens': None,
-                'aperture': None,
-                'shutter_speed': None,
-                'iso': None,
-                'focal_length': None
+                # EXIF data loaded from database (instant, no file extraction)
+                'model': exif_data.get('model') if exif_data else None,
+                'lens': exif_data.get('lens') if exif_data else None,
+                'aperture': exif_data.get('aperture') if exif_data else None,
+                'shutter_speed': exif_data.get('shutter_speed') if exif_data else None,
+                'iso': exif_data.get('iso') if exif_data else None,
+                'focal_length': exif_data.get('focal_length') if exif_data else None
             })
     
     # Sort images by display_order if available, otherwise by filename
@@ -1344,6 +1351,14 @@ def upload_image():
             generate_thumbnail_for_image(filename)
         except Exception as thumb_error:
             print(f"Warning: Failed to generate thumbnail for {filename}: {thumb_error}")
+        
+        # Extract and store EXIF in database
+        try:
+            from exif_db_helper import store_exif_in_db
+            exif_data = extract_exif_data(filepath)
+            store_exif_in_db(filename, exif_data)
+        except Exception as exif_error:
+            print(f"Warning: Failed to store EXIF for {filename}: {exif_error}")
         
         flash(f'Image "{filename}" uploaded successfully!')
     else:
@@ -2061,6 +2076,14 @@ def upload_images_new():
                     generate_thumbnail_for_image(filename)
                 except Exception as thumb_error:
                     print(f"Warning: Failed to generate thumbnail for {filename}: {thumb_error}")
+                
+                # Extract and store EXIF in database
+                try:
+                    from exif_db_helper import store_exif_in_db
+                    exif_data = extract_exif_data(filepath)
+                    store_exif_in_db(filename, exif_data)
+                except Exception as exif_error:
+                    print(f"Warning: Failed to store EXIF for {filename}: {exif_error}")
                 
                 uploaded_files.append(filename)
             else:
@@ -4545,8 +4568,15 @@ def get_image_exif(filename):
             if dpi_value is not None:
                 dpi_value = float(dpi_value)
             
-            # Extract full EXIF data for camera settings
-            exif_data = extract_exif_data(image_path)
+            # Get EXIF data from database (instant retrieval)
+            from exif_db_helper import get_exif_from_db
+            exif_data = get_exif_from_db(filename)
+            
+            # If not in database, extract and store it
+            if not exif_data:
+                exif_data = extract_exif_data(image_path)
+                from exif_db_helper import store_exif_in_db
+                store_exif_in_db(filename, exif_data)
             
             return jsonify({
                 'success': True,
