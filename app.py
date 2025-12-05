@@ -633,9 +633,6 @@ def scan_images():
             # Get image info (skip network fetch during startup to prevent timeouts)
             info = get_image_info(filepath, skip_network_fetch=True)
             
-            # Extract EXIF data
-            exif_data = extract_exif_data(filepath)
-            
             # Load display order from metadata if available
             display_order = None
             metadata_file = os.path.join(IMAGES_FOLDER, f"{filename}.json")
@@ -666,13 +663,14 @@ def scan_images():
                 'width': info['width'],
                 'height': info['height'],
                 'display_order': display_order,
-                # EXIF data
-                'model': exif_data.get('model'),
-                'lens': exif_data.get('lens'),
-                'aperture': exif_data.get('aperture'),
-                'shutter_speed': exif_data.get('shutter_speed'),
-                'iso': exif_data.get('iso'),
-                'focal_length': exif_data.get('focal_length')
+                # EXIF data removed from gallery scan for performance
+                # EXIF is extracted on-demand when viewing individual images
+                'model': None,
+                'lens': None,
+                'aperture': None,
+                'shutter_speed': None,
+                'iso': None,
+                'focal_length': None
             })
     
     # Sort images by display_order if available, otherwise by filename
