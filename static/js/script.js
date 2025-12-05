@@ -540,6 +540,15 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault(); // Prevent default link behavior
             const category = this.getAttribute('data-category');
             
+            // Update URL with category parameter
+            const url = new URL(window.location);
+            if (category === 'all') {
+                url.searchParams.delete('category');
+            } else {
+                url.searchParams.set('category', category);
+            }
+            window.history.pushState({}, '', url);
+            
             // Update active link
             categoryLinks.forEach(l => l.classList.remove('active'));
             this.classList.add('active');
