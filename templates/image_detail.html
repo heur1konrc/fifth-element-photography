@@ -100,61 +100,153 @@
             font-weight: 600 !important;
         }
         
+        /* Single column layout for mobile-first design */
+        .modal-beta-single-column {
+            width: 100%;
+        }
+        
+        .modal-beta-all-actions {
+            margin: 20px 0;
+        }
+        
+        .modal-beta-all-actions .btn-beta {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 15px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        /* Collapsible sections */
+        .collapsible-section {
+            margin: 15px 0;
+            border: 1px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .collapsible-section summary {
+            padding: 15px;
+            background: #252525;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            user-select: none;
+            list-style: none;
+        }
+        
+        .collapsible-section summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .collapsible-section summary:hover {
+            background: #2a2a2a;
+        }
+        
+        .collapsible-section[open] summary {
+            border-bottom: 1px solid #333;
+        }
+        
+        .collapsible-section .modal-beta-exif,
+        .collapsible-section .modal-beta-description {
+            padding: 15px;
+            background: #1a1a1a;
+        }
+        
         /* Mobile responsive styles */
         @media (max-width: 768px) {
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+            }
+            
             body {
-                padding: 20px 15px;
+                padding: 10px;
             }
             
             .modal-beta-content {
-                padding: 20px;
+                padding: 10px;
+                width: 100%;
+                box-sizing: border-box;
             }
             
             .modal-beta-layout {
                 display: flex;
                 flex-direction: column;
+                width: 100%;
             }
             
             .modal-beta-left,
             .modal-beta-right {
                 width: 100%;
-                max-width: 100%;
+                box-sizing: border-box;
             }
             
             .modal-beta-title {
-                font-size: 1.5rem;
-                margin-bottom: 15px;
+                font-size: 1.3rem;
+                margin-bottom: 10px;
             }
             
             .modal-beta-image {
                 width: 100%;
                 height: auto;
                 border-radius: 8px;
-                margin-bottom: 20px;
+                margin-bottom: 15px;
             }
             
+            /* Compact EXIF - 2 columns */
             .modal-beta-exif {
-                margin-bottom: 20px;
+                margin-bottom: 15px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
             }
             
             .exif-item {
-                margin-bottom: 10px;
-                font-size: 0.9rem;
+                margin-bottom: 0;
+                font-size: 0.75rem;
+            }
+            
+            .exif-label {
+                font-size: 0.7rem;
+            }
+            
+            .exif-value {
+                font-size: 0.8rem;
             }
             
             .modal-beta-actions {
-                margin-bottom: 20px;
+                margin-bottom: 15px;
             }
             
-            .btn-beta {
-                font-size: 0.95rem;
-                padding: 12px 20px;
+            .modal-beta-actions .btn-beta {
+                font-size: 0.85rem;
+                padding: 10px;
+                margin-bottom: 8px;
             }
             
+            /* Scrollable description */
             .modal-beta-description {
-                font-size: 0.95rem;
-                line-height: 1.6;
-                margin-bottom: 20px;
+                font-size: 0.85rem;
+                line-height: 1.5;
+                margin-bottom: 15px;
+                max-height: 150px;
+                overflow-y: auto;
+            }
+            
+            .btn-view-gallery,
+            .btn-beta-order,
+            .btn-beta-coffee {
+                font-size: 0.9rem !important;
+                padding: 12px !important;
+                margin-bottom: 10px !important;
+            }
+            
+            .modal-beta-logo img {
+                max-width: 180px;
             }
         }
     </style>
@@ -209,61 +301,75 @@
 <body>
     <div class="modal-beta-content">
         <div class="modal-beta-layout">
-            <!-- Left Column: Image and EXIF -->
-            <div class="modal-beta-left">
+            <div class="modal-beta-single-column">
+                <!-- Title -->
                 <h2 class="modal-beta-title">{{ image.title }}</h2>
+                
+                <!-- Image -->
                 <img class="modal-beta-image" src="{{ image.url }}" alt="{{ image.title }}">
                 
-                <!-- EXIF Data -->
-                <div class="modal-beta-exif">
-                    <div class="exif-item">
-                        <span class="exif-label">MODEL:</span>
-                        <span class="exif-value">{{ image.model if image.model else 'Unavailable' }}</span>
-                    </div>
-                    <div class="exif-item">
-                        <span class="exif-label">LENS:</span>
-                        <span class="exif-value">{{ image.lens if image.lens else 'Unavailable' }}</span>
-                    </div>
-                    <div class="exif-item">
-                        <span class="exif-label">APERTURE:</span>
-                        <span class="exif-value">{{ image.aperture if image.aperture else 'Unavailable' }}</span>
-                    </div>
-                    <div class="exif-item">
-                        <span class="exif-label">SHUTTER SPEED:</span>
-                        <span class="exif-value">{{ image.shutter_speed if image.shutter_speed else 'Unavailable' }}</span>
-                    </div>
-                    <div class="exif-item">
-                        <span class="exif-label">ISO:</span>
-                        <span class="exif-value">{{ image.iso if image.iso else 'Unavailable' }}</span>
-                    </div>
-                    <div class="exif-item">
-                        <span class="exif-label">FOCAL LENGTH:</span>
-                        <span class="exif-value">{{ image.focal_length if image.focal_length else 'Unavailable' }}</span>
-                    </div>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="modal-beta-actions">
+                <!-- All Action Buttons (First Set) -->
+                <div class="modal-beta-all-actions">
                     <button class="btn-beta btn-beta-primary" onclick="window.open('{{ image.url }}', '_blank')">View High Resolution (New Window)</button>
                     <a href="{{ image.url }}" download="{{ image.filename }}" class="btn-beta btn-beta-primary" style="text-decoration: none; display: block; text-align: center;">Download Full Size Image</a>
+                    <a href="/?image={{ image.filename }}" class="btn-beta btn-beta-primary" style="text-decoration: none; display: block; text-align: center;">← View in Gallery</a>
+                    {% if has_shopify_product %}
+                    <button class="btn-beta btn-beta-order" onclick="openOrderForm('{{ image.filename }}')">🛒 ORDER PRINTS</button>
+                    {% endif %}
+                    <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" class="btn-beta btn-beta-coffee" style="text-decoration: none; display: block; text-align: center;">☕ BUY ME A COFFEE</a>
                 </div>
-            </div>
-            
-            <!-- Right Column: Description and Order Button -->
-            <div class="modal-beta-right">
+                
+                <!-- Collapsible EXIF Data -->
+                <details class="collapsible-section">
+                    <summary>📷 Camera Settings (EXIF)</summary>
+                    <div class="modal-beta-exif">
+                        <div class="exif-item">
+                            <span class="exif-label">MODEL:</span>
+                            <span class="exif-value">{{ image.model if image.model else 'Unavailable' }}</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="exif-label">LENS:</span>
+                            <span class="exif-value">{{ image.lens if image.lens else 'Unavailable' }}</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="exif-label">APERTURE:</span>
+                            <span class="exif-value">{{ image.aperture if image.aperture else 'Unavailable' }}</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="exif-label">SHUTTER SPEED:</span>
+                            <span class="exif-value">{{ image.shutter_speed if image.shutter_speed else 'Unavailable' }}</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="exif-label">ISO:</span>
+                            <span class="exif-value">{{ image.iso if image.iso else 'Unavailable' }}</span>
+                        </div>
+                        <div class="exif-item">
+                            <span class="exif-label">FOCAL LENGTH:</span>
+                            <span class="exif-value">{{ image.focal_length if image.focal_length else 'Unavailable' }}</span>
+                        </div>
+                    </div>
+                </details>
+                
+                <!-- Collapsible Description -->
                 {% if image.description %}
-                <div class="modal-beta-description">
-                    {{ image.description|safe }}
+                <details class="collapsible-section">
+                    <summary>📝 About This Image</summary>
+                    <div class="modal-beta-description">
+                        {{ image.description|safe }}
+                    </div>
+                </details>
+                {% endif %}
+                
+                <!-- All Action Buttons (Second Set) -->
+                <div class="modal-beta-all-actions">
+                    <button class="btn-beta btn-beta-primary" onclick="window.open('{{ image.url }}', '_blank')">View High Resolution (New Window)</button>
+                    <a href="{{ image.url }}" download="{{ image.filename }}" class="btn-beta btn-beta-primary" style="text-decoration: none; display: block; text-align: center;">Download Full Size Image</a>
+                    <a href="/?image={{ image.filename }}" class="btn-beta btn-beta-primary" style="text-decoration: none; display: block; text-align: center;">← View in Gallery</a>
+                    {% if has_shopify_product %}
+                    <button class="btn-beta btn-beta-order" onclick="openOrderForm('{{ image.filename }}')">🛒 ORDER PRINTS</button>
+                    {% endif %}
+                    <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" class="btn-beta btn-beta-coffee" style="text-decoration: none; display: block; text-align: center;">☕ BUY ME A COFFEE</a>
                 </div>
-                {% endif %}
-                
-                <a href="/?image={{ image.filename }}" class="btn-view-gallery">← View in Gallery</a>
-                
-                {% if has_shopify_product %}
-                <button class="btn-beta btn-beta-order" onclick="openOrderForm('{{ image.filename }}')">🛒 ORDER PRINTS</button>
-                {% endif %}
-                
-                <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" class="btn-beta btn-beta-coffee" style="text-decoration: none; display: block; text-align: center;">☕ BUY ME A COFFEE</a>
                 
                 <!-- Logo -->
                 <div class="modal-beta-logo">
