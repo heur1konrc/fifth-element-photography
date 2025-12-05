@@ -1232,3 +1232,386 @@ function analyzeImageFromModal(filename, title) {
 
 // Removed: Text formatting functions (replaced by Quill WYSIWYG editor)
 
+
+// ==================== LUMAPRINTS BULK MAPPING ====================
+
+const LumaprintsState = {
+    unmappedProducts: [],
+    availableImages: [],
+    selectedImage: null,
+    mappings: []
+};
+
+/**
+ * Open Lumaprints mapping modal
+ */
+function openLumaprintsModal() {
+    document.getElementById('lumaprints-modal').style.display = 'block';
+    // Reset to step 1
+    document.getElementById('lumaprints-step-1').style.display = 'block';
+    document.getElementById('lumaprints-step-2').style.display = 'none';
+    document.getElementById('lumaprints-step-3').style.display = 'none';
+}
+
+/**
+ * Close Lumaprints mapping modal
+ */
+function closeLumaprintsModal() {
+    document.getElementById('lumaprints-modal').style.display = 'none';
+}
+
+/**
+ * Upload and process Lumaprints Excel file
+ */
+async function uploadLumaprintsFile() {
+    const fileInput = document.getElementById('lumaprints-file-input');
+    const statusDiv = document.getElementById('lumaprints-upload-status');
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+        showAlert('Please select a file', 'warning');
+        return;
+    }
+    
+    const file = fileInput.files[0];
+    
+    if (!file.name.endsWith('.xlsx')) {
+        showAlert('File must be .xlsx format', 'error');
+        return;
+    }
+    
+    statusDiv.innerHTML = '<p>Uploading and processing...</p>';
+    
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        const response = await fetch('/api/lumaprints/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            LumaprintsState.unmappedProducts = data.unmapped_products;
+            statusDiv.innerHTML = `<p style="color: green;">✓ File processed! Found ${data.unmapped_count} unmapped products.</p>`;
+            
+            // Load available images
+            await loadLumaprintsImages();
+            
+            // Move to step 2
+            setTimeout(() => {
+                document.getElementById('lumaprints-step-1').style.display = 'none';
+                document.getElementById('lumaprints-step-2').style.display = 'block';
+                displayUnmappedProducts();
+            }, 1000);
+        } else {
+            statusDiv.innerHTML = `<p style="color: red;">✗ Error: ${data.error}</p>`;
+        }
+    } catch (error) {
+        statusDiv.innerHTML = `<p style="color: red;">✗ Error: ${error.message}</p>`;
+    }
+}
+
+/**
+ * Load available images with aspect ratios
+ */
+async function loadLumaprintsImages() {
+    try {
+        const response = await fetch('/api/lumaprints/images');
+        const data = await response.json();
+        
+        LumaprintsState.availableImages = data.images;
+    } catch (error) {
+        console.error('Error loading images:', error);
+    }
+}
+
+/**
+ * Display unmapped products
+ */
+function displayUnmappedProducts() {
+    const countElem = document.getElementById('lumaprints-unmapped-count');
+    const listElem = document.getElementById('lumaprints-products-list');
+    
+    countElem.textContent = `Found ${LumaprintsState.unmappedProducts.length} unmapped products.`;
+    
+    if (LumaprintsState.unmappedProducts.length === 0) {
+        listElem.innerHTML = '<p>No unmapped products found!</p>';
+        return;
+    }
+    
+    // Initialize mapping rows with first row
+    initializeMappingRows();
+    
+    // Show first 10 products as preview
+    const preview = LumaprintsState.unmappedProducts.slice(0, 10);
+    listElem.innerHTML = `
+        <h4>Preview (first 10 products):</h4>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f0f0f0;">
+                    <th style="padding: 8px; border: 1px solid #ddd;">Title</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Size</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Product Type</th>
+                    <th style="padding: 8px; border: 1px solid #ddd;">Existing Filename</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${preview.map(p => `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${p.product_name || 'N/A'}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${p.size || 'N/A'}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${p.option1 || 'N/A'}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${p.existing_filename || 'None'}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        ${LumaprintsState.unmappedProducts.length > 10 ? `<p style="margin-top: 10px; font-style: italic;">... and ${LumaprintsState.unmappedProducts.length - 10} more products</p>` : ''}
+    `;
+}
+
+/**
+ * Get unique product titles from unmapped products
+ */
+function getUniqueProductTitles() {
+    const titles = new Set();
+    LumaprintsState.unmappedProducts.forEach(p => {
+        if (p.product_name) {
+            titles.add(p.product_name);
+        }
+    });
+    return Array.from(titles).sort();
+}
+
+/**
+ * Initialize mapping rows with first empty row
+ */
+function initializeMappingRows() {
+    const container = document.getElementById('lumaprints-mapping-rows');
+    container.innerHTML = '';
+    addMappingRow();
+}
+
+/**
+ * Add a new mapping row
+ */
+function addMappingRow() {
+    const container = document.getElementById('lumaprints-mapping-rows');
+    const rowIndex = container.children.length;
+    const titles = getUniqueProductTitles();
+    
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'mapping-row';
+    rowDiv.style.cssText = 'margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: white;';
+    rowDiv.dataset.rowIndex = rowIndex;
+    
+    rowDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong>Mapping #${rowIndex + 1}</strong>
+            ${rowIndex > 0 ? `<button class="btn btn-small btn-danger" onclick="removeMappingRow(${rowIndex})">Remove</button>` : ''}
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div>
+                <label>Product Title:</label>
+                <select class="mapping-title-select" style="width: 100%; padding: 8px; margin-top: 5px;">
+                    <option value="">-- Select Title --</option>
+                    ${titles.map(t => `<option value="${t}">${t}</option>`).join('')}
+                </select>
+            </div>
+            <div>
+                <label>Image Filename:</label>
+                <input type="text" class="mapping-filename-input" placeholder="e.g., image.jpg" style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+            <div>
+                <label>Aspect Ratio:</label>
+                <select class="mapping-aspect-select" style="width: 100%; padding: 8px; margin-top: 5px;">
+                    <option value="3:2">3:2 (Landscape)</option>
+                    <option value="2:3">2:3 (Portrait)</option>
+                    <option value="1:1">1:1 (Square)</option>
+                </select>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(rowDiv);
+}
+
+/**
+ * Remove a mapping row
+ */
+function removeMappingRow(rowIndex) {
+    const container = document.getElementById('lumaprints-mapping-rows');
+    const row = container.querySelector(`[data-row-index="${rowIndex}"]`);
+    if (row) {
+        row.remove();
+        // Renumber remaining rows
+        renumberMappingRows();
+    }
+}
+
+/**
+ * Renumber mapping rows after removal
+ */
+function renumberMappingRows() {
+    const container = document.getElementById('lumaprints-mapping-rows');
+    const rows = container.querySelectorAll('.mapping-row');
+    rows.forEach((row, index) => {
+        row.dataset.rowIndex = index;
+        row.querySelector('strong').textContent = `Mapping #${index + 1}`;
+        
+        // Update data attributes
+        row.querySelectorAll('[data-row-index]').forEach(elem => {
+            elem.dataset.rowIndex = index;
+        });
+    });
+}
+
+/**
+ * Apply mapping to all unmapped products
+ * Applies ALL product types (Canvas + all Art Paper types) at once
+ */
+async function applyLumaprintsMapping() {
+    // Collect all mapping rows
+    const container = document.getElementById('lumaprints-mapping-rows');
+    const rows = container.querySelectorAll('.mapping-row');
+    
+    // Validate and collect mappings
+    const userMappings = [];
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const titleSelect = row.querySelector('.mapping-title-select');
+        const filenameInput = row.querySelector('.mapping-filename-input');
+        const aspectSelect = row.querySelector('.mapping-aspect-select');
+        
+        const title = titleSelect.value;
+        const filename = filenameInput.value.trim();
+        const aspectRatio = aspectSelect.value;
+        
+        if (!title) {
+            showAlert(`Mapping #${i + 1}: Please select a product title`, 'warning');
+            return;
+        }
+        
+        if (!filename) {
+            showAlert(`Mapping #${i + 1}: Please enter an image filename`, 'warning');
+            return;
+        }
+        
+        userMappings.push({
+            title: title,
+            filename: filename,
+            aspectRatio: aspectRatio
+        });
+    }
+    
+    if (userMappings.length === 0) {
+        showAlert('Please add at least one mapping', 'warning');
+        return;
+    }
+    
+    // Build mappings for products
+    const mappings = [];
+    
+    for (const product of LumaprintsState.unmappedProducts) {
+        // Find matching user mapping by title
+        const userMapping = userMappings.find(m => m.title === product.product_name);
+        
+        if (!userMapping) {
+            // Skip products that don't have a mapping
+            continue;
+        }
+        
+        const filename = userMapping.filename;
+        const width = product.width || 12;
+        const length = product.length || 18;
+        const productType = product.option1 || '';
+        
+        // Determine product type
+        let subcategory = '';
+        let options = [];
+        
+        if (productType.includes('Canvas')) {
+            subcategory = '0.75in Stretched Canvas';
+            options = [
+                ['Canvas Border', 'Mirror Wrap'],
+                ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
+                ['Canvas Finish', 'Semi-Glossy']
+            ];
+        } else if (productType.includes('Hot Press')) {
+            subcategory = 'Hot Press Fine Art Paper';
+            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
+        } else if (productType.includes('Semi-Glossy')) {
+            subcategory = 'Semi-Glossy Fine Art Paper';
+            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
+        } else if (productType.includes('Glossy')) {
+            subcategory = 'Glossy Fine Art Paper';
+            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
+        } else {
+            // Default to canvas
+            subcategory = '0.75in Stretched Canvas';
+            options = [
+                ['Canvas Border', 'Mirror Wrap'],
+                ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
+                ['Canvas Finish', 'Semi-Glossy']
+            ];
+        }
+        
+        mappings.push({
+            row: product.row,
+            data: {
+                product_handling: 'Update',
+                image_filename: filename,
+                subcategory: subcategory,
+                width: width,
+                length: length,
+                options: options
+            }
+        });
+    }
+    
+    // Send mappings to backend
+    try {
+        const response = await fetch('/api/lumaprints/apply-mapping', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ mappings: mappings })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert(`✓ Successfully mapped ${data.mapped_count} products!`, 'success');
+            
+            // Move to step 3
+            document.getElementById('lumaprints-step-2').style.display = 'none';
+            document.getElementById('lumaprints-step-3').style.display = 'block';
+            document.getElementById('lumaprints-mapped-count').textContent = data.mapped_count;
+        } else {
+            showAlert('Error applying mapping: ' + data.error, 'error');
+        }
+    } catch (error) {
+        showAlert('Error: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Download mapped Excel file
+ */
+function downloadLumaprintsFile() {
+    window.location.href = '/api/lumaprints/download';
+}
+
+// Event listeners for Lumaprints buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const btnUpload = document.getElementById('btn-lumaprints-upload');
+    const btnAddRow = document.getElementById('btn-add-mapping-row');
+    const btnApply = document.getElementById('btn-lumaprints-apply-all');
+    const btnDownload = document.getElementById('btn-lumaprints-download');
+    
+    if (btnUpload) btnUpload.addEventListener('click', uploadLumaprintsFile);
+    if (btnAddRow) btnAddRow.addEventListener('click', addMappingRow);
+    if (btnApply) btnApply.addEventListener('click', applyLumaprintsMapping);
+    if (btnDownload) btnDownload.addEventListener('click', downloadLumaprintsFile);
+});

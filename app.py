@@ -4646,3 +4646,146 @@ def migrate_shopify_table():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+
+
+# ==================== LUMAPRINTS BULK MAPPING ROUTES ====================
+
+@app.route('/api/lumaprints/upload', methods=['POST'])
+@require_admin_auth
+def lumaprints_upload():
+    """Upload Lumaprints Excel file for processing"""
+    import lumaprints_mapper as lm
+    
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        if not file.filename.endswith('.xlsx'):
+            return jsonify({'error': 'File must be .xlsx format'}), 400
+        
+        # Save uploaded file temporarily
+        temp_path = os.path.join('/tmp', 'lumaprints_upload.xlsx')
+        file.save(temp_path)
+        
+        # Load and process
+        wb, ws = lm.load_excel(temp_path)
+        
+        # Sort by Column A (keeping header)
+        lm.sort_by_column_a(ws)
+        
+        # Get unmapped products
+        unmapped = lm.get_unmapped_products(ws)
+        
+        # Save sorted workbook
+        sorted_path = os.path.join('/tmp', 'lumaprints_sorted.xlsx')
+        lm.save_excel(wb, sorted_path)
+        
+        return jsonify({
+            'success': True,
+            'unmapped_count': len(unmapped),
+            'unmapped_products': unmapped[:50]  # Limit to first 50 for display
+        })
+    
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Lumaprints upload error: {error_details}")
+        return jsonify({'error': str(e), 'details': error_details}), 500
+
+
+@app.route('/api/lumaprints/images')
+@require_admin_auth
+def lumaprints_get_images():
+    """Get available images from loaded Excel file"""
+    import lumaprints_mapper as lm
+    
+    try:
+        # Load the sorted workbook
+        sorted_path = os.path.join('/tmp', 'lumaprints_sorted.xlsx')
+        if not os.path.exists(sorted_path):
+            return jsonify({'error': 'No Excel file loaded. Please upload first.'}), 400
+        
+        wb, ws = lm.load_excel(sorted_path)
+        images = lm.get_available_images(ws)
+        return jsonify({'images': images})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/lumaprints/apply-mapping', methods=['POST'])
+@require_admin_auth
+def lumaprints_apply_mapping():
+    """Apply mapping to products"""
+    import lumaprints_mapper as lm
+    
+    try:
+        data = request.json
+        mappings = data.get('mappings', [])
+        
+        if not mappings:
+            return jsonify({'error': 'No mappings provided'}), 400
+        
+        # Load sorted workbook
+        sorted_path = os.path.join('/tmp', 'lumaprints_sorted.xlsx')
+        if not os.path.exists(sorted_path):
+            return jsonify({'error': 'No Excel file loaded. Please upload first.'}), 400
+        
+        wb, ws = lm.load_excel(sorted_path)
+        
+        # Apply each mapping
+        processed_rows = []
+        skipped_rows = []
+        
+        for i, mapping in enumerate(mappings):
+            row = mapping.get('row')
+            mapping_data = mapping.get('data')
+            
+            print(f"Processing mapping {i+1}/{len(mappings)}: row={row}, has_data={bool(mapping_data)}")
+            
+            if row and mapping_data:
+                lm.apply_mapping(ws, row, mapping_data)
+                processed_rows.append(row)
+                print(f"  ✓ Applied mapping to row {row}")
+            else:
+                skipped_rows.append({'index': i, 'row': row, 'has_data': bool(mapping_data)})
+                print(f"  ✗ Skipped mapping {i}: row={row}, has_data={bool(mapping_data)}")
+        
+        print(f"\nSummary: Processed {len(processed_rows)} rows, Skipped {len(skipped_rows)} rows")
+        
+        # Save updated workbook
+        output_path = os.path.join('/tmp', 'lumaprints_mapped.xlsx')
+        lm.save_excel(wb, output_path)
+        
+        return jsonify({
+            'success': True,
+            'mapped_count': len(mappings),
+            'download_ready': True
+        })
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/lumaprints/download')
+@require_admin_auth
+def lumaprints_download():
+    """Download mapped Excel file"""
+    try:
+        output_path = os.path.join('/tmp', 'lumaprints_mapped.xlsx')
+        
+        if not os.path.exists(output_path):
+            return jsonify({'error': 'No mapped file available'}), 404
+        
+        return send_file(
+            output_path,
+            as_attachment=True,
+            download_name='lumaprints_mapped.xlsx',
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
