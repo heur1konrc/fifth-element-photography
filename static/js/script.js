@@ -91,9 +91,26 @@ async function loadImages() {
             // Initialize pagination
             initPagination();
             
-            // Display all images initially with pagination
-            displayImagesWithPagination(allImages);
-            updateImageCount(allImages.length);
+            // Check for category parameter and filter if present
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryParam = urlParams.get('category');
+            
+            if (categoryParam) {
+                // Filter images by category
+                filterImages(categoryParam);
+                // Update active category link
+                const categoryLinks = document.querySelectorAll('.category-link');
+                categoryLinks.forEach(link => {
+                    if (link.getAttribute('data-category') === categoryParam) {
+                        categoryLinks.forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                    }
+                });
+            } else {
+                // Display all images initially with pagination
+                displayImagesWithPagination(allImages);
+                updateImageCount(allImages.length);
+            }
         } else {
             imageGrid.innerHTML = '<div class="loading">No images found in /data directory</div>';
         }
