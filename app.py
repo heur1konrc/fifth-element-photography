@@ -1767,7 +1767,10 @@ def edit_image(filename):
                             <i class="fas fa-search"></i> Analyze Image
                         </button>
                         <a href="/images/{filename}" download="{filename}" class="btn btn-success btn-small" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                            <i class="fas fa-download"></i> Download Image
+                            <i class="fas fa-download"></i> High-res Download
+                        </a>
+                        <a href="/admin/download-thumbnail/{filename}" download="thumb_{filename}" class="btn btn-info btn-small" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-image"></i> Thumbnail Download
                         </a>
                     </div>
                 </div>
@@ -2870,6 +2873,32 @@ def download_image(filename):
         
     except Exception as e:
         return f"Error downloading image: {str(e)}", 500
+
+@app.route('/admin/download-thumbnail/<filename>')
+@require_admin_auth
+def download_thumbnail(filename):
+    """Download thumbnail version of image"""
+    try:
+        # Security check - ensure filename is safe
+        if not filename or '..' in filename or '/' in filename:
+            return "Invalid filename", 400
+        
+        # Construct thumbnail path
+        thumb_filename = f"thumb_{filename}"
+        thumb_path = os.path.join('static', 'thumbnails', thumb_filename)
+        
+        if os.path.exists(thumb_path):
+            return send_from_directory(
+                os.path.join('static', 'thumbnails'),
+                thumb_filename,
+                as_attachment=True,
+                download_name=thumb_filename
+            )
+        else:
+            return "Thumbnail not found", 404
+            
+    except Exception as e:
+        return f"Error downloading thumbnail: {str(e)}", 500
 
 @app.route('/admin/download-highres/<filename>')
 @require_admin_auth
