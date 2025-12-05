@@ -188,9 +188,7 @@ function showLoadingModal(title) {
     // Attach close handlers immediately
     const closeBtn = document.querySelector('.shopify-modal-close');
     if (closeBtn) {
-        console.log('Attaching close button handler');
         closeBtn.onclick = function() {
-            console.log('Close button clicked');
             window.closeShopifyModal();
             return false;
         };
@@ -199,7 +197,6 @@ function showLoadingModal(title) {
     // Click on backdrop to close
     modal.onclick = function(e) {
         if (e.target === modal) {
-            console.log('Backdrop clicked');
             window.closeShopifyModal();
         }
     };
@@ -207,7 +204,6 @@ function showLoadingModal(title) {
     // ESC key to close
     const escHandler = function(e) {
         if (e.key === 'Escape' || e.keyCode === 27) {
-            console.log('ESC key pressed');
             window.closeShopifyModal();
             document.removeEventListener('keydown', escHandler);
         }
@@ -488,16 +484,10 @@ function addToCart() {
 
 // Close Shopify product modal
 window.closeShopifyModal = function() {
-    console.log('closeShopifyModal called');
     const modal = document.getElementById('shopify-product-modal');
-    console.log('Modal element:', modal);
     if (modal) {
-        console.log('Removing modal');
         modal.remove();
         document.body.style.overflow = 'auto';
-        console.log('Modal removed');
-    } else {
-        console.error('Modal element not found!');
     }
     
     // Clean up global state
