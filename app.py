@@ -700,11 +700,12 @@ def index():
     
     if category_param and category_param != 'all':
         # Filter images by category to find first image
-        image_categories = load_image_categories()
         for img in images:
-            img_cats = image_categories.get(img['filename'], [])
-            if isinstance(img_cats, str):
-                img_cats = [img_cats]
+            # Check all_categories field (new format) or category field (old format)
+            img_cats = img.get('all_categories', [])
+            if not img_cats:
+                # Fallback to single category field
+                img_cats = [img.get('category', '')]
             if category_param in img_cats:
                 og_image = img
                 og_title = f"Fifth Element Photography - {category_param.title()} Gallery"
