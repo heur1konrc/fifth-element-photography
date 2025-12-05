@@ -351,6 +351,24 @@ function setupEventListeners() {
             
             const section = this.getAttribute('data-section');
             
+            // Special handling for HOME link - reset category filter
+            if (section === 'home') {
+                const url = new URL(window.location);
+                url.searchParams.delete('category');
+                window.history.pushState({}, '', url);
+                
+                // Reset to ALL category
+                const categoryLinks = document.querySelectorAll('.category-link');
+                const allCategoryLink = document.querySelector('.category-link[data-category="all"]');
+                if (allCategoryLink) {
+                    categoryLinks.forEach(l => l.classList.remove('active'));
+                    allCategoryLink.classList.add('active');
+                }
+                
+                // Filter to show all images
+                filterImages('all');
+            }
+            
             // Update active nav link
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             this.classList.add('active');
@@ -557,27 +575,6 @@ document.addEventListener('DOMContentLoaded', function() {
             filterImages(category);
         });
     });
-    
-    // Add event listener for HOME link
-    const homeLink = document.querySelector('.nav-link[data-section="home"]');
-    if (homeLink) {
-        homeLink.addEventListener('click', function(e) {
-            // Clear category filter and URL parameter
-            const url = new URL(window.location);
-            url.searchParams.delete('category');
-            window.history.pushState({}, '', url);
-            
-            // Reset to ALL category
-            const allCategoryLink = document.querySelector('.category-link[data-category="all"]');
-            if (allCategoryLink) {
-                categoryLinks.forEach(l => l.classList.remove('active'));
-                allCategoryLink.classList.add('active');
-            }
-            
-            // Filter to show all images
-            filterImages('all');
-        });
-    }
 });
 
 
