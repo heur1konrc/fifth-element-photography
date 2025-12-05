@@ -557,6 +557,27 @@ document.addEventListener('DOMContentLoaded', function() {
             filterImages(category);
         });
     });
+    
+    // Add event listener for HOME link
+    const homeLink = document.querySelector('.nav-link[data-section="home"]');
+    if (homeLink) {
+        homeLink.addEventListener('click', function(e) {
+            // Clear category filter and URL parameter
+            const url = new URL(window.location);
+            url.searchParams.delete('category');
+            window.history.pushState({}, '', url);
+            
+            // Reset to ALL category
+            const allCategoryLink = document.querySelector('.category-link[data-category="all"]');
+            if (allCategoryLink) {
+                categoryLinks.forEach(l => l.classList.remove('active'));
+                allCategoryLink.classList.add('active');
+            }
+            
+            // Filter to show all images
+            filterImages('all');
+        });
+    }
 });
 
 
