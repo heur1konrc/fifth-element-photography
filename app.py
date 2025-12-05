@@ -692,6 +692,25 @@ def index():
     images = scan_images()
     categories = sorted(load_categories())
     
+    # Check for category parameter for Open Graph tags
+    category_param = request.args.get('category')
+    og_image = None
+    og_title = "Fifth Element Photography - Featured Image of the Week"
+    og_description = "Professional photography with artistic vision and technical excellence"
+    
+    if category_param and category_param != 'all':
+        # Filter images by category to find first image
+        image_categories = load_image_categories()
+        for img in images:
+            img_cats = image_categories.get(img['filename'], [])
+            if isinstance(img_cats, str):
+                img_cats = [img_cats]
+            if category_param in img_cats:
+                og_image = img
+                og_title = f"Fifth Element Photography - {category_param.title()} Gallery"
+                og_description = f"Explore {category_param} photography with artistic vision and technical excellence"
+                break
+    
     # Get category counts (count images in all their assigned categories)
     category_counts = {}
     image_categories = load_image_categories()
@@ -765,7 +784,10 @@ def index():
                              featured_image=featured_image,
                              featured_exif=featured_exif,
                              about_data=about_data,
-                             hero_image=hero_image)
+                             hero_image=hero_image,
+                             og_image=og_image,
+                             og_title=og_title,
+                             og_description=og_description)
     else:
         # Desktop users get the original template (unchanged)
         return render_template('index.html', 
@@ -775,7 +797,10 @@ def index():
                              featured_image=featured_image,
                              featured_exif=featured_exif,
                              about_data=about_data,
-                             hero_image=hero_image)
+                             hero_image=hero_image,
+                             og_image=og_image,
+                             og_title=og_title,
+                             og_description=og_description)
 
 @app.route('/mobile')
 def mobile_gallery():

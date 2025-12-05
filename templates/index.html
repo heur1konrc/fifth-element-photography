@@ -6,23 +6,23 @@
     <title>Fifth Element Photography - Capturing the Quintessence</title>
     
     <!-- Open Graph Meta Tags for Social Sharing -->
-    <meta property="og:title" content="Fifth Element Photography - Featured Image of the Week">
-    <meta property="og:description" content="Professional photography with artistic vision and technical excellence">
+    <meta property="og:title" content="{{ og_title }}">
+    <meta property="og:description" content="{{ og_description }}">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://fifth-element-photography-production.up.railway.app/#featured">
+    <meta property="og:url" content="https://fifthelement.photos{{ request.full_path if request.query_string else request.path }}">
     
-    
-    <meta property="og:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}">
-    <meta property="og:image:alt" content="{{ featured_image.title if featured_image else "No Featured Image" }}">
+    {% set og_image_url = og_image.url if og_image else (featured_image.url if featured_image else "/static/images/placeholder.jpg") %}
+    <meta property="og:image" content="https://fifthelement.photos{{ og_image_url }}">
+    <meta property="og:image:alt" content="{{ og_image.title if og_image else (featured_image.title if featured_image else 'No Featured Image') }}">
     
     <meta property="og:site_name" content="Fifth Element Photography">
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Fifth Element Photography - Featured Image of the Week">
-    <meta name="twitter:description" content="Professional photography with artistic vision and technical excellence">
+    <meta name="twitter:title" content="{{ og_title }}">
+    <meta name="twitter:description" content="{{ og_description }}">
     
-    <meta name="twitter:image" content="https://fifth-element-photography-production.up.railway.app{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}">
+    <meta name="twitter:image" content="https://fifthelement.photos{{ og_image_url }}">
     
     
     <link rel="stylesheet" href="/static/css/style.css?v=20250101-001">
