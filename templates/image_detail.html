@@ -314,7 +314,7 @@
                     <a href="{{ image.url }}" download="{{ image.filename }}" class="btn-beta btn-beta-primary" style="text-decoration: none; display: block; text-align: center;">Download Full Size Image</a>
                     <a href="/?image={{ image.filename }}" class="btn-beta btn-beta-primary" style="text-decoration: none; display: block; text-align: center;">← View in Gallery</a>
                     {% if has_shopify_product %}
-                    <button class="btn-beta btn-beta-order" onclick="openOrderForm('{{ image.filename }}')">🛒 ORDER PRINTS</button>
+                    <button class="btn-beta btn-beta-order" onclick="openShopifyProductModal('{{ image.url }}', '{{ image.title }}')">🛒 ORDER PRINTS</button>
                     {% endif %}
                     <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" class="btn-beta btn-beta-coffee" style="text-decoration: none; display: block; text-align: center;">☕ BUY ME A COFFEE</a>
                 </div>
@@ -366,7 +366,7 @@
                     <a href="{{ image.url }}" download="{{ image.filename }}" class="btn-beta btn-beta-primary" style="text-decoration: none; display: block; text-align: center;">Download Full Size Image</a>
                     <a href="/?image={{ image.filename }}" class="btn-beta btn-beta-primary" style="text-decoration: none; display: block; text-align: center;">← View in Gallery</a>
                     {% if has_shopify_product %}
-                    <button class="btn-beta btn-beta-order" onclick="openOrderForm('{{ image.filename }}')">🛒 ORDER PRINTS</button>
+                    <button class="btn-beta btn-beta-order" onclick="openShopifyProductModal('{{ image.url }}', '{{ image.title }}')">🛒 ORDER PRINTS</button>
                     {% endif %}
                     <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" class="btn-beta btn-beta-coffee" style="text-decoration: none; display: block; text-align: center;">☕ BUY ME A COFFEE</a>
                 </div>
