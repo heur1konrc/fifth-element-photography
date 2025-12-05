@@ -99,6 +99,64 @@
         .modal-beta-description strong {
             font-weight: 600 !important;
         }
+        
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px;
+            }
+            
+            .modal-beta-content {
+                padding: 20px;
+            }
+            
+            .modal-beta-layout {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .modal-beta-left,
+            .modal-beta-right {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .modal-beta-title {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+            
+            .modal-beta-image {
+                width: 100%;
+                height: auto;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+            
+            .modal-beta-exif {
+                margin-bottom: 20px;
+            }
+            
+            .exif-item {
+                margin-bottom: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .modal-beta-actions {
+                margin-bottom: 20px;
+            }
+            
+            .btn-beta {
+                font-size: 0.95rem;
+                padding: 12px 20px;
+            }
+            
+            .modal-beta-description {
+                font-size: 0.95rem;
+                line-height: 1.6;
+                margin-bottom: 20px;
+            }
+        }
     </style>
     
     <!-- Include Shopify and order form scripts -->
