@@ -4545,12 +4545,21 @@ def get_image_exif(filename):
             if dpi_value is not None:
                 dpi_value = float(dpi_value)
             
+            # Extract full EXIF data for camera settings
+            exif_data = extract_exif_data(image_path)
+            
             return jsonify({
                 'success': True,
                 'width': width,
                 'height': height,
                 'dpi': dpi_value,
-                'format': img.format
+                'format': img.format,
+                'model': exif_data.get('model'),
+                'lens': exif_data.get('lens'),
+                'aperture': exif_data.get('aperture'),
+                'shutter_speed': exif_data.get('shutter_speed'),
+                'iso': exif_data.get('iso'),
+                'focal_length': exif_data.get('focal_length')
             })
             
     except Exception as e:

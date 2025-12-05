@@ -18,13 +18,44 @@ function openModalBeta(imageData) {
     document.getElementById('modalBetaImage').src = imageData.url || '';
     document.getElementById('modalBetaImage').alt = imageData.title || 'Image';
     
-    // Populate EXIF data (using same field names as featured image)
-    document.getElementById('exifModel').textContent = imageData.model || 'Unavailable';
-    document.getElementById('exifLens').textContent = imageData.lens || 'Unavailable';
-    document.getElementById('exifAperture').textContent = imageData.aperture || 'Unavailable';
-    document.getElementById('exifShutter').textContent = imageData.shutter_speed || 'Unavailable';
-    document.getElementById('exifISO').textContent = imageData.iso || 'Unavailable';
-    document.getElementById('exifFocal').textContent = imageData.focal_length || 'Unavailable';
+    // Set EXIF to "Loading..." initially
+    document.getElementById('exifModel').textContent = 'Loading...';
+    document.getElementById('exifLens').textContent = 'Loading...';
+    document.getElementById('exifAperture').textContent = 'Loading...';
+    document.getElementById('exifShutter').textContent = 'Loading...';
+    document.getElementById('exifISO').textContent = 'Loading...';
+    document.getElementById('exifFocal').textContent = 'Loading...';
+    
+    // Fetch EXIF data from API
+    fetch(`/api/image/exif/${imageData.filename}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('exifModel').textContent = data.model || 'Unavailable';
+                document.getElementById('exifLens').textContent = data.lens || 'Unavailable';
+                document.getElementById('exifAperture').textContent = data.aperture || 'Unavailable';
+                document.getElementById('exifShutter').textContent = data.shutter_speed || 'Unavailable';
+                document.getElementById('exifISO').textContent = data.iso || 'Unavailable';
+                document.getElementById('exifFocal').textContent = data.focal_length || 'Unavailable';
+            } else {
+                // If API fails, set to Unavailable
+                document.getElementById('exifModel').textContent = 'Unavailable';
+                document.getElementById('exifLens').textContent = 'Unavailable';
+                document.getElementById('exifAperture').textContent = 'Unavailable';
+                document.getElementById('exifShutter').textContent = 'Unavailable';
+                document.getElementById('exifISO').textContent = 'Unavailable';
+                document.getElementById('exifFocal').textContent = 'Unavailable';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching EXIF:', error);
+            document.getElementById('exifModel').textContent = 'Unavailable';
+            document.getElementById('exifLens').textContent = 'Unavailable';
+            document.getElementById('exifAperture').textContent = 'Unavailable';
+            document.getElementById('exifShutter').textContent = 'Unavailable';
+            document.getElementById('exifISO').textContent = 'Unavailable';
+            document.getElementById('exifFocal').textContent = 'Unavailable';
+        });
     
     // Populate description
     const descriptionDiv = document.getElementById('modalBetaDescription');
