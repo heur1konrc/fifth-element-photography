@@ -116,7 +116,7 @@
                          data-exif-iso="{{ image.iso if image.iso else 'Unavailable' }}"
                          data-exif-focal="{{ image.focal_length if image.focal_length else 'Unavailable' }}"
                          onclick="openImageModal(this)">
-                        <img src="{{ url_for("serve_image", filename=image.filename) }}" alt="{{ image.title or image.filename }}" class="gallery-image">
+                         <img src="{{ url_for('get_thumbnail', filename=image.filename) }}" alt="{{ image.title or image.filename }}" class="gallery-image">
                     </div>
                     {% endfor %}
                 </div>

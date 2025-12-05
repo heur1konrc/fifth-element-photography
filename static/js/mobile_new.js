@@ -249,6 +249,17 @@ function initCategoriesCarousel() {
             const category = btn.dataset.category;
             filterGallery(category);
             
+            // Update URL with category parameter
+            if (category === 'all') {
+                // Remove category parameter for 'all'
+                window.history.pushState({}, '', window.location.pathname);
+            } else {
+                // Add category parameter
+                const url = new URL(window.location);
+                url.searchParams.set('category', category);
+                window.history.pushState({}, '', url);
+            }
+            
             // Scroll to gallery section
             const gallerySection = document.querySelector('.gallery-section');
             if (gallerySection) {
