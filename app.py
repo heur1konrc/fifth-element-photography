@@ -931,6 +931,18 @@ def image_detail(filename):
     print(f"[IMAGE_DETAIL] Image URL: {image.get('url', 'NO URL')}")
     print(f"[IMAGE_DETAIL] Image dimensions: {image.get('width', 'NO WIDTH')}x{image.get('height', 'NO HEIGHT')}")
     
+    # Extract EXIF data on-demand for detail view
+    filepath = os.path.join(IMAGES_FOLDER, filename)
+    if os.path.exists(filepath):
+        exif_data = extract_exif_data(filepath)
+        # Update image dict with fresh EXIF data
+        image['model'] = exif_data.get('model')
+        image['lens'] = exif_data.get('lens')
+        image['aperture'] = exif_data.get('aperture')
+        image['shutter_speed'] = exif_data.get('shutter_speed')
+        image['iso'] = exif_data.get('iso')
+        image['focal_length'] = exif_data.get('focal_length')
+    
     # Check if image has Shopify product mapping
     has_shopify_product = False
     try:
