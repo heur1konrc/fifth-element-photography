@@ -6,6 +6,29 @@ document.addEventListener('DOMContentLoaded', function() {
     initActionButtons();
     initCategoriesCarousel();
     initMobileContactForm();
+    
+    // Check for URL parameters and filter gallery
+    const urlParams = new URLSearchParams(window.location.search);
+    const categoryParam = urlParams.get('category');
+    
+    if (categoryParam) {
+        console.log('Category parameter found:', categoryParam);
+        // Wait for images to load, then filter
+        setTimeout(() => {
+            // Find and activate the category button
+            const categoryBtns = document.querySelectorAll('.category-btn');
+            categoryBtns.forEach(btn => {
+                if (btn.dataset.category === categoryParam) {
+                    // Remove active from all buttons
+                    categoryBtns.forEach(b => b.classList.remove('active'));
+                    // Add active to matching button
+                    btn.classList.add('active');
+                }
+            });
+            // Filter the gallery
+            filterGallery(categoryParam);
+        }, 500);
+    }
 });
 
 // Mobile Navigation Toggle
