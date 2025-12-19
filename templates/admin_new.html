@@ -143,6 +143,10 @@
                             <i class="fas fa-shopping-cart"></i>
                             Shopify Product Mapping
                         </a>
+                        <button class="btn btn-success" onclick="openShopifyCSVModal()">
+                            <i class="fas fa-file-csv"></i>
+                            Generate Shopify CSV
+                        </button>
                         <button class="btn btn-warning" onclick="openLumaprintsModal()">
                             <i class="fas fa-file-excel"></i>
                             Lumaprints Bulk Mapping
@@ -586,6 +590,45 @@
                         <span class="legend-item poor">Poor (&lt;150 DPI)</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shopify CSV Generator Modal -->
+    <div id="shopify-csv-modal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>📋 Generate Shopify Product CSV</h2>
+                <button class="modal-close" onclick="closeShopifyCSVModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="shopify-csv-content">
+                    <h3>Select Images to Generate Products</h3>
+                    <p>Select one or more images below. The tool will automatically detect aspect ratios and generate Shopify product CSVs with correct pricing.</p>
+                    
+                    <div style="margin: 20px 0; padding: 15px; background: #e3f2fd; border-radius: 4px;">
+                        <strong>What this generates:</strong>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li>Fine Art Paper products (Hot Press, Semi-glossy, Glossy)</li>
+                            <li>Canvas products (0.75" Stretched Canvas)</li>
+                            <li>All size variants based on aspect ratio</li>
+                            <li>Prices calculated from your current pricing database</li>
+                        </ul>
+                    </div>
+
+                    <div id="shopify-csv-image-list" style="max-height: 400px; overflow-y: auto; margin: 20px 0; padding: 15px; background: #f9f9f9; border-radius: 4px;">
+                        <!-- Image checkboxes will be populated here -->
+                    </div>
+
+                    <div style="margin-top: 20px;">
+                        <button id="btn-shopify-csv-generate" class="btn btn-success btn-large">📥 Generate & Download CSV</button>
+                    </div>
+
+                    <div id="shopify-csv-status" style="margin-top: 15px;"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeShopifyCSVModal()">Close</button>
             </div>
         </div>
     </div>
