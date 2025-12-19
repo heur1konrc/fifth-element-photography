@@ -708,7 +708,12 @@ def scan_images():
 
 @app.route('/')
 def index():
-    """Main portfolio page"""
+    """Main homepage with carousel"""
+    return render_template('index_new.html')
+
+@app.route('/portfolio')
+def portfolio():
+    """Full portfolio page (old layout)"""
     images = scan_images()
     categories = sorted(load_categories())
     
