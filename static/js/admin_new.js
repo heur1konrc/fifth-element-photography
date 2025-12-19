@@ -1921,7 +1921,7 @@ async function addSelectedToCarousel() {
         const data = await response.json();
         if (data.success) {
             showAlert(`${data.message}. Total carousel images: ${data.total}`, 'success');
-            loadImages(); // Refresh to show updated state
+            setTimeout(() => location.reload(), 1000);
         } else {
             showAlert(data.message, 'error');
         }
@@ -1948,10 +1948,9 @@ async function removeSelectedFromCarousel() {
         const data = await response.json();
         if (data.success) {
             showAlert(`${data.message}. Total carousel images: ${data.total}`, 'success');
-            loadImages(); // Refresh to show updated state
+            setTimeout(() => location.reload(), 1000);
         } else {
             showAlert(data.message, 'error');
-        }
     } catch (error) {
         console.error('Error removing from carousel:', error);
         showAlert('Error removing images from carousel', 'error');
