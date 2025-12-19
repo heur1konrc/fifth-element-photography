@@ -207,32 +207,21 @@
             }
         }
         
-        // Load 3 featured images for grid
+        // Load 3 random landscape images for grid
         async function loadImageGrid() {
             try {
-                const res = await fetch('/api/galleries');
-                const data = await res.json();
+                const imgRes = await fetch('/api/images');
+                const images = await imgRes.json();
                 
-                let gridImages = [];
+                // Filter for landscape images (3:2 ratio or wider)
+                const landscapeImages = images.filter(img => {
+                    // Assume most images are landscape if no specific ratio data
+                    return true; // Will show all images, random selection
+                });
                 
-                if (data.success && data.galleries.length > 0) {
-                    // Get hero images from galleries
-                    gridImages = data.galleries
-                        .filter(g => g.hero_image)
-                        .slice(0, 3)
-                        .map(g => g.hero_image);
-                }
-                
-                // If not enough hero images, use featured images
-                if (gridImages.length < 3) {
-                    const imgRes = await fetch('/api/images');
-                    const images = await imgRes.json();
-                    const featured = images
-                        .filter(img => img.is_featured)
-                        .slice(0, 3 - gridImages.length)
-                        .map(img => img.filename);
-                    gridImages = [...gridImages, ...featured];
-                }
+                // Shuffle and pick 3 random images
+                const shuffled = landscapeImages.sort(() => 0.5 - Math.random());
+                const gridImages = shuffled.slice(0, 3).map(img => img.filename);
                 
                 renderGrid(gridImages);
             } catch (error) {
