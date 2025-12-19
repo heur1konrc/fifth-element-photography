@@ -181,6 +181,29 @@ def create_shopify_product():
                     'inventory_management': 'shopify'
                 })
             
+            # Prepare image for upload
+            image_path = os.path.join(IMAGES_FOLDER, filename)
+            image_attachment = None
+            
+            # Check if image exists and is under 20MB
+            if os.path.exists(image_path):
+                file_size_mb = os.path.getsize(image_path) / (1024 * 1024)
+                if file_size_mb <= 20:
+                    # Read image and encode as base64
+                    import base64
+                    with open(image_path, 'rb') as img_file:
+                        image_data = base64.b64encode(img_file.read()).decode('utf-8')
+                        image_attachment = {
+                            'attachment': image_data,
+                            'filename': filename
+                        }
+                else:
+                    errors.append(f"{filename}: Image size ({file_size_mb:.1f}MB) exceeds 20MB limit")
+                    continue
+            else:
+                errors.append(f"{filename}: Image file not found")
+                continue
+            
             # Create product via Shopify API
             product_data = {
                 'product': {
@@ -193,7 +216,8 @@ def create_shopify_product():
                         {'name': 'Printed Product', 'values': list(product_types)},
                         {'name': 'Size', 'values': list(sizes)}
                     ],
-                    'variants': variants
+                    'variants': variants,
+                    'images': [image_attachment] if image_attachment else []
                 }
             }
             
