@@ -35,6 +35,20 @@ def slugify(text):
     text = re.sub(r'[-\s]+', '-', text)
     return text.strip('-')
 
+def map_product_type_to_shopify(db_product_type):
+    """Map database product type names to Shopify product type names for mapping compatibility"""
+    mapping = {
+        'Hot Press Fine Art Paper': 'Hot Press (recommended for photos)',
+        'Cold Press Fine Art Paper': 'Hot Press (recommended for photos)',  # Map to same as Hot Press
+        'Semi-Glossy Fine Art Paper': 'Semi-glossy',
+        'Glossy Fine Art Paper': 'Glossy',
+        '0.75" Stretched Canvas': 'Canvas',
+        '1.25" Stretched Canvas': 'Canvas',
+        '1.50" Stretched Canvas': 'Canvas',
+        'Rolled Canvas': 'Canvas'
+    }
+    return mapping.get(db_product_type, db_product_type)
+
 def detect_aspect_ratio(image_filename):
     """Detect aspect ratio from image file"""
     from PIL import Image
@@ -118,13 +132,14 @@ def generate_shopify_csv():
             if not pricing_data:
                 continue
             
-            # Group by product type
+            # Group by product type and map to Shopify names
             product_types = {}
             for row in pricing_data:
-                prod_type = row['product_type']
-                if prod_type not in product_types:
-                    product_types[prod_type] = []
-                product_types[prod_type].append({
+                db_prod_type = row['product_type']
+                shopify_prod_type = map_product_type_to_shopify(db_prod_type)
+                if shopify_prod_type not in product_types:
+                    product_types[shopify_prod_type] = []
+                product_types[shopify_prod_type].append({
                     'size': row['size_name'],
                     'cost': row['cost_price'],
                     'price': round(row['cost_price'] * markup_multiplier, 2)
