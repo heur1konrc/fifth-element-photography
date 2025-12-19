@@ -124,7 +124,14 @@ def generate_shopify_csv():
                 WHERE bp.is_available = TRUE
                 AND ar.display_name = ?
                 AND pc.display_name IN ('Canvas', 'Fine Art Paper')
-                ORDER BY pc.display_order, ps.display_order, pz.width, pz.height
+                ORDER BY 
+                    CASE pc.display_name 
+                        WHEN 'Fine Art Paper' THEN 1 
+                        WHEN 'Canvas' THEN 2 
+                    END,
+                    ps.display_order, 
+                    pz.width, 
+                    pz.height
             """, (aspect_ratio,))
             
             pricing_data = cursor.fetchall()
