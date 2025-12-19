@@ -75,6 +75,10 @@
             background: rgba(255,255,255,0.1);
             color: white;
         }
+        .form-group select option {
+            background: #2a3f5f;
+            color: white;
+        }
         .image-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -227,10 +231,25 @@
             const grid = document.getElementById('imageGrid');
             grid.innerHTML = allImages.map(img => `
                 <div class="image-item ${selectedImages.has(img.filename) ? 'selected' : ''}" 
-                     onclick="toggleImage('${img.filename}')">
+                     data-filename="${img.filename}" 
+                     style="cursor: pointer;">
                     <img src="/thumbnail/${img.filename}" alt="${img.title}">
                 </div>
             `).join('');
+            
+            // Add click handlers
+            document.querySelectorAll('.image-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const filename = this.dataset.filename;
+                    if (selectedImages.has(filename)) {
+                        selectedImages.delete(filename);
+                        this.classList.remove('selected');
+                    } else {
+                        selectedImages.add(filename);
+                        this.classList.add('selected');
+                    }
+                });
+            });
             
             document.getElementById('imagesModal').style.display = 'block';
         }
