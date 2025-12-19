@@ -37,11 +37,13 @@ from routes.setup_pricing import setup_pricing_bp
 from routes.shopify_admin import shopify_admin_bp
 from routes.shopify_csv_generator import shopify_csv_bp
 from routes.shopify_api_creator import shopify_api_creator_bp
+from routes.shopify_status_api import shopify_status_api_bp
 app.register_blueprint(pricing_admin_bp)
 app.register_blueprint(setup_pricing_bp)
 app.register_blueprint(shopify_admin_bp)
 app.register_blueprint(shopify_csv_bp)
 app.register_blueprint(shopify_api_creator_bp)
+app.register_blueprint(shopify_status_api_bp)
 
 # Initialize database if it doesn't exist
 def ensure_database_exists():

@@ -193,6 +193,18 @@ def create_shopify_product():
             
             if response.status_code == 201:
                 created_products.append(title)
+                
+                # Extract Shopify product ID from response
+                response_data = response.json()
+                shopify_product_id = str(response_data['product']['id'])
+                
+                # Save to database for tracking
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT OR REPLACE INTO shopify_products (image_filename, shopify_product_id, shopify_handle)
+                    VALUES (?, ?, ?)
+                """, (filename, shopify_product_id, handle))
+                conn.commit()
             else:
                 error_msg = f"{title}: HTTP {response.status_code} - {response.text}"
                 print(f"ERROR: {error_msg}")

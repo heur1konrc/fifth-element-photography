@@ -1723,3 +1723,87 @@ async function createShopifyProductsViaAPI() {
         showAlert('Error creating products. Please try again.', 'error');
     }
 }
+
+
+// ===== SHOPIFY STATUS FILTER =====
+
+let shopifyStatusData = {};
+let currentShopifyFilter = 'all';
+
+// Load Shopify status for all images
+async function loadShopifyStatus() {
+    try {
+        const response = await fetch('/api/images/shopify-status');
+        const result = await response.json();
+        
+        if (result.success) {
+            // Build lookup map
+            shopifyStatusData = {};
+            result.images.forEach(img => {
+                shopifyStatusData[img.filename] = img.in_shopify;
+            });
+            
+            // Update filter stats
+            updateFilterStats(result.images);
+            
+            // Apply current filter
+            applyShopifyFilter();
+        }
+    } catch (error) {
+        console.error('Error loading Shopify status:', error);
+    }
+}
+
+// Update filter statistics
+function updateFilterStats(images) {
+    const inShopify = images.filter(img => img.in_shopify).length;
+    const notInShopify = images.filter(img => !img.in_shopify).length;
+    const total = images.length;
+    
+    const statsEl = document.getElementById('filterStats');
+    if (statsEl) {
+        statsEl.textContent = `Total: ${total} | In Shopify: ${inShopify} | Not in Shopify: ${notInShopify}`;
+    }
+}
+
+// Apply Shopify filter to image grid
+function applyShopifyFilter() {
+    const filterSelect = document.getElementById('shopifyFilter');
+    if (!filterSelect) return;
+    
+    currentShopifyFilter = filterSelect.value;
+    
+    // Get all image cards
+    const imageCards = document.querySelectorAll('.image-card');
+    
+    imageCards.forEach(card => {
+        const filename = card.querySelector('.image-title')?.textContent?.trim();
+        if (!filename) return;
+        
+        const inShopify = shopifyStatusData[filename] || false;
+        
+        // Apply filter
+        if (currentShopifyFilter === 'all') {
+            card.style.display = '';
+        } else if (currentShopifyFilter === 'in_shopify') {
+            card.style.display = inShopify ? '' : 'none';
+        } else if (currentShopifyFilter === 'not_in_shopify') {
+            card.style.display = !inShopify ? '' : 'none';
+        }
+    });
+}
+
+// Load Shopify status on page load
+document.addEventListener('DOMContentLoaded', () => {
+    loadShopifyStatus();
+});
+
+// Reload Shopify status after creating products
+const originalCreateShopifyProductsViaAPI = window.createShopifyProductsViaAPI;
+if (typeof originalCreateShopifyProductsViaAPI === 'function') {
+    window.createShopifyProductsViaAPI = async function() {
+        await originalCreateShopifyProductsViaAPI();
+        // Reload status after creation
+        setTimeout(() => loadShopifyStatus(), 1000);
+    };
+}
