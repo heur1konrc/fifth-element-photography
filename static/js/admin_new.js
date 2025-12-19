@@ -1777,7 +1777,7 @@ function applyShopifyFilter() {
     const imageCards = document.querySelectorAll('.image-card');
     
     imageCards.forEach(card => {
-        const filename = card.querySelector('.image-title')?.textContent?.trim();
+        const filename = card.dataset.filename;
         if (!filename) return;
         
         const inShopify = shopifyStatusData[filename] || false;
