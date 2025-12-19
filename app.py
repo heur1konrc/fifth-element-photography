@@ -4795,3 +4795,49 @@ def lumaprints_download():
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/images/size-report')
+@require_admin_auth
+def image_size_report():
+    """Generate report of all image files with their sizes in MB"""
+    try:
+        images_data = []
+        
+        if os.path.exists(IMAGES_FOLDER):
+            for filename in os.listdir(IMAGES_FOLDER):
+                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+                    filepath = os.path.join(IMAGES_FOLDER, filename)
+                    if os.path.isfile(filepath):
+                        size_bytes = os.path.getsize(filepath)
+                        size_mb = size_bytes / (1024 * 1024)  # Convert to MB
+                        images_data.append({
+                            'filename': filename,
+                            'size_mb': round(size_mb, 2),
+                            'size_bytes': size_bytes
+                        })
+        
+        # Sort by size descending
+        images_data.sort(key=lambda x: x['size_bytes'], reverse=True)
+        
+        # Calculate statistics
+        total_images = len(images_data)
+        total_size_mb = sum(img['size_mb'] for img in images_data)
+        avg_size_mb = total_size_mb / total_images if total_images > 0 else 0
+        over_5mb = len([img for img in images_data if img['size_mb'] > 5])
+        over_10mb = len([img for img in images_data if img['size_mb'] > 10])
+        
+        return jsonify({
+            'success': True,
+            'images': images_data,
+            'statistics': {
+                'total_images': total_images,
+                'total_size_mb': round(total_size_mb, 2),
+                'average_size_mb': round(avg_size_mb, 2),
+                'over_5mb': over_5mb,
+                'over_10mb': over_10mb
+            }
+        })
+    
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
