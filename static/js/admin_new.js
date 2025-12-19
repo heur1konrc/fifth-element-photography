@@ -1668,3 +1668,50 @@ async function generateShopifyCSVFromSelected() {
         showAlert('Error generating CSV. Please try again.', 'error');
     }
 }
+
+
+// ============================================================================
+// SHOPIFY API PRODUCT CREATOR
+// ============================================================================
+
+async function createShopifyProductsViaAPI() {
+    const selectedImages = getSelectedImages();
+    
+    if (selectedImages.length === 0) {
+        showAlert('Please select at least one image using the checkboxes.', 'warning');
+        return;
+    }
+    
+    showAlert(`Creating ${selectedImages.length} Shopify product(s) via API...`, 'info');
+    
+    try {
+        const response = await fetch('/api/shopify/create-product', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                images: selectedImages.map(filename => ({
+                    filename: filename,
+                    title: filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
+                    description: ''
+                }))
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            let message = `✓ Successfully created ${result.created.length} product(s)!`;
+            if (result.errors.length > 0) {
+                message += `\n\nErrors:\n${result.errors.join('\n')}`;
+            }
+            showAlert(message, result.errors.length > 0 ? 'warning' : 'success');
+        } else {
+            showAlert(`Error: ${result.error || 'Failed to create products'}`, 'error');
+        }
+    } catch (error) {
+        console.error('Error creating products:', error);
+        showAlert('Error creating products. Please try again.', 'error');
+    }
+}
