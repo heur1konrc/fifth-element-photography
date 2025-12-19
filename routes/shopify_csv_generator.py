@@ -39,7 +39,7 @@ def map_product_type_to_shopify(db_product_type):
     """Map database product type names to Shopify product type names for mapping compatibility"""
     mapping = {
         'Hot Press Fine Art Paper': 'Hot Press (recommended for photos)',
-        'Cold Press Fine Art Paper': 'Hot Press (recommended for photos)',  # Map to same as Hot Press
+        'Cold Press Fine Art Paper': None,  # Exclude Cold Press - not used in Shopify
         'Semi-Glossy Fine Art Paper': 'Semi-glossy',
         'Glossy Fine Art Paper': 'Glossy',
         '0.75" Stretched Canvas': 'Canvas',
@@ -144,6 +144,9 @@ def generate_shopify_csv():
             for row in pricing_data:
                 db_prod_type = row['product_type']
                 shopify_prod_type = map_product_type_to_shopify(db_prod_type)
+                # Skip if mapped to None (excluded product type)
+                if shopify_prod_type is None:
+                    continue
                 if shopify_prod_type not in product_types:
                     product_types[shopify_prod_type] = []
                 product_types[shopify_prod_type].append({
