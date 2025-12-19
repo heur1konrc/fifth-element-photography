@@ -4841,3 +4841,10 @@ def image_size_report():
     
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/admin/image-size-report')
+@require_admin_auth
+def image_size_report_page():
+    """Display image size report page"""
+    return render_template('image_size_report.html')
