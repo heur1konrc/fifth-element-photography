@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Management - Fifth Element Photography</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { margin-bottom: 30px; }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .btn-primary { background: #4CAF50; color: white; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-secondary { background: #2196F3; color: white; }
+        .gallery-list {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .gallery-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #2a3f5f;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 12px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .image-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .image-item.selected {
+            border-color: #4CAF50;
+        }
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-images"></i> Gallery Management</h1>
+        
+        <button class="btn btn-primary" onclick="openCreateModal()">
+            <i class="fas fa-plus"></i> Create New Gallery
+        </button>
+        <a href="/admin" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Admin
+        </a>
+        
+        <div class="gallery-list" id="galleryList">
+            <p>Loading galleries...</p>
+        </div>
+    </div>
+    
+    <!-- Create/Edit Gallery Modal -->
+    <div id="galleryModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Create Gallery</h2>
+            <form id="galleryForm">
+                <input type="hidden" id="galleryId">
+                <div class="form-group">
+                    <label>Gallery Name *</label>
+                    <input type="text" id="galleryName" required>
+                </div>
+                <div class="form-group">
+                    <label>URL Slug *</label>
+                    <input type="text" id="gallerySlug" required>
+                </div>
+                <div class="form-group">
+                    <label>Hero Image</label>
+                    <select id="heroImage">
+                        <option value="">Select hero image...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="galleryDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Display Order</label>
+                    <input type="number" id="displayOrder" value="0">
+                </div>
+                <button type="submit" class="btn btn-primary">Save Gallery</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Manage Images Modal -->
+    <div id="imagesModal" class="modal">
+        <div class="modal-content">
+            <h2 id="imagesModalTitle">Manage Gallery Images</h2>
+            <p>Select images to add to this gallery:</p>
+            <div class="image-grid" id="imageGrid"></div>
+            <button class="btn btn-primary" onclick="saveGalleryImages()">Save Changes</button>
+            <button class="btn btn-secondary" onclick="closeImagesModal()">Close</button>
+        </div>
+    </div>
+    
+    <script>
+        let allImages = [];
+        let currentGalleryId = null;
+        let selectedImages = new Set();
+        
+        async function loadGalleries() {
+            const res = await fetch('/api/galleries');
+            const data = await res.json();
+            
+            const list = document.getElementById('galleryList');
+            if (data.galleries.length === 0) {
+                list.innerHTML = '<p>No galleries yet. Create your first one!</p>';
+                return;
+            }
+            
+            list.innerHTML = data.galleries.map(g => `
+                <div class="gallery-item">
+                    <div>
+                        <strong>${g.name}</strong> (${g.image_count} images)
+                        <br><small>/${g.slug}</small>
+                    </div>
+                    <div>
+                        <button class="btn btn-secondary" onclick="manageImages(${g.id}, '${g.name}')">
+                            <i class="fas fa-images"></i> Manage Images
+                        </button>
+                        <button class="btn btn-primary" onclick="editGallery(${g.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteGallery(${g.id}, '${g.name}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        async function loadAllImages() {
+            const res = await fetch('/api/images');
+            allImages = await res.json();
+            
+            const select = document.getElementById('heroImage');
+            select.innerHTML = '<option value="">Select hero image...</option>' +
+                allImages.map(img => `<option value="${img.filename}">${img.title || img.filename}</option>`).join('');
+        }
+        
+        function openCreateModal() {
+            document.getElementById('modalTitle').textContent = 'Create Gallery';
+            document.getElementById('galleryForm').reset();
+            document.getElementById('galleryId').value = '';
+            document.getElementById('galleryModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('galleryModal').style.display = 'none';
+        }
+        
+        async function manageImages(galleryId, galleryName) {
+            currentGalleryId = galleryId;
+            document.getElementById('imagesModalTitle').textContent = `Manage Images: ${galleryName}`;
+            
+            const res = await fetch(`/api/galleries/${galleryId}/images`);
+            const data = await res.json();
+            selectedImages = new Set(data.images);
+            
+            const grid = document.getElementById('imageGrid');
+            grid.innerHTML = allImages.map(img => `
+                <div class="image-item ${selectedImages.has(img.filename) ? 'selected' : ''}" 
+                     onclick="toggleImage('${img.filename}')">
+                    <img src="/thumbnail/${img.filename}" alt="${img.title}">
+                </div>
+            `).join('');
+            
+            document.getElementById('imagesModal').style.display = 'block';
+        }
+        
+        function toggleImage(filename) {
+            if (selectedImages.has(filename)) {
+                selectedImages.delete(filename);
+            } else {
+                selectedImages.add(filename);
+            }
+            manageImages(currentGalleryId, '');
+        }
+        
+        async function saveGalleryImages() {
+            // Remove all existing images
+            const current = await fetch(`/api/galleries/${currentGalleryId}/images`);
+            const currentData = await current.json();
+            
+            for (const img of currentData.images) {
+                await fetch(`/api/galleries/${currentGalleryId}/images/${img}`, { method: 'DELETE' });
+            }
+            
+            // Add selected images
+            for (const img of selectedImages) {
+                await fetch(`/api/galleries/${currentGalleryId}/images`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image_filename: img })
+                });
+            }
+            
+            alert('Gallery images updated!');
+            closeImagesModal();
+            loadGalleries();
+        }
+        
+        function closeImagesModal() {
+            document.getElementById('imagesModal').style.display = 'none';
+        }
+        
+        document.getElementById('galleryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const data = {
+                name: document.getElementById('galleryName').value,
+                slug: document.getElementById('gallerySlug').value,
+                hero_image: document.getElementById('heroImage').value,
+                description: document.getElementById('galleryDescription').value,
+                display_order: parseInt(document.getElementById('displayOrder').value)
+            };
+            
+            const galleryId = document.getElementById('galleryId').value;
+            const url = galleryId ? `/api/galleries/${galleryId}` : '/api/galleries';
+            const method = galleryId ? 'PUT' : 'POST';
+            
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (res.ok) {
+                alert('Gallery saved!');
+                closeModal();
+                loadGalleries();
+            } else {
+                alert('Error saving gallery');
+            }
+        });
+        
+        document.getElementById('galleryName').addEventListener('input', (e) => {
+            const slug = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            document.getElementById('gallerySlug').value = slug;
+        });
+        
+        async function deleteGallery(id, name) {
+            if (!confirm(`Delete gallery "${name}"?`)) return;
+            
+            await fetch(`/api/galleries/${id}`, { method: 'DELETE' });
+            loadGalleries();
+        }
+        
+        loadGalleries();
+        loadAllImages();
+    </script>
+</body>
+</html>
