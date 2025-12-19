@@ -259,8 +259,11 @@ def generate_shopify_csv():
         writer.writeheader()
         writer.writerows(csv_rows)
         
-        # Convert to bytes for download
-        csv_bytes = io.BytesIO(output.getvalue().encode('utf-8'))
+        # Convert to bytes for download with UTF-8 BOM for proper Excel compatibility
+        csv_content = output.getvalue()
+        csv_bytes = io.BytesIO()
+        csv_bytes.write('\ufeff'.encode('utf-8'))  # UTF-8 BOM
+        csv_bytes.write(csv_content.encode('utf-8'))
         csv_bytes.seek(0)
         
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
