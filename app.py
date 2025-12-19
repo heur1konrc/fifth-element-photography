@@ -4900,3 +4900,77 @@ def image_size_report():
 def image_size_report_page():
     """Display image size report page"""
     return render_template('image_size_report.html')
+
+
+@app.route('/api/generate-gallery-images', methods=['POST'])
+@require_admin_auth
+def generate_gallery_images():
+    """Pre-generate all gallery-optimized images for fast loading"""
+    try:
+        from PIL import Image
+        import os
+        
+        # Create gallery-images directory if it doesn't exist
+        os.makedirs('/data/gallery-images', exist_ok=True)
+        
+        # Get all image files
+        image_files = []
+        if os.path.exists(IMAGES_FOLDER):
+            for filename in os.listdir(IMAGES_FOLDER):
+                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+                    image_files.append(filename)
+        
+        generated = 0
+        skipped = 0
+        errors = []
+        
+        for filename in image_files:
+            try:
+                gallery_path = os.path.join('/data/gallery-images', filename)
+                
+                # Skip if already exists
+                if os.path.exists(gallery_path):
+                    skipped += 1
+                    continue
+                
+                # Open original image
+                original_path = os.path.join(IMAGES_FOLDER, filename)
+                
+                with Image.open(original_path) as img:
+                    # Convert to RGB if necessary
+                    if img.mode in ('RGBA', 'P'):
+                        img = img.convert('RGB')
+                    
+                    # Get original dimensions
+                    orig_width, orig_height = img.size
+                    
+                    # Calculate new dimensions (max 1200px on longest side)
+                    max_dimension = 1200
+                    if orig_width > orig_height:
+                        new_width = max_dimension
+                        new_height = int((max_dimension / orig_width) * orig_height)
+                    else:
+                        new_height = max_dimension
+                        new_width = int((max_dimension / orig_height) * orig_width)
+                    
+                    # Resize image with high quality
+                    img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                    
+                    # Save gallery image with good quality
+                    img.save(gallery_path, 'JPEG', quality=90, optimize=True)
+                    
+                    generated += 1
+                    
+            except Exception as e:
+                errors.append(f"{filename}: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'generated': generated,
+            'skipped': skipped,
+            'total': len(image_files),
+            'errors': errors
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

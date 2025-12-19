@@ -1833,3 +1833,37 @@ if (typeof originalCreateShopifyProductsViaAPI === 'function') {
         setTimeout(() => loadShopifyStatus(), 1000);
     };
 }
+
+
+// Generate gallery images
+async function generateGalleryImages() {
+    if (!confirm('This will pre-generate optimized versions of all images for fast gallery loading. This may take a few minutes. Continue?')) {
+        return;
+    }
+    
+    try {
+        showAlert('Generating gallery images... This may take a few minutes.', 'info');
+        
+        const response = await fetch('/api/generate-gallery-images', {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            let message = `Gallery images generated!\n\nGenerated: ${result.generated}\nSkipped (already exist): ${result.skipped}\nTotal: ${result.total}`;
+            
+            if (result.errors && result.errors.length > 0) {
+                message += `\n\nErrors: ${result.errors.length}`;
+            }
+            
+            alert(message);
+            showAlert('Gallery images generated successfully!', 'success');
+        } else {
+            showAlert('Error generating gallery images: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('Error generating gallery images. Please try again.', 'error');
+    }
+}
