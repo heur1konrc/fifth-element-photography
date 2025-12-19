@@ -1798,6 +1798,32 @@ document.addEventListener('DOMContentLoaded', () => {
     loadShopifyStatus();
 });
 
+// Sync existing Shopify products
+async function syncShopifyProducts() {
+    if (!confirm('This will fetch all products from Shopify and update the database. Continue?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/shopify/sync-products', {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert(`Successfully synced ${result.synced} products from Shopify (${result.total_shopify_products} total products found)`);
+            // Reload status
+            loadShopifyStatus();
+        } else {
+            alert('Sync failed: ' + result.error);
+        }
+    } catch (error) {
+        console.error('Sync error:', error);
+        alert('Sync failed. Please try again.');
+    }
+}
+
 // Reload Shopify status after creating products
 const originalCreateShopifyProductsViaAPI = window.createShopifyProductsViaAPI;
 if (typeof originalCreateShopifyProductsViaAPI === 'function') {

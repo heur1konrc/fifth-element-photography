@@ -24,6 +24,69 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+@shopify_status_api_bp.route('/api/shopify/sync-products', methods=['POST'])
+def sync_shopify_products():
+    """Sync existing Shopify products into database"""
+    import requests
+    
+    SHOPIFY_STORE = os.environ.get('SHOPIFY_STORE', 'fifth-element-photography.myshopify.com')
+    SHOPIFY_API_SECRET = os.environ.get('SHOPIFY_API_SECRET', '')
+    SHOPIFY_API_VERSION = '2024-01'
+    
+    try:
+        # Fetch all products from Shopify
+        url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit=250'
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Shopify-Access-Token': SHOPIFY_API_SECRET
+        }
+        
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code != 200:
+            return jsonify({'success': False, 'error': f'Shopify API error: {response.status_code}'}), 500
+        
+        products = response.json().get('products', [])
+        
+        # Save to database
+        conn = get_db()
+        cursor = conn.cursor()
+        synced_count = 0
+        
+        for product in products:
+            product_id = str(product['id'])
+            handle = product['handle']
+            title = product['title']
+            
+            # Try to match title to filename (title should be the image name without extension)
+            # Look for matching image file
+            image_filename = None
+            if os.path.exists(IMAGES_FOLDER):
+                for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
+                    potential_file = title + ext
+                    if os.path.exists(os.path.join(IMAGES_FOLDER, potential_file)):
+                        image_filename = potential_file
+                        break
+            
+            if image_filename:
+                cursor.execute("""
+                    INSERT OR REPLACE INTO shopify_products (image_filename, shopify_product_id, shopify_handle)
+                    VALUES (?, ?, ?)
+                """, (image_filename, product_id, handle))
+                synced_count += 1
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'synced': synced_count,
+            'total_shopify_products': len(products)
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @shopify_status_api_bp.route('/api/images/shopify-status', methods=['GET'])
 def get_images_shopify_status():
     """Get all images with their Shopify product status"""
