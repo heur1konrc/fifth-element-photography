@@ -1025,6 +1025,58 @@ def get_thumbnail(filename):
             return send_file(original_path)
         return jsonify({'error': str(e)}), 500
 
+@app.route('/gallery-image/<filename>')
+def get_gallery_image(filename):
+    """Generate and serve gallery-optimized images (1200px wide for public display)"""
+    try:
+        from PIL import Image
+        import io
+        
+        # Check if gallery image already exists
+        gallery_path = os.path.join('/data/gallery-images', filename)
+        if os.path.exists(gallery_path):
+            return send_file(gallery_path)
+        
+        # Create gallery-images directory if it doesn't exist
+        os.makedirs('/data/gallery-images', exist_ok=True)
+        
+        # Open original image
+        original_path = os.path.join(IMAGES_FOLDER, filename)
+        if not os.path.exists(original_path):
+            return jsonify({'error': 'Image not found'}), 404
+        
+        with Image.open(original_path) as img:
+            # Convert to RGB if necessary
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+            
+            # Get original dimensions
+            orig_width, orig_height = img.size
+            
+            # Calculate new dimensions (max 1200px on longest side)
+            max_dimension = 1200
+            if orig_width > orig_height:
+                new_width = max_dimension
+                new_height = int((max_dimension / orig_width) * orig_height)
+            else:
+                new_height = max_dimension
+                new_width = int((max_dimension / orig_height) * orig_width)
+            
+            # Resize image with high quality
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Save gallery image with good quality
+            img.save(gallery_path, 'JPEG', quality=90, optimize=True)
+            
+            return send_file(gallery_path)
+            
+    except Exception as e:
+        # Fallback to original image if gallery image generation fails
+        original_path = os.path.join(IMAGES_FOLDER, filename)
+        if os.path.exists(original_path):
+            return send_file(original_path)
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     """Admin login page"""
