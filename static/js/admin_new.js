@@ -1621,74 +1621,15 @@ document.addEventListener('DOMContentLoaded', function() {
 // SHOPIFY CSV GENERATOR
 // ============================================================================
 
-function openShopifyCSVModal() {
-    const modal = document.getElementById('shopify-csv-modal');
-    modal.style.display = 'block';
-    loadImagesForShopifyCSV();
-}
-
-function closeShopifyCSVModal() {
-    const modal = document.getElementById('shopify-csv-modal');
-    modal.style.display = 'none';
-}
-
-async function loadImagesForShopifyCSV() {
-    const imageList = document.getElementById('shopify-csv-image-list');
-    imageList.innerHTML = '<p>Loading images...</p>';
+async function generateShopifyCSVFromSelected() {
+    const selectedImages = getSelectedImages();
     
-    try {
-        const response = await fetch('/api/images');
-        const data = await response.json();
-        
-        if (data.success && data.images && data.images.length > 0) {
-            let html = '<div style="margin-bottom: 15px;"><label><input type="checkbox" id="select-all-images" onchange="toggleAllImages(this)"> <strong>Select All</strong></label></div>';
-            html += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">';
-            
-            data.images.forEach(image => {
-                html += `
-                    <label style="display: flex; align-items: center; padding: 10px; background: white; border-radius: 4px; cursor: pointer;">
-                        <input type="checkbox" class="image-checkbox" value="${image.filename}" data-title="${image.title || image.filename}" style="margin-right: 10px;">
-                        <div style="flex: 1;">
-                            <div style="font-weight: bold; font-size: 0.9em;">${image.title || image.filename}</div>
-                            <div style="font-size: 0.8em; color: #666;">${image.filename}</div>
-                        </div>
-                    </label>
-                `;
-            });
-            
-            html += '</div>';
-            imageList.innerHTML = html;
-        } else {
-            imageList.innerHTML = '<p>No images found.</p>';
-        }
-    } catch (error) {
-        console.error('Error loading images:', error);
-        imageList.innerHTML = '<p style="color: red;">Error loading images. Please try again.</p>';
-    }
-}
-
-function toggleAllImages(checkbox) {
-    const checkboxes = document.querySelectorAll('.image-checkbox');
-    checkboxes.forEach(cb => cb.checked = checkbox.checked);
-}
-
-async function generateShopifyCSV() {
-    const checkboxes = document.querySelectorAll('.image-checkbox:checked');
-    const statusDiv = document.getElementById('shopify-csv-status');
-    
-    if (checkboxes.length === 0) {
-        statusDiv.innerHTML = '<p style="color: red;">Please select at least one image.</p>';
+    if (selectedImages.length === 0) {
+        showAlert('Please select at least one image using the checkboxes.', 'warning');
         return;
     }
     
-    const images = Array.from(checkboxes).map(cb => ({
-        filename: cb.value,
-        title: cb.dataset.title,
-        description: '',
-        url: `/images/${cb.value}`
-    }));
-    
-    statusDiv.innerHTML = '<p style="color: blue;">Generating CSV... Please wait.</p>';
+    showAlert(`Generating Shopify CSV for ${selectedImages.length} image(s)...`, 'info');
     
     try {
         const response = await fetch('/api/shopify/generate-csv', {
@@ -1696,11 +1637,17 @@ async function generateShopifyCSV() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ images: images })
+            body: JSON.stringify({ 
+                images: selectedImages.map(filename => ({
+                    filename: filename,
+                    title: filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
+                    description: '',
+                    url: `/images/${filename}`
+                }))
+            })
         });
         
         if (response.ok) {
-            // Download the CSV file
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1711,21 +1658,13 @@ async function generateShopifyCSV() {
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
             
-            statusDiv.innerHTML = '<p style="color: green;">✓ CSV generated and downloaded successfully!</p>';
+            showAlert('✓ Shopify CSV generated and downloaded successfully!', 'success');
         } else {
             const error = await response.json();
-            statusDiv.innerHTML = `<p style="color: red;">Error: ${error.error || 'Failed to generate CSV'}</p>`;
+            showAlert(`Error: ${error.error || 'Failed to generate CSV'}`, 'error');
         }
     } catch (error) {
         console.error('Error generating CSV:', error);
-        statusDiv.innerHTML = '<p style="color: red;">Error generating CSV. Please try again.</p>';
+        showAlert('Error generating CSV. Please try again.', 'error');
     }
 }
-
-// Event listener for Shopify CSV Generator button
-document.addEventListener('DOMContentLoaded', function() {
-    const generateBtn = document.getElementById('btn-shopify-csv-generate');
-    if (generateBtn) {
-        generateBtn.addEventListener('click', generateShopifyCSV);
-    }
-});
