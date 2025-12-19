@@ -1867,3 +1867,37 @@ async function generateGalleryImages() {
         showAlert('Error generating gallery images. Please try again.', 'error');
     }
 }
+
+
+// Populate EXIF database
+async function populateExifDatabase() {
+    if (!confirm('This will extract EXIF data from all images and store it in the database. This may take a few minutes. Continue?')) {
+        return;
+    }
+    
+    try {
+        showAlert('Extracting EXIF data from all images... This may take a few minutes.', 'info');
+        
+        const response = await fetch('/api/populate-exif-database', {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            let message = `EXIF data populated!\n\nProcessed: ${result.processed}\nSkipped: ${result.skipped}\nTotal: ${result.total}`;
+            
+            if (result.errors && result.errors.length > 0) {
+                message += `\n\nErrors: ${result.errors.length}`;
+            }
+            
+            alert(message);
+            showAlert('EXIF database populated successfully! Image modals will now show camera data.', 'success');
+        } else {
+            showAlert('Error populating EXIF database: ' + result.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('Error populating EXIF database. Please try again.', 'error');
+    }
+}

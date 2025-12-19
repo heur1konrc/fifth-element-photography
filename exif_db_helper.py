@@ -112,3 +112,31 @@ def delete_exif_from_db(filename):
     except Exception as e:
         print(f"Error deleting EXIF for {filename}: {e}")
         return False
+
+
+def ensure_exif_table():
+    """Ensure the image_exif table exists"""
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS image_exif (
+                filename TEXT PRIMARY KEY,
+                model TEXT,
+                lens TEXT,
+                aperture TEXT,
+                shutter_speed TEXT,
+                iso TEXT,
+                focal_length TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"Error creating EXIF table: {e}")
+        return False

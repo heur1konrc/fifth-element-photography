@@ -4974,3 +4974,52 @@ def generate_gallery_images():
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/populate-exif-database', methods=['POST'])
+@require_admin_auth
+def populate_exif_database():
+    """Extract and store EXIF data for all images in database"""
+    try:
+        from exif_db_helper import ensure_exif_table, store_exif_in_db
+        
+        # Ensure table exists
+        ensure_exif_table()
+        
+        # Get all image files
+        image_files = []
+        if os.path.exists(IMAGES_FOLDER):
+            for filename in os.listdir(IMAGES_FOLDER):
+                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+                    image_files.append(filename)
+        
+        processed = 0
+        skipped = 0
+        errors = []
+        
+        for filename in image_files:
+            try:
+                filepath = os.path.join(IMAGES_FOLDER, filename)
+                
+                # Extract EXIF data
+                exif_data = extract_exif_data(filepath)
+                
+                # Store in database
+                if store_exif_in_db(filename, exif_data):
+                    processed += 1
+                else:
+                    skipped += 1
+                    
+            except Exception as e:
+                errors.append(f"{filename}: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'processed': processed,
+            'skipped': skipped,
+            'total': len(image_files),
+            'errors': errors
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
