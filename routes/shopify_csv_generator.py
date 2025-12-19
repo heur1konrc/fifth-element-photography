@@ -140,7 +140,7 @@ def generate_shopify_csv():
                 if shopify_prod_type not in product_types:
                     product_types[shopify_prod_type] = []
                 product_types[shopify_prod_type].append({
-                    'size': row['size_name'],
+                    'size': row['size_name'].strip('"'),  # Remove quotes from size
                     'cost': row['cost_price'],
                     'price': round(row['cost_price'] * markup_multiplier, 2)
                 })
