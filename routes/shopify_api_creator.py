@@ -26,8 +26,26 @@ else:
     DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'database', 'print_ordering.db')
     IMAGES_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'images')
 
+def ensure_shopify_products_table():
+    """Ensure shopify_products table exists"""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS shopify_products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            image_filename TEXT UNIQUE NOT NULL,
+            shopify_product_id TEXT NOT NULL,
+            shopify_handle TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    conn.close()
+
 def get_db():
     """Get database connection"""
+    ensure_shopify_products_table()
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
