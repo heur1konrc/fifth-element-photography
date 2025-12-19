@@ -47,10 +47,10 @@ def map_product_type_to_shopify(db_product_type):
         'Cold Press Fine Art Paper': None,  # Exclude
         'Semi-Glossy Fine Art Paper': 'Semi-glossy',
         'Glossy Fine Art Paper': 'Glossy',
-        '0.75" Stretched Canvas': 'Canvas',
-        '1.25" Stretched Canvas': 'Canvas',
-        '1.50" Stretched Canvas': 'Canvas',
-        'Rolled Canvas': 'Canvas'
+        '0.75" Stretched Canvas': '0.75" Stretched Canvas',
+        '1.25" Stretched Canvas': '1.25" Stretched Canvas',
+        '1.50" Stretched Canvas': '1.50" Stretched Canvas',
+        'Rolled Canvas': 'Rolled Canvas'
     }
     return mapping.get(db_product_type, db_product_type)
 
