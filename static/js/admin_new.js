@@ -1705,10 +1705,13 @@ async function createShopifyProductsViaAPI() {
             let message = `✓ Successfully created ${result.created.length} product(s)!`;
             if (result.errors.length > 0) {
                 message += `\n\nErrors:\n${result.errors.join('\n')}`;
+                console.error('Product creation errors:', result.errors);
             }
             showAlert(message, result.errors.length > 0 ? 'warning' : 'success');
         } else {
-            showAlert(`Error: ${result.error || 'Failed to create products'}`, 'error');
+            const errorMsg = `Error: ${result.error || 'Failed to create products'}`;
+            console.error('API Error:', result);
+            showAlert(errorMsg, 'error');
         }
     } catch (error) {
         console.error('Error creating products:', error);

@@ -182,10 +182,14 @@ def create_shopify_product():
             
             response = requests.post(url, headers=headers, json=product_data)
             
+            print(f"Shopify API Response Status: {response.status_code}")
+            print(f"Shopify API Response: {response.text}")
+            
             if response.status_code == 201:
                 created_products.append(title)
             else:
-                error_msg = f"{title}: {response.status_code} - {response.text}"
+                error_msg = f"{title}: HTTP {response.status_code} - {response.text}"
+                print(f"ERROR: {error_msg}")
                 errors.append(error_msg)
         
         conn.close()
