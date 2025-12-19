@@ -290,6 +290,32 @@
             document.getElementById('imagesModal').style.display = 'none';
         }
         
+        async function editGallery(id) {
+            const res = await fetch('/api/galleries');
+            const data = await res.json();
+            const gallery = data.galleries.find(g => g.id === id);
+            
+            if (!gallery) return;
+            
+            document.getElementById('modalTitle').textContent = 'Edit Gallery';
+            document.getElementById('galleryId').value = gallery.id;
+            document.getElementById('galleryName').value = gallery.name;
+            document.getElementById('gallerySlug').value = gallery.slug;
+            document.getElementById('heroImage').value = gallery.hero_image || '';
+            document.getElementById('galleryDescription').value = gallery.description || '';
+            document.getElementById('displayOrder').value = gallery.display_order || 0;
+            
+            document.getElementById('galleryModal').style.display = 'block';
+        }
+        
+        async function deleteGallery(id, name) {
+            if (!confirm(`Delete gallery "${name}"? This will remove the gallery but not the images.`)) return;
+            
+            await fetch(`/api/galleries/${id}`, { method: 'DELETE' });
+            alert('Gallery deleted!');
+            loadGalleries();
+        }
+        
         document.getElementById('galleryForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -324,13 +350,6 @@
             const slug = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
             document.getElementById('gallerySlug').value = slug;
         });
-        
-        async function deleteGallery(id, name) {
-            if (!confirm(`Delete gallery "${name}"?`)) return;
-            
-            await fetch(`/api/galleries/${id}`, { method: 'DELETE' });
-            loadGalleries();
-        }
         
         loadGalleries();
         loadAllImages();
