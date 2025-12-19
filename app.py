@@ -729,7 +729,9 @@ def scan_images():
 @app.route('/')
 def index():
     """Main homepage with carousel"""
-    return render_template('index_new.html')
+    from gallery_db import get_all_galleries
+    galleries = get_all_galleries()
+    return render_template('index_new.html', galleries=galleries)
 
 @app.route('/portfolio')
 def portfolio():
@@ -5090,3 +5092,30 @@ def remove_from_carousel():
         return jsonify({'success': True, 'message': f'Removed {removed} image(s) from carousel', 'total': len(carousel_images)})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/gallery/<slug>')
+def gallery_page(slug):
+    """Display individual gallery page"""
+    from gallery_db import get_all_galleries, get_gallery_by_slug, get_gallery_images
+    
+    # Get the gallery by slug
+    gallery = get_gallery_by_slug(slug)
+    if not gallery:
+        return "Gallery not found", 404
+    
+    # Get all galleries for navigation
+    galleries = get_all_galleries()
+    
+    # Get images for this gallery
+    image_filenames = get_gallery_images(gallery['id'])
+    
+    # Load full image data
+    all_images = scan_images()
+    images = [img for img in all_images if img['filename'] in image_filenames]
+    
+    return render_template('gallery_page.html', gallery=gallery, galleries=galleries, images=images)
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
