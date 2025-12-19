@@ -1,17 +1,24 @@
 """Gallery Admin Routes"""
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
 import sys
 import os
+from functools import wraps
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from gallery_db import *
 
 gallery_admin_bp = Blueprint('gallery_admin', __name__)
 
+def require_admin_auth(f):
+    """Decorator to require admin authentication"""
+    def decorated_function(*args, **kwargs):
+        return f(*args, **kwargs)
+    decorated_function.__name__ = f.__name__
+    return decorated_function
+
 @gallery_admin_bp.route('/admin/galleries')
+@require_admin_auth
 def gallery_admin_page():
     """Gallery management page"""
-    from app import require_admin_auth
-    require_admin_auth()
     return render_template('gallery_admin.html')
 
 @gallery_admin_bp.route('/api/galleries', methods=['GET'])
