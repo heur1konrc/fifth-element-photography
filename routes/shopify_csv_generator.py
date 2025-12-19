@@ -87,7 +87,8 @@ def generate_shopify_csv():
             filename = image.get('filename')
             title = image.get('title', filename)
             description = image.get('description', '')
-            image_url = image.get('url', '')
+            # Leave image_url blank - user will add images manually in Shopify
+            image_url = ''
             
             # Detect aspect ratio
             aspect_ratio = detect_aspect_ratio(filename)
