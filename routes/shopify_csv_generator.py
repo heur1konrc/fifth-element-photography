@@ -170,7 +170,7 @@ def generate_shopify_csv():
                             'Unit Price Base Measure Unit': '',
                             'Variant Barcode': '',
                             'Image Src': image_url,
-                            'Image Position': '1',
+                            'Image Position': '',
                             'Image Alt Text': '',
                             'Gift Card': 'false',
                             'SEO Title': '',
