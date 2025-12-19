@@ -1951,6 +1951,7 @@ async function removeSelectedFromCarousel() {
             setTimeout(() => location.reload(), 1000);
         } else {
             showAlert(data.message, 'error');
+        }
     } catch (error) {
         console.error('Error removing from carousel:', error);
         showAlert('Error removing images from carousel', 'error');
