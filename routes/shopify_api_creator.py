@@ -139,6 +139,9 @@ def create_shopify_product():
             
             # Build variants
             variants = []
+            product_types = set()
+            sizes = set()
+            
             for row in pricing_data:
                 db_prod_type = row['product_type']
                 shopify_prod_type = map_product_type_to_shopify(db_prod_type)
@@ -148,6 +151,9 @@ def create_shopify_product():
                 
                 size = row['size_name'].strip('"')
                 price = round(row['cost_price'] * markup_multiplier, 2)
+                
+                product_types.add(shopify_prod_type)
+                sizes.add(size)
                 
                 variants.append({
                     'option1': shopify_prod_type,
@@ -166,8 +172,8 @@ def create_shopify_product():
                     'product_type': 'Art Print',
                     'status': 'active',
                     'options': [
-                        {'name': 'Printed Product'},
-                        {'name': 'Size'}
+                        {'name': 'Printed Product', 'values': list(product_types)},
+                        {'name': 'Size', 'values': list(sizes)}
                     ],
                     'variants': variants
                 }
