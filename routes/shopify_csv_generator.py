@@ -256,7 +256,7 @@ def generate_shopify_csv():
         # Generate CSV file
         output = io.StringIO()
         fieldnames = list(csv_rows[0].keys())
-        writer = csv.DictWriter(output, fieldnames=fieldnames)
+        writer = csv.DictWriter(output, fieldnames=fieldnames, quoting=csv.QUOTE_MINIMAL)
         writer.writeheader()
         writer.writerows(csv_rows)
         
