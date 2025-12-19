@@ -1901,3 +1901,59 @@ async function populateExifDatabase() {
         showAlert('Error populating EXIF database. Please try again.', 'error');
     }
 }
+
+
+// Carousel Management Functions
+async function addSelectedToCarousel() {
+    const selected = getSelectedImages();
+    if (selected.length === 0) {
+        alert('Please select at least one image');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/carousel/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filenames: selected })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            showAlert(`${data.message}. Total carousel images: ${data.total}`, 'success');
+            loadImages(); // Refresh to show updated state
+        } else {
+            showAlert(data.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error adding to carousel:', error);
+        showAlert('Error adding images to carousel', 'error');
+    }
+}
+
+async function removeSelectedFromCarousel() {
+    const selected = getSelectedImages();
+    if (selected.length === 0) {
+        alert('Please select at least one image');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/carousel/remove', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filenames: selected })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+            showAlert(`${data.message}. Total carousel images: ${data.total}`, 'success');
+            loadImages(); // Refresh to show updated state
+        } else {
+            showAlert(data.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error removing from carousel:', error);
+        showAlert('Error removing images from carousel', 'error');
+    }
+}

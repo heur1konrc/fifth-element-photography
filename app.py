@@ -1856,12 +1856,6 @@ def edit_image(filename):
                 </div>
                 <div class="form-group">
                     <label>Image Options:</label>
-                    <div class="image-options" style="margin-bottom: 15px;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" name="show_in_carousel" {'checked' if image.get('show_in_carousel') else ''}>
-                            <span>Show in Homepage Carousel</span>
-                        </label>
-                    </div>
                     <div class="image-options">
                         <button type="button" class="btn btn-primary btn-small" onclick="setAsFeaturedFromModal('{filename}', '{image.get('title', '')}')">
                             <i class="fas fa-star"></i> Set as Featured Image
@@ -1906,7 +1900,6 @@ def update_image(filename):
         categories_input = request.form.getlist('categories')  # Get multiple categories
         is_featured = request.form.get('is_featured') == 'on'
         is_background = request.form.get('is_background') == 'on'
-        show_in_carousel = request.form.get('show_in_carousel') == 'on'
         
         # Handle file renaming if new filename provided
         actual_old_filename = filename
@@ -2054,17 +2047,6 @@ def update_image(filename):
             about_settings = {'background_image': filename}
             with open(ABOUT_FILE, 'w') as f:
                 json.dump(about_settings, f)
-        
-        # Handle carousel image
-        carousel_images = load_carousel_images()
-        if show_in_carousel:
-            if filename not in carousel_images:
-                carousel_images.append(filename)
-                save_carousel_images(carousel_images)
-        else:
-            if filename in carousel_images:
-                carousel_images.remove(filename)
-                save_carousel_images(carousel_images)
         
         return jsonify({'success': True, 'message': f'Image {filename} updated successfully'})
     except Exception as e:
@@ -5068,3 +5050,43 @@ def populate_exif_database():
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/carousel/add', methods=['POST'])
+def add_to_carousel():
+    """Add selected images to homepage carousel"""
+    try:
+        filenames = request.json.get('filenames', [])
+        if not filenames:
+            return jsonify({'success': False, 'message': 'No images selected'}), 400
+        
+        carousel_images = load_carousel_images()
+        added = 0
+        for filename in filenames:
+            if filename not in carousel_images:
+                carousel_images.append(filename)
+                added += 1
+        
+        save_carousel_images(carousel_images)
+        return jsonify({'success': True, 'message': f'Added {added} image(s) to carousel', 'total': len(carousel_images)})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/api/carousel/remove', methods=['POST'])
+def remove_from_carousel():
+    """Remove selected images from homepage carousel"""
+    try:
+        filenames = request.json.get('filenames', [])
+        if not filenames:
+            return jsonify({'success': False, 'message': 'No images selected'}), 400
+        
+        carousel_images = load_carousel_images()
+        removed = 0
+        for filename in filenames:
+            if filename in carousel_images:
+                carousel_images.remove(filename)
+                removed += 1
+        
+        save_carousel_images(carousel_images)
+        return jsonify({'success': True, 'message': f'Removed {removed} image(s) from carousel', 'total': len(carousel_images)})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
