@@ -1711,6 +1711,11 @@ async function createShopifyProductsViaAPI() {
         } else {
             const errorMsg = `Error: ${result.error || 'Failed to create products'}`;
             console.error('API Error:', result);
+            console.error('Error details:', JSON.stringify(result, null, 2));
+            if (result.errors && result.errors.length > 0) {
+                console.error('Errors array:', result.errors);
+                result.errors.forEach((err, i) => console.error(`Error ${i}:`, err));
+            }
             showAlert(errorMsg, 'error');
         }
     } catch (error) {
