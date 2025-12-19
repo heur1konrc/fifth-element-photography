@@ -72,31 +72,31 @@
             color: #7B68EE;
         }
         
-        /* Image Grid */
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+        /* Carousel Container */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
             margin: 30px 0;
         }
         
-        .grid-item {
-            position: relative;
-            overflow: hidden;
-            aspect-ratio: 4/3;
-            background: #000;
-            cursor: pointer;
+        .carousel-track {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.8s ease-in-out;
         }
         
-        .grid-item img {
+        .carousel-slide {
+            min-width: calc((100% - 40px) / 3);
+            aspect-ratio: 4/3;
+            background: #000;
+            overflow: hidden;
+        }
+        
+        .carousel-slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s;
-        }
-        
-        .grid-item:hover img {
-            transform: scale(1.05);
         }
         
         /* Footer */
@@ -132,9 +132,8 @@
                 font-size: 12px;
             }
             
-            .image-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
+            .carousel-slide {
+                min-width: 100%;
             }
             
             .logo {
@@ -166,8 +165,10 @@
     </nav>
     
     <div class="container">
-        <div class="image-grid" id="imageGrid">
-            <!-- 3 images will be inserted here -->
+        <div class="carousel-container">
+            <div class="carousel-track" id="carouselTrack">
+                <!-- Carousel slides will be inserted here -->
+            </div>
         </div>
     </div>
     
@@ -207,41 +208,87 @@
             }
         }
         
-        // Load 3 random landscape images for grid
-        async function loadImageGrid() {
+        let carouselImages = [];
+        let currentIndex = 0;
+        let autoplayInterval;
+        const AUTOPLAY_SPEED = 5000; // 5 seconds default
+        
+        // Load images marked for carousel
+        async function loadCarousel() {
             try {
                 const imgRes = await fetch('/api/images');
                 const images = await imgRes.json();
                 
-                // Filter for landscape images (3:2 ratio or wider)
-                const landscapeImages = images.filter(img => {
-                    // Assume most images are landscape if no specific ratio data
-                    return true; // Will show all images, random selection
-                });
+                // Filter images marked for carousel
+                const carouselMarked = images.filter(img => img.show_in_carousel);
                 
-                // Shuffle and pick 3 random images
-                const shuffled = landscapeImages.sort(() => 0.5 - Math.random());
-                const gridImages = shuffled.slice(0, 3).map(img => img.filename);
+                if (carouselMarked.length === 0) {
+                    console.log('No images marked for carousel');
+                    return;
+                }
                 
-                renderGrid(gridImages);
+                carouselImages = carouselMarked.map(img => img.filename);
+                
+                renderCarousel();
+                startAutoplay();
             } catch (error) {
-                console.error('Error loading image grid:', error);
+                console.error('Error loading carousel:', error);
             }
         }
         
-        function renderGrid(images) {
-            const grid = document.getElementById('imageGrid');
+        function renderCarousel() {
+            const track = document.getElementById('carouselTrack');
             
-            grid.innerHTML = images.map(img => `
-                <div class="grid-item">
-                    <img src="/gallery-image/${img}" alt="Featured Image">
+            // Duplicate images for infinite loop effect
+            const allImages = [...carouselImages, ...carouselImages.slice(0, 3)];
+            
+            track.innerHTML = allImages.map(img => `
+                <div class="carousel-slide">
+                    <img src="/thumbnail/${img}" alt="Carousel Image">
                 </div>
             `).join('');
         }
         
+        function slideCarousel() {
+            currentIndex++;
+            
+            if (currentIndex >= carouselImages.length) {
+                // Reset to beginning without animation
+                const track = document.getElementById('carouselTrack');
+                track.style.transition = 'none';
+                currentIndex = 0;
+                updateCarouselPosition();
+                
+                // Re-enable animation after reset
+                setTimeout(() => {
+                    track.style.transition = 'transform 0.8s ease-in-out';
+                    currentIndex = 1;
+                    updateCarouselPosition();
+                }, 50);
+            } else {
+                updateCarouselPosition();
+            }
+        }
+        
+        function updateCarouselPosition() {
+            const track = document.getElementById('carouselTrack');
+            const slideWidth = track.querySelector('.carousel-slide').offsetWidth;
+            const gap = 20;
+            const offset = -(currentIndex * (slideWidth + gap));
+            track.style.transform = `translateX(${offset}px)`;
+        }
+        
+        function startAutoplay() {
+            autoplayInterval = setInterval(slideCarousel, AUTOPLAY_SPEED);
+        }
+        
+        function stopAutoplay() {
+            clearInterval(autoplayInterval);
+        }
+        
         // Initialize
         loadGalleries();
-        loadImageGrid();
+        loadCarousel();
     </script>
 </body>
 </html>

@@ -567,6 +567,21 @@ def load_hero_image():
         pass
     return None
 
+def load_carousel_images():
+    """Load list of images marked for homepage carousel"""
+    try:
+        if os.path.exists('/data/carousel_images.json'):
+            with open('/data/carousel_images.json', 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return []
+
+def save_carousel_images(carousel_list):
+    """Save list of images for homepage carousel"""
+    with open('/data/carousel_images.json', 'w') as f:
+        json.dump(carousel_list, f)
+
 def scan_images():
     """Scan /data directory for images"""
     images = []
@@ -580,6 +595,7 @@ def scan_images():
     background_images = load_background_images()
     featured_image_data = load_featured_image()
     hero_image_data = load_hero_image()
+    carousel_images = load_carousel_images()
     
     # Default categories mapping for auto-detection
     default_categories = {
@@ -635,6 +651,9 @@ def scan_images():
             # Check if image is the hero image
             is_hero = hero_image_data and hero_image_data.get('filename') == filename
             
+            # Check if image is marked for homepage carousel
+            show_in_carousel = filename in carousel_images
+            
             # SINGLE SOURCE: Use description as the story (no separate featured_story)
             # Description and story are now the same field
             featured_story = description
@@ -680,6 +699,7 @@ def scan_images():
                 'is_background': is_background,
                 'is_featured': is_featured,
                 'is_hero': is_hero,
+                'show_in_carousel': show_in_carousel,
                 'story': featured_story,
                 'url': f'/images/{filename}',
                 'thumbnail_url': thumbnail_url,
@@ -1836,6 +1856,12 @@ def edit_image(filename):
                 </div>
                 <div class="form-group">
                     <label>Image Options:</label>
+                    <div class="image-options" style="margin-bottom: 15px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" name="show_in_carousel" {'checked' if image.get('show_in_carousel') else ''}>
+                            <span>Show in Homepage Carousel</span>
+                        </label>
+                    </div>
                     <div class="image-options">
                         <button type="button" class="btn btn-primary btn-small" onclick="setAsFeaturedFromModal('{filename}', '{image.get('title', '')}')">
                             <i class="fas fa-star"></i> Set as Featured Image
@@ -1880,6 +1906,7 @@ def update_image(filename):
         categories_input = request.form.getlist('categories')  # Get multiple categories
         is_featured = request.form.get('is_featured') == 'on'
         is_background = request.form.get('is_background') == 'on'
+        show_in_carousel = request.form.get('show_in_carousel') == 'on'
         
         # Handle file renaming if new filename provided
         actual_old_filename = filename
@@ -2027,6 +2054,17 @@ def update_image(filename):
             about_settings = {'background_image': filename}
             with open(ABOUT_FILE, 'w') as f:
                 json.dump(about_settings, f)
+        
+        # Handle carousel image
+        carousel_images = load_carousel_images()
+        if show_in_carousel:
+            if filename not in carousel_images:
+                carousel_images.append(filename)
+                save_carousel_images(carousel_images)
+        else:
+            if filename in carousel_images:
+                carousel_images.remove(filename)
+                save_carousel_images(carousel_images)
         
         return jsonify({'success': True, 'message': f'Image {filename} updated successfully'})
     except Exception as e:
