@@ -172,12 +172,12 @@ def create_shopify_product():
                 JOIN aspect_ratios ar ON pz.aspect_ratio_id = ar.aspect_ratio_id
                 WHERE bp.is_available = TRUE
                 AND ar.display_name = ?
-                AND pc.display_name IN ('Canvas', 'Fine Art Paper', 'Foam-mounted Print', 'Metal')
+                AND pc.display_name IN ('Canvas', 'Fine Art Paper', 'Foam-mounted Fine Art Paper', 'Metal')
                 ORDER BY 
                     CASE pc.display_name 
                         WHEN 'Fine Art Paper' THEN 1 
                         WHEN 'Canvas' THEN 2 
-                        WHEN 'Foam-mounted Print' THEN 3
+                        WHEN 'Foam-mounted Fine Art Paper' THEN 3
                         WHEN 'Metal' THEN 4
                     END,
                     ps.display_order, 
