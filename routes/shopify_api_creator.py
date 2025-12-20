@@ -191,12 +191,13 @@ def create_shopify_product():
                 ('0.75" Framed Canvas', [
                     ('Black', 'black_floating_075'),
                     ('White', 'white_floating_075'),
+                    ('Silver', 'silver_floating_075'),
                     ('Gold', 'gold_plein_air'),
                 ]),
                 ('1.25" Framed Canvas', [
                     ('Black', 'black_floating_125'),
+                    ('White', 'white_floating_125'),
                     ('Oak', 'oak_floating_125'),
-                    ('Walnut', 'walnut_floating_125'),
                 ]),
                 ('1.50" Framed Canvas', [
                     ('Black', 'black_floating_150'),
@@ -228,7 +229,7 @@ def create_shopify_product():
                 for color_name, option_name in frame_colors:
                     # Get frame price adjustment (if any)
                     cursor.execute("""
-                        SELECT op.price_adjustment
+                        SELECT op.cost_price
                         FROM option_pricing op
                         JOIN product_options po ON op.option_id = po.option_id
                         WHERE po.option_name = ?
