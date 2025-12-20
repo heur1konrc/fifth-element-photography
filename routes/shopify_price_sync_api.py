@@ -50,9 +50,14 @@ def sync_shopify_prices():
         cursor = conn.cursor()
         
         # Get global markup multiplier
-        cursor.execute("SELECT markup_multiplier FROM markup_rules WHERE rule_name = 'global_markup' LIMIT 1")
+        cursor.execute("""
+            SELECT markup_value FROM markup_rules 
+            WHERE rule_type = 'global' AND is_active = TRUE 
+            LIMIT 1
+        """)
         markup_row = cursor.fetchone()
-        markup_multiplier = float(markup_row[0]) if markup_row and markup_row[0] else 1.5
+        global_markup = markup_row[0] if markup_row else 100.0
+        markup_multiplier = 1 + (global_markup / 100)
         
         # Fetch all Shopify products (paginated)
         all_products = []
