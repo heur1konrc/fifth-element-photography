@@ -27,7 +27,9 @@ def normalize_size_name(size_name):
     """Normalize size name to match database format"""
     # Shopify may use different × characters, normalize to \u00d7
     size_name = size_name.replace('x', '×').replace('X', '×')
-    # Ensure it uses the multiplication sign (\u00d7) not lowercase x
+    # Database stores sizes with trailing quote like '8×12"'
+    if not size_name.endswith('"'):
+        size_name += '"'
     return size_name
 
 def map_shopify_to_db_product_type(shopify_product_type):
