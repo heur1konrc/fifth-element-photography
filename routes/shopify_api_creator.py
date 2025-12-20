@@ -9,6 +9,7 @@ import sqlite3
 import os
 import requests
 import json
+import base64
 
 shopify_api_creator_bp = Blueprint('shopify_api_creator', __name__)
 
@@ -49,6 +50,17 @@ def get_db():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+def load_image_titles():
+    """Load image titles from JSON file"""
+    try:
+        titles_file = '/data/image_titles.json' if os.path.exists('/data') else os.path.join(os.path.dirname(__file__), '..', 'data', 'image_titles.json')
+        if os.path.exists(titles_file):
+            with open(titles_file, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading image titles: {e}")
+    return {}
 
 def slugify(text):
     """Convert text to URL-friendly slug"""
@@ -106,6 +118,9 @@ def create_shopify_product():
         conn = get_db()
         cursor = conn.cursor()
         
+        # Load image titles
+        image_titles = load_image_titles()
+        
         # Get global markup
         cursor.execute("""
             SELECT markup_value FROM markup_rules 
@@ -121,7 +136,14 @@ def create_shopify_product():
         
         for image in images:
             filename = image.get('filename')
-            title = image.get('title', filename)
+            # Use saved title from database, or generate from filename
+            if filename in image_titles:
+                title = image_titles[filename]
+            else:
+                # Generate clean title from filename as fallback
+                title = filename.replace('-', ' ').replace('_', ' ')
+                title = os.path.splitext(title)[0]
+                title = ' '.join(word.capitalize() for word in title.split())
             handle = slugify(title)
             aspect_ratio = detect_aspect_ratio(filename)
             
@@ -190,7 +212,6 @@ def create_shopify_product():
                 file_size_mb = os.path.getsize(image_path) / (1024 * 1024)
                 if file_size_mb <= 20:
                     # Read image and encode as base64
-                    import base64
                     with open(image_path, 'rb') as img_file:
                         image_data = base64.b64encode(img_file.read()).decode('utf-8')
                         image_attachment = {
