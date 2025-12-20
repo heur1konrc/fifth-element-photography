@@ -18,10 +18,10 @@ def add_metal_prints():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Step 1: Add Metal category
+        # Step 1: Add Metal category with display_name
         cursor.execute("""
-            INSERT INTO product_categories (category_name, display_order) 
-            VALUES ('Metal', 5)
+            INSERT INTO product_categories (category_name, display_name, display_order) 
+            VALUES ('Metal', 'Metal', 5)
         """)
         metal_category_id = cursor.lastrowid
         
