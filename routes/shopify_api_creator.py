@@ -240,7 +240,7 @@ def create_shopify_product():
                     # Add pricing data with flattened frame color name
                     for row in base_framed_pricing:
                         pricing_data.append({
-                            'product_type': f"{canvas_type} - {color_name}",
+                            'product_type': f"{canvas_type} {color_name}",
                             'size_name': row['size_name'],
                             'cost_price': row['cost_price'] + frame_adjustment,
                             'frame_option': color_name
