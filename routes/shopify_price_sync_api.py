@@ -7,8 +7,8 @@ import time
 shopify_price_sync_bp = Blueprint('shopify_price_sync_api', __name__)
 
 # Shopify configuration
-SHOPIFY_STORE = os.getenv('SHOPIFY_STORE_NAME', 'none')
-SHOPIFY_ACCESS_TOKEN = os.getenv('SHOPIFY_API_SECRET', 'none')
+SHOPIFY_STORE = os.environ.get('SHOPIFY_STORE', 'fifth-element-photography.myshopify.com')
+SHOPIFY_ACCESS_TOKEN = os.environ.get('SHOPIFY_API_SECRET', '')
 SHOPIFY_API_VERSION = '2024-01'
 
 def get_db_connection():
