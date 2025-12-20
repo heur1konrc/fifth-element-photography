@@ -39,11 +39,11 @@ def add_metal_prints():
         """, (metal_category_id,))
         silver_subcategory_id = cursor.lastrowid
         
-        # Get aspect ratio IDs
-        cursor.execute("SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = '3:2'")
+        # Get aspect ratio IDs by display_name
+        cursor.execute("SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = 'Standard'")
         aspect_32_id = cursor.fetchone()[0]
         
-        cursor.execute("SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = '1:1'")
+        cursor.execute("SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = 'Square'")
         aspect_11_id = cursor.fetchone()[0]
         
         # 3:2 sizes and prices
@@ -65,6 +65,8 @@ def add_metal_prints():
             ('36×36"', 270.62)
         ]
         
+        added_count = 0
+        
         # Add pricing for both subcategories
         for subcategory_id in [white_subcategory_id, silver_subcategory_id]:
             # Add 3:2 sizes
@@ -80,6 +82,7 @@ def add_metal_prints():
                         INSERT INTO base_pricing (subcategory_id, size_id, cost_price, is_available)
                         VALUES (?, ?, ?, TRUE)
                     """, (subcategory_id, size_id, cost))
+                    added_count += 1
             
             # Add 1:1 sizes
             for size_name, cost in square_sizes:
@@ -94,6 +97,7 @@ def add_metal_prints():
                         INSERT INTO base_pricing (subcategory_id, size_id, cost_price, is_available)
                         VALUES (?, ?, ?, TRUE)
                     """, (subcategory_id, size_id, cost))
+                    added_count += 1
         
         conn.commit()
         
@@ -113,6 +117,9 @@ def add_metal_prints():
             'success': True,
             'message': 'Metal prints added successfully',
             'metal_category_id': metal_category_id,
+            'white_subcategory_id': white_subcategory_id,
+            'silver_subcategory_id': silver_subcategory_id,
+            'pricing_entries_added': added_count,
             'subcategories': [{'name': row[0], 'price_count': row[1]} for row in results]
         })
     
