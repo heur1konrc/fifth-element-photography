@@ -24,8 +24,8 @@ def fix_metal_36x36():
         
         # Add 36×36" size
         cursor.execute("""
-            INSERT INTO print_sizes (size_name, aspect_ratio_id)
-            VALUES ('36×36"', ?)
+            INSERT INTO print_sizes (size_name, width, height, aspect_ratio_id)
+            VALUES ('36×36"', 36, 36, ?)
         """, (square_aspect_id,))
         size_36x36_id = cursor.lastrowid
         
