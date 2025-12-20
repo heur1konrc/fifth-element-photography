@@ -1,13 +1,29 @@
 // Print sizes for analysis
 const printSizes = [
+    // Standard 3:2 sizes
     { name: "4 x 6", width: 4, height: 6 },
+    { name: "8 x 12", width: 8, height: 12 },
+    { name: "12 x 18", width: 12, height: 18 },
+    { name: "16 x 24", width: 16, height: 24 },
+    { name: "20 x 30", width: 20, height: 30 },
+    { name: "24 x 36", width: 24, height: 36 },
+    { name: "30 x 45", width: 30, height: 45 },
+    { name: "32 x 48", width: 32, height: 48 },
+    { name: "40 x 60", width: 40, height: 60 },
+    // Standard 4:5 sizes
     { name: "5 x 7", width: 5, height: 7 },
     { name: "8 x 10", width: 8, height: 10 },
-    { name: "8.5 x 11 (Letter)", width: 8.5, height: 11 },
     { name: "11 x 14", width: 11, height: 14 },
     { name: "16 x 20", width: 16, height: 20 },
-    { name: "20 x 30", width: 20, height: 30 },
-    { name: "12 x 12 (Square)", width: 12, height: 12 }
+    // Square 1:1 sizes
+    { name: "8 x 8", width: 8, height: 8 },
+    { name: "10 x 10", width: 10, height: 10 },
+    { name: "12 x 12", width: 12, height: 12 },
+    { name: "16 x 16", width: 16, height: 16 },
+    { name: "20 x 20", width: 20, height: 20 },
+    { name: "24 x 24", width: 24, height: 24 },
+    { name: "30 x 30", width: 30, height: 30 },
+    { name: "40 x 40", width: 40, height: 40 }
 ];
 
 // Calculate aspect ratio
