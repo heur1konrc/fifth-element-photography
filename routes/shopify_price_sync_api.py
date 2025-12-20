@@ -19,7 +19,12 @@ SHOPIFY_API_VERSION = '2024-01'
 
 def get_db_connection():
     """Get database connection"""
-    db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'print_ordering.db')
+    # Use Railway's persistent volume path if it exists
+    if os.path.exists('/data'):
+        db_path = '/data/print_ordering.db'
+    else:
+        db_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'print_ordering.db')
+    
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
