@@ -91,7 +91,10 @@ def map_product_type_to_shopify(db_product_type):
         'Foam-mounted Hot Press': 'Foam-mounted Hot Press',
         'Foam-mounted Cold Press': 'Foam-mounted Cold Press',
         'Foam-mounted Semi-Glossy': 'Foam-mounted Semi-Glossy',
-        'Foam-mounted Glossy': 'Foam-mounted Glossy'
+        'Foam-mounted Glossy': 'Foam-mounted Glossy',
+        # Metal
+        'Glossy White Metal': 'Glossy White Metal',
+        'Glossy Silver Metal': 'Glossy Silver Metal'
     }
     return mapping.get(db_product_type, db_product_type)
 
