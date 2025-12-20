@@ -8,7 +8,6 @@ import sqlite3
 import os
 import requests
 import time
-import base64
 from datetime import datetime
 
 shopify_price_sync_bp = Blueprint('shopify_price_sync', __name__)
@@ -29,6 +28,23 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def get_markup_multiplier():
+    """Get global markup multiplier from database"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("""
+            SELECT markup_value FROM markup_rules 
+            WHERE rule_type = 'global' AND is_active = TRUE 
+            LIMIT 1
+        """)
+        markup_row = cursor.fetchone()
+        global_markup = markup_row[0] if markup_row else 100.0
+        return 1 + (global_markup / 100)
+    finally:
+        conn.close()
+
 def calculate_price_for_variant(product_category, size_name, frame_color=None):
     """
     Calculate price for a specific variant based on database pricing rules
@@ -38,51 +54,94 @@ def calculate_price_for_variant(product_category, size_name, frame_color=None):
     cursor = conn.cursor()
     
     try:
-        # Get the product option ID for this category
-        cursor.execute("""
-            SELECT id FROM product_options 
-            WHERE name = ?
-        """, (product_category,))
-        option_row = cursor.fetchone()
+        markup_multiplier = get_markup_multiplier()
         
-        if not option_row:
-            return None
+        # Determine the subcategory name based on product category
+        if product_category == "Framed Canvas" and frame_color:
+            # For framed canvas, we need to find the specific frame type
+            # Map frame color to subcategory
+            frame_type_map = {
+                'Black': ['0.75" Framed Canvas', '1.25" Framed Canvas', '1.50" Framed Canvas'],
+                'White': ['0.75" Framed Canvas', '1.25" Framed Canvas', '1.50" Framed Canvas'],
+                'Silver': ['0.75" Framed Canvas'],
+                'Gold': ['0.75" Framed Canvas'],
+                'Oak': ['1.25" Framed Canvas', '1.50" Framed Canvas']
+            }
             
-        option_id = option_row['id']
-        
-        # Get base price for this size
-        cursor.execute("""
-            SELECT base_price FROM product_option_sizes
-            WHERE product_option_id = ? AND size_name = ?
-        """, (option_id, size_name))
-        size_row = cursor.fetchone()
-        
-        if not size_row:
-            return None
+            # Try each possible frame type for this color
+            base_price = None
+            frame_adjustment = 0.0
             
-        base_price = size_row['base_price']
-        
-        # Add frame color markup if applicable
-        frame_markup = 0
-        if frame_color and product_category == "Framed Canvas":
+            for frame_type in frame_type_map.get(frame_color, []):
+                # Get base price for this frame type and size
+                cursor.execute("""
+                    SELECT bp.cost_price
+                    FROM base_pricing bp
+                    JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
+                    JOIN print_sizes pz ON bp.size_id = pz.size_id
+                    WHERE ps.display_name = ?
+                    AND pz.size_name = ?
+                    AND bp.is_available = TRUE
+                """, (frame_type, size_name))
+                
+                row = cursor.fetchone()
+                if row:
+                    base_price = float(row[0])
+                    
+                    # Get frame color adjustment
+                    frame_option_map = {
+                        ('0.75" Framed Canvas', 'Black'): 'black_floating_075',
+                        ('0.75" Framed Canvas', 'White'): 'white_floating_075',
+                        ('0.75" Framed Canvas', 'Silver'): 'silver_floating_075',
+                        ('0.75" Framed Canvas', 'Gold'): 'gold_plein_air',
+                        ('1.25" Framed Canvas', 'Black'): 'black_floating_125',
+                        ('1.25" Framed Canvas', 'White'): 'white_floating_125',
+                        ('1.25" Framed Canvas', 'Oak'): 'oak_floating_125',
+                        ('1.50" Framed Canvas', 'Black'): 'black_floating_150',
+                        ('1.50" Framed Canvas', 'White'): 'white_floating_150',
+                        ('1.50" Framed Canvas', 'Oak'): 'oak_floating_150',
+                    }
+                    
+                    option_name = frame_option_map.get((frame_type, frame_color))
+                    if option_name:
+                        cursor.execute("""
+                            SELECT op.cost_price
+                            FROM option_pricing op
+                            JOIN product_options po ON op.option_id = po.option_id
+                            WHERE po.option_name = ?
+                        """, (option_name,))
+                        
+                        frame_row = cursor.fetchone()
+                        if frame_row and frame_row[0]:
+                            frame_adjustment = float(frame_row[0])
+                    
+                    break  # Found a match, stop searching
+            
+            if base_price is None:
+                return None
+            
+            cost_price = base_price + frame_adjustment
+        else:
+            # For non-framed products (Canvas, Fine Art Paper, Foam-mounted)
             cursor.execute("""
-                SELECT price_markup FROM product_option_subcategories
-                WHERE product_option_id = ? AND size_name = ? AND subcategory_value = ?
-            """, (option_id, size_name, frame_color))
-            frame_row = cursor.fetchone()
+                SELECT bp.cost_price
+                FROM base_pricing bp
+                JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
+                JOIN product_categories pc ON ps.category_id = pc.category_id
+                JOIN print_sizes pz ON bp.size_id = pz.size_id
+                WHERE pc.display_name = ?
+                AND pz.size_name = ?
+                AND bp.is_available = TRUE
+            """, (product_category, size_name))
             
-            if frame_row:
-                frame_markup = frame_row['price_markup']
+            row = cursor.fetchone()
+            if not row:
+                return None
+            
+            cost_price = float(row[0])
         
-        # Get global markup percentage
-        cursor.execute("SELECT markup_percentage FROM pricing_settings WHERE id = 1")
-        markup_row = cursor.fetchone()
-        markup_percentage = markup_row['markup_percentage'] if markup_row else 0
-        
-        # Calculate final price
-        subtotal = base_price + frame_markup
-        final_price = subtotal * (1 + markup_percentage / 100)
-        
+        # Apply markup
+        final_price = cost_price * markup_multiplier
         return round(final_price, 2)
         
     finally:
@@ -197,7 +256,7 @@ def sync_shopify_prices():
                         new_price = calculate_price_for_variant(category, size_name, frame_color)
                         
                         if new_price is None:
-                            errors.append(f"Variant {variant['id']}: Could not calculate price for {category} - {size_name}")
+                            errors.append(f"Variant {variant['id']}: Could not calculate price for {category} - {size_name} - {frame_color}")
                             continue
                         
                         # Check if price needs updating
