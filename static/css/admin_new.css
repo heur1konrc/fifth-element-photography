@@ -1683,6 +1683,16 @@ select option {
     transform: translateY(-1px);
 }
 
+.btn-analyze {
+    background: #2196F3;
+    color: white;
+}
+
+.btn-analyze:hover {
+    background: #0b7dda;
+    transform: translateY(-1px);
+}
+
 .btn-delete {
     background: #f44336;
     color: white;
