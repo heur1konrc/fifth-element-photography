@@ -45,7 +45,7 @@ def get_markup_multiplier():
     finally:
         conn.close()
 
-def calculate_price_for_variant(product_category, size_name, frame_color=None):
+def calculate_price_for_variant(product_category, size_name, frame_color=None, subcategory=None):
     """
     Calculate price for a specific variant based on database pricing rules
     Returns price in dollars (float)
@@ -55,6 +55,27 @@ def calculate_price_for_variant(product_category, size_name, frame_color=None):
     
     try:
         markup_multiplier = get_markup_multiplier()
+        
+        # For non-framed products, use the subcategory from option1
+        if product_category != "Framed Canvas" and subcategory:
+            # Query using the specific subcategory (e.g., "0.75\" Stretched Canvas")
+            cursor.execute("""
+                SELECT bp.cost_price
+                FROM base_pricing bp
+                JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
+                JOIN print_sizes pz ON bp.size_id = pz.size_id
+                WHERE ps.display_name = ?
+                AND pz.size_name = ?
+                AND bp.is_available = TRUE
+            """, (subcategory, size_name))
+            
+            row = cursor.fetchone()
+            if not row:
+                return None
+            
+            cost_price = float(row[0])
+            final_price = cost_price * markup_multiplier
+            return round(final_price, 2)
         
         # Determine the subcategory name based on product category
         if product_category == "Framed Canvas" and frame_color:
@@ -239,21 +260,19 @@ def sync_shopify_prices():
                 product_had_updates = False
                 for variant in product.get('variants', []):
                     try:
-                        # Parse variant title to get size and frame color
-                        variant_title = variant.get('title', '')
+                        # Shopify variants use option1 (Printed Product) and option2 (Size)
+                        # option1 = subcategory (e.g., "0.75\" Stretched Canvas" or "Black")
+                        # option2 = size (e.g., "8×12")
+                        subcategory = variant.get('option1', '').strip()
+                        size_name = variant.get('option2', '').strip()
                         
-                        # Handle different variant title formats
-                        size_name = variant_title
+                        # For framed canvas, option1 is the frame color
                         frame_color = None
-                        
-                        if ' - ' in variant_title:
-                            parts = variant_title.split(' - ')
-                            size_name = parts[0].strip()
-                            if len(parts) > 1:
-                                frame_color = parts[1].strip()
+                        if category == "Framed Canvas":
+                            frame_color = subcategory
                         
                         # Calculate new price
-                        new_price = calculate_price_for_variant(category, size_name, frame_color)
+                        new_price = calculate_price_for_variant(category, size_name, frame_color, subcategory)
                         
                         if new_price is None:
                             errors.append(f"Variant {variant['id']}: Could not calculate price for {category} - {size_name} - {frame_color}")
