@@ -4,7 +4,7 @@ import sqlite3
 import requests
 import time
 
-shopify_price_sync_api = Blueprint('shopify_price_sync_api', __name__)
+shopify_price_sync_bp = Blueprint('shopify_price_sync_api', __name__)
 
 # Shopify configuration
 SHOPIFY_STORE = os.getenv('SHOPIFY_STORE_NAME', 'none')
@@ -145,7 +145,7 @@ def calculate_price_for_variant(product_category, size_name, frame_color, subcat
     finally:
         conn.close()
 
-@shopify_price_sync_api.route('/api/shopify/sync-prices', methods=['POST'])
+@shopify_price_sync_bp.route('/api/shopify/sync-prices', methods=['POST'])
 def sync_shopify_prices():
     """
     Sync prices for all existing Shopify products based on current database pricing.
