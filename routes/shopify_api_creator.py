@@ -22,7 +22,7 @@ SHOPIFY_API_VERSION = '2024-01'
 # Database path
 if os.path.exists('/data'):
     DB_PATH = '/data/print_ordering.db'
-    IMAGES_FOLDER = '/data/originals'  # Use hi-res originals for Shopify
+    IMAGES_FOLDER = '/data'  # Use web-optimized images (under 20MB for Shopify limit)
 else:
     DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'database', 'print_ordering.db')
     IMAGES_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'images')
