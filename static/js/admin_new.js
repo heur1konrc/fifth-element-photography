@@ -1856,19 +1856,46 @@ async function syncShopifyPrices() {
         const result = await response.json();
         
         if (result.success) {
-            let message = `✓ Price sync completed!\n\n`;
-            message += `Products updated: ${result.products_updated}\n`;
-            message += `Variants updated: ${result.variants_updated}\n`;
-            message += `Duration: ${Math.round(result.duration_seconds / 60)} minutes`;
-            
+            // Log all errors to console for debugging
             if (result.errors && result.errors.length > 0) {
-                message += `\n\nErrors (${result.errors.length}):\n${result.errors.slice(0, 5).join('\n')}`;
-                if (result.errors.length > 5) {
-                    message += `\n... and ${result.errors.length - 5} more errors`;
-                }
+                console.log('Price sync errors:', result.errors);
             }
             
-            alert(message);
+            // Create a custom modal for better display
+            let modalContent = `
+                <div style="max-height: 500px; overflow-y: auto; text-align: left;">
+                    <h4>✓ Price sync completed!</h4>
+                    <p><strong>Products updated:</strong> ${result.products_updated}</p>
+                    <p><strong>Variants updated:</strong> ${result.variants_updated}</p>
+                    <p><strong>Duration:</strong> ${Math.round(result.duration_seconds / 60)} minutes</p>
+            `;
+            
+            if (result.errors && result.errors.length > 0) {
+                modalContent += `
+                    <hr>
+                    <h5>Errors (${result.errors.length}):</h5>
+                    <div style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 11px; max-height: 300px; overflow-y: auto; white-space: pre-wrap;">
+                `;
+                result.errors.forEach(error => {
+                    modalContent += `<div style="margin-bottom: 8px; border-bottom: 1px solid #dee2e6; padding-bottom: 5px;">${error}</div>`;
+                });
+                modalContent += `</div>`;
+            }
+            
+            modalContent += `</div>`;
+            
+            // Use a simple modal
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; padding: 30px; border-radius: 8px; max-width: 900px; width: 90%;">
+                        ${modalContent}
+                        <button onclick="this.closest('div').parentElement.remove()" style="margin-top: 20px; padding: 10px 30px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
             showAlert('Price sync completed successfully!', 'success');
         } else {
             showAlert(`Price sync failed: ${result.error}`, 'danger');
