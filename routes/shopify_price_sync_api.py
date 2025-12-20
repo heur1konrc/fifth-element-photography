@@ -275,7 +275,7 @@ def sync_shopify_prices():
                         new_price = calculate_price_for_variant(category, size_name, frame_color, subcategory)
                         
                         if new_price is None:
-                            errors.append(f"Variant {variant['id']}: Could not calculate price for {category} - {size_name} - {frame_color}")
+                            errors.append(f"Variant {variant['id']}: Could not calculate price for {category} | subcategory='{subcategory}' | size='{size_name}' | frame_color='{frame_color}'")
                             continue
                         
                         # Check if price needs updating
