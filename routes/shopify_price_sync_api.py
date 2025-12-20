@@ -23,6 +23,13 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def normalize_size_name(size_name):
+    """Normalize size name to match database format"""
+    # Shopify may use different × characters, normalize to \u00d7
+    size_name = size_name.replace('x', '×').replace('X', '×')
+    # Ensure it uses the multiplication sign (\u00d7) not lowercase x
+    return size_name
+
 def map_shopify_to_db_product_type(shopify_product_type):
     """Reverse map Shopify product type names to database product type names"""
     # Most names are the same, but some have mappings
@@ -93,7 +100,7 @@ def calculate_price_for_variant(product_category, size_name, frame_color, subcat
                     WHERE ps.display_name = ?
                     AND pz.size_name = ?
                     AND bp.is_available = TRUE
-                """, (canvas_type, size_name))
+                """, (canvas_type, normalize_size_name(size_name)))
                 
                 row = cursor.fetchone()
                 if not row:
@@ -129,7 +136,7 @@ def calculate_price_for_variant(product_category, size_name, frame_color, subcat
             WHERE ps.display_name = ?
             AND pz.size_name = ?
             AND bp.is_available = TRUE
-        """, (db_subcategory, size_name))
+        """, (db_subcategory, normalize_size_name(size_name)))
         
         row = cursor.fetchone()
         if not row:
