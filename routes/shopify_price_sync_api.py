@@ -262,3 +262,59 @@ def sync_shopify_prices():
             'success': False,
             'error': str(e)
         }), 500
+
+
+@shopify_price_sync_bp.route('/api/shopify/debug-pricing', methods=['GET'])
+def debug_pricing():
+    """Debug endpoint to inspect database pricing structure"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Get a sample of subcategories
+        cursor.execute("""
+            SELECT ps.display_name, pc.display_name as category
+            FROM product_subcategories ps
+            JOIN product_categories pc ON ps.category_id = pc.category_id
+            LIMIT 10
+        """)
+        subcategories = [dict(row) for row in cursor.fetchall()]
+        
+        # Get a sample of sizes
+        cursor.execute("""
+            SELECT size_name, ar.display_name as aspect_ratio
+            FROM print_sizes pz
+            JOIN aspect_ratios ar ON pz.aspect_ratio_id = ar.aspect_ratio_id
+            LIMIT 10
+        """)
+        sizes = [dict(row) for row in cursor.fetchall()]
+        
+        # Try a simple pricing query for "0.75\" Stretched Canvas" and "8×12"
+        cursor.execute("""
+            SELECT 
+                ps.display_name as subcategory,
+                pz.size_name,
+                bp.cost_price
+            FROM base_pricing bp
+            JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
+            JOIN print_sizes pz ON bp.size_id = pz.size_id
+            WHERE ps.display_name = '0.75" Stretched Canvas'
+            AND pz.size_name = '8×12'
+            AND bp.is_available = TRUE
+        """)
+        test_price = cursor.fetchone()
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'subcategories': subcategories,
+            'sizes': sizes,
+            'test_query_result': dict(test_price) if test_price else None
+        })
+    
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
