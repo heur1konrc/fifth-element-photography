@@ -1868,7 +1868,7 @@ def edit_image(filename):
                         <button type="button" class="btn btn-warning btn-small" onclick="analyzeImageFromModal('{filename}', '{image.get('title', '')}')">
                             <i class="fas fa-search"></i> Analyze Image
                         </button>
-                        <a href="/images/{filename}" download="{filename}" class="btn btn-success btn-small" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                        <a href="/admin/download-highres/{filename}" download="highres_{filename}" class="btn btn-success btn-small" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                             <i class="fas fa-download"></i> High-res Download
                         </a>
                         <a href="/admin/download-thumbnail/{filename}" download="thumb_{filename}" class="btn btn-info btn-small" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
