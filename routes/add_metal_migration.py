@@ -18,25 +18,33 @@ def add_metal_prints():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Add Metal category
+        # Step 1: Add Metal category
         cursor.execute("""
-            INSERT OR IGNORE INTO product_categories (category_name, display_order) 
+            INSERT INTO product_categories (category_name, display_order) 
             VALUES ('Metal', 5)
         """)
+        metal_category_id = cursor.lastrowid
         
-        # Add Glossy White Metal subcategory
+        # Step 2: Add Glossy White Metal subcategory
         cursor.execute("""
-            INSERT OR IGNORE INTO product_subcategories (category_id, subcategory_name, display_name, display_order)
-            SELECT category_id, 'glossy_white_metal', 'Glossy White Metal', 1
-            FROM product_categories WHERE category_name = 'Metal'
-        """)
+            INSERT INTO product_subcategories (category_id, subcategory_name, display_name, display_order)
+            VALUES (?, 'glossy_white_metal', 'Glossy White Metal', 1)
+        """, (metal_category_id,))
+        white_subcategory_id = cursor.lastrowid
         
-        # Add Glossy Silver Metal subcategory
+        # Step 3: Add Glossy Silver Metal subcategory
         cursor.execute("""
-            INSERT OR IGNORE INTO product_subcategories (category_id, subcategory_name, display_name, display_order)
-            SELECT category_id, 'glossy_silver_metal', 'Glossy Silver Metal', 2
-            FROM product_categories WHERE category_name = 'Metal'
-        """)
+            INSERT INTO product_subcategories (category_id, subcategory_name, display_name, display_order)
+            VALUES (?, 'glossy_silver_metal', 'Glossy Silver Metal', 2)
+        """, (metal_category_id,))
+        silver_subcategory_id = cursor.lastrowid
+        
+        # Get aspect ratio IDs
+        cursor.execute("SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = '3:2'")
+        aspect_32_id = cursor.fetchone()[0]
+        
+        cursor.execute("SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = '1:1'")
+        aspect_11_id = cursor.fetchone()[0]
         
         # 3:2 sizes and prices
         standard_sizes = [
@@ -57,41 +65,35 @@ def add_metal_prints():
             ('36×36"', 270.62)
         ]
         
-        # Add pricing for Glossy White Metal
-        for subcategory_name in ['glossy_white_metal', 'glossy_silver_metal']:
+        # Add pricing for both subcategories
+        for subcategory_id in [white_subcategory_id, silver_subcategory_id]:
             # Add 3:2 sizes
             for size_name, cost in standard_sizes:
                 cursor.execute("""
-                    INSERT OR IGNORE INTO base_pricing (subcategory_id, size_id, cost_price, is_available)
-                    SELECT 
-                        ps.subcategory_id,
-                        pz.size_id,
-                        ?,
-                        TRUE
-                    FROM product_subcategories ps
-                    JOIN product_categories pc ON ps.category_id = pc.category_id
-                    JOIN print_sizes pz ON pz.aspect_ratio_id = (SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = '3:2')
-                    WHERE pc.category_name = 'Metal' 
-                    AND ps.subcategory_name = ?
-                    AND pz.size_name = ?
-                """, (cost, subcategory_name, size_name))
+                    SELECT size_id FROM print_sizes 
+                    WHERE aspect_ratio_id = ? AND size_name = ?
+                """, (aspect_32_id, size_name))
+                size_result = cursor.fetchone()
+                if size_result:
+                    size_id = size_result[0]
+                    cursor.execute("""
+                        INSERT INTO base_pricing (subcategory_id, size_id, cost_price, is_available)
+                        VALUES (?, ?, ?, TRUE)
+                    """, (subcategory_id, size_id, cost))
             
             # Add 1:1 sizes
             for size_name, cost in square_sizes:
                 cursor.execute("""
-                    INSERT OR IGNORE INTO base_pricing (subcategory_id, size_id, cost_price, is_available)
-                    SELECT 
-                        ps.subcategory_id,
-                        pz.size_id,
-                        ?,
-                        TRUE
-                    FROM product_subcategories ps
-                    JOIN product_categories pc ON ps.category_id = pc.category_id
-                    JOIN print_sizes pz ON pz.aspect_ratio_id = (SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = '1:1')
-                    WHERE pc.category_name = 'Metal' 
-                    AND ps.subcategory_name = ?
-                    AND pz.size_name = ?
-                """, (cost, subcategory_name, size_name))
+                    SELECT size_id FROM print_sizes 
+                    WHERE aspect_ratio_id = ? AND size_name = ?
+                """, (aspect_11_id, size_name))
+                size_result = cursor.fetchone()
+                if size_result:
+                    size_id = size_result[0]
+                    cursor.execute("""
+                        INSERT INTO base_pricing (subcategory_id, size_id, cost_price, is_available)
+                        VALUES (?, ?, ?, TRUE)
+                    """, (subcategory_id, size_id, cost))
         
         conn.commit()
         
@@ -99,11 +101,10 @@ def add_metal_prints():
         cursor.execute("""
             SELECT ps.display_name, COUNT(bp.pricing_id) as price_count
             FROM product_subcategories ps
-            JOIN product_categories pc ON ps.category_id = pc.category_id
             LEFT JOIN base_pricing bp ON ps.subcategory_id = bp.subcategory_id
-            WHERE pc.category_name = 'Metal'
+            WHERE ps.subcategory_id IN (?, ?)
             GROUP BY ps.subcategory_id
-        """)
+        """, (white_subcategory_id, silver_subcategory_id))
         
         results = cursor.fetchall()
         conn.close()
@@ -111,10 +112,14 @@ def add_metal_prints():
         return jsonify({
             'success': True,
             'message': 'Metal prints added successfully',
+            'metal_category_id': metal_category_id,
             'subcategories': [{'name': row[0], 'price_count': row[1]} for row in results]
         })
     
     except Exception as e:
+        if conn:
+            conn.rollback()
+            conn.close()
         return jsonify({
             'success': False,
             'error': str(e)
