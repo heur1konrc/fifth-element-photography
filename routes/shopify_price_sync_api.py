@@ -297,6 +297,7 @@ def debug_pricing():
         sizes = [dict(row) for row in cursor.fetchall()]
         
         # Try a simple pricing query for "0.75\" Stretched Canvas" and "8×12"
+        # Test with raw "8x12" first
         cursor.execute("""
             SELECT 
                 ps.display_name as subcategory,
@@ -306,10 +307,26 @@ def debug_pricing():
             JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
             JOIN print_sizes pz ON bp.size_id = pz.size_id
             WHERE ps.display_name = '0.75" Stretched Canvas'
-            AND pz.size_name = '8×12'
+            AND pz.size_name = '8x12'
             AND bp.is_available = TRUE
         """)
-        test_price = cursor.fetchone()
+        test_price_raw = cursor.fetchone()
+        
+        # Test with normalized "8×12"
+        normalized_size = normalize_size_name('8x12')
+        cursor.execute("""
+            SELECT 
+                ps.display_name as subcategory,
+                pz.size_name,
+                bp.cost_price
+            FROM base_pricing bp
+            JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
+            JOIN print_sizes pz ON bp.size_id = pz.size_id
+            WHERE ps.display_name = '0.75" Stretched Canvas'
+            AND pz.size_name = ?
+            AND bp.is_available = TRUE
+        """, (normalized_size,))
+        test_price_normalized = cursor.fetchone()
         
         conn.close()
         
@@ -317,7 +334,9 @@ def debug_pricing():
             'success': True,
             'subcategories': subcategories,
             'sizes': sizes,
-            'test_query_result': dict(test_price) if test_price else None
+            'normalized_size': normalized_size,
+            'test_query_raw': dict(test_price_raw) if test_price_raw else None,
+            'test_query_normalized': dict(test_price_normalized) if test_price_normalized else None
         })
     
     except Exception as e:
