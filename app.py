@@ -5094,6 +5094,38 @@ def remove_from_carousel():
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
+@app.route('/api/debug/storage-check')
+def debug_storage_check():
+    """Debug endpoint to check file sizes in storage directories"""
+    import os
+    try:
+        result = {
+            'data_dir': {},
+            'originals_dir': {}
+        }
+        
+        # Check /data directory
+        if os.path.exists('/data'):
+            for filename in os.listdir('/data'):
+                filepath = os.path.join('/data', filename)
+                if os.path.isfile(filepath) and filename.lower().endswith(('.jpg', '.jpeg', '.png')):
+                    size_mb = os.path.getsize(filepath) / (1024 * 1024)
+                    result['data_dir'][filename] = f"{size_mb:.2f} MB"
+        
+        # Check /data/originals directory
+        if os.path.exists('/data/originals'):
+            for filename in os.listdir('/data/originals'):
+                filepath = os.path.join('/data/originals', filename)
+                if os.path.isfile(filepath) and filename.lower().endswith(('.jpg', '.jpeg', '.png')):
+                    size_mb = os.path.getsize(filepath) / (1024 * 1024)
+                    result['originals_dir'][filename] = f"{size_mb:.2f} MB"
+        else:
+            result['originals_dir'] = "Directory does not exist"
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/gallery/<slug>')
 def gallery_page(slug):
     """Display individual gallery page"""
