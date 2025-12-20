@@ -73,14 +73,25 @@ def slugify(text):
 def map_product_type_to_shopify(db_product_type):
     """Map database product type names to Shopify product type names"""
     mapping = {
+        # Fine Art Paper
         'Hot Press Fine Art Paper': 'Hot Press (recommended for photos)',
-        'Cold Press Fine Art Paper': None,  # Exclude
+        'Cold Press Fine Art Paper': 'Cold Press',
         'Semi-Glossy Fine Art Paper': 'Semi-glossy',
         'Glossy Fine Art Paper': 'Glossy',
+        # Canvas
         '0.75" Stretched Canvas': '0.75" Stretched Canvas',
         '1.25" Stretched Canvas': '1.25" Stretched Canvas',
         '1.50" Stretched Canvas': '1.50" Stretched Canvas',
-        'Rolled Canvas': 'Rolled Canvas'
+        'Rolled Canvas': 'Rolled Canvas',
+        # Framed Canvas
+        '0.75" Framed Canvas': '0.75" Framed Canvas',
+        '1.25" Framed Canvas': '1.25" Framed Canvas',
+        '1.50" Framed Canvas': '1.50" Framed Canvas',
+        # Foam-mounted
+        'Foam-mounted Hot Press': 'Foam-mounted Hot Press',
+        'Foam-mounted Cold Press': 'Foam-mounted Cold Press',
+        'Foam-mounted Semi-Glossy': 'Foam-mounted Semi-Glossy',
+        'Foam-mounted Glossy': 'Foam-mounted Glossy'
     }
     return mapping.get(db_product_type, db_product_type)
 
@@ -147,12 +158,13 @@ def create_shopify_product():
             handle = slugify(title)
             aspect_ratio = detect_aspect_ratio(filename)
             
-            # Query pricing
+            # Query pricing for unframed products
             cursor.execute("""
                 SELECT 
                     ps.display_name as product_type,
                     pz.size_name,
-                    bp.cost_price
+                    bp.cost_price,
+                    NULL as frame_option
                 FROM base_pricing bp
                 JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
                 JOIN product_categories pc ON ps.category_id = pc.category_id
@@ -160,18 +172,79 @@ def create_shopify_product():
                 JOIN aspect_ratios ar ON pz.aspect_ratio_id = ar.aspect_ratio_id
                 WHERE bp.is_available = TRUE
                 AND ar.display_name = ?
-                AND pc.display_name IN ('Canvas', 'Fine Art Paper')
+                AND pc.display_name IN ('Canvas', 'Fine Art Paper', 'Foam-mounted Print')
                 ORDER BY 
                     CASE pc.display_name 
                         WHEN 'Fine Art Paper' THEN 1 
                         WHEN 'Canvas' THEN 2 
+                        WHEN 'Foam-mounted Print' THEN 3
                     END,
                     ps.display_order, 
                     pz.width, 
                     pz.height
             """, (aspect_ratio,))
             
-            pricing_data = cursor.fetchall()
+            pricing_data = list(cursor.fetchall())
+            
+            # Add framed canvas options with flattened frame colors
+            framed_canvas_config = [
+                ('0.75" Framed Canvas', [
+                    ('Black', 'black_floating_075'),
+                    ('White', 'white_floating_075'),
+                    ('Gold', 'gold_plein_air'),
+                ]),
+                ('1.25" Framed Canvas', [
+                    ('Black', 'black_floating_125'),
+                    ('Oak', 'oak_floating_125'),
+                    ('Walnut', 'walnut_floating_125'),
+                ]),
+                ('1.50" Framed Canvas', [
+                    ('Black', 'black_floating_150'),
+                    ('White', 'white_floating_150'),
+                    ('Oak', 'oak_floating_150'),
+                ]),
+            ]
+            
+            for canvas_type, frame_colors in framed_canvas_config:
+                # Get base pricing for this framed canvas type
+                cursor.execute("""
+                    SELECT 
+                        ps.display_name as product_type,
+                        pz.size_name,
+                        bp.cost_price
+                    FROM base_pricing bp
+                    JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
+                    JOIN print_sizes pz ON bp.size_id = pz.size_id
+                    JOIN aspect_ratios ar ON pz.aspect_ratio_id = ar.aspect_ratio_id
+                    WHERE bp.is_available = TRUE
+                    AND ar.display_name = ?
+                    AND ps.display_name = ?
+                    ORDER BY pz.width, pz.height
+                """, (aspect_ratio, canvas_type))
+                
+                base_framed_pricing = cursor.fetchall()
+                
+                # For each frame color, add variants with the frame color in the name
+                for color_name, option_name in frame_colors:
+                    # Get frame price adjustment (if any)
+                    cursor.execute("""
+                        SELECT op.price_adjustment
+                        FROM option_pricing op
+                        JOIN product_options po ON op.option_id = po.option_id
+                        WHERE po.option_name = ?
+                    """, (option_name,))
+                    
+                    frame_row = cursor.fetchone()
+                    frame_adjustment = float(frame_row[0]) if frame_row and frame_row[0] else 0.0
+                    
+                    # Add pricing data with flattened frame color name
+                    for row in base_framed_pricing:
+                        pricing_data.append({
+                            'product_type': f"{canvas_type} - {color_name}",
+                            'size_name': row['size_name'],
+                            'cost_price': row['cost_price'] + frame_adjustment,
+                            'frame_option': color_name
+                        })
             
             if not pricing_data:
                 errors.append(f"{filename}: No pricing data found")
