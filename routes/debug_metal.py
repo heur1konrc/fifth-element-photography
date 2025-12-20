@@ -18,10 +18,19 @@ def debug_metal():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Check aspect ratios
+        # Get ALL columns from aspect_ratios table
+        cursor.execute("PRAGMA table_info(aspect_ratios)")
+        aspect_ratio_columns = [row[1] for row in cursor.fetchall()]
+        
+        # Check aspect ratios - get ALL columns
         cursor.execute("SELECT * FROM aspect_ratios")
-        aspect_ratios = [{'aspect_ratio_id': row[0], 'display_name': row[1], 'ratio': row[2]} 
-                        for row in cursor.fetchall()]
+        aspect_ratios_raw = cursor.fetchall()
+        aspect_ratios = []
+        for row in aspect_ratios_raw:
+            ar_dict = {}
+            for i, col_name in enumerate(aspect_ratio_columns):
+                ar_dict[col_name] = row[i]
+            aspect_ratios.append(ar_dict)
         
         # Check print sizes
         cursor.execute("SELECT size_id, size_name, aspect_ratio_id FROM print_sizes ORDER BY size_name")
@@ -64,6 +73,7 @@ def debug_metal():
         
         return jsonify({
             'success': True,
+            'aspect_ratio_columns': aspect_ratio_columns,
             'aspect_ratios': aspect_ratios,
             'print_sizes': print_sizes,
             'categories': categories,
