@@ -91,22 +91,25 @@ function analyzeImageFromUrl(imageUrl, filename, title) {
                 printHeight = Math.min(size.width, size.height);
             }
             
+            // Calculate print size aspect ratio
+            const sizeRatio = getAspectRatio(Math.round(printWidth * 10), Math.round(printHeight * 10));
+            
+            // Only show print sizes that match the image aspect ratio
+            if (aspectRatio !== sizeRatio) {
+                return; // Skip this size
+            }
+            
             // Use ACTUAL image dimensions for DPI calculation
             const dpiHorizontal = actualWidth / printWidth;
             const dpiVertical = actualHeight / printHeight;
             const effectiveDPI = Math.floor(Math.min(dpiHorizontal, dpiVertical));
             
             const quality = getQualityRating(effectiveDPI);
-            const sizeRatio = getAspectRatio(Math.round(printWidth * 10), Math.round(printHeight * 10));
-            
-            const ratioMatchText = aspectRatio === sizeRatio ? 
-                '<span class="match-perfect">Perfect Match</span>' : 
-                '<span class="match-crop">Requires Cropping</span>';
             
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="size-name">${size.name}</td>
-                <td class="aspect-match">${ratioMatchText}</td>
+                <td class="aspect-match"><span class="match-perfect">Perfect Match</span></td>
                 <td class="dpi-value">${effectiveDPI} DPI</td>
                 <td class="quality-rating">
                     <span class="quality-badge ${quality.class}">${quality.text}</span>
