@@ -41,6 +41,7 @@ from routes.shopify_status_api import shopify_status_api_bp
 from routes.shopify_price_sync_api import shopify_price_sync_bp
 from routes.add_metal_migration import add_metal_bp
 from routes.debug_metal import debug_metal_bp
+from routes.fix_metal_36x36 import fix_metal_36x36_bp
 from routes.gallery_admin import gallery_admin_bp
 app.register_blueprint(pricing_admin_bp)
 app.register_blueprint(setup_pricing_bp)
@@ -51,6 +52,7 @@ app.register_blueprint(shopify_status_api_bp)
 app.register_blueprint(shopify_price_sync_bp)
 app.register_blueprint(add_metal_bp)
 app.register_blueprint(debug_metal_bp)
+app.register_blueprint(fix_metal_36x36_bp)
 app.register_blueprint(gallery_admin_bp)
 
 # Initialize database if it doesn't exist
