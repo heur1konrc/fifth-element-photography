@@ -40,8 +40,8 @@ function getQualityRating(dpi) {
 
 // Main function called from "Analyze" button
 function analyzeImage(filename, title) {
-    // Analyze the image by loading it from the URL (no window opening)
-    const imageUrl = `https://fifthelement.photos/images/${filename}`;
+    // Analyze the HIGH-RES image by loading it from the hi-res viewer URL
+    const imageUrl = `/admin/view-highres/${filename}`;
     analyzeImageFromUrl(imageUrl, filename, title);
 }
 
