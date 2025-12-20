@@ -260,7 +260,8 @@ def create_shopify_product():
                 'Canvas': [],
                 'Framed Canvas': [],
                 'Fine Art Paper': [],
-                'Foam-mounted Print': []
+                'Foam-mounted Print': [],
+                'Metal': []
             }
             
             for row in pricing_data:
@@ -275,6 +276,8 @@ def create_shopify_product():
                     category = 'Fine Art Paper'
                 elif 'Foam-mounted' in db_prod_type:
                     category = 'Foam-mounted Print'
+                elif 'Metal' in db_prod_type:
+                    category = 'Metal'
                 else:
                     continue
                 
