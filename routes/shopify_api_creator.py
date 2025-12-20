@@ -391,3 +391,219 @@ def create_shopify_product():
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@shopify_api_creator_bp.route('/sync-shopify-prices', methods=['POST'])
+def sync_shopify_prices():
+    """
+    Sync prices from database to existing Shopify products
+    Updates all variant prices to match current database pricing with markup
+    """
+    try:
+        # Get markup from request
+        data = request.get_json()
+        markup_multiplier = float(data.get('markup', 2.5))
+        
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        # Get all Shopify products from tracking table
+        cursor.execute("""
+            SELECT image_filename, shopify_product_id, shopify_handle
+            FROM shopify_products
+            ORDER BY image_filename
+        """)
+        
+        shopify_products = cursor.fetchall()
+        
+        if not shopify_products:
+            return jsonify({'success': False, 'error': 'No Shopify products found in database'})
+        
+        updated_count = 0
+        skipped_count = 0
+        errors = []
+        
+        # Process each Shopify product
+        for product_row in shopify_products:
+            shopify_product_id = product_row['shopify_product_id']
+            image_filename = product_row['image_filename']
+            shopify_handle = product_row['shopify_handle']
+            
+            try:
+                # Extract actual filename and category from tracking filename
+                # Format: "filename_Category" or just "filename"
+                if '_Canvas' in image_filename or '_Framed Canvas' in image_filename or '_Fine Art Paper' in image_filename or '_Foam-mounted Print' in image_filename:
+                    # Split on last underscore to get category
+                    parts = image_filename.rsplit('_', 1)
+                    actual_filename = parts[0]
+                    category = parts[1] if len(parts) > 1 else None
+                else:
+                    actual_filename = image_filename
+                    category = None
+                
+                # Get aspect ratio for this image
+                cursor.execute("SELECT aspect_ratio FROM images WHERE filename = ?", (actual_filename,))
+                image_row = cursor.fetchone()
+                
+                if not image_row:
+                    errors.append(f"{image_filename}: Image not found in database")
+                    skipped_count += 1
+                    continue
+                
+                aspect_ratio = image_row['aspect_ratio']
+                
+                # Get current pricing from database for this aspect ratio and category
+                # This replicates the pricing logic from create_products
+                pricing_data = []
+                
+                # Get base pricing for all categories
+                cursor.execute("""
+                    SELECT 
+                        ps.display_name as product_type,
+                        pz.size_name,
+                        bp.cost_price
+                    FROM base_pricing bp
+                    JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
+                    JOIN print_sizes pz ON bp.size_id = pz.size_id
+                    JOIN aspect_ratios ar ON pz.aspect_ratio_id = ar.aspect_ratio_id
+                    WHERE bp.is_available = TRUE
+                    AND ar.display_name = ?
+                    ORDER BY pz.width, pz.height
+                """, (aspect_ratio,))
+                
+                base_pricing = cursor.fetchall()
+                
+                for row in base_pricing:
+                    pricing_data.append({
+                        'product_type': row['product_type'],
+                        'size_name': row['size_name'],
+                        'cost_price': row['cost_price']
+                    })
+                
+                # Add framed canvas variants with colors
+                framed_canvas_config = [
+                    ('0.75" Framed Canvas', [
+                        ('Black', 'black_floating_075'),
+                        ('White', 'white_floating_075'),
+                        ('Silver', 'silver_floating_075'),
+                        ('Gold', 'gold_floating_075'),
+                    ]),
+                    ('1.25" Framed Canvas', [
+                        ('Black', 'black_floating_125'),
+                        ('White', 'white_floating_125'),
+                        ('Oak', 'oak_floating_125'),
+                    ]),
+                    ('1.50" Framed Canvas', [
+                        ('Black', 'black_floating_150'),
+                        ('White', 'white_floating_150'),
+                        ('Oak', 'oak_floating_150'),
+                    ]),
+                ]
+                
+                for canvas_type, frame_colors in framed_canvas_config:
+                    cursor.execute("""
+                        SELECT 
+                            ps.display_name as product_type,
+                            pz.size_name,
+                            bp.cost_price
+                        FROM base_pricing bp
+                        JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
+                        JOIN print_sizes pz ON bp.size_id = pz.size_id
+                        JOIN aspect_ratios ar ON pz.aspect_ratio_id = ar.aspect_ratio_id
+                        WHERE bp.is_available = TRUE
+                        AND ar.display_name = ?
+                        AND ps.display_name = ?
+                        ORDER BY pz.width, pz.height
+                    """, (aspect_ratio, canvas_type))
+                    
+                    base_framed_pricing = cursor.fetchall()
+                    
+                    for color_name, option_name in frame_colors:
+                        cursor.execute("""
+                            SELECT op.cost_price
+                            FROM option_pricing op
+                            JOIN product_options po ON op.option_id = po.option_id
+                            WHERE po.option_name = ?
+                        """, (option_name,))
+                        
+                        frame_row = cursor.fetchone()
+                        frame_adjustment = float(frame_row[0]) if frame_row and frame_row[0] else 0.0
+                        
+                        for row in base_framed_pricing:
+                            pricing_data.append({
+                                'product_type': f"{canvas_type} {color_name}",
+                                'size_name': row['size_name'],
+                                'cost_price': row['cost_price'] + frame_adjustment
+                            })
+                
+                # Get Shopify product variants
+                url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products/{shopify_product_id}.json'
+                headers = {
+                    'X-Shopify-Access-Token': SHOPIFY_API_SECRET
+                }
+                
+                response = requests.get(url, headers=headers)
+                
+                if response.status_code != 200:
+                    errors.append(f"{image_filename}: Failed to fetch from Shopify (HTTP {response.status_code})")
+                    skipped_count += 1
+                    continue
+                
+                shopify_product = response.json()['product']
+                variants = shopify_product.get('variants', [])
+                
+                # Update each variant's price
+                for variant in variants:
+                    variant_id = variant['id']
+                    option1 = variant.get('option1', '')  # Product type
+                    option2 = variant.get('option2', '')  # Size
+                    
+                    # Find matching price in database
+                    matching_price = None
+                    for price_row in pricing_data:
+                        db_prod_type = price_row['product_type']
+                        shopify_prod_type = map_product_type_to_shopify(db_prod_type)
+                        if shopify_prod_type is None:
+                            shopify_prod_type = db_prod_type
+                        
+                        db_size = price_row['size_name'].strip('"')
+                        
+                        if shopify_prod_type == option1 and db_size == option2:
+                            matching_price = round(price_row['cost_price'] * markup_multiplier, 2)
+                            break
+                    
+                    if matching_price is None:
+                        continue  # Skip variants with no matching price
+                    
+                    # Update variant price via API
+                    update_url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/variants/{variant_id}.json'
+                    update_data = {
+                        'variant': {
+                            'id': variant_id,
+                            'price': str(matching_price)
+                        }
+                    }
+                    
+                    update_response = requests.put(update_url, headers=headers, json=update_data)
+                    
+                    if update_response.status_code == 200:
+                        updated_count += 1
+                    else:
+                        errors.append(f"{image_filename} variant {variant_id}: HTTP {update_response.status_code}")
+                
+            except Exception as e:
+                errors.append(f"{image_filename}: {str(e)}")
+                skipped_count += 1
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'updated': updated_count,
+            'skipped': skipped_count,
+            'errors': errors[:10]  # Limit to first 10 errors
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
