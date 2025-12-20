@@ -13,8 +13,8 @@ from datetime import datetime
 
 shopify_price_sync_bp = Blueprint('shopify_price_sync', __name__)
 
-SHOPIFY_STORE = os.environ.get('SHOPIFY_STORE')
-SHOPIFY_ACCESS_TOKEN = os.environ.get('SHOPIFY_ACCESS_TOKEN')
+SHOPIFY_STORE = os.environ.get('SHOPIFY_STORE', 'fifth-element-photography.myshopify.com')
+SHOPIFY_ACCESS_TOKEN = os.environ.get('SHOPIFY_API_SECRET', '')
 SHOPIFY_API_VERSION = '2024-01'
 
 def get_db_connection():
