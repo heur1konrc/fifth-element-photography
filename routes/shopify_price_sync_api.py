@@ -28,6 +28,17 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+def map_shopify_to_db_product_type(shopify_product_type):
+    """Reverse map Shopify product type names to database product type names"""
+    # Most names are the same, but some have mappings
+    reverse_mapping = {
+        'Hot Press (recommended for photos)': 'Hot Press Fine Art Paper',
+        'Cold Press': 'Cold Press Fine Art Paper',
+        'Semi-glossy': 'Semi-Glossy Fine Art Paper',
+        'Glossy': 'Glossy Fine Art Paper',
+    }
+    return reverse_mapping.get(shopify_product_type, shopify_product_type)
+
 def get_markup_multiplier():
     """Get global markup multiplier from database"""
     conn = get_db_connection()
@@ -58,6 +69,9 @@ def calculate_price_for_variant(product_category, size_name, frame_color=None, s
         
         # For non-framed products, use the subcategory from option1
         if product_category != "Framed Canvas" and subcategory:
+            # Convert Shopify name back to database name
+            db_subcategory = map_shopify_to_db_product_type(subcategory)
+            
             # Query using the specific subcategory (e.g., "0.75\" Stretched Canvas")
             cursor.execute("""
                 SELECT bp.cost_price
@@ -67,7 +81,7 @@ def calculate_price_for_variant(product_category, size_name, frame_color=None, s
                 WHERE ps.display_name = ?
                 AND pz.size_name = ?
                 AND bp.is_available = TRUE
-            """, (subcategory, size_name))
+            """, (db_subcategory, size_name))
             
             row = cursor.fetchone()
             if not row:
