@@ -1834,6 +1834,50 @@ if (typeof originalCreateShopifyProductsViaAPI === 'function') {
     };
 }
 
+// ============================================================================
+// SHOPIFY PRICE SYNC
+// ============================================================================
+
+async function syncShopifyPrices() {
+    if (!confirm('This will update prices for ALL existing Shopify products based on current pricing in the database.\n\nThis process may take 30-60 minutes due to Shopify rate limits (2 requests/second).\n\nContinue?')) {
+        return;
+    }
+    
+    try {
+        showAlert('Starting price sync... This will take 30-60 minutes. Please keep this tab open.', 'info');
+        
+        const response = await fetch('/api/shopify/sync-prices', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            let message = `✓ Price sync completed!\n\n`;
+            message += `Products updated: ${result.products_updated}\n`;
+            message += `Variants updated: ${result.variants_updated}\n`;
+            message += `Duration: ${Math.round(result.duration_seconds / 60)} minutes`;
+            
+            if (result.errors && result.errors.length > 0) {
+                message += `\n\nErrors (${result.errors.length}):\n${result.errors.slice(0, 5).join('\n')}`;
+                if (result.errors.length > 5) {
+                    message += `\n... and ${result.errors.length - 5} more errors`;
+                }
+            }
+            
+            alert(message);
+            showAlert('Price sync completed successfully!', 'success');
+        } else {
+            showAlert(`Price sync failed: ${result.error}`, 'danger');
+        }
+    } catch (error) {
+        console.error('Price sync error:', error);
+        showAlert('Price sync failed. Please check console for details.', 'danger');
+    }
+}
 
 // Generate gallery images
 async function generateGalleryImages() {
