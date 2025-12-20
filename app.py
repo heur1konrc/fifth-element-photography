@@ -1861,7 +1861,7 @@ def edit_image(filename):
                 </div>
                 <div class="form-group">
                     <label for="description">Description:</label>
-                    <div id="quill-editor" style="background: #1a1a1a; min-height: 200px;"></div>
+                    <div id="quill-editor" style="background: #1a1a1a; min-height: 120px; width: 100%;"></div>
                     <textarea id="description" name="description" style="display: none;">{image.get('description', '')}</textarea>
                 </div>
                 <div class="form-group">

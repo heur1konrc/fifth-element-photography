@@ -557,7 +557,7 @@ body {
     transform: translate(-50%, -50%);
     background: #2d2d2d;
     border-radius: 12px;
-    max-width: 700px;
+    max-width: 900px;
     width: 90%;
     max-height: 85vh;
     overflow-y: auto;
