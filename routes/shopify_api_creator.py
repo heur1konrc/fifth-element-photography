@@ -251,31 +251,30 @@ def create_shopify_product():
                 errors.append(f"{filename}: No pricing data found")
                 continue
             
-            # Build variants
-            variants = []
-            product_types = set()
-            sizes = set()
+            # Group pricing data by category
+            categories = {
+                'Canvas': [],
+                'Framed Canvas': [],
+                'Fine Art Paper': [],
+                'Foam-mounted Print': []
+            }
             
             for row in pricing_data:
                 db_prod_type = row['product_type']
-                shopify_prod_type = map_product_type_to_shopify(db_prod_type)
                 
-                if shopify_prod_type is None:
+                # Determine category
+                if 'Framed Canvas' in db_prod_type:
+                    category = 'Framed Canvas'
+                elif 'Canvas' in db_prod_type:
+                    category = 'Canvas'
+                elif 'Fine Art Paper' in db_prod_type:
+                    category = 'Fine Art Paper'
+                elif 'Foam-mounted' in db_prod_type:
+                    category = 'Foam-mounted Print'
+                else:
                     continue
                 
-                size = row['size_name'].strip('"')
-                price = round(row['cost_price'] * markup_multiplier, 2)
-                
-                product_types.add(shopify_prod_type)
-                sizes.add(size)
-                
-                variants.append({
-                    'option1': shopify_prod_type,
-                    'option2': size,
-                    'price': str(price),
-                    'inventory_quantity': 10,
-                    'inventory_management': 'shopify'
-                })
+                categories[category].append(row)
             
             # Prepare image for upload
             image_path = os.path.join(IMAGES_FOLDER, filename)
@@ -299,53 +298,88 @@ def create_shopify_product():
                 errors.append(f"{filename}: Image file not found")
                 continue
             
-            # Create product via Shopify API
-            product_data = {
-                'product': {
-                    'title': title,
-                    'handle': handle,
-                    'vendor': 'Lumaprints',
-                    'product_type': 'Art Print',
-                    'status': 'active',
-                    'options': [
-                        {'name': 'Printed Product', 'values': list(product_types)},
-                        {'name': 'Size', 'values': list(sizes)}
-                    ],
-                    'variants': variants,
-                    'images': [image_attachment] if image_attachment else []
+            # Create separate products for each category
+            for category_name, category_data in categories.items():
+                if not category_data:
+                    continue  # Skip empty categories
+                
+                # Build variants for this category
+                variants = []
+                product_types = set()
+                sizes = set()
+                
+                for row in category_data:
+                    db_prod_type = row['product_type']
+                    shopify_prod_type = map_product_type_to_shopify(db_prod_type)
+                    
+                    if shopify_prod_type is None:
+                        shopify_prod_type = db_prod_type  # Use as-is if no mapping
+                    
+                    size = row['size_name'].strip('"')
+                    price = round(row['cost_price'] * markup_multiplier, 2)
+                    
+                    product_types.add(shopify_prod_type)
+                    sizes.add(size)
+                    
+                    variants.append({
+                        'option1': shopify_prod_type,
+                        'option2': size,
+                        'price': str(price),
+                        'inventory_quantity': 10,
+                        'inventory_management': 'shopify'
+                    })
+                
+                # Create product title and handle for this category
+                category_title = f"{title} - {category_name}"
+                category_handle = f"{handle}-{slugify(category_name)}"
+                
+                # Create product via Shopify API
+                product_data = {
+                    'product': {
+                        'title': category_title,
+                        'handle': category_handle,
+                        'vendor': 'Lumaprints',
+                        'product_type': 'Art Print',
+                        'status': 'active',
+                        'options': [
+                            {'name': 'Printed Product', 'values': sorted(list(product_types))},
+                            {'name': 'Size', 'values': sorted(list(sizes))}
+                        ],
+                        'variants': variants,
+                        'images': [image_attachment] if image_attachment else []
+                    }
                 }
-            }
-            
-            # Make API request
-            url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json'
-            headers = {
-                'Content-Type': 'application/json',
-                'X-Shopify-Access-Token': SHOPIFY_API_SECRET
-            }
-            
-            response = requests.post(url, headers=headers, json=product_data)
-            
-            print(f"Shopify API Response Status: {response.status_code}")
-            print(f"Shopify API Response: {response.text}")
-            
-            if response.status_code == 201:
-                created_products.append(title)
                 
-                # Extract Shopify product ID from response
-                response_data = response.json()
-                shopify_product_id = str(response_data['product']['id'])
+                # Make API request
+                url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json'
+                headers = {
+                    'Content-Type': 'application/json',
+                    'X-Shopify-Access-Token': SHOPIFY_API_SECRET
+                }
                 
-                # Save to database for tracking
-                cursor = conn.cursor()
-                cursor.execute("""
-                    INSERT OR REPLACE INTO shopify_products (image_filename, shopify_product_id, shopify_handle)
-                    VALUES (?, ?, ?)
-                """, (filename, shopify_product_id, handle))
-                conn.commit()
-            else:
-                error_msg = f"{title}: HTTP {response.status_code} - {response.text}"
-                print(f"ERROR: {error_msg}")
-                errors.append(error_msg)
+                response = requests.post(url, headers=headers, json=product_data)
+                
+                print(f"Shopify API Response Status: {response.status_code}")
+                print(f"Shopify API Response: {response.text}")
+                
+                if response.status_code == 201:
+                    created_products.append(category_title)
+                    
+                    # Extract Shopify product ID from response
+                    response_data = response.json()
+                    shopify_product_id = str(response_data['product']['id'])
+                    
+                    # Save to database for tracking (using category handle)
+                    cursor = conn.cursor()
+                    cursor.execute("""
+                        INSERT OR REPLACE INTO shopify_products (image_filename, shopify_product_id, shopify_handle)
+                        VALUES (?, ?, ?)
+                    """, (f"{filename}_{category_name}", shopify_product_id, category_handle))
+                    conn.commit()
+                else:
+                    error_msg = f"{category_title}: HTTP {response.status_code} - {response.text}"
+                    print(f"ERROR: {error_msg}")
+                    errors.append(error_msg)
         
         conn.close()
         
