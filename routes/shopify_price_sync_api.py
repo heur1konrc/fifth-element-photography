@@ -90,30 +90,52 @@ def sync_shopify_prices():
         variants_updated = 0
         errors = []
         
-        # Process each product
-        for product in all_products:
-            product_title = product.get('title', '')
-            
-            # Extract image filename from product title (format: "ImageName - Category")
-            if ' - ' not in product_title:
-                continue
-            
-            image_filename = product_title.split(' - ')[0].strip()
-            
-            # Get aspect ratio for this image from database
-            cursor.execute("SELECT aspect_ratio FROM images WHERE filename = ?", (image_filename,))
-            image_row = cursor.fetchone()
-            
-            if not image_row:
-                errors.append(f"{product_title}: Image not found in database")
-                continue
-            
-            aspect_ratio = image_row['aspect_ratio']
-            
-            # Get pricing data for this aspect ratio (EXACT copy from shopify_api_creator)
-            pricing_data = []
-            
-            # Get base pricing for all categories
+        # Get ALL pricing data once (for all aspect ratios)
+        pricing_data = []
+        
+        # Get base pricing for all categories and aspect ratios
+        cursor.execute("""
+            SELECT 
+                ps.display_name as product_type,
+                pz.size_name,
+                bp.cost_price
+            FROM base_pricing bp
+            JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
+            JOIN print_sizes pz ON bp.size_id = pz.size_id
+            WHERE bp.is_available = TRUE
+            ORDER BY pz.width, pz.height
+        """)
+        
+        base_pricing = cursor.fetchall()
+        
+        for row in base_pricing:
+            pricing_data.append({
+                'product_type': row['product_type'],
+                'size_name': row['size_name'],
+                'cost_price': row['cost_price']
+            })
+        
+        # Add framed canvas variants with colors
+        framed_canvas_config = [
+            ('0.75" Framed Canvas', [
+                ('Black', 'black_floating_075'),
+                ('White', 'white_floating_075'),
+                ('Silver', 'silver_floating_075'),
+                ('Gold', 'gold_floating_075'),
+            ]),
+            ('1.25" Framed Canvas', [
+                ('Black', 'black_floating_125'),
+                ('White', 'white_floating_125'),
+                ('Oak', 'oak_floating_125'),
+            ]),
+            ('1.50" Framed Canvas', [
+                ('Black', 'black_floating_150'),
+                ('White', 'white_floating_150'),
+                ('Oak', 'oak_floating_150'),
+            ]),
+        ]
+        
+        for canvas_type, frame_colors in framed_canvas_config:
             cursor.execute("""
                 SELECT 
                     ps.display_name as product_type,
@@ -122,78 +144,35 @@ def sync_shopify_prices():
                 FROM base_pricing bp
                 JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
                 JOIN print_sizes pz ON bp.size_id = pz.size_id
-                JOIN aspect_ratios ar ON pz.aspect_ratio_id = ar.aspect_ratio_id
                 WHERE bp.is_available = TRUE
-                AND ar.display_name = ?
+                AND ps.display_name = ?
                 ORDER BY pz.width, pz.height
-            """, (aspect_ratio,))
+            """, (canvas_type,))
             
-            base_pricing = cursor.fetchall()
+            base_framed_pricing = cursor.fetchall()
             
-            for row in base_pricing:
-                pricing_data.append({
-                    'product_type': row['product_type'],
-                    'size_name': row['size_name'],
-                    'cost_price': row['cost_price']
-                })
-            
-            # Add framed canvas variants with colors (EXACT copy from shopify_api_creator)
-            framed_canvas_config = [
-                ('0.75" Framed Canvas', [
-                    ('Black', 'black_floating_075'),
-                    ('White', 'white_floating_075'),
-                    ('Silver', 'silver_floating_075'),
-                    ('Gold', 'gold_floating_075'),
-                ]),
-                ('1.25" Framed Canvas', [
-                    ('Black', 'black_floating_125'),
-                    ('White', 'white_floating_125'),
-                    ('Oak', 'oak_floating_125'),
-                ]),
-                ('1.50" Framed Canvas', [
-                    ('Black', 'black_floating_150'),
-                    ('White', 'white_floating_150'),
-                    ('Oak', 'oak_floating_150'),
-                ]),
-            ]
-            
-            for canvas_type, frame_colors in framed_canvas_config:
+            for color_name, option_name in frame_colors:
                 cursor.execute("""
-                    SELECT 
-                        ps.display_name as product_type,
-                        pz.size_name,
-                        bp.cost_price
-                    FROM base_pricing bp
-                    JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
-                    JOIN print_sizes pz ON bp.size_id = pz.size_id
-                    JOIN aspect_ratios ar ON pz.aspect_ratio_id = ar.aspect_ratio_id
-                    WHERE bp.is_available = TRUE
-                    AND ar.display_name = ?
-                    AND ps.display_name = ?
-                    ORDER BY pz.width, pz.height
-                """, (aspect_ratio, canvas_type))
+                    SELECT op.cost_price
+                    FROM option_pricing op
+                    JOIN product_options po ON op.option_id = po.option_id
+                    WHERE po.option_name = ?
+                """, (option_name,))
                 
-                base_framed_pricing = cursor.fetchall()
+                frame_row = cursor.fetchone()
+                frame_adjustment = float(frame_row[0]) if frame_row and frame_row[0] else 0.0
                 
-                for color_name, option_name in frame_colors:
-                    cursor.execute("""
-                        SELECT op.cost_price
-                        FROM option_pricing op
-                        JOIN product_options po ON op.option_id = po.option_id
-                        WHERE po.option_name = ?
-                    """, (option_name,))
-                    
-                    frame_row = cursor.fetchone()
-                    frame_adjustment = float(frame_row[0]) if frame_row and frame_row[0] else 0.0
-                    
-                    for row in base_framed_pricing:
-                        pricing_data.append({
-                            'product_type': f"{canvas_type} {color_name}",
-                            'size_name': row['size_name'],
-                            'cost_price': row['cost_price'] + frame_adjustment
-                        })
+                for row in base_framed_pricing:
+                    pricing_data.append({
+                        'product_type': f"{canvas_type} {color_name}",
+                        'size_name': row['size_name'],
+                        'cost_price': row['cost_price'] + frame_adjustment
+                    })
+        
+        # Now update variants for all products
+        for product in all_products:
+            product_title = product.get('title', '')
             
-            # Now update variants (EXACT copy from shopify_api_creator)
             product_updated = False
             for variant in product.get('variants', []):
                 variant_id = variant.get('id')
