@@ -31,7 +31,7 @@ def fix_metal_36x36():
         
         # Get Metal subcategory IDs
         cursor.execute("""
-            SELECT subcategory_id, display_name
+            SELECT ps.subcategory_id, ps.display_name
             FROM product_subcategories ps
             JOIN product_categories pc ON ps.category_id = pc.category_id
             WHERE pc.category_name = 'Metal'
