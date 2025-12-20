@@ -70,7 +70,7 @@ def add_metal_prints():
                         TRUE
                     FROM product_subcategories ps
                     JOIN product_categories pc ON ps.category_id = pc.category_id
-                    JOIN print_sizes pz ON pz.aspect_ratio_id = (SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = 'Standard')
+                    JOIN print_sizes pz ON pz.aspect_ratio_id = (SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = '3:2')
                     WHERE pc.category_name = 'Metal' 
                     AND ps.subcategory_name = ?
                     AND pz.size_name = ?
@@ -87,7 +87,7 @@ def add_metal_prints():
                         TRUE
                     FROM product_subcategories ps
                     JOIN product_categories pc ON ps.category_id = pc.category_id
-                    JOIN print_sizes pz ON pz.aspect_ratio_id = (SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = 'Square')
+                    JOIN print_sizes pz ON pz.aspect_ratio_id = (SELECT aspect_ratio_id FROM aspect_ratios WHERE display_name = '1:1')
                     WHERE pc.category_name = 'Metal' 
                     AND ps.subcategory_name = ?
                     AND pz.size_name = ?
