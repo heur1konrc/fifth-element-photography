@@ -314,7 +314,7 @@
                                     <button class="btn-compact btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn-compact btn-analyze" onclick="analyzeImage('{{ image.filename }}', '{{ image.title }}')" title="Analyze Image">
+                                    <button class="btn-compact btn-analyze" onclick="analyzeImage('{{ image.filename }}', '{{ image.title|replace("'", "\\'")|replace('"', '\\"') }}')" title="Analyze Image">
                                         <i class="fas fa-search"></i>
                                     </button>
                                     <button class="btn-compact btn-delete" onclick="deleteImage('{{ image.filename }}')" title="Delete">
