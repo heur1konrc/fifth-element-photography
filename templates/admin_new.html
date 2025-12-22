@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/thumbnail_admin.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_horizontal_panels.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_tabs.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_sidebar.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Quill WYSIWYG Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -92,6 +93,72 @@
                 
                 <!-- IMAGES TAB -->
                 <div class="admin-tab-content active" id="tab-images">
+                    <div class="admin-layout-with-sidebar">
+                        <!-- LEFT SIDEBAR -->
+                        <aside class="admin-sidebar">
+                            <div class="sidebar-section">
+                                <h3 class="sidebar-section-title">Actions</h3>
+                                <button class="sidebar-button btn-primary" onclick="openUploadModal()">
+                                    <i class="fas fa-plus"></i>
+                                    Upload Images
+                                </button>
+                                <button class="sidebar-button" onclick="openCategoryModal()">
+                                    <i class="fas fa-tags"></i>
+                                    Manage Categories
+                                </button>
+                                <button class="sidebar-button" onclick="randomizePortfolio()">
+                                    <i class="fas fa-dice"></i>
+                                    Randomize Order
+                                </button>
+                                <button class="sidebar-button btn-success" onclick="backupSystem()">
+                                    <i class="fas fa-download"></i>
+                                    Backup System
+                                </button>
+                                <button class="sidebar-button btn-info" onclick="generateGalleryImages()">
+                                    <i class="fas fa-images"></i>
+                                    Generate Gallery Images
+                                </button>
+                                <a href="/admin/galleries" class="sidebar-button btn-info">
+                                    <i class="fas fa-photo-video"></i>
+                                    Gallery Admin
+                                </a>
+                                <button class="sidebar-button btn-warning" onclick="populateExifDatabase()">
+                                    <i class="fas fa-camera"></i>
+                                    Populate EXIF Database
+                                </button>
+                            </div>
+                            
+                            <div class="sidebar-section">
+                                <h3 class="sidebar-section-title">Shopify</h3>
+                                <a href="/admin/pricing" class="sidebar-button btn-warning">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    Pricing Management
+                                </a>
+                                <a href="/admin/shopify-mapping" class="sidebar-button btn-info">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    Shopify Product Mapping
+                                </a>
+                                <button class="sidebar-button btn-success" onclick="createShopifyProductsViaAPI()">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    Create Shopify Products
+                                </button>
+                                <button class="sidebar-button btn-info" onclick="syncShopifyPrices()">
+                                    <i class="fas fa-sync-alt"></i>
+                                    Sync Prices to Shopify
+                                </button>
+                                <button class="sidebar-button" onclick="generateShopifyCSVFromSelected()">
+                                    <i class="fas fa-file-csv"></i>
+                                    Generate Shopify CSV
+                                </button>
+                                <button class="sidebar-button btn-warning" onclick="openLumaprintsModal()">
+                                    <i class="fas fa-file-excel"></i>
+                                    Lumaprints Bulk Mapping
+                                </button>
+                            </div>
+                        </aside>
+                        
+                        <!-- MAIN CONTENT -->
+                        <div class="admin-main-content">
    
         <!-- Featured Image Story Management 
             <section class="featured-section">
@@ -156,68 +223,7 @@
                         </button>
                     </div>
 
-                    <div class="section-actions">
-                        <button class="btn btn-primary" onclick="openUploadModal()">
-                            <i class="fas fa-plus"></i>
-                            Upload Images
-                        </button>
-                        <button class="btn btn-secondary" onclick="openCategoryModal()">
-                            <i class="fas fa-tags"></i>
-                            Manage Categories
-                        </button>
-                        <button class="btn btn-accent" onclick="randomizePortfolio()">
-                            <i class="fas fa-dice"></i>
-                            Randomize Order
-                        </button>
-                        <button class="btn btn-success" onclick="backupSystem()">
-                            <i class="fas fa-download"></i>
-                            Backup System
-                        </button>
-                        <button class="btn btn-info" onclick="generateGalleryImages()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <i class="fas fa-images"></i>
-                            Generate Gallery Images
-                        </button>
-                        <a href="/admin/galleries" class="btn btn-info" style="text-decoration: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <i class="fas fa-photo-video"></i>
-                            Gallery Admin
-                        </a>
-                        <button class="btn btn-warning" onclick="populateExifDatabase()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                            <i class="fas fa-camera"></i>
-                            Populate EXIF Database
-                        </button>
-                        <a href="/admin/pricing" class="btn btn-warning" style="text-decoration: none;">
-                            <i class="fas fa-dollar-sign"></i>
-                            Pricing Management (Beta)
-                        </a>
-                        <a href="/admin/shopify-mapping" class="btn btn-info" style="text-decoration: none;">
-                            <i class="fas fa-shopping-cart"></i>
-                            Shopify Product Mapping
-                        </a>
-                        <button class="btn btn-primary" onclick="createShopifyProductsViaAPI()" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            Create Shopify Products (API)
-                        </button>
-                        <button class="btn btn-info" onclick="syncShopifyPrices()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                            <i class="fas fa-sync-alt"></i>
-                            Sync Prices to Shopify
-                        </button>
-                        <button class="btn btn-success" onclick="generateShopifyCSVFromSelected()">
-                            <i class="fas fa-file-csv"></i>
-                            Generate Shopify CSV
-                        </button>
-                        <button class="btn btn-warning" onclick="openLumaprintsModal()">
-                            <i class="fas fa-file-excel"></i>
-                            Lumaprints Bulk Mapping
-                        </button>
-                        <!-- REMOVED v2.0.0: Print Orders, Products, Lumaprints Mapping, Database Management buttons -->
 
-                    </div>
-                    
-                    <!-- Version Information -->
-                    <div style="margin-top: 30px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; font-size: 13px; color: rgba(255, 255, 255, 0.6);">
-                        <div style="margin-bottom: 5px;"><strong>Admin Version:</strong> v2.2.0</div>
-                        <div><strong>Website Version:</strong> v2.0.1</div>
-                    </div>
                 </div>
 
                 <!-- Pagination Controls -->
@@ -399,6 +405,10 @@
                     </div>
                 {% endif %}
             </section>
+                        </div>
+                        <!-- END MAIN CONTENT -->
+                    </div>
+                    <!-- END SIDEBAR LAYOUT -->
                 </div>
                 <!-- END IMAGES TAB -->
                 

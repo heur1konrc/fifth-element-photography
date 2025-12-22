@@ -1,0 +1,114 @@
+/* Admin Sidebar Layout */
+
+.admin-layout-with-sidebar {
+    display: flex;
+    gap: 0;
+    min-height: calc(100vh - 100px);
+}
+
+.admin-sidebar {
+    width: 280px;
+    background: #1a1a1a;
+    border-right: 1px solid #333;
+    padding: 20px;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.admin-main-content {
+    flex: 1;
+    overflow-x: hidden;
+}
+
+.sidebar-section {
+    margin-bottom: 30px;
+}
+
+.sidebar-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #666;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333;
+}
+
+.sidebar-button {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    background: #2a2a2a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.sidebar-button:hover {
+    background: #333;
+    border-color: #4a9eff;
+    transform: translateX(3px);
+}
+
+.sidebar-button i {
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+}
+
+.sidebar-button.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+}
+
+.sidebar-button.btn-primary:hover {
+    transform: translateX(3px) scale(1.02);
+}
+
+.sidebar-button.btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border-color: transparent;
+}
+
+.sidebar-button.btn-warning {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-color: transparent;
+}
+
+.sidebar-button.btn-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+}
+
+.sidebar-button.btn-danger {
+    background: #dc3545;
+    border-color: transparent;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .admin-sidebar {
+        width: 240px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-layout-with-sidebar {
+        flex-direction: column;
+    }
+    
+    .admin-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #333;
+    }
+}
