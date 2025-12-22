@@ -360,10 +360,14 @@
                         <aside class="admin-sidebar">
                             <div class="sidebar-section">
                                 <h3 class="sidebar-section-title">Shopify Actions</h3>
-                                <a href="/admin/shopify-mapping" class="sidebar-button btn-info">
+                                <button class="sidebar-button btn-info" onclick="loadShopifyPage('/admin/shopify-mapping')">
                                     <i class="fas fa-shopping-cart"></i>
                                     Shopify Product Mapping
-                                </a>
+                                </button>
+                                <button class="sidebar-button btn-warning" onclick="loadShopifyPage('/admin/pricing')">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    Pricing Management
+                                </button>
                                 <button class="sidebar-button btn-success" onclick="createShopifyProductsViaAPI()">
                                     <i class="fas fa-cloud-upload-alt"></i>
                                     Create Shopify Products
@@ -390,13 +394,7 @@
                         <!-- MAIN CONTENT -->
                         <div class="admin-main-content">
                             <div class="tab-section">
-                                <div class="tab-section-header">
-                                    <div>
-                                        <h2 class="tab-section-title">Shopify Integration</h2>
-                                        <p class="tab-section-description">Manage Shopify product creation, pricing, and synchronization</p>
-                                    </div>
-                                </div>
-                                <p style="color: #999; text-align: center; padding: 40px;">Shopify content will be organized here...</p>
+                                <iframe id="shopify-content-frame" style="width: 100%; height: calc(100vh - 180px); border: none; border-radius: 8px; background: #1a1a1a;"></iframe>
                             </div>
                         </div>
                     </div>
@@ -796,6 +794,7 @@
     <script src="{{ url_for('static', filename='js/image_analysis.js') }}"></script>
     <script src="{{ url_for('static', filename='js/inline_edit.js') }}"></script>
     <script src="{{ url_for('static', filename='js/admin_tabs.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shopify_tab.js') }}"></script>
 </body>
 </html>
 
