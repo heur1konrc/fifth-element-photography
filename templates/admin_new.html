@@ -289,10 +289,6 @@
                                         <div class="panel-thumbnail-new">
                                             <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title }}" loading="lazy">
                                         </div>
-                                        <div class="panel-image-info">
-                                            <div class="panel-filename">File Name: <span class="inline-edit-filename" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'filename')">{{ image.filename }}</span></div>
-                                            <div class="panel-title">Image Title: <span class="inline-edit-title" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'title')">{{ image.title }}</span></div>
-                                        </div>
                                     </div>
                                     
                                     <!-- MIDDLE: Categories, Galleries & Description -->
@@ -340,8 +336,13 @@
                                     </div>
                                 </div>
                                 
-                                <!-- BOTTOM SECTION: Action Buttons + Icons -->
+                                <!-- BOTTOM SECTION: Filename/Title + Action Buttons + Icons -->
                                 <div class="panel-bottom-section">
+                                    <div class="panel-image-info">
+                                        <div class="panel-filename">File Name: <span class="inline-edit-filename" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'filename')">{{ image.filename }}</span></div>
+                                        <div class="panel-title">Image Title: <span class="inline-edit-title" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'title')">{{ image.title }}</span></div>
+                                    </div>
+                                    
                                     <div class="panel-action-buttons">
                                         <button class="panel-btn btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit">
                                             <i class="fas fa-edit"></i>
