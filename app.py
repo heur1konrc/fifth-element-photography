@@ -5367,3 +5367,75 @@ def toggle_carousel_inline():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+@app.route('/admin/update-image-categories', methods=['POST'])
+@require_admin_auth
+def update_image_categories():
+    """Update categories for an image via JSON API"""
+    try:
+        data = request.get_json()
+        filename = data.get('filename')
+        categories = data.get('categories', [])
+        
+        if not filename:
+            return jsonify({'success': False, 'error': 'No filename provided'}), 400
+        
+        # Load and update categories
+        image_categories = load_image_categories()
+        image_categories[filename] = categories
+        
+        if save_image_categories(image_categories):
+            return jsonify({'success': True, 'message': 'Categories updated successfully'})
+        else:
+            return jsonify({'success': False, 'error': 'Failed to save categories'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/admin/get-galleries', methods=['GET'])
+@require_admin_auth
+def get_galleries_api():
+    """Get all galleries for the selector modal"""
+    try:
+        from gallery_db import get_all_galleries
+        galleries = get_all_galleries()
+        gallery_names = [g['name'] for g in galleries]
+        return jsonify({'success': True, 'galleries': gallery_names})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/admin/update-image-galleries', methods=['POST'])
+@require_admin_auth
+def update_image_galleries():
+    """Update galleries for an image via JSON API"""
+    try:
+        data = request.get_json()
+        filename = data.get('filename')
+        gallery_names = data.get('galleries', [])
+        
+        if not filename:
+            return jsonify({'success': False, 'error': 'No filename provided'}), 400
+        
+        from gallery_db import get_all_galleries, add_image_to_gallery, remove_image_from_gallery, get_galleries_for_image
+        
+        # Get all galleries
+        all_galleries = get_all_galleries()
+        gallery_map = {g['name']: g['id'] for g in all_galleries}
+        
+        # Get current galleries for this image
+        current_galleries = get_galleries_for_image(filename)
+        current_gallery_ids = {g['id'] for g in current_galleries}
+        
+        # Determine which galleries to add and remove
+        selected_gallery_ids = {gallery_map[name] for name in gallery_names if name in gallery_map}
+        
+        # Remove from galleries not in selection
+        for gallery_id in current_gallery_ids - selected_gallery_ids:
+            remove_image_from_gallery(gallery_id, filename)
+        
+        # Add to new galleries
+        for gallery_id in selected_gallery_ids - current_gallery_ids:
+            add_image_to_gallery(gallery_id, filename)
+        
+        return jsonify({'success': True, 'message': 'Galleries updated successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
