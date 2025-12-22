@@ -109,4 +109,8 @@ function updateVisibleCount(visible, total) {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Image sort and filter initialized');
+    // Run initial sort
+    setTimeout(() => {
+        applySortAndFilter();
+    }, 100);
 });
