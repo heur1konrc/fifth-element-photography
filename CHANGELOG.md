@@ -2,6 +2,53 @@
 
 All notable changes to Fifth Element Photography website will be documented in this file.
 
+## [2.3.0] - 2024-12-22
+
+### Added
+- **Tabbed Admin Interface** - New 4-tab layout (Images, Shopify, Tools, Settings) with localStorage persistence
+- **Horizontal Image Panels** - Redesigned image cards with thumbnail on left, metadata in center, actions on right
+- **Category & Gallery Badges** - Visual badges showing all assigned categories and galleries on each image panel
+- **Category Selector Modal** - Click + button to open modal with checkboxes for managing image categories
+- **Gallery Selector Modal** - Click + button to open modal with checkboxes for managing image galleries
+- **Iframe Integration** - Manage Categories and Gallery Admin pages now load in iframe within Images tab
+- **Manage Categories HTML Page** - New dedicated page (`admin_categories.html`) for category management with add/delete UI
+- **Gallery Data in Images** - Added `galleries` field to image data showing all galleries containing each image
+- **Date Added Field** - Added `date_added` field using file modification time for date-based sorting
+- **API Endpoints** - New `/admin/update-image-categories` and `/admin/update-image-galleries` endpoints
+- **Inline Editing** - Editable filename and title fields directly on image panels
+
+### Changed
+- **Admin Layout** - Moved from single-page to tabbed interface for better organization
+- **Image Panel Design** - Changed from vertical to horizontal layout (60% less scrolling)
+- **Sidebar Organization** - Grouped functions into Actions, Sort & Filter, Categories, and Bulk Actions sections
+- **Shopify Tab Loading** - Optimized to load in seconds instead of 90+ seconds
+- **Category Management Route** - Modified to return HTML template for GET requests, JSON for API calls
+- **Sort Options** - Added Gallery sorting option alongside existing A-Z, Z-A, Date, and Category options
+
+### Fixed
+- **Category Modal Conflict** - Resolved duplicate `categoryModal` ID causing selector modal to not display
+- **Category Data Display** - Fixed template to use `all_categories` field correctly
+- **Gallery Data Integration** - Created `get_galleries_for_image()` function to fetch gallery memberships
+- **Modal JavaScript** - Added `showNotification()` function for user feedback
+- **JSON API Detection** - Fixed category management page to request JSON format with `?format=json` parameter
+
+### Technical Improvements
+- Created `selector_modals.js` for category and gallery management modals
+- Created `selector_modals.css` for modal styling
+- Added `loadImagesPage()` function for iframe content loading
+- Implemented localStorage for tab state persistence across sessions
+- Enhanced `scan_images()` to include galleries and date_added fields
+- Modified `manage_categories()` route to support both HTML and JSON responses
+
+### User Experience
+- **60% Less Scrolling** - Horizontal panels show more information in less vertical space
+- **Faster Navigation** - Tabbed interface keeps related functions together
+- **Visual Clarity** - Color-coded badges make categories and galleries immediately visible
+- **Quick Editing** - Inline editing and modal selectors reduce clicks and page loads
+- **Better Organization** - Collapsible sidebar sections keep interface clean and focused
+
+---
+
 ## [2.2.0] - 2024-11-18
 
 ### Added
