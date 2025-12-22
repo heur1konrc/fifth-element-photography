@@ -6,6 +6,7 @@
     <title>Admin Dashboard - Fifth Element Photography</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_new.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/thumbnail_admin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_horizontal_panels.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Quill WYSIWYG Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -259,67 +260,89 @@
                 {% if images %}
                     <div class="image-grid">
                         {% for image in images %}
-                            <div class="image-card" data-filename="{{ image.filename }}">
-                                <div class="image-checkbox">
+                            <div class="image-panel-horizontal" data-filename="{{ image.filename }}">
+                                <!-- Left: Checkbox + Thumbnail -->
+                                <div class="panel-left">
                                     <input type="checkbox" class="image-select" data-filename="{{ image.filename }}" onchange="updateSelectionCount()">
+                                    <div class="panel-thumbnail">
+                                        <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title }}" loading="lazy">
+                                    </div>
                                 </div>
                                 
-                                <div class="image-preview">
-                                    <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title }}" loading="lazy" decoding="async" style="background: #1a1a1a;">
-                                    {% if image.is_featured %}
-                                    <div class="status-badge featured-badge">
-                                        <i class="fas fa-star"></i> FEATURED
+                                <!-- Middle: Info Section -->
+                                <div class="panel-middle">
+                                    <!-- Row 1: Title + Status Icons -->
+                                    <div class="panel-row-1">
+                                        <div class="inline-edit-group">
+                                            <label>Title:</label>
+                                            <input type="text" class="inline-edit-title" data-filename="{{ image.filename }}" value="{{ image.title }}" onblur="saveInlineEdit(this, 'title')" />
+                                        </div>
+                                        <div class="status-icons">
+                                            <i class="fas fa-star status-icon {% if image.is_featured %}active{% endif %}" 
+                                               onclick="toggleFeatured('{{ image.filename }}')" 
+                                               title="{% if image.is_featured %}Remove from Featured{% else %}Set as Featured{% endif %}"></i>
+                                            <i class="fas fa-images status-icon {% if image.in_carousel %}active{% endif %}" 
+                                               onclick="toggleCarousel('{{ image.filename }}')" 
+                                               title="{% if image.in_carousel %}Remove from Carousel{% else %}Add to Carousel{% endif %}"></i>
+                                        </div>
                                     </div>
-                                    {% endif %}
-                                    {% if image.is_hero %}
-                                    <div class="status-badge hero-badge">
-                                        <i class="fas fa-home"></i> HERO
+                                    
+                                    <!-- Row 2: Filename -->
+                                    <div class="panel-row-2">
+                                        <div class="inline-edit-group">
+                                            <label>File:</label>
+                                            <input type="text" class="inline-edit-filename" data-filename="{{ image.filename }}" value="{{ image.filename }}" onblur="saveInlineEdit(this, 'filename')" />
+                                        </div>
                                     </div>
-                                    {% endif %}
-                                    <div class="image-overlay">
-                                        <div class="overlay-actions">
-                                            <button class="action-btn edit-btn" onclick="editImage('{{ image.filename }}')" title="Edit">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <!--
-                                            <button class="action-btn slideshow-btn" onclick="addToSlideshow('{{ image.filename }}')" title="Add to Slideshow">
+                                    
+                                    <!-- Row 3: Categories -->
+                                    <div class="panel-row-3">
+                                        <div class="badge-container">
+                                            {% if image.all_categories %}
+                                                {% for cat in image.all_categories %}
+                                                    <span class="category-badge category-{{ cat|lower|replace(' ', '-') }}">{{ cat }}</span>
+                                                {% endfor %}
+                                            {% else %}
+                                                <span class="category-badge category-{{ image.category|lower|replace(' ', '-') }}">{{ image.category }}</span>
+                                            {% endif %}
+                                            <button class="badge-add-btn" onclick="openCategorySelector('{{ image.filename }}')" title="Manage Categories">
                                                 <i class="fas fa-plus"></i>
-                                            </button>
-                                            -->
-                                            <button class="action-btn delete-btn" onclick="deleteImage('{{ image.filename }}')" title="Delete">
-                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="image-info">
-                                    <h3 class="image-title">{{ image.title }}</h3>
-                                    <div class="image-categories">
-                                        {% if image.all_categories %}
-                                            {% for cat in image.all_categories %}
-                                                <span class="category-badge category-{{ cat|lower|replace(' ', '-') }}">
-                                                    {{ cat }}
-                                                </span>
-                                            {% endfor %}
-                                        {% else %}
-                                            <span class="category-badge category-{{ image.category|lower|replace(' ', '-') }}">
-                                                {{ image.category }}
-                                            </span>
-                                        {% endif %}
+                                    
+                                    <!-- Row 4: Galleries -->
+                                    <div class="panel-row-4">
+                                        <div class="badge-container">
+                                            <label class="badge-label">Galleries:</label>
+                                            {% if image.galleries %}
+                                                {% for gallery in image.galleries %}
+                                                    <span class="gallery-badge">{{ gallery }}</span>
+                                                {% endfor %}
+                                            {% else %}
+                                                <span class="no-galleries">None</span>
+                                            {% endif %}
+                                            <button class="badge-add-btn" onclick="openGallerySelector('{{ image.filename }}')" title="Manage Galleries">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="image-actions-compact">
-                                    <button class="btn-compact btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn-compact btn-analyze" onclick="analyzeImage('{{ image.filename }}', '{{ image.title|replace("'", "\\'")|replace('"', '\\"') }}')" title="Analyze Image">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                    <button class="btn-compact btn-delete" onclick="deleteImage('{{ image.filename }}')" title="Delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    
+                                    <!-- Row 5: Action Buttons -->
+                                    <div class="panel-row-5">
+                                        <button class="panel-btn btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit Details">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="panel-btn btn-analyze" onclick="analyzeImage('{{ image.filename }}', '{{ image.title|replace("'", "\\'")|replace('"', '\\"') }}')" title="Analyze Image">
+                                            <i class="fas fa-search"></i> Analyze
+                                        </button>
+                                        <button class="panel-btn btn-download" onclick="downloadHighres('{{ image.filename }}')" title="Download Hi-Res">
+                                            <i class="fas fa-download"></i> Download
+                                        </button>
+                                        <button class="panel-btn btn-delete" onclick="deleteImage('{{ image.filename }}')" title="Delete">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         {% endfor %}
@@ -708,6 +731,7 @@
     <script src="{{ url_for('static', filename='js/admin_new.js') }}"></script>
     <script src="{{ url_for('static', filename='js/thumbnail_admin.js') }}"></script>
     <script src="{{ url_for('static', filename='js/image_analysis.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/inline_edit.js') }}"></script>
 </body>
 </html>
 

@@ -5171,5 +5171,179 @@ def gallery_page(slug):
     return render_template('gallery_page.html', gallery=gallery, galleries=galleries, images=images)
 
 
+@app.route('/admin/update-image-field', methods=['POST'])
+@require_admin_auth
+def update_image_field():
+    """Update a single field of an image (title or filename) via inline editing"""
+    try:
+        data = request.json
+        filename = data.get('filename')
+        field = data.get('field')  # 'title' or 'filename'
+        value = data.get('value', '').strip()
+        
+        if not filename or not field or not value:
+            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+        
+        if field == 'title':
+            # Update title
+            image_titles = load_image_titles()
+            image_titles[filename] = value
+            save_image_titles(image_titles)
+            return jsonify({'success': True, 'message': 'Title updated'})
+        
+        elif field == 'filename':
+            import os
+            import shutil
+            from image_storage_manager import ImageStorageManager
+            storage_manager = ImageStorageManager()
+            
+            # Validate filename has correct extension
+            old_ext = os.path.splitext(filename)[1]
+            new_ext = os.path.splitext(value)[1]
+            if old_ext != new_ext:
+                return jsonify({'success': False, 'error': 'Cannot change file extension'}), 400
+            
+            # Check if new filename already exists
+            if value != filename:
+                web_path = storage_manager.get_web_path(value)
+                if web_path and os.path.exists(web_path):
+                    return jsonify({'success': False, 'error': 'Filename already exists'}), 400
+                
+                # Rename files
+                old_web_path = storage_manager.get_web_path(filename)
+                new_web_path = storage_manager.get_web_path(value)
+                old_highres_path = storage_manager.get_highres_path(filename)
+                new_highres_path = storage_manager.get_highres_path(value)
+                
+                if old_web_path and os.path.exists(old_web_path):
+                    os.rename(old_web_path, new_web_path)
+                
+                if old_highres_path and os.path.exists(old_highres_path):
+                    os.rename(old_highres_path, new_highres_path)
+                
+                # Update all JSON references
+                image_titles = load_image_titles()
+                if filename in image_titles:
+                    image_titles[value] = image_titles.pop(filename)
+                    save_image_titles(image_titles)
+                
+                image_descriptions = load_image_descriptions()
+                if filename in image_descriptions:
+                    image_descriptions[value] = image_descriptions.pop(filename)
+                    save_image_descriptions(image_descriptions)
+                
+                image_categories = load_image_categories()
+                if filename in image_categories:
+                    image_categories[value] = image_categories.pop(filename)
+                    save_image_categories(image_categories)
+                
+                # Update database references
+                try:
+                    db_path = '/data/lumaprints_pricing.db'
+                    conn = sqlite3.connect(db_path)
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE shopify_mappings SET image_filename = ? WHERE image_filename = ?", 
+                                 (value, filename))
+                    conn.commit()
+                    conn.close()
+                except Exception as db_error:
+                    print(f"Warning: Could not update database: {db_error}")
+                
+                # Update featured image if needed
+                try:
+                    if os.path.exists('/data/featured_image.json'):
+                        with open('/data/featured_image.json', 'r') as f:
+                            featured_data = json.load(f)
+                        if featured_data.get('filename') == filename:
+                            featured_data['filename'] = value
+                            with open('/data/featured_image.json', 'w') as f:
+                                json.dump(featured_data, f)
+                except Exception as e:
+                    print(f"Warning: Could not update featured image: {e}")
+                
+                # Update carousel if needed
+                try:
+                    carousel_images = load_carousel_images()
+                    if filename in carousel_images:
+                        idx = carousel_images.index(filename)
+                        carousel_images[idx] = value
+                        save_carousel_images(carousel_images)
+                except Exception as e:
+                    print(f"Warning: Could not update carousel: {e}")
+                
+                return jsonify({'success': True, 'message': 'Filename updated', 'new_filename': value})
+        
+        return jsonify({'success': False, 'error': 'Invalid field'}), 400
+        
+    except Exception as e:
+        print(f"Error updating image field: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/admin/toggle-featured', methods=['POST'])
+@require_admin_auth
+def toggle_featured_inline():
+    """Toggle featured status for inline editing"""
+    try:
+        data = request.json
+        filename = data.get('filename')
+        
+        if not filename:
+            return jsonify({'success': False, 'error': 'Missing filename'}), 400
+        
+        # Check current featured image
+        current_featured = None
+        if os.path.exists('/data/featured_image.json'):
+            with open('/data/featured_image.json', 'r') as f:
+                featured_data = json.load(f)
+                current_featured = featured_data.get('filename')
+        
+        # Toggle logic
+        if current_featured == filename:
+            # Remove featured status
+            if os.path.exists('/data/featured_image.json'):
+                os.remove('/data/featured_image.json')
+            return jsonify({'success': True, 'is_featured': False})
+        else:
+            # Set as featured
+            featured_data = {
+                'filename': filename,
+                'set_date': datetime.now().isoformat()
+            }
+            with open('/data/featured_image.json', 'w') as f:
+                json.dump(featured_data, f)
+            return jsonify({'success': True, 'is_featured': True})
+        
+    except Exception as e:
+        print(f"Error toggling featured: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/admin/toggle-carousel', methods=['POST'])
+@require_admin_auth
+def toggle_carousel_inline():
+    """Toggle carousel status for inline editing"""
+    try:
+        data = request.json
+        filename = data.get('filename')
+        
+        if not filename:
+            return jsonify({'success': False, 'error': 'Missing filename'}), 400
+        
+        carousel_images = load_carousel_images()
+        
+        if filename in carousel_images:
+            # Remove from carousel
+            carousel_images.remove(filename)
+            save_carousel_images(carousel_images)
+            return jsonify({'success': True, 'in_carousel': False})
+        else:
+            # Add to carousel
+            carousel_images.append(filename)
+            save_carousel_images(carousel_images)
+            return jsonify({'success': True, 'in_carousel': True})
+        
+    except Exception as e:
+        print(f"Error toggling carousel: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

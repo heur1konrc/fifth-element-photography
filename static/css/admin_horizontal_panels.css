@@ -1,0 +1,339 @@
+/* Horizontal Image Panel Layout */
+
+.image-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px 0;
+}
+
+.image-panel-horizontal {
+    display: flex;
+    background: #2a2a2a;
+    border-radius: 8px;
+    padding: 15px;
+    gap: 20px;
+    align-items: flex-start;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.image-panel-horizontal:hover {
+    border-color: #4a9eff;
+    background: #333;
+}
+
+/* Left Section: Checkbox + Thumbnail */
+.panel-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.panel-left input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.panel-thumbnail {
+    width: 150px;
+    height: 150px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #1a1a1a;
+}
+
+.panel-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Middle Section: Info */
+.panel-middle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Row 1: Title + Status Icons */
+.panel-row-1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.inline-edit-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.inline-edit-group label {
+    color: #999;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 45px;
+}
+
+.inline-edit-title,
+.inline-edit-filename {
+    flex: 1;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: #fff;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.inline-edit-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.inline-edit-title:hover,
+.inline-edit-filename:hover {
+    border-color: #666;
+    background: #222;
+}
+
+.inline-edit-title:focus,
+.inline-edit-filename:focus {
+    outline: none;
+    border-color: #4a9eff;
+    background: #222;
+}
+
+.status-icons {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.status-icon {
+    font-size: 20px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.status-icon:hover {
+    color: #999;
+    transform: scale(1.1);
+}
+
+.status-icon.active {
+    color: #ffd700;
+}
+
+.status-icon.fa-star.active {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.status-icon.fa-images.active {
+    color: #4a9eff;
+}
+
+/* Row 2: Filename */
+.panel-row-2 {
+    display: flex;
+    align-items: center;
+}
+
+/* Row 3 & 4: Badges */
+.panel-row-3,
+.panel-row-4 {
+    display: flex;
+    align-items: center;
+}
+
+.badge-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.badge-label {
+    color: #999;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+.category-badge,
+.gallery-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.gallery-badge {
+    background: #3a5a7a;
+    color: #fff;
+}
+
+.no-galleries {
+    color: #666;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.badge-add-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #444;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.badge-add-btn:hover {
+    background: #4a9eff;
+    transform: scale(1.1);
+}
+
+/* Row 5: Action Buttons */
+.panel-row-5 {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.panel-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.panel-btn i {
+    font-size: 14px;
+}
+
+.btn-edit {
+    background: #28a745;
+    color: #fff;
+}
+
+.btn-edit:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.btn-analyze {
+    background: #007bff;
+    color: #fff;
+}
+
+.btn-analyze:hover {
+    background: #0056b3;
+    transform: translateY(-1px);
+}
+
+.btn-download {
+    background: #17a2b8;
+    color: #fff;
+}
+
+.btn-download:hover {
+    background: #138496;
+    transform: translateY(-1px);
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: #fff;
+}
+
+.btn-delete:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .panel-thumbnail {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@media (max-width: 768px) {
+    .image-panel-horizontal {
+        flex-direction: column;
+    }
+    
+    .panel-left {
+        flex-direction: row;
+        width: 100%;
+    }
+    
+    .panel-thumbnail {
+        width: 100px;
+        height: 100px;
+    }
+}
+
+/* Inline Notification System */
+.inline-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    opacity: 0;
+    transform: translateX(100px);
+    transition: all 0.3s ease;
+}
+
+.inline-notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-success {
+    background: #28a745;
+}
+
+.notification-error {
+    background: #dc3545;
+}
+
+.notification-info {
+    background: #17a2b8;
+}
+
+.notification-warning {
+    background: #ffc107;
+    color: #000;
+}
