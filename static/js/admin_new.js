@@ -81,8 +81,9 @@ function updateSelectionCount() {
 }
 
 function getSelectedImages() {
-    const selectedCheckboxes = document.querySelectorAll('.image-select:checked');
-    return Array.from(selectedCheckboxes).map(checkbox => checkbox.dataset.filename);
+    // Check for both Images tab (.image-select) and Shopify tab (.image-checkbox) checkboxes
+    const selectedCheckboxes = document.querySelectorAll('.image-select:checked, .image-checkbox:checked');
+    return Array.from(selectedCheckboxes).map(checkbox => checkbox.value || checkbox.dataset.filename);
 }
 
 // Category Assignment
