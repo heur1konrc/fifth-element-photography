@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_tabs.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_sidebar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/image_controls.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_panel_new.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Quill WYSIWYG Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -267,49 +268,29 @@
                 {% if images %}
                     <div class="image-grid">
                                   {% for image in images %}
-                        <div class="image-panel" 
+                            <div class="image-panel-new" 
                              data-filename="{{ image.filename }}"
                              data-title="{{ image.title }}"
                              data-categories="{{ image.categories|join(',') if image.categories else '' }}"
                              data-galleries="{{ image.galleries|join(',') if image.galleries else '' }}"
                              data-date-added="{{ image.date_added or '' }}">
-                                <!-- Left: Checkbox + Thumbnail -->
-                                <div class="panel-left">
-                                    <input type="checkbox" class="image-select" data-filename="{{ image.filename }}" onchange="updateSelectionCount()">
-                                    <div class="panel-thumbnail">
+                                
+                                <!-- LEFT: Image Section -->
+                                <div class="panel-left-new">
+                                    <div class="panel-thumbnail-new">
                                         <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title }}" loading="lazy">
+                                    </div>
+                                    <div class="panel-image-info">
+                                        <div class="panel-filename">File Name: <span class="inline-edit-filename" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'filename')">{{ image.filename }}</span></div>
+                                        <div class="panel-title">Image Title: <span class="inline-edit-title" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'title')">{{ image.title }}</span></div>
                                     </div>
                                 </div>
                                 
-                                <!-- Middle: Info Section -->
-                                <div class="panel-middle">
-                                    <!-- Row 1: Title + Status Icons -->
-                                    <div class="panel-row-1">
-                                        <div class="inline-edit-group">
-                                            <label>Title:</label>
-                                            <input type="text" class="inline-edit-title" data-filename="{{ image.filename }}" value="{{ image.title }}" onblur="saveInlineEdit(this, 'title')" />
-                                        </div>
-                                        <div class="status-icons">
-                                            <i class="fas fa-star status-icon {% if image.is_featured %}active{% endif %}" 
-                                               onclick="toggleFeatured('{{ image.filename }}')" 
-                                               title="{% if image.is_featured %}Remove from Featured{% else %}Set as Featured{% endif %}"></i>
-                                            <i class="fas fa-images status-icon {% if image.in_carousel %}active{% endif %}" 
-                                               onclick="toggleCarousel('{{ image.filename }}')" 
-                                               title="{% if image.in_carousel %}Remove from Carousel{% else %}Add to Carousel{% endif %}"></i>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Row 2: Filename -->
-                                    <div class="panel-row-2">
-                                        <div class="inline-edit-group">
-                                            <label>File:</label>
-                                            <input type="text" class="inline-edit-filename" data-filename="{{ image.filename }}" value="{{ image.filename }}" onblur="saveInlineEdit(this, 'filename')" />
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Row 3: Categories -->
-                                    <div class="panel-row-3">
-                                        <div class="badge-container">
+                                <!-- MIDDLE: Categories & Description -->
+                                <div class="panel-middle-new">
+                                    <div class="panel-section">
+                                        <h4>Categories</h4>
+                                        <div class="category-badges-vertical">
                                             {% if image.all_categories %}
                                                 {% for cat in image.all_categories %}
                                                     <span class="category-badge category-{{ cat|lower|replace(' ', '-') }}">{{ cat }}</span>
@@ -323,10 +304,14 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Row 4: Galleries -->
-                                    <div class="panel-row-4">
-                                        <div class="badge-container">
-                                            <label class="badge-label">Galleries:</label>
+                                    <div class="panel-section">
+                                        <h4>Image Description</h4>
+                                        <div class="panel-description" contenteditable="true" data-filename="{{ image.filename }}" onblur="saveInlineEdit(this, 'description')">{{ image.description or 'Click to add description...' }}</div>
+                                    </div>
+                                    
+                                    <div class="panel-section panel-galleries">
+                                        <label>Galleries:</label>
+                                        <div class="gallery-badges-inline">
                                             {% if image.galleries %}
                                                 {% for gallery in image.galleries %}
                                                     <span class="gallery-badge">{{ gallery }}</span>
@@ -339,9 +324,21 @@
                                             </button>
                                         </div>
                                     </div>
+                                </div>
+                                
+                                <!-- RIGHT: Status Icons & Action Buttons -->
+                                <div class="panel-right-new">
+                                    <div class="panel-top-icons">
+                                        <i class="fas fa-star status-icon {% if image.is_featured %}active{% endif %}" 
+                                           onclick="toggleFeatured('{{ image.filename }}')" 
+                                           title="{% if image.is_featured %}Remove from Featured{% else %}Set as Featured{% endif %}"></i>
+                                        <i class="fas fa-images status-icon {% if image.in_carousel %}active{% endif %}" 
+                                           onclick="toggleCarousel('{{ image.filename }}')" 
+                                           title="{% if image.in_carousel %}Remove from Carousel{% else %}Add to Carousel{% endif %}"></i>
+                                        <input type="checkbox" class="image-select" data-filename="{{ image.filename }}" onchange="updateSelectionCount()">
+                                    </div>
                                     
-                                    <!-- Row 5: Action Buttons -->
-                                    <div class="panel-row-5">
+                                    <div class="panel-action-buttons">
                                         <button class="panel-btn btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit Details">
                                             <i class="fas fa-edit"></i> Edit
                                         </button>
