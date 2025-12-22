@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ gallery.name }} - Fifth Element Photography</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-beta.css') }}">
     <style>
         * {
             margin: 0;
@@ -180,7 +181,7 @@
 
         <div class="gallery-grid">
             {% for image in images %}
-            <div class="gallery-item" onclick="window.location.href='/portfolio#{{ image.filename }}'">
+            <div class="gallery-item" onclick="openModalBeta({filename: '{{ image.filename }}', title: '{{ image.title }}', url: '/images/{{ image.filename }}', description: `{{ image.description|safe }}`, model: '{{ image.model }}', lens: '{{ image.lens }}', aperture: '{{ image.aperture }}', shutter_speed: '{{ image.shutter_speed }}', iso: '{{ image.iso }}', focal_length: '{{ image.focal_length }}'})" style="cursor: pointer;">
                 <img src="/gallery-image/{{ image.filename }}" alt="{{ image.title }}" loading="lazy">
             </div>
             {% endfor %}
@@ -196,5 +197,11 @@
             </div>
         </div>
     </footer>
+
+    <!-- Image Modal -->
+    {% include 'modal_beta.html' %}
+
+    <!-- Modal JavaScript -->
+    <script src="{{ url_for('static', filename='js/modal-beta.js') }}"></script>
 </body>
 </html>
