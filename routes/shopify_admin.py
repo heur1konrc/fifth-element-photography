@@ -36,14 +36,26 @@ def login_required(f):
 # @login_required  # Temporarily disabled for testing
 def shopify_mapping():
     """Shopify product mapping management page"""
-    # Get all images - check /data first (Railway), then static/images (local)
-    images_dir = '/data' if os.path.exists('/data') else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'images')
+    # Get all images from gallery_images database (fast, optimized thumbnails)
+    gallery_db_path = '/data/gallery_images.db' if os.path.exists('/data') else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'gallery_images.db')
     image_files = []
     
-    if os.path.exists(images_dir):
-        for filename in os.listdir(images_dir):
-            if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
-                image_files.append(filename)
+    try:
+        gallery_conn = sqlite3.connect(gallery_db_path)
+        gallery_conn.row_factory = sqlite3.Row
+        gallery_cursor = gallery_conn.cursor()
+        gallery_cursor.execute('SELECT filename FROM images ORDER BY filename')
+        image_rows = gallery_cursor.fetchall()
+        gallery_conn.close()
+        image_files = [row['filename'] for row in image_rows]
+    except Exception as e:
+        print(f"Error loading from gallery_images.db: {e}")
+        # Fallback to directory scan if gallery DB fails
+        images_dir = '/data' if os.path.exists('/data') else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'images')
+        if os.path.exists(images_dir):
+            for filename in os.listdir(images_dir):
+                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+                    image_files.append(filename)
     
     # Get existing mappings from database
     try:
