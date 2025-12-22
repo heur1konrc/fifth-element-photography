@@ -1,0 +1,96 @@
+/* Tabbed Admin Interface */
+
+.admin-tabs-container {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+.admin-tabs-nav {
+    display: flex;
+    gap: 5px;
+    border-bottom: 2px solid #333;
+    padding: 0 20px;
+    background: #1a1a1a;
+}
+
+.admin-tab-button {
+    padding: 15px 30px;
+    background: transparent;
+    border: none;
+    color: #999;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.admin-tab-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+.admin-tab-button.active {
+    background: #2a2a2a;
+    color: #4a9eff;
+}
+
+.admin-tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #4a9eff;
+}
+
+.admin-tab-button i {
+    margin-right: 8px;
+}
+
+.admin-tab-content {
+    display: none;
+    padding: 30px 20px;
+    background: #1e1e1e;
+    border-radius: 0 0 8px 8px;
+}
+
+.admin-tab-content.active {
+    display: block;
+}
+
+/* Tab specific styling */
+.tab-section {
+    margin-bottom: 40px;
+}
+
+.tab-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #333;
+}
+
+.tab-section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+}
+
+.tab-section-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tab-section-description {
+    color: #999;
+    font-size: 14px;
+    margin-top: 5px;
+}

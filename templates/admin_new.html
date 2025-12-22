@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_new.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/thumbnail_admin.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_horizontal_panels.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_tabs.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Quill WYSIWYG Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -71,6 +72,26 @@
 
         <!-- Main Content -->
         <main class="dashboard-main">
+            
+            <!-- Tabbed Interface -->
+            <div class="admin-tabs-container">
+                <nav class="admin-tabs-nav">
+                    <button class="admin-tab-button active" data-tab="images">
+                        <i class="fas fa-images"></i> Images
+                    </button>
+                    <button class="admin-tab-button" data-tab="shopify">
+                        <i class="fas fa-shopping-cart"></i> Shopify
+                    </button>
+                    <button class="admin-tab-button" data-tab="tools">
+                        <i class="fas fa-tools"></i> Tools
+                    </button>
+                    <button class="admin-tab-button" data-tab="settings">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                </nav>
+                
+                <!-- IMAGES TAB -->
+                <div class="admin-tab-content active" id="tab-images">
    
         <!-- Featured Image Story Management 
             <section class="featured-section">
@@ -378,8 +399,52 @@
                     </div>
                 {% endif %}
             </section>
-
-
+                </div>
+                <!-- END IMAGES TAB -->
+                
+                <!-- SHOPIFY TAB -->
+                <div class="admin-tab-content" id="tab-shopify">
+                    <div class="tab-section">
+                        <div class="tab-section-header">
+                            <div>
+                                <h2 class="tab-section-title">Shopify Integration</h2>
+                                <p class="tab-section-description">Manage Shopify product creation, pricing, and synchronization</p>
+                            </div>
+                        </div>
+                        <p style="color: #999; text-align: center; padding: 40px;">Shopify tools will be organized here...</p>
+                    </div>
+                </div>
+                <!-- END SHOPIFY TAB -->
+                
+                <!-- TOOLS TAB -->
+                <div class="admin-tab-content" id="tab-tools">
+                    <div class="tab-section">
+                        <div class="tab-section-header">
+                            <div>
+                                <h2 class="tab-section-title">Admin Tools</h2>
+                                <p class="tab-section-description">System utilities and batch operations</p>
+                            </div>
+                        </div>
+                        <p style="color: #999; text-align: center; padding: 40px;">Admin tools will be organized here...</p>
+                    </div>
+                </div>
+                <!-- END TOOLS TAB -->
+                
+                <!-- SETTINGS TAB -->
+                <div class="admin-tab-content" id="tab-settings">
+                    <div class="tab-section">
+                        <div class="tab-section-header">
+                            <div>
+                                <h2 class="tab-section-title">Settings</h2>
+                                <p class="tab-section-description">System configuration and version information</p>
+                            </div>
+                        </div>
+                        <p style="color: #999; text-align: center; padding: 40px;">Settings will be organized here...</p>
+                    </div>
+                </div>
+                <!-- END SETTINGS TAB -->
+            </div>
+            <!-- END TABBED INTERFACE -->
 
             <!-- About Page Management -->
             <section class="about-section">
@@ -732,6 +797,7 @@
     <script src="{{ url_for('static', filename='js/thumbnail_admin.js') }}"></script>
     <script src="{{ url_for('static', filename='js/image_analysis.js') }}"></script>
     <script src="{{ url_for('static', filename='js/inline_edit.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin_tabs.js') }}"></script>
 </body>
 </html>
 
