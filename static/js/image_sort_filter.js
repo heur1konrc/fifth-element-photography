@@ -6,13 +6,21 @@ function applySortAndFilter() {
     const galleryFilter = document.getElementById('galleryFilter').value;
     const searchTerm = document.getElementById('imageSearch').value.toLowerCase();
     
+    console.log('Sort by:', sortBy);
+    
     // Get selected category filters
     const categoryCheckboxes = document.querySelectorAll('.category-filter-checkbox:checked');
     const selectedCategories = Array.from(categoryCheckboxes).map(cb => cb.value.toLowerCase());
     
     // Get all image panels
     const imageGrid = document.querySelector('.image-grid');
-    const imagePanels = Array.from(imageGrid.querySelectorAll('.image-panel'));
+    if (!imageGrid) {
+        console.error('Image grid not found');
+        return;
+    }
+    
+    const imagePanels = Array.from(imageGrid.querySelectorAll('.image-panel-new'));
+    console.log('Found panels:', imagePanels.length);
     
     // Filter images
     imagePanels.forEach(panel => {
@@ -49,6 +57,7 @@ function applySortAndFilter() {
     
     // Get visible panels for sorting
     const visiblePanels = imagePanels.filter(panel => panel.style.display !== 'none');
+    console.log('Visible panels:', visiblePanels.length);
     
     // Sort visible panels
     visiblePanels.sort((a, b) => {
@@ -70,7 +79,15 @@ function applySortAndFilter() {
         }
     });
     
-    // Re-append sorted panels
+    // Clear grid and re-append all panels in correct order
+    // First, append all hidden panels
+    imagePanels.forEach(panel => {
+        if (panel.style.display === 'none') {
+            imageGrid.appendChild(panel);
+        }
+    });
+    
+    // Then append visible sorted panels
     visiblePanels.forEach(panel => imageGrid.appendChild(panel));
     
     // Update count
