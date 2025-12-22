@@ -122,6 +122,45 @@
                             </div>
                             
                             <div class="sidebar-section">
+                                <h3 class="sidebar-section-title">Sort & Filter</h3>
+                                
+                                <!-- Sort -->
+                                <label style="color: rgba(255,255,255,0.7); font-size: 11px; margin-bottom: 4px; display: block;">SORT BY</label>
+                                <select id="sortBy" class="control-select" onchange="applySortAndFilter()" style="width: 100%; margin-bottom: 12px;">
+                                    <option value="az">A-Z</option>
+                                    <option value="za">Z-A</option>
+                                    <option value="date-new">Date Added (Newest)</option>
+                                    <option value="date-old">Date Added (Oldest)</option>
+                                    <option value="category">Category</option>
+                                    <option value="gallery">Gallery</option>
+                                </select>
+                                
+                                <!-- Search -->
+                                <label style="color: rgba(255,255,255,0.7); font-size: 11px; margin-bottom: 4px; display: block;">SEARCH</label>
+                                <input type="text" id="imageSearch" class="control-input" placeholder="Filename or title..." oninput="applySortAndFilter()" style="width: 100%; margin-bottom: 12px;">
+                                
+                                <!-- Gallery Filter -->
+                                <label style="color: rgba(255,255,255,0.7); font-size: 11px; margin-bottom: 4px; display: block;">GALLERY</label>
+                                <select id="galleryFilter" class="control-select" onchange="applySortAndFilter()" style="width: 100%; margin-bottom: 12px;">
+                                    <option value="">All Galleries</option>
+                                    {% for gallery in all_galleries %}
+                                    <option value="{{ gallery.slug }}">{{ gallery.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                
+                                <!-- Category Filter -->
+                                <label style="color: rgba(255,255,255,0.7); font-size: 11px; margin-bottom: 4px; display: block;">CATEGORIES</label>
+                                <div class="category-filter-checkboxes" style="flex-direction: column; gap: 6px;">
+                                    {% for category in all_categories|sort %}
+                                    <label class="checkbox-label" style="border-radius: 4px; padding: 4px 8px;">
+                                        <input type="checkbox" class="category-filter-checkbox" value="{{ category }}" onchange="applySortAndFilter()">
+                                        <span>{{ category.title() }}</span>
+                                    </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="sidebar-section">
                                 <h3 class="sidebar-section-title">Bulk Actions</h3>
                                 <button class="sidebar-button btn-success" onclick="selectAll()">
                                     <i class="fas fa-check-square"></i>
@@ -203,54 +242,6 @@
             <section class="portfolio-section">
                 <div class="section-header">
                     <h2 class="section-title">Current Portfolio ({{ total_images }} images{% if total_pages > 1 %} - Page {{ page }} of {{ total_pages }}{% endif %})</h2>
-                </div>
-                
-                <!-- Top Controls Bar -->
-                <div class="top-controls-bar">
-                    <div class="controls-row">
-                        <!-- Sort Controls -->
-                        <div class="control-group">
-                            <label for="sortBy">Sort by:</label>
-                            <select id="sortBy" class="control-select" onchange="applySortAndFilter()">
-                                <option value="az">A-Z</option>
-                                <option value="za">Z-A</option>
-                                <option value="date-new">Date Added (Newest)</option>
-                                <option value="date-old">Date Added (Oldest)</option>
-                                <option value="category">Category</option>
-                                <option value="gallery">Gallery</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Category Filter -->
-                        <div class="control-group">
-                            <label>Filter by Category:</label>
-                            <div class="category-filter-checkboxes">
-                                {% for category in all_categories|sort %}
-                                <label class="checkbox-label">
-                                    <input type="checkbox" class="category-filter-checkbox" value="{{ category }}" onchange="applySortAndFilter()">
-                                    <span>{{ category.title() }}</span>
-                                </label>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        
-                        <!-- Gallery Filter -->
-                        <div class="control-group">
-                            <label for="galleryFilter">Filter by Gallery:</label>
-                            <select id="galleryFilter" class="control-select" onchange="applySortAndFilter()">
-                                <option value="">All Galleries</option>
-                                {% for gallery in all_galleries %}
-                                <option value="{{ gallery.slug }}">{{ gallery.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <!-- Search -->
-                        <div class="control-group">
-                            <label for="imageSearch">Search:</label>
-                            <input type="text" id="imageSearch" class="control-input" placeholder="Filename or title..." oninput="applySortAndFilter()">
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Pagination Controls -->
