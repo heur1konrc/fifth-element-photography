@@ -474,16 +474,14 @@
                             
                             <!-- Image Gallery (default view) -->
                             <div id="shopifyImageGallery" class="tab-section">
-                                <div class="image-grid">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px;">
                                     {% for image in all_images %}
-                                    <div class="image-panel" data-filename="{{ image.filename }}">
-                                        <input type="checkbox" class="image-checkbox" value="{{ image.filename }}">
-                                        <div class="image-thumbnail">
-                                            <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title or image.filename }}" loading="lazy">
+                                    <div style="position: relative; background: #2a2a2a; border-radius: 8px; padding: 10px; cursor: pointer;" data-filename="{{ image.filename }}">
+                                        <input type="checkbox" class="image-checkbox" value="{{ image.filename }}" style="position: absolute; top: 15px; left: 15px; width: 20px; height: 20px; cursor: pointer; z-index: 10;">
+                                        <div style="width: 100%; aspect-ratio: 1; overflow: hidden; border-radius: 4px; margin-bottom: 8px;">
+                                            <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title or image.filename }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
                                         </div>
-                                        <div class="image-info">
-                                            <div class="image-filename">{{ image.filename }}</div>
-                                        </div>
+                                        <div style="font-size: 12px; color: #ccc; text-align: center; word-break: break-word;">{{ image.filename }}</div>
                                     </div>
                                     {% endfor %}
                                 </div>
