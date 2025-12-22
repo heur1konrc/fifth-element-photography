@@ -110,10 +110,6 @@
                                     <i class="fas fa-dice"></i>
                                     Randomize Order
                                 </button>
-                                <button class="sidebar-button btn-success" onclick="backupSystem()">
-                                    <i class="fas fa-download"></i>
-                                    Backup System
-                                </button>
                                 <button class="sidebar-button btn-info" onclick="generateGalleryImages()">
                                     <i class="fas fa-images"></i>
                                     Generate Gallery Images
@@ -122,38 +118,6 @@
                                     <i class="fas fa-photo-video"></i>
                                     Gallery Admin
                                 </a>
-                                <button class="sidebar-button btn-warning" onclick="populateExifDatabase()">
-                                    <i class="fas fa-camera"></i>
-                                    Populate EXIF Database
-                                </button>
-                            </div>
-                            
-                            <div class="sidebar-section">
-                                <h3 class="sidebar-section-title">Shopify</h3>
-                                <a href="/admin/pricing" class="sidebar-button btn-warning">
-                                    <i class="fas fa-dollar-sign"></i>
-                                    Pricing Management
-                                </a>
-                                <a href="/admin/shopify-mapping" class="sidebar-button btn-info">
-                                    <i class="fas fa-shopping-cart"></i>
-                                    Shopify Product Mapping
-                                </a>
-                                <button class="sidebar-button btn-success" onclick="createShopifyProductsViaAPI()">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    Create Shopify Products
-                                </button>
-                                <button class="sidebar-button btn-info" onclick="syncShopifyPrices()">
-                                    <i class="fas fa-sync-alt"></i>
-                                    Sync Prices to Shopify
-                                </button>
-                                <button class="sidebar-button" onclick="generateShopifyCSVFromSelected()">
-                                    <i class="fas fa-file-csv"></i>
-                                    Generate Shopify CSV
-                                </button>
-                                <button class="sidebar-button btn-warning" onclick="openLumaprintsModal()">
-                                    <i class="fas fa-file-excel"></i>
-                                    Lumaprints Bulk Mapping
-                                </button>
                             </div>
                         </aside>
                         
@@ -414,28 +378,88 @@
                 
                 <!-- SHOPIFY TAB -->
                 <div class="admin-tab-content" id="tab-shopify">
-                    <div class="tab-section">
-                        <div class="tab-section-header">
-                            <div>
-                                <h2 class="tab-section-title">Shopify Integration</h2>
-                                <p class="tab-section-description">Manage Shopify product creation, pricing, and synchronization</p>
+                    <div class="admin-layout-with-sidebar">
+                        <!-- LEFT SIDEBAR -->
+                        <aside class="admin-sidebar">
+                            <div class="sidebar-section">
+                                <h3 class="sidebar-section-title">Shopify Actions</h3>
+                                <a href="/admin/shopify-mapping" class="sidebar-button btn-info">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    Shopify Product Mapping
+                                </a>
+                                <button class="sidebar-button btn-success" onclick="createShopifyProductsViaAPI()">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    Create Shopify Products
+                                </button>
+                                <button class="sidebar-button btn-info" onclick="syncShopifyPrices()">
+                                    <i class="fas fa-sync-alt"></i>
+                                    Sync Prices to Shopify
+                                </button>
+                                <button class="sidebar-button btn-info" onclick="syncShopifyProducts()">
+                                    <i class="fas fa-sync-alt"></i>
+                                    Sync from Shopify
+                                </button>
+                                <button class="sidebar-button" onclick="generateShopifyCSVFromSelected()">
+                                    <i class="fas fa-file-csv"></i>
+                                    Generate Shopify CSV
+                                </button>
+                                <button class="sidebar-button btn-warning" onclick="openLumaprintsModal()">
+                                    <i class="fas fa-file-excel"></i>
+                                    Lumaprints Bulk Mapping
+                                </button>
+                            </div>
+                        </aside>
+                        
+                        <!-- MAIN CONTENT -->
+                        <div class="admin-main-content">
+                            <div class="tab-section">
+                                <div class="tab-section-header">
+                                    <div>
+                                        <h2 class="tab-section-title">Shopify Integration</h2>
+                                        <p class="tab-section-description">Manage Shopify product creation, pricing, and synchronization</p>
+                                    </div>
+                                </div>
+                                <p style="color: #999; text-align: center; padding: 40px;">Shopify content will be organized here...</p>
                             </div>
                         </div>
-                        <p style="color: #999; text-align: center; padding: 40px;">Shopify tools will be organized here...</p>
                     </div>
                 </div>
                 <!-- END SHOPIFY TAB -->
                 
                 <!-- TOOLS TAB -->
                 <div class="admin-tab-content" id="tab-tools">
-                    <div class="tab-section">
-                        <div class="tab-section-header">
-                            <div>
-                                <h2 class="tab-section-title">Admin Tools</h2>
-                                <p class="tab-section-description">System utilities and batch operations</p>
+                    <div class="admin-layout-with-sidebar">
+                        <!-- LEFT SIDEBAR -->
+                        <aside class="admin-sidebar">
+                            <div class="sidebar-section">
+                                <h3 class="sidebar-section-title">System Tools</h3>
+                                <button class="sidebar-button btn-warning" onclick="populateExifDatabase()">
+                                    <i class="fas fa-camera"></i>
+                                    Populate EXIF Database
+                                </button>
+                                <button class="sidebar-button btn-success" onclick="backupSystem()">
+                                    <i class="fas fa-download"></i>
+                                    Backup System
+                                </button>
+                                <button class="sidebar-button btn-warning" onclick="openLumaprintsModal()">
+                                    <i class="fas fa-file-excel"></i>
+                                    Lumaprints Bulk Mapping
+                                </button>
+                            </div>
+                        </aside>
+                        
+                        <!-- MAIN CONTENT -->
+                        <div class="admin-main-content">
+                            <div class="tab-section">
+                                <div class="tab-section-header">
+                                    <div>
+                                        <h2 class="tab-section-title">Admin Tools</h2>
+                                        <p class="tab-section-description">System utilities and batch operations</p>
+                                    </div>
+                                </div>
+                                <p style="color: #999; text-align: center; padding: 40px;">Tool content will be organized here...</p>
                             </div>
                         </div>
-                        <p style="color: #999; text-align: center; padding: 40px;">Admin tools will be organized here...</p>
                     </div>
                 </div>
                 <!-- END TOOLS TAB -->
@@ -451,100 +475,87 @@
                         </div>
                         <p style="color: #999; text-align: center; padding: 40px;">Settings will be organized here...</p>
                     </div>
+                    
+                    <!-- About Page Management -->
+                    <div class="tab-section">
+                        <div class="tab-section-header">
+                            <div>
+                                <h2 class="tab-section-title">About Page Management</h2>
+                                <p class="tab-section-description">Manage your About page image and bio</p>
+                            </div>
+                        </div>
+                        <div class="about-content">
+                            {% if about_data and about_data.filename %}
+                                <div class="current-about">
+                                    <div class="about-image-preview">
+                                        <img src="/about/{{ about_data.filename }}" alt="About Image">
+                                    </div>
+                                    <div class="about-info">
+                                        <h3>About Page Image</h3>
+                                        <div class="about-actions" style="margin-bottom: 15px;">
+                                            <form action="/upload_about_image" method="post" enctype="multipart/form-data" style="display: inline-block; margin-right: 10px;">
+                                                <input type="file" name="file" accept="image/*" required style="display: none;" id="aboutFileInput">
+                                                <button type="button" class="btn btn-primary" onclick="document.getElementById('aboutFileInput').click()">
+                                                    <i class="fas fa-upload"></i>
+                                                    Upload New About Image
+                                                </button>
+                                                <input type="hidden" name="bio" id="hiddenBio" value="{{ about_data.bio or '' }}">
+                                                <button type="submit" class="btn btn-success" style="display: none;" id="aboutSubmitBtn">Upload</button>
+                                            </form>
+                                            <button class="btn btn-danger" onclick="removeAboutImage('{{ about_data.filename }}')">
+                                                <i class="fas fa-trash"></i>
+                                                Remove Image
+                                            </button>
+                                        </div>
+                                        <div class="about-bio">
+                                            <label for="about-bio">About Page Bio:</label>
+                                            <textarea id="about-bio" placeholder="Write your personal bio for the About page..." rows="15">{{ about_data.bio or '' }}</textarea>
+                                            <button class="btn btn-small btn-success" onclick="saveAboutBio('{{ about_data.filename }}')">
+                                                <i class="fas fa-save"></i>
+                                                Save Bio
+                                            </button>
+                                        </div>
+                                        <div class="about-meta">
+                                            <span class="dimensions">About Image</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="no-about">
+                                    <div class="no-about-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <h3>No About Image Set</h3>
+                                    <p>Upload an image for your About page. This will be separate from your portfolio.</p>
+                                    <form action="/upload_about_image" method="post" enctype="multipart/form-data" style="margin-top: 20px;">
+                                        <input type="file" name="file" accept="image/*" required style="margin-bottom: 10px;">
+                                        <br>
+                                        <textarea name="bio" placeholder="Write your bio here..." rows="4" style="width: 100%; box-sizing: border-box; margin-bottom: 10px;"></textarea>
+                                        <br>
+                                        <button type="submit" class="btn btn-primary">Upload About Image</button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Version Information -->
+                    <div class="tab-section">
+                        <div class="tab-section-header">
+                            <div>
+                                <h2 class="tab-section-title">Version Information</h2>
+                            </div>
+                        </div>
+                        <div style="padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; font-size: 13px; color: rgba(255, 255, 255, 0.6);">
+                            <div style="margin-bottom: 5px;"><strong>Admin Version:</strong> v2.2.0</div>
+                            <div><strong>Website Version:</strong> v2.0.1</div>
+                        </div>
+                    </div>
                 </div>
                 <!-- END SETTINGS TAB -->
             </div>
             <!-- END TABBED INTERFACE -->
 
-            <!-- About Page Management -->
-            <section class="about-section">
-                <div class="section-header">
-                    <h2 class="section-title">About Page Management</h2>
-                </div>
-                
-                <div class="about-content">
-                    {% if about_data and about_data.filename %}
-                        <div class="current-about">
-                            <div class="about-image-preview">
-                                <img src="/about/{{ about_data.filename }}" alt="About Image">
-                            <!--<div class="about-overlay">
-                                </div>--> 
-                            </div>
-                            <div class="about-info">
-                                <h3>About Page Image</h3>
-                                <div class="about-actions" style="margin-bottom: 15px;">
-                                    <!-- Simple upload button for about image -->
-                                    <form action="/upload_about_image" method="post" enctype="multipart/form-data" style="display: inline-block; margin-right: 10px;">
-                                        <input type="file" name="file" accept="image/*" required style="display: none;" id="aboutFileInput">
-                                        <button type="button" class="btn btn-primary" onclick="document.getElementById('aboutFileInput').click()">
-                                            <i class="fas fa-upload"></i>
-                                            Upload New About Image
-                                        </button>
-                                        <input type="hidden" name="bio" id="hiddenBio" value="{{ about_data.bio or '' }}">
-                                        <button type="submit" class="btn btn-success" style="display: none;" id="aboutSubmitBtn">Upload</button>
-                                    </form>
-                                    <button class="btn btn-danger" onclick="removeAboutImage('{{ about_data.filename }}')">
-                                        <i class="fas fa-trash"></i>
-                                        Remove Image
-                                    </button>
-                                </div>
-                                <div class="about-bio">
-                                    <label for="about-bio">About Page Bio:</label>
-                                    <textarea id="about-bio" placeholder="Write your personal bio for the About page..." rows="15">{{ about_data.bio or '' }}</textarea>
-                                    <button class="btn btn-small btn-success" onclick="saveAboutBio('{{ about_data.filename }}')">
-                                        <i class="fas fa-save"></i>
-                                        Save Bio
-                                    </button>
-                                </div>
-                                <div class="about-meta">
-                                    <span class="dimensions">About Image</span>
-                                </div>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="no-about">
-                            <div class="no-about-icon">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <h3>No About Image Set</h3>
-                            <p>Upload an image for your About page. This will be separate from your portfolio.</p>
-                            <form action="/upload_about_image" method="post" enctype="multipart/form-data" style="margin-top: 20px;">
-                                <input type="file" name="file" accept="image/*" required style="margin-bottom: 10px;">
-                                <br>
-                                <textarea name="bio" placeholder="Write your bio here..." rows="4" style="width: 100%; box-sizing: border-box; margin-bottom: 10px;"></textarea>
-                                <br>
-                                <button type="submit" class="btn btn-primary">Upload About Image</button>
-                            </form>
-                        </div>
-                    {% endif %}
-                </div>
-            </section>
-
-            <!-- Featured Image Management 
-            <section class="featured-section">
-                <div class="section-header">
-                    <h2 class="section-title">Featured Image Management</h2>
-                </div>
-                <div class="featured-content">
-                    {% set featured_image = images|selectattr('is_featured')|first %}
-                    {% if featured_image %}
-                        <div class="current-featured">
-                            <img src="{{ featured_image.url }}" alt="{{ featured_image.title }}">
-                            <div class="featured-info">
-                                <h3>{{ featured_image.title }}</h3>
-                                <p>Currently set as weekly featured image</p>
-                                <button class="btn btn-secondary" onclick="removeFeatured('{{ featured_image.filename }}')">
-                                    Remove Featured Status
-                                </button>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="no-featured">
-                            <p>No featured image selected. Choose an image from the portfolio above to set as featured.</p>
-                        </div>
-                    {% endif %}
-                </div>
-            </section>-->
         </main>
     </div>
 
