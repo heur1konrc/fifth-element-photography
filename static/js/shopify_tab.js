@@ -36,3 +36,49 @@ function closeShopifyIframe() {
 // Expose functions globally
 window.loadShopifyPage = loadShopifyPage;
 window.closeShopifyIframe = closeShopifyIframe;
+
+// Sort Shopify images
+function sortShopifyImages() {
+    const grid = document.getElementById('shopifyImageGrid');
+    if (!grid) return;
+    
+    const sortBy = document.getElementById('shopifySortBy').value;
+    const items = Array.from(grid.querySelectorAll('.shopify-image-item'));
+    
+    items.sort((a, b) => {
+        const filenameA = a.dataset.filename.toLowerCase();
+        const filenameB = b.dataset.filename.toLowerCase();
+        const dateA = a.dataset.date;
+        const dateB = b.dataset.date;
+        
+        switch(sortBy) {
+            case 'a-z':
+                return filenameA.localeCompare(filenameB);
+            case 'z-a':
+                return filenameB.localeCompare(filenameA);
+            case 'date-asc':
+                return (dateA || '').localeCompare(dateB || '');
+            case 'date-desc':
+            default:
+                return (dateB || '').localeCompare(dateA || '');
+        }
+    });
+    
+    // Clear and re-append sorted items
+    grid.innerHTML = '';
+    items.forEach(item => grid.appendChild(item));
+}
+
+// Sort on page load (newest first by default)
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a bit for the tab to be ready
+    setTimeout(() => {
+        const grid = document.getElementById('shopifyImageGrid');
+        if (grid) {
+            sortShopifyImages();
+        }
+    }, 500);
+});
+
+// Expose function globally
+window.sortShopifyImages = sortShopifyImages;
