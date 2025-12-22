@@ -1789,9 +1789,14 @@ def manage_categories():
         
         return jsonify({'success': False, 'message': 'Invalid action'}), 400
     
-    # GET request - return categories as JSON
-    categories = sorted(load_categories())
-    return jsonify({'categories': categories})
+    # GET request - check if it's an API call or page request
+    if request.headers.get('Accept') == 'application/json' or request.args.get('format') == 'json':
+        # API call - return JSON
+        categories = sorted(load_categories())
+        return jsonify({'categories': categories})
+    else:
+        # Page request - render HTML template
+        return render_template('admin_categories.html')
 
 @app.route('/assign_category/<filename>', methods=['POST'])
 @require_admin_auth

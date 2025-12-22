@@ -182,3 +182,14 @@ document.addEventListener('click', function(e) {
         closeGallerySelector();
     }
 });
+
+// Show notification function
+function showNotification(message, type) {
+    // Try to use existing toast/notification system if available
+    if (typeof showToast === 'function') {
+        showToast(message, type);
+    } else {
+        // Fallback to alert
+        alert(message);
+    }
+}
