@@ -1413,6 +1413,7 @@ def admin():
         
         images = scan_images()
         all_categories = sorted(load_categories())
+        all_galleries = get_all_galleries()  # Get all galleries for filter dropdown
         about_data = load_about_data()
 
         # Load hero image for admin template
@@ -1435,7 +1436,8 @@ def admin():
         return render_template('admin_new.html', 
                              images=paginated_images,
                              all_images=images,  # For stats
-                             all_categories=all_categories, 
+                             all_categories=all_categories,
+                             all_galleries=all_galleries,  # For gallery filter dropdown
                              about_data=about_data,
                              hero_image=hero_image,
                              page=page,
