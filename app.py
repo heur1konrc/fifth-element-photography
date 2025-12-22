@@ -1413,7 +1413,11 @@ def admin():
         
         images = scan_images()
         all_categories = sorted(load_categories())
-        all_galleries = get_all_galleries()  # Get all galleries for filter dropdown
+        
+        # Get all galleries for filter dropdown
+        from gallery_db import get_all_galleries
+        all_galleries = get_all_galleries()
+        
         about_data = load_about_data()
 
         # Load hero image for admin template
