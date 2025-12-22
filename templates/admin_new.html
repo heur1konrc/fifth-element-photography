@@ -430,11 +430,11 @@
                         <aside class="admin-sidebar">
                             <div class="sidebar-section">
                                 <h3 class="sidebar-section-title">Shopify Actions</h3>
-                                <button class="sidebar-button btn-info" onclick="loadShopifyPage('/admin/shopify-mapping')">
+                                <button class="sidebar-button btn-info" onclick="loadShopifyPage('/admin/shopify-mapping', 'Shopify Product Mapping')">
                                     <i class="fas fa-shopping-cart"></i>
                                     Shopify Product Mapping
                                 </button>
-                                <button class="sidebar-button btn-warning" onclick="loadShopifyPage('/admin/pricing')">
+                                <button class="sidebar-button btn-warning" onclick="loadShopifyPage('/admin/pricing', 'Pricing Management')">
                                     <i class="fas fa-dollar-sign"></i>
                                     Pricing Management
                                 </button>
@@ -463,8 +463,30 @@
                         
                         <!-- MAIN CONTENT -->
                         <div class="admin-main-content">
-                            <div class="tab-section">
-                                <iframe id="shopify-content-frame" style="width: 100%; height: calc(100vh - 180px); border: none; border-radius: 8px; background: #1a1a1a;"></iframe>
+                            <!-- Shopify iframe (hidden by default) -->
+                            <div id="shopifyIframeContainer" style="display: none;">
+                                <div id="shopifyIframeHeader" style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #2a2a2a; border-radius: 8px 8px 0 0; margin-bottom: 0;">
+                                    <h3 id="shopifyIframeTitle" style="margin: 0; color: #fff;">Shopify Page</h3>
+                                    <button onclick="closeShopifyIframe()" style="background: #666; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Close</button>
+                                </div>
+                                <iframe id="shopify-content-frame" style="width: 100%; height: calc(100vh - 240px); border: none; border-radius: 0 0 8px 8px; background: #1a1a1a;"></iframe>
+                            </div>
+                            
+                            <!-- Image Gallery (default view) -->
+                            <div id="shopifyImageGallery" class="tab-section">
+                                <div class="image-grid">
+                                    {% for image in all_images %}
+                                    <div class="image-panel" data-filename="{{ image.filename }}">
+                                        <input type="checkbox" class="image-checkbox" value="{{ image.filename }}">
+                                        <div class="image-thumbnail">
+                                            <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title or image.filename }}" loading="lazy">
+                                        </div>
+                                        <div class="image-info">
+                                            <div class="image-filename">{{ image.filename }}</div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     </div>
