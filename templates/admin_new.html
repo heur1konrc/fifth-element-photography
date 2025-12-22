@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_sidebar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/image_controls.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_panel_new.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/selector_modals.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Quill WYSIWYG Editor -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -116,10 +117,10 @@
                                     <i class="fas fa-images"></i>
                                     Generate Gallery Images
                                 </button>
-                                <a href="/admin/galleries" class="sidebar-button btn-info">
+                                <button class="sidebar-button btn-info" onclick="openGalleryAdmin()">
                                     <i class="fas fa-photo-video"></i>
                                     Gallery Admin
-                                </a>
+                                </button>
                             </div>
                             
                             <div class="sidebar-section">
@@ -202,6 +203,17 @@
                         
                         <!-- MAIN CONTENT -->
                         <div class="admin-main-content">
+                            <!-- Iframe Container for loading pages -->
+                            <div id="images-iframe-container" style="display: none; width: 100%; height: calc(100vh - 150px); background: #1a1a1a; border-radius: 8px; overflow: hidden;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #2a2a2a; border-bottom: 1px solid #444;">
+                                    <h3 id="images-iframe-title" style="color: #4a9eff; margin: 0; font-size: 16px;"></h3>
+                                    <button onclick="closeImagesIframe()" style="background: #555; border: none; color: #ddd; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;">Close</button>
+                                </div>
+                                <iframe id="images-iframe" style="width: 100%; height: calc(100% - 60px); border: none;"></iframe>
+                            </div>
+                            
+                            <!-- Regular Content -->
+                            <div id="images-regular-content">
    
         <!-- Featured Image Story Management 
             <section class="featured-section">
@@ -278,7 +290,7 @@
                             <div class="image-panel-new" 
                              data-filename="{{ image.filename }}"
                              data-title="{{ image.title }}"
-                             data-categories="{{ image.categories|join(',') if image.categories else '' }}"
+                             data-categories="{{ image.all_categories|join(',') if image.all_categories else image.category }}"
                              data-galleries="{{ image.galleries|join(',') if image.galleries else '' }}"
                              data-date-added="{{ image.date_added or '' }}">
                                 
@@ -402,6 +414,8 @@
                     </div>
                 {% endif %}
             </section>
+                            </div>
+                            <!-- END REGULAR CONTENT -->
                         </div>
                         <!-- END MAIN CONTENT -->
                     </div>
@@ -852,6 +866,7 @@
     <script src="{{ url_for('static', filename='js/admin_tabs.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shopify_tab.js') }}"></script>
     <script src="{{ url_for('static', filename='js/image_sort_filter.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/selector_modals.js') }}"></script>
     <script>
         function toggleCollapsible(header) {
             const content = header.nextElementSibling;
@@ -869,7 +884,87 @@
                 icon.style.transform = 'rotate(-90deg)';
             }
         }
+        
+        // Images Tab Iframe Functions
+        function loadImagesPage(url, title) {
+            const iframeContainer = document.getElementById('images-iframe-container');
+            const regularContent = document.getElementById('images-regular-content');
+            const iframe = document.getElementById('images-iframe');
+            const iframeTitle = document.getElementById('images-iframe-title');
+            
+            // Show iframe, hide regular content
+            regularContent.style.display = 'none';
+            iframeContainer.style.display = 'block';
+            
+            // Set title and load URL
+            iframeTitle.textContent = title;
+            iframe.src = url;
+        }
+        
+        function closeImagesIframe() {
+            const iframeContainer = document.getElementById('images-iframe-container');
+            const regularContent = document.getElementById('images-regular-content');
+            const iframe = document.getElementById('images-iframe');
+            
+            // Hide iframe, show regular content
+            iframeContainer.style.display = 'none';
+            regularContent.style.display = 'block';
+            
+            // Clear iframe src
+            iframe.src = '';
+            
+            // Reload images to reflect any changes
+            location.reload();
+        }
+        
+        // Update button handlers
+        function openCategoryModal() {
+            loadImagesPage('/categories', 'Manage Categories');
+        }
+        
+        function openGalleryAdmin() {
+            loadImagesPage('/gallery-admin', 'Gallery Admin');
+        }
     </script>
+
+    <!-- Category Selector Modal -->
+    <div id="categoryModal" class="selector-modal">
+        <div class="selector-modal-content">
+            <div class="selector-modal-header">
+                <h3>Manage Categories</h3>
+                <button class="selector-modal-close" onclick="closeCategorySelector()">&times;</button>
+            </div>
+            <div class="selector-modal-body">
+                <div class="selector-options" id="categoryOptions">
+                    <!-- Categories will be populated here -->
+                </div>
+            </div>
+            <div class="selector-modal-footer">
+                <button class="selector-btn selector-btn-cancel" onclick="closeCategorySelector()">Cancel</button>
+                <button class="selector-btn selector-btn-save" onclick="saveCategoryChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gallery Selector Modal -->
+    <div id="galleryModal" class="selector-modal">
+        <div class="selector-modal-content">
+            <div class="selector-modal-header">
+                <h3>Manage Galleries</h3>
+                <button class="selector-modal-close" onclick="closeGallerySelector()">&times;</button>
+            </div>
+            <div class="selector-modal-body">
+                <div class="selector-options" id="galleryOptions">
+                    <!-- Galleries will be populated here -->
+                </div>
+            </div>
+            <div class="selector-modal-footer">
+                <button class="selector-btn selector-btn-cancel" onclick="closeGallerySelector()">Cancel</button>
+                <button class="selector-btn selector-btn-save" onclick="saveGalleryChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
 

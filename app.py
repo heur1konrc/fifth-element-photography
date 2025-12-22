@@ -679,6 +679,15 @@ def scan_images():
             # Get image info (skip network fetch during startup to prevent timeouts)
             info = get_image_info(filepath, skip_network_fetch=True)
             
+            # Get file modification time for date_added
+            date_added = None
+            try:
+                import datetime
+                mtime = os.path.getmtime(filepath)
+                date_added = datetime.datetime.fromtimestamp(mtime).isoformat()
+            except Exception as e:
+                print(f"Warning: Failed to get date for {filename}: {e}")
+            
             # Load display order from metadata if available
             display_order = None
             metadata_file = os.path.join(IMAGES_FOLDER, f"{filename}.json")
@@ -708,11 +717,21 @@ def scan_images():
             except Exception as e:
                 print(f"Warning: Failed to get EXIF for {filename}: {e}")
             
+            # Get galleries for this image
+            galleries = []
+            try:
+                from gallery_db import get_galleries_for_image
+                gallery_list = get_galleries_for_image(filename)
+                galleries = [g['name'] for g in gallery_list]
+            except Exception as e:
+                print(f"Warning: Failed to get galleries for {filename}: {e}")
+            
             images.append({
                 'filename': filename,
                 'title': title,
                 'category': category,  # Primary category (first one)
                 'all_categories': all_cats,  # All categories for filtering
+                'galleries': galleries,  # List of gallery names this image belongs to
                 'description': description,
                 'is_background': is_background,
                 'is_featured': is_featured,
@@ -724,6 +743,7 @@ def scan_images():
                 'width': info['width'],
                 'height': info['height'],
                 'display_order': display_order,
+                'date_added': date_added,
                 # EXIF data loaded from database (instant, no file extraction)
                 'model': exif_data.get('model') if exif_data else None,
                 'lens': exif_data.get('lens') if exif_data else None,

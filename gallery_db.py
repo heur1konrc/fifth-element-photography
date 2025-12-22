@@ -147,5 +147,20 @@ def delete_gallery(gallery_id):
     conn.commit()
     conn.close()
 
+def get_galleries_for_image(image_filename):
+    """Get all galleries that contain a specific image"""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT g.* FROM galleries g
+        JOIN gallery_images gi ON g.id = gi.gallery_id
+        WHERE gi.image_filename = ?
+        ORDER BY g.display_order, g.name
+    ''', (image_filename,))
+    galleries = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return galleries
+
 # Initialize on import
 init_gallery_db()
