@@ -193,7 +193,7 @@
         
         async function loadCategories() {
             try {
-                const response = await fetch('/admin/categories');
+                const response = await fetch('/admin/categories?format=json');
                 const data = await response.json();
                 categories = data.categories || [];
                 renderCategories();
