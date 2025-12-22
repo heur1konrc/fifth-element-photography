@@ -331,7 +331,7 @@
                                         <!-- Bottom: Description -->
                                         <div class="panel-section">
                                             <h4>Image Description</h4>
-                                            <div class="panel-description" contenteditable="true" data-filename="{{ image.filename }}" onblur="saveInlineEdit(this, 'description')">{{ image.description or 'Click to add description...' }}</div>
+                                            <div class="panel-description">{{ image.description|safe if image.description else '<em style="color: #666;">No description</em>' }}</div>
                                         </div>
                                     </div>
                                 </div>
