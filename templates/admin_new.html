@@ -119,6 +119,37 @@
                                     Gallery Admin
                                 </a>
                             </div>
+                            
+                            <div class="sidebar-section">
+                                <h3 class="sidebar-section-title">Bulk Actions</h3>
+                                <button class="sidebar-button btn-success" onclick="selectAll()">
+                                    <i class="fas fa-check-square"></i>
+                                    Select All
+                                </button>
+                                <button class="sidebar-button" onclick="selectNone()">
+                                    <i class="fas fa-square"></i>
+                                    Select None
+                                </button>
+                                <div style="padding: 8px 12px; color: #999; font-size: 13px; text-align: center; border: 1px solid #333; border-radius: 6px; margin-bottom: 8px;">
+                                    Selected: <span id="selectedCount" style="color: #4a9eff; font-weight: 600;">0</span>
+                                </div>
+                                <button class="sidebar-button btn-primary" onclick="updateSelectedCategories()">
+                                    <i class="fas fa-tags"></i>
+                                    Update Categories
+                                </button>
+                                <button class="sidebar-button btn-success" onclick="addSelectedToCarousel()">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Add to Carousel
+                                </button>
+                                <button class="sidebar-button btn-warning" onclick="removeSelectedFromCarousel()">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Remove from Carousel
+                                </button>
+                                <button class="sidebar-button btn-danger" onclick="deleteSelected()">
+                                    <i class="fas fa-trash"></i>
+                                    Delete Selected
+                                </button>
+                            </div>
                         </aside>
                         
                         <!-- MAIN CONTENT -->
@@ -191,45 +222,7 @@
                 </div>
                 {% endif %}
                 
-                <!-- Bulk Actions Bar -->
-                <div class="bulk-actions-bar">
-                    <div class="selection-controls">
-                        <button class="btn btn-small btn-success" onclick="selectAll()">Select All</button>
-                        <span class="selection-count">Selected: <span id="selectedCount">0</span></span>
-                        <button class="btn btn-small btn-secondary" onclick="selectNone()">Select None</button>
-                        <button class="btn btn-danger" onclick="deleteSelected()"><i class="fas fa-trash"></i>Delete Selected</button>
-                        <!--<span class="selection-count">Selected: <span id="selectedCount">0</span></span>-->
-                    </div>
-                    
-                    <div class="category-assignment">
-                        <label>Set categories for selected images:</label>
-                        <div class="category-buttons">
-                            {% for category in all_categories|sort %}
-                                <button class="category-btn" data-category="{{ category }}" onclick="assignCategoryToSelected('{{ category }}')">
-                                    {{ category.title() }}
-                                </button>
-                            {% endfor %}
-                        </div>
-                        <button class="btn btn-primary" onclick="updateSelectedCategories()">Update Categories</button>
-                        <button class="btn btn-success" onclick="addSelectedToCarousel()" style="margin-left: 10px;">
-                            <i class="fas fa-plus-circle"></i> Add to Carousel
-                        </button>
-                        <button class="btn btn-warning" onclick="removeSelectedFromCarousel()" style="margin-left: 10px;">
-                            <i class="fas fa-minus-circle"></i> Remove from Carousel
-                        </button>
-                    </div>
 
-                    <div class="bulk-actions">
-                        <!--<button class="btn btn-danger" onclick="deleteSelected()">
-                            <i class="fas fa-trash"></i>
-                            Delete Selected
-                        </button>-->
-                        <!--<button class="btn btn-success" onclick="backupSystem()">
-                            <i class="fas fa-download"></i>
-                            Backup System
-                        </button> -->
-                    </div>
-                </div>
 
                 <!-- Image Grid -->
                 {% if images %}
