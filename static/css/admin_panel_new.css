@@ -78,6 +78,12 @@
     gap: 15px;
 }
 
+.panel-top-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
 .panel-section h4 {
     color: #fff;
     font-size: 14px;
@@ -92,7 +98,8 @@
     margin-right: 8px;
 }
 
-.category-badges-vertical {
+.category-badges-vertical,
+.gallery-badges-vertical {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -133,18 +140,7 @@
     background: #222;
 }
 
-.panel-galleries {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
 
-.gallery-badges-inline {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    align-items: center;
-}
 
 .gallery-badge {
     padding: 4px 10px;
@@ -183,18 +179,20 @@
     transform: scale(1.1);
 }
 
-/* RIGHT SECTION - Icons & Buttons */
+/* RIGHT SECTION - Buttons & Icons */
 .panel-right-new {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: stretch;
 }
 
-.panel-top-icons {
+.panel-bottom-icons {
     display: flex;
     gap: 12px;
     align-items: center;
+    justify-content: flex-end;
+    margin-top: 10px;
 }
 
 .status-icon {
@@ -230,9 +228,9 @@
 
 .panel-action-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
-    width: 100%;
+    flex-wrap: wrap;
 }
 
 .panel-btn {

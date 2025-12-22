@@ -150,14 +150,21 @@
                                 </select>
                                 
                                 <!-- Category Filter -->
-                                <label style="color: rgba(255,255,255,0.7); font-size: 11px; margin-bottom: 4px; display: block;">CATEGORIES</label>
-                                <div class="category-filter-checkboxes" style="flex-direction: column; gap: 6px;">
-                                    {% for category in all_categories|sort %}
-                                    <label class="checkbox-label" style="border-radius: 4px; padding: 4px 8px;">
-                                        <input type="checkbox" class="category-filter-checkbox" value="{{ category }}" onchange="applySortAndFilter()">
-                                        <span>{{ category.title() }}</span>
-                                    </label>
-                                    {% endfor %}
+                                <div class="collapsible-section">
+                                    <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                                        <label style="color: rgba(255,255,255,0.7); font-size: 11px; margin: 0;">CATEGORIES</label>
+                                        <i class="fas fa-chevron-down" style="font-size: 10px; color: rgba(255,255,255,0.5); transition: transform 0.2s;"></i>
+                                    </div>
+                                    <div class="collapsible-content" style="display: block;">
+                                        <div class="category-filter-checkboxes" style="flex-direction: column; gap: 6px; margin-top: 8px;">
+                                            {% for category in all_categories|sort %}
+                                            <label class="checkbox-label" style="border-radius: 4px; padding: 4px 8px;">
+                                                <input type="checkbox" class="category-filter-checkbox" value="{{ category }}" onchange="applySortAndFilter()">
+                                                <span>{{ category.title() }}</span>
+                                            </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -286,58 +293,52 @@
                                     </div>
                                 </div>
                                 
-                                <!-- MIDDLE: Categories & Description -->
+                                <!-- MIDDLE: Categories, Galleries & Description -->
                                 <div class="panel-middle-new">
-                                    <div class="panel-section">
-                                        <h4>Categories</h4>
-                                        <div class="category-badges-vertical">
-                                            {% if image.all_categories %}
-                                                {% for cat in image.all_categories %}
-                                                    <span class="category-badge category-{{ cat|lower|replace(' ', '-') }}">{{ cat }}</span>
-                                                {% endfor %}
-                                            {% else %}
-                                                <span class="category-badge category-{{ image.category|lower|replace(' ', '-') }}">{{ image.category }}</span>
-                                            {% endif %}
-                                            <button class="badge-add-btn" onclick="openCategorySelector('{{ image.filename }}')" title="Manage Categories">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
+                                    <!-- Top Row: Categories and Galleries Side by Side -->
+                                    <div class="panel-top-row">
+                                        <div class="panel-section panel-categories">
+                                            <h4>Categories</h4>
+                                            <div class="category-badges-vertical">
+                                                {% if image.all_categories %}
+                                                    {% for cat in image.all_categories %}
+                                                        <span class="category-badge category-{{ cat|lower|replace(' ', '-') }}">{{ cat }}</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="category-badge category-{{ image.category|lower|replace(' ', '-') }}">{{ image.category }}</span>
+                                                {% endif %}
+                                                <button class="badge-add-btn" onclick="openCategorySelector('{{ image.filename }}')" title="Manage Categories">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="panel-section panel-galleries">
+                                            <h4>Galleries:</h4>
+                                            <div class="gallery-badges-vertical">
+                                                {% if image.galleries %}
+                                                    {% for gallery in image.galleries %}
+                                                        <span class="gallery-badge">{{ gallery }}</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="no-galleries">None</span>
+                                                {% endif %}
+                                                <button class="badge-add-btn" onclick="openGallerySelector('{{ image.filename }}')" title="Manage Galleries">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     
+                                    <!-- Bottom: Description -->
                                     <div class="panel-section">
                                         <h4>Image Description</h4>
                                         <div class="panel-description" contenteditable="true" data-filename="{{ image.filename }}" onblur="saveInlineEdit(this, 'description')">{{ image.description or 'Click to add description...' }}</div>
                                     </div>
-                                    
-                                    <div class="panel-section panel-galleries">
-                                        <label>Galleries:</label>
-                                        <div class="gallery-badges-inline">
-                                            {% if image.galleries %}
-                                                {% for gallery in image.galleries %}
-                                                    <span class="gallery-badge">{{ gallery }}</span>
-                                                {% endfor %}
-                                            {% else %}
-                                                <span class="no-galleries">None</span>
-                                            {% endif %}
-                                            <button class="badge-add-btn" onclick="openGallerySelector('{{ image.filename }}')" title="Manage Galleries">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </div>
-                                    </div>
                                 </div>
                                 
-                                <!-- RIGHT: Status Icons & Action Buttons -->
+                                <!-- RIGHT: Action Buttons & Icons -->
                                 <div class="panel-right-new">
-                                    <div class="panel-top-icons">
-                                        <i class="fas fa-star status-icon {% if image.is_featured %}active{% endif %}" 
-                                           onclick="toggleFeatured('{{ image.filename }}')" 
-                                           title="{% if image.is_featured %}Remove from Featured{% else %}Set as Featured{% endif %}"></i>
-                                        <i class="fas fa-images status-icon {% if image.in_carousel %}active{% endif %}" 
-                                           onclick="toggleCarousel('{{ image.filename }}')" 
-                                           title="{% if image.in_carousel %}Remove from Carousel{% else %}Add to Carousel{% endif %}"></i>
-                                        <input type="checkbox" class="image-select" data-filename="{{ image.filename }}" onchange="updateSelectionCount()">
-                                    </div>
-                                    
                                     <div class="panel-action-buttons">
                                         <button class="panel-btn btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit Details">
                                             <i class="fas fa-edit"></i> Edit
@@ -351,6 +352,16 @@
                                         <button class="panel-btn btn-delete" onclick="deleteImage('{{ image.filename }}')" title="Delete">
                                             <i class="fas fa-trash"></i> Delete
                                         </button>
+                                    </div>
+                                    
+                                    <div class="panel-bottom-icons">
+                                        <i class="fas fa-star status-icon {% if image.is_featured %}active{% endif %}" 
+                                           onclick="toggleFeatured('{{ image.filename }}')" 
+                                           title="{% if image.is_featured %}Remove from Featured{% else %}Set as Featured{% endif %}"></i>
+                                        <i class="fas fa-images status-icon {% if image.in_carousel %}active{% endif %}" 
+                                           onclick="toggleCarousel('{{ image.filename }}')" 
+                                           title="{% if image.in_carousel %}Remove from Carousel{% else %}Add to Carousel{% endif %}"></i>
+                                        <input type="checkbox" class="image-select" data-filename="{{ image.filename }}" onchange="updateSelectionCount()">
                                     </div>
                                 </div>
                             </div>
@@ -837,6 +848,24 @@
     <script src="{{ url_for('static', filename='js/admin_tabs.js') }}"></script>
     <script src="{{ url_for('static', filename='js/shopify_tab.js') }}"></script>
     <script src="{{ url_for('static', filename='js/image_sort_filter.js') }}"></script>
+    <script>
+        function toggleCollapsible(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('i');
+            
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                content.style.display = 'block';
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('collapsed');
+                setTimeout(() => {
+                    content.style.display = 'none';
+                }, 300);
+                icon.style.transform = 'rotate(-90deg)';
+            }
+        }
+    </script>
 </body>
 </html>
 
