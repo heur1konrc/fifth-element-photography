@@ -282,75 +282,78 @@
                              data-galleries="{{ image.galleries|join(',') if image.galleries else '' }}"
                              data-date-added="{{ image.date_added or '' }}">
                                 
-                                <!-- LEFT: Image Section -->
-                                <div class="panel-left-new">
-                                    <div class="panel-thumbnail-new">
-                                        <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title }}" loading="lazy">
-                                    </div>
-                                    <div class="panel-image-info">
-                                        <div class="panel-filename">File Name: <span class="inline-edit-filename" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'filename')">{{ image.filename }}</span></div>
-                                        <div class="panel-title">Image Title: <span class="inline-edit-title" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'title')">{{ image.title }}</span></div>
-                                    </div>
-                                </div>
-                                
-                                <!-- MIDDLE: Categories, Galleries & Description -->
-                                <div class="panel-middle-new">
-                                    <!-- Top Row: Categories and Galleries Side by Side -->
-                                    <div class="panel-top-row">
-                                        <div class="panel-section panel-categories">
-                                            <h4>Categories</h4>
-                                            <div class="category-badges-vertical">
-                                                {% if image.all_categories %}
-                                                    {% for cat in image.all_categories %}
-                                                        <span class="category-badge category-{{ cat|lower|replace(' ', '-') }}">{{ cat }}</span>
-                                                    {% endfor %}
-                                                {% else %}
-                                                    <span class="category-badge category-{{ image.category|lower|replace(' ', '-') }}">{{ image.category }}</span>
-                                                {% endif %}
-                                                <button class="badge-add-btn" onclick="openCategorySelector('{{ image.filename }}')" title="Manage Categories">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
+                                <!-- TOP SECTION: Image + Categories/Galleries/Description -->
+                                <div class="panel-top-section">
+                                    <!-- LEFT: Image Section -->
+                                    <div class="panel-left-new">
+                                        <div class="panel-thumbnail-new">
+                                            <img src="/thumbnail/{{ image.filename }}" alt="{{ image.title }}" loading="lazy">
                                         </div>
-                                        
-                                        <div class="panel-section panel-galleries">
-                                            <h4>Galleries:</h4>
-                                            <div class="gallery-badges-vertical">
-                                                {% if image.galleries %}
-                                                    {% for gallery in image.galleries %}
-                                                        <span class="gallery-badge">{{ gallery }}</span>
-                                                    {% endfor %}
-                                                {% else %}
-                                                    <span class="no-galleries">None</span>
-                                                {% endif %}
-                                                <button class="badge-add-btn" onclick="openGallerySelector('{{ image.filename }}')" title="Manage Galleries">
-                                                    <i class="fas fa-plus"></i>
-                                                </button>
-                                            </div>
+                                        <div class="panel-image-info">
+                                            <div class="panel-filename">File Name: <span class="inline-edit-filename" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'filename')">{{ image.filename }}</span></div>
+                                            <div class="panel-title">Image Title: <span class="inline-edit-title" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'title')">{{ image.title }}</span></div>
                                         </div>
                                     </div>
                                     
-                                    <!-- Bottom: Description -->
-                                    <div class="panel-section">
-                                        <h4>Image Description</h4>
-                                        <div class="panel-description" contenteditable="true" data-filename="{{ image.filename }}" onblur="saveInlineEdit(this, 'description')">{{ image.description or 'Click to add description...' }}</div>
+                                    <!-- MIDDLE: Categories, Galleries & Description -->
+                                    <div class="panel-middle-new">
+                                        <!-- Top Row: Categories and Galleries Side by Side -->
+                                        <div class="panel-top-row">
+                                            <div class="panel-section panel-categories">
+                                                <h4>Categories</h4>
+                                                <div class="category-badges-vertical">
+                                                    {% if image.all_categories %}
+                                                        {% for cat in image.all_categories %}
+                                                            <span class="category-badge category-{{ cat|lower|replace(' ', '-') }}">{{ cat }}</span>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <span class="category-badge category-{{ image.category|lower|replace(' ', '-') }}">{{ image.category }}</span>
+                                                    {% endif %}
+                                                    <button class="badge-add-btn" onclick="openCategorySelector('{{ image.filename }}')" title="Manage Categories">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="panel-section panel-galleries">
+                                                <h4>Galleries:</h4>
+                                                <div class="gallery-badges-vertical">
+                                                    {% if image.galleries %}
+                                                        {% for gallery in image.galleries %}
+                                                            <span class="gallery-badge">{{ gallery }}</span>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <span class="no-galleries">None</span>
+                                                    {% endif %}
+                                                    <button class="badge-add-btn" onclick="openGallerySelector('{{ image.filename }}')" title="Manage Galleries">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Bottom: Description -->
+                                        <div class="panel-section">
+                                            <h4>Image Description</h4>
+                                            <div class="panel-description" contenteditable="true" data-filename="{{ image.filename }}" onblur="saveInlineEdit(this, 'description')">{{ image.description or 'Click to add description...' }}</div>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <!-- RIGHT: Action Buttons & Icons -->
-                                <div class="panel-right-new">
+                                <!-- BOTTOM SECTION: Action Buttons + Icons -->
+                                <div class="panel-bottom-section">
                                     <div class="panel-action-buttons">
-                                        <button class="panel-btn btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit Details">
-                                            <i class="fas fa-edit"></i> Edit
+                                        <button class="panel-btn btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit">
+                                            <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="panel-btn btn-analyze" onclick="analyzeImage('{{ image.filename }}', '{{ image.title|replace("'", "\\'")|replace('"', '\\"') }}')" title="Analyze Image">
-                                            <i class="fas fa-search"></i> Analyze
+                                        <button class="panel-btn btn-analyze" onclick="analyzeImage('{{ image.filename }}', '{{ image.title|replace("'", "\\'")|replace('"', '\\"') }}')" title="Analyze">
+                                            <i class="fas fa-search"></i>
                                         </button>
-                                        <button class="panel-btn btn-download" onclick="downloadHighres('{{ image.filename }}')" title="Download Hi-Res">
-                                            <i class="fas fa-download"></i> Download
+                                        <button class="panel-btn btn-download" onclick="downloadHighres('{{ image.filename }}')" title="Download">
+                                            <i class="fas fa-download"></i>
                                         </button>
                                         <button class="panel-btn btn-delete" onclick="deleteImage('{{ image.filename }}')" title="Delete">
-                                            <i class="fas fa-trash"></i> Delete
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                     

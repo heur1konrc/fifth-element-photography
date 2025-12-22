@@ -1,15 +1,29 @@
 /* New Image Panel Layout - Based on Mockup */
 
 .image-panel-new {
-    display: grid;
-    grid-template-columns: 350px 1fr 200px;
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     background: #2a2a2a;
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 15px;
     border: 2px solid transparent;
     transition: all 0.2s ease;
+}
+
+.panel-top-section {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 20px;
+}
+
+.panel-bottom-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px solid #444;
 }
 
 .image-panel-new:hover {
@@ -179,20 +193,10 @@
     transform: scale(1.1);
 }
 
-/* RIGHT SECTION - Buttons & Icons */
-.panel-right-new {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: stretch;
-}
-
 .panel-bottom-icons {
     display: flex;
     gap: 12px;
     align-items: center;
-    justify-content: flex-end;
-    margin-top: 10px;
 }
 
 .status-icon {
@@ -229,27 +233,24 @@
 .panel-action-buttons {
     display: flex;
     flex-direction: row;
-    gap: 8px;
-    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .panel-btn {
-    padding: 8px 12px;
+    padding: 10px 16px;
     border-radius: 6px;
     border: none;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
     transition: all 0.2s ease;
-    width: 100%;
 }
 
 .panel-btn i {
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .btn-edit {
