@@ -512,10 +512,54 @@ console.log('Shopify Storefront API integration loaded');
 
 // Show category selector modal
 function showCategorySelector(imageUrl, imageTitle, productHandles) {
-    const modal = document.getElementById('shopify-product-modal');
-    const container = document.getElementById('shopify-product-component');
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('shopify-product-modal');
     
-    if (!modal || !container) return;
+    if (!modal) {
+        // Create the modal structure
+        const modalHTML = `
+            <div id="shopify-product-modal" class="shopify-modal">
+                <div class="shopify-modal-content">
+                    <div class="shopify-modal-header">
+                        <h2>${imageTitle}</h2>
+                        <button class="shopify-modal-close">&times;</button>
+                    </div>
+                    <div id="shopify-product-component"></div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+        modal = document.getElementById('shopify-product-modal');
+        
+        // Attach close handlers
+        const closeBtn = document.querySelector('.shopify-modal-close');
+        if (closeBtn) {
+            closeBtn.onclick = function() {
+                window.closeShopifyModal();
+                return false;
+            };
+        }
+        
+        // Click on backdrop to close
+        modal.onclick = function(e) {
+            if (e.target === modal) {
+                window.closeShopifyModal();
+            }
+        };
+        
+        // ESC key to close
+        const escHandler = function(e) {
+            if (e.key === 'Escape' || e.keyCode === 27) {
+                window.closeShopifyModal();
+                document.removeEventListener('keydown', escHandler);
+            }
+        };
+        document.addEventListener('keydown', escHandler);
+    }
+    
+    const container = document.getElementById('shopify-product-component');
+    if (!container) return;
     
     // Build category selector HTML
     const categoriesHTML = productHandles.map(({category, handle}) => `
