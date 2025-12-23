@@ -565,7 +565,10 @@ function showCategorySelector(imageUrl, imageTitle, productHandles) {
     const categoriesHTML = productHandles.map(({category, handle}) => `
         <button class="category-selector-btn" onclick="openProductByHandle('${handle}', '${imageTitle}')">
             <img src="${getCategoryIcon(category)}" alt="${category}" class="category-image" />
-            <span class="category-name">${category}</span>
+            <div class="category-info">
+                <div class="category-title">${category}</div>
+                <div class="category-description">${getCategoryDescription(category)}</div>
+            </div>
         </button>
     `).join('');
     
@@ -592,6 +595,18 @@ function getCategoryIcon(category) {
         'Foam-mounted Print': '/static/images/products/foam-mounted.png'
     };
     return images[category] || '/static/images/products/canvas.png';
+}
+
+// Get description for category
+function getCategoryDescription(category) {
+    const descriptions = {
+        'Canvas': 'Get your artwork, designs and photos on canvas with our high-quality stretched or rolled canvas prints. Made with carefully hand-stretched fabric on a wooden frame.',
+        'Framed Canvas': 'Give your photos and artwork the professional look of a framed canvas print. Choose from floating, decorative, or traditional gallery frames – a perfect blend of elegance, depth, and versatility.',
+        'Fine Art Paper': "It's not just a piece of paper – it's a work of art. Fine art paper creates an elegant, classic aesthetic with vibrant colors that give off a gallery-feel that won't fade easily.",
+        'Foam-mounted Print': 'Discover a new way to showcase your art and photos with our foam-mounted fine art paper prints. These lightweight and sturdy prints offer the perfect solution for stunning, professional presentation.',
+        'Metal': "Display your photos and artworks in a way that's both beautiful and durable. The infusion of the image to the aluminum's coating offers a level of vibrancy and vividness not seen in other print medium."
+    };
+    return descriptions[category] || '';
 }
 
 // Open product by handle directly
