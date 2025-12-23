@@ -1481,14 +1481,22 @@ def admin():
                     break
         
         # Check Shopify status for all images
-        from routes.shopify_admin import get_all_mappings
-        shopify_mappings = get_all_mappings()
+        import sqlite3
+        db_path = '/data/print_ordering.db' if os.path.exists('/data') else os.path.join(os.path.dirname(__file__), 'database', 'print_ordering.db')
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute('SELECT DISTINCT image_filename FROM shopify_products')
+            shopify_filenames = {row[0] for row in cursor.fetchall()}
+            conn.close()
+        except:
+            shopify_filenames = set()
         
         # Add has_shopify_products flag to each image
         for img in all_images_unfiltered:
-            img['has_shopify_products'] = img['filename'] in shopify_mappings
+            img['has_shopify_products'] = img['filename'] in shopify_filenames
         for img in images:
-            img['has_shopify_products'] = img['filename'] in shopify_mappings
+            img['has_shopify_products'] = img['filename'] in shopify_filenames
         
         # Calculate pagination
         total_images = len(images)
