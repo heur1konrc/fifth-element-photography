@@ -1432,7 +1432,7 @@ def admin():
         
         # Apply gallery filter
         if gallery_filter and gallery_filter != 'all':
-            images = [img for img in images if gallery_filter in img.get('galleries', [])]
+            images = [img for img in images if any(g.get('slug') == gallery_filter for g in img.get('galleries', []))]
         
         about_data = load_about_data()
 
