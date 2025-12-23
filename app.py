@@ -1481,8 +1481,8 @@ def admin():
                     break
         
         # Check Shopify status for all images
-        from routes.shopify_admin import get_shopify_product_mappings
-        shopify_mappings = get_shopify_product_mappings()
+        from routes.shopify_admin import get_all_mappings
+        shopify_mappings = get_all_mappings()
         
         # Add has_shopify_products flag to each image
         for img in all_images_unfiltered:
