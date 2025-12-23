@@ -1547,6 +1547,8 @@ async function applyLumaprintsMapping() {
         const width = product.width || 0;
         const length = product.length || 0;
         
+        console.log(`Product row ${product.row}: width=${width}, length=${length}, option1="${product.option1}"`);
+        
         // Strip "Printed Product - " and convert to subcategory format
         const productType = (product.option1 || '').replace(/^Printed Product - /i, '');
         let subcategory = '';
@@ -1569,15 +1571,19 @@ async function applyLumaprintsMapping() {
             options = [];
         }
         
+        const mappingData = {
+            image_filename: userMapping.filename,
+            subcategory: subcategory,
+            width: width,
+            length: length,
+            options: options
+        };
+        
+        console.log(`Mapping data for row ${product.row}:`, mappingData);
+        
         mappings.push({
             row: product.row,
-            data: {
-                image_filename: userMapping.filename,
-                subcategory: subcategory,
-                width: width,
-                length: length,
-                options: options
-            }
+            data: mappingData
         });
     }
     
