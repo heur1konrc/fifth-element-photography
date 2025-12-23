@@ -1,12 +1,23 @@
 """
 Fifth Element Photography - Main Application
 ==============================================
-Version: v2.3.0
+Version: v2.3.1
 Date: 2024-12-22
 Description: Photography gallery with Shopify e-commerce integration
 
 CHANGELOG:
 ----------
+v2.3.1 (2024-12-22):
+  - FIXED: Shopify tab now shows ALL images independently from Images tab filters
+  - FIXED: Gallery filter from Images tab no longer carries over to Shopify tab
+  - FIXED: URL parameters automatically cleared when switching to Shopify tab
+  - IMPROVED: Images tab pagination reduced to 6 images per page (from 24)
+  - IMPROVED: Removed top pagination controls (kept only bottom pagination)
+  - IMPROVED: Search, filter, and sort persist correctly across pagination
+  - TECHNICAL: Backend provides separate all_images_unfiltered for Shopify tab
+  - TECHNICAL: JavaScript clears URL params (search, gallery, sort, page) on tab switch
+  - Backup: fifth-element-backup-20251223-004904.tar.gz
+
 v2.3.0 (2024-12-22):
   - ADDED: Tabbed admin interface (Images, Shopify, Tools, Settings)
   - ADDED: Horizontal image panels with category/gallery badges
@@ -68,6 +79,6 @@ SHOPIFY INTEGRATION (v2.1.0):
 - Checkout handled by Shopify
 """
 
-__version__ = "2.3.0"
+__version__ = "2.3.1"
 __date__ = "2024-12-22"
 
