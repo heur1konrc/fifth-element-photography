@@ -1363,34 +1363,76 @@ function displayUnmappedProducts() {
         return;
     }
     
-    // Initialize mapping rows with first row
-    initializeMappingRows();
+    // Get unique product titles
+    const uniqueTitles = getUniqueProductTitles();
     
-    // Show all unmapped products
-    const preview = LumaprintsState.unmappedProducts;
+    // Show product titles with checkboxes for selection
     listElem.innerHTML = `
-        <h4>Unmapped Products (${preview.length} total):</h4>
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background: #f0f0f0;">
-                    <th style="padding: 8px; border: 1px solid #ddd;">Title</th>
-                    <th style="padding: 8px; border: 1px solid #ddd;">Size</th>
-                    <th style="padding: 8px; border: 1px solid #ddd;">Product Type</th>
-                    <th style="padding: 8px; border: 1px solid #ddd;">Existing Filename</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${preview.map(p => `
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${p.product_name || 'N/A'}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${p.size || 'N/A'}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${p.option1 || 'N/A'}</td>
-                        <td style="padding: 8px; border: 1px solid #ddd;">${p.existing_filename || 'None'}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
+        <h4>Select Products to Map:</h4>
+        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9;">
+            ${uniqueTitles.map(title => {
+                const count = LumaprintsState.unmappedProducts.filter(p => {
+                    const baseTitle = p.product_name
+                        .replace(/ - Canvas$/i, '')
+                        .replace(/ - Framed Canvas$/i, '')
+                        .replace(/ - Fine Art Paper$/i, '')
+                        .replace(/ - Foam-mounted Print$/i, '')
+                        .replace(/ - Metal Print$/i, '')
+                        .replace(/ - Metal$/i, '')
+                        .trim();
+                    return baseTitle === title;
+                }).length;
+                return `
+                    <div style="margin-bottom: 15px; padding: 10px; background: white; border: 1px solid #ddd; border-radius: 4px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" class="product-title-checkbox" value="${title}" style="margin-right: 10px; width: 18px; height: 18px;">
+                            <div>
+                                <strong>${title}</strong>
+                                <div style="font-size: 0.9em; color: #666; margin-top: 4px;">${count} unmapped variants</div>
+                            </div>
+                        </label>
+                        <div class="mapping-inputs-${title.replace(/[^a-zA-Z0-9]/g, '_')}" style="margin-top: 10px; padding-left: 28px; display: none;">
+                            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+                                <div>
+                                    <label style="font-size: 0.9em; color: #666;">Image Filename:</label>
+                                    <input type="text" class="mapping-filename" placeholder="e.g., image.jpg" style="width: 100%; padding: 8px; margin-top: 4px;">
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.9em; color: #666;">Aspect Ratio:</label>
+                                    <select class="mapping-aspect" style="width: 100%; padding: 8px; margin-top: 4px;">
+                                        <option value="3:2">3:2 (Landscape)</option>
+                                        <option value="2:3">2:3 (Portrait)</option>
+                                        <option value="1:1">1:1 (Square)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
     `;
+    
+    // Add event listeners to checkboxes
+    document.querySelectorAll('.product-title-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const title = this.value;
+            const safeTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
+            const inputsDiv = document.querySelector(`.mapping-inputs-${safeTitle}`);
+            if (inputsDiv) {
+                inputsDiv.style.display = this.checked ? 'block' : 'none';
+            }
+            
+            // Auto-fill filename if available
+            if (this.checked && LumaprintsState.titleToFilenameMap) {
+                const filename = LumaprintsState.titleToFilenameMap[title];
+                if (filename) {
+                    const filenameInput = inputsDiv.querySelector('.mapping-filename');
+                    if (filenameInput) filenameInput.value = filename;
+                }
+            }
+        });
+    });
 }
 
 /**
@@ -1522,29 +1564,31 @@ function renumberMappingRows() {
  * Applies ALL product types (Canvas + all Art Paper types) at once
  */
 async function applyLumaprintsMapping() {
-    // Collect all mapping rows
-    const container = document.getElementById('lumaprints-mapping-rows');
-    const rows = container.querySelectorAll('.mapping-row');
+    // Collect checked products
+    const checkboxes = document.querySelectorAll('.product-title-checkbox:checked');
+    
+    if (checkboxes.length === 0) {
+        showAlert('Please select at least one product to map', 'warning');
+        return;
+    }
     
     // Validate and collect mappings
     const userMappings = [];
-    for (let i = 0; i < rows.length; i++) {
-        const row = rows[i];
-        const titleSelect = row.querySelector('.mapping-title-select');
-        const filenameInput = row.querySelector('.mapping-filename-input');
-        const aspectSelect = row.querySelector('.mapping-aspect-select');
+    for (const checkbox of checkboxes) {
+        const title = checkbox.value;
+        const safeTitle = title.replace(/[^a-zA-Z0-9]/g, '_');
+        const inputsDiv = document.querySelector(`.mapping-inputs-${safeTitle}`);
         
-        const title = titleSelect.value;
-        const filename = filenameInput.value.trim();
-        const aspectRatio = aspectSelect.value;
+        if (!inputsDiv) continue;
         
-        if (!title) {
-            showAlert(`Mapping #${i + 1}: Please select a product title`, 'warning');
-            return;
-        }
+        const filenameInput = inputsDiv.querySelector('.mapping-filename');
+        const aspectSelect = inputsDiv.querySelector('.mapping-aspect');
+        
+        const filename = filenameInput ? filenameInput.value.trim() : '';
+        const aspectRatio = aspectSelect ? aspectSelect.value : '3:2';
         
         if (!filename) {
-            showAlert(`Mapping #${i + 1}: Please enter an image filename`, 'warning');
+            showAlert(`Product "${title}": Please enter an image filename`, 'warning');
             return;
         }
         
