@@ -4919,7 +4919,8 @@ def lumaprints_upload():
         wb, ws = lm.load_excel(temp_path)
         
         # Sort by Column A (keeping header)
-        lm.sort_by_column_a(ws)
+        # DISABLED: Sorting was corrupting existing mappings
+        # lm.sort_by_column_a(ws)
         
         # Get unmapped products
         unmapped = lm.get_unmapped_products(ws)
@@ -5598,3 +5599,22 @@ def update_image_galleries():
         return jsonify({'success': True, 'message': 'Galleries updated successfully'})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/admin/download-lumaprints-backup')
+@require_admin_auth
+def download_lumaprints_backup():
+    """Download Lumaprints backup file"""
+    try:
+        backup_path = '/home/ubuntu/fifth-element-photography/static/lumaprints_backup_working.xlsx'
+        if os.path.exists(backup_path):
+            return send_from_directory(
+                os.path.dirname(backup_path),
+                os.path.basename(backup_path),
+                as_attachment=True,
+                download_name='lumaprints_mapped_backup.xlsx'
+            )
+        else:
+            return "Backup file not found", 404
+    except Exception as e:
+        return f"Error: {str(e)}", 500
