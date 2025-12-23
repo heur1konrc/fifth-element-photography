@@ -1413,7 +1413,7 @@ def admin():
     try:
         # Pagination parameters
         page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 24, type=int)  # 24 images per page
+        per_page = request.args.get('per_page', 6, type=int)  # 6 images per page
         
         # Search and filter parameters
         search_query = request.args.get('search', '').strip().lower()
