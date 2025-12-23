@@ -1547,43 +1547,112 @@ async function applyLumaprintsMapping() {
         const length = product.length || 18;
         const productType = product.option1 || '';
         
-        // Determine product type
+        // Determine product type and map to Lumaprints subcategory
         let subcategory = '';
         let options = [];
         
-        if (productType.includes('Canvas')) {
-            subcategory = '0.75in Stretched Canvas';
-            options = [
-                ['Canvas Border', 'Mirror Wrap'],
-                ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
-                ['Canvas Finish', 'Semi-Glossy']
-            ];
-        } else if (productType.includes('Hot Press')) {
-            subcategory = 'Hot Press Fine Art Paper';
-            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
-        } else if (productType.includes('Semi-Glossy')) {
-            subcategory = 'Semi-Glossy Fine Art Paper';
-            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
-        } else if (productType.includes('Glossy')) {
-            subcategory = 'Glossy Fine Art Paper';
-            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];  
-        } else if (productType.includes('White Metal')) {
+        // Match exact product type from Shopify to Lumaprints subcategory
+        // Order matters - check specific types before general ones
+        
+        // Metal products
+        if (productType.includes('Glossy White Metal')) {
             subcategory = 'Glossy White Metal';
             options = [];
-        } else if (productType.includes('Silver Metal')) {
+        } else if (productType.includes('Glossy Silver Metal')) {
             subcategory = 'Glossy Silver Metal';
-            options = [];  
-        } else if (productType.includes('Foam')) {
-            subcategory = 'Foam-mounted Print';
             options = [];
-        } else {
-            // Default to canvas
-            subcategory = '0.75in Stretched Canvas';
+        }
+        // Foam-mounted products
+        else if (productType.includes('Foam-mounted Hot Press')) {
+            subcategory = 'Foam-mounted Hot Press';
+            options = [];
+        } else if (productType.includes('Foam-mounted Cold Press')) {
+            subcategory = 'Foam-mounted Cold Press';
+            options = [];
+        } else if (productType.includes('Foam-mounted Semi-Glossy') || productType.includes('Foam-mounted Semi-glossy')) {
+            subcategory = 'Foam-mounted Semi-Glossy';
+            options = [];
+        } else if (productType.includes('Foam-mounted Glossy')) {
+            subcategory = 'Foam-mounted Glossy';
+            options = [];
+        }
+        // Framed Canvas - check frame type and depth
+        else if (productType.includes('1.50') && productType.includes('Framed Canvas Black')) {
+            subcategory = '1.50 Framed Canvas Black';
+            options = [];
+        } else if (productType.includes('1.50') && productType.includes('Framed Canvas White')) {
+            subcategory = '1.50 Framed Canvas White';
+            options = [];
+        } else if (productType.includes('1.50') && productType.includes('Framed Canvas Oak')) {
+            subcategory = '1.50 Framed Canvas Oak';
+            options = [];
+        } else if (productType.includes('1.25') && productType.includes('Framed Canvas Black')) {
+            subcategory = '1.25 Framed Canvas Black';
+            options = [];
+        } else if (productType.includes('1.25') && productType.includes('Framed Canvas White')) {
+            subcategory = '1.25 Framed Canvas White';
+            options = [];
+        } else if (productType.includes('1.25') && productType.includes('Framed Canvas Oak')) {
+            subcategory = '1.25 Framed Canvas Oak';
+            options = [];
+        } else if (productType.includes('0.75') && productType.includes('Framed Canvas Black')) {
+            subcategory = '0.75 Framed Canvas Black';
+            options = [];
+        } else if (productType.includes('0.75') && productType.includes('Framed Canvas White')) {
+            subcategory = '0.75 Framed Canvas White';
+            options = [];
+        } else if (productType.includes('0.75') && productType.includes('Framed Canvas Gold')) {
+            subcategory = '0.75 Framed Canvas Gold';
+            options = [];
+        } else if (productType.includes('0.75') && productType.includes('Framed Canvas Silver')) {
+            subcategory = '0.75 Framed Canvas Silver';
+            options = [];
+        }
+        // Stretched Canvas
+        else if (productType.includes('1.50') && productType.includes('Stretched Canvas')) {
+            subcategory = '1.50 Stretched Canvas';
             options = [
                 ['Canvas Border', 'Mirror Wrap'],
                 ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
                 ['Canvas Finish', 'Semi-Glossy']
             ];
+        } else if (productType.includes('1.25') && productType.includes('Stretched Canvas')) {
+            subcategory = '1.25 Stretched Canvas';
+            options = [
+                ['Canvas Border', 'Mirror Wrap'],
+                ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
+                ['Canvas Finish', 'Semi-Glossy']
+            ];
+        } else if (productType.includes('0.75') && productType.includes('Stretched Canvas')) {
+            subcategory = '0.75 Stretched Canvas';
+            options = [
+                ['Canvas Border', 'Mirror Wrap'],
+                ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
+                ['Canvas Finish', 'Semi-Glossy']
+            ];
+        } else if (productType.includes('Rolled Canvas')) {
+            subcategory = 'Rolled Canvas';
+            options = [];
+        }
+        // Fine Art Paper - check before general "Glossy" to avoid conflicts
+        else if (productType.includes('Hot Press')) {
+            subcategory = 'Hot Press';
+            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
+        } else if (productType.includes('Cold Press')) {
+            subcategory = 'Cold Press';
+            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
+        } else if (productType.includes('Semi-glossy') || productType.includes('Semi-Glossy')) {
+            subcategory = 'Semi-glossy';
+            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
+        } else if (productType.includes('Glossy')) {
+            subcategory = 'Glossy';
+            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
+        }
+        // Default fallback
+        else {
+            console.warn('Unknown product type:', productType);
+            subcategory = productType; // Use as-is
+            options = [];
         }
         
         mappings.push({
