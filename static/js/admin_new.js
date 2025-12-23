@@ -1384,6 +1384,7 @@ function getUniqueProductTitles() {
             // Remove product type suffixes to get base title
             let baseTitle = p.product_name
                 .replace(/ - Canvas$/i, '')
+                .replace(/ - Framed Canvas$/i, '')
                 .replace(/ - Fine Art Paper$/i, '')
                 .replace(/ - Foam-mounted Print$/i, '')
                 .replace(/ - Metal Print$/i, '')
