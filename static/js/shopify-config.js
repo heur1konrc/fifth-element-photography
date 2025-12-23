@@ -10,6 +10,7 @@ const SHOPIFY_CONFIG = {
 };
 
 // Product mapping cache (loaded from database)
+// Format: { "image.jpg": { "Canvas": "handle-canvas", "Metal": "handle-metal", ... } }
 let PRODUCT_MAPPING = {};
 
 // Load product mappings from database
@@ -29,12 +30,26 @@ async function loadProductMappings() {
 // Initialize mappings on page load
 loadProductMappings();
 
-// Get Shopify product handle for an image
-function getProductHandle(imageFilename) {
+// Get all Shopify product handles for an image (returns object with categories)
+function getProductHandles(imageFilename) {
     return PRODUCT_MAPPING[imageFilename] || null;
 }
 
-// Get product handle from image URL
+// Get product handles from image URL
+function getProductHandlesFromUrl(imageUrl) {
+    const filename = imageUrl.split('/').pop();
+    return getProductHandles(filename);
+}
+
+// Legacy function for backward compatibility - returns first available handle
+function getProductHandle(imageFilename) {
+    const handles = getProductHandles(imageFilename);
+    if (!handles) return null;
+    // Return first available handle
+    return Object.values(handles)[0] || null;
+}
+
+// Legacy function for backward compatibility
 function getProductHandleFromUrl(imageUrl) {
     const filename = imageUrl.split('/').pop();
     return getProductHandle(filename);

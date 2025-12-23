@@ -131,14 +131,69 @@ async function createCartWithItem(variantId) {
 
 // Open product modal for a specific image
 function openShopifyProductModal(imageUrl, imageTitle) {
-    const productHandle = getProductHandleFromUrl(imageUrl);
+    const productHandles = getProductHandlesFromUrl(imageUrl);
     
-    if (!productHandle) {
+    if (!productHandles || Object.keys(productHandles).length === 0) {
         alert('This image is not yet available for purchase. Please check back soon!');
         console.error('No Shopify product mapped for:', imageUrl);
         return;
     }
 
+    // If multiple categories exist, show category selector
+    if (Object.keys(productHandles).length > 1) {
+        showCategorySelector(productHandles, imageTitle);
+    } else {
+        // Only one category, open it directly
+        const handle = Object.values(productHandles)[0];
+        openProductByHandle(handle, imageTitle);
+    }
+}
+
+// Show category selector modal
+function showCategorySelector(productHandles, imageTitle) {
+    const categories = Object.keys(productHandles);
+    
+    const categoryButtons = categories.map(category => 
+        `<button class="category-select-btn" data-handle="${productHandles[category]}">${category}</button>`
+    ).join('');
+    
+    const modalHTML = `
+        <div id="shopify-category-modal" class="shopify-modal">
+            <div class="shopify-modal-content category-selector">
+                <div class="shopify-modal-header">
+                    <h2>Select Print Type</h2>
+                    <button class="shopify-modal-close" onclick="closeCategoryModal()">&times;</button>
+                </div>
+                <div class="category-selector-body">
+                    <p>Choose the type of print for "${imageTitle}":</p>
+                    <div class="category-buttons">
+                        ${categoryButtons}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Add click handlers to category buttons
+    document.querySelectorAll('.category-select-btn').forEach(btn => {
+        btn.onclick = () => {
+            const handle = btn.dataset.handle;
+            closeCategoryModal();
+            openProductByHandle(handle, imageTitle);
+        };
+    });
+}
+
+// Close category selector modal
+function closeCategoryModal() {
+    const modal = document.getElementById('shopify-category-modal');
+    if (modal) modal.remove();
+}
+
+// Open product by handle
+function openProductByHandle(productHandle, imageTitle) {
     // Show loading state
     showLoadingModal(imageTitle);
 

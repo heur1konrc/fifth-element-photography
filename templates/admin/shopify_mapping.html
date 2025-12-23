@@ -267,6 +267,29 @@
             <p>Manage ORDER PRINTS functionality and map images to Shopify products</p>
         </div>
         
+        <div class="controls-bar" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px;">
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <input type="text" 
+                       id="search-input" 
+                       placeholder="🔍 Search by filename..." 
+                       style="flex: 1; min-width: 250px; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 1em;">
+                
+                <select id="filter-status" 
+                        style="padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 1em; min-width: 200px;">
+                    <option value="all">All Images</option>
+                    <option value="enabled">ORDER PRINTS Enabled</option>
+                    <option value="disabled">ORDER PRINTS Disabled</option>
+                    <option value="mapped">Mapped to Shopify</option>
+                    <option value="unmapped">Not Mapped</option>
+                </select>
+                
+                <button onclick="clearFilters()" 
+                        style="padding: 12px 20px; background: #f44336; color: white; border: none; border-radius: 6px; font-size: 1em; cursor: pointer;">
+                    Clear Filters
+                </button>
+            </div>
+        </div>
+        
         <div class="stats-bar">
             <div class="stat-item">
                 <div class="stat-value" id="total-images">{{ images|length }}</div>
@@ -282,7 +305,23 @@
             </div>
         </div>
         
-        <div class="mappings-grid">
+        <div style="background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="font-weight: 600; color: #667eea;">Showing <span id="visible-count">0</span> images</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <label style="color: #666;">Items per page:</label>
+                <select id="items-per-page" style="padding: 8px; border: 2px solid #e0e0e0; border-radius: 6px;">
+                    <option value="20">20</option>
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div id="pagination-controls" style="display: flex; gap: 10px;"></div>
+        </div>
+        
+        <div class="mappings-grid" id="mappings-grid">
             {% for image in images %}
             <div class="mapping-card" data-filename="{{ image.filename }}">
                 <img src="/gallery-image/{{ image.filename }}" 
