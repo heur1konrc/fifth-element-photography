@@ -1375,12 +1375,21 @@ function displayUnmappedProducts() {
 
 /**
  * Get unique product titles from unmapped products
+ * Extracts base title without product type suffix (e.g., "Oregon Hockey 16" from "Oregon Hockey 16 - Canvas")
  */
 function getUniqueProductTitles() {
     const titles = new Set();
     LumaprintsState.unmappedProducts.forEach(p => {
         if (p.product_name) {
-            titles.add(p.product_name);
+            // Remove product type suffixes to get base title
+            let baseTitle = p.product_name
+                .replace(/ - Canvas$/i, '')
+                .replace(/ - Fine Art Paper$/i, '')
+                .replace(/ - Foam-mounted Print$/i, '')
+                .replace(/ - Metal Print$/i, '')
+                .replace(/ - Metal$/i, '')
+                .trim();
+            titles.add(baseTitle);
         }
     });
     return Array.from(titles).sort();
@@ -1516,8 +1525,17 @@ async function applyLumaprintsMapping() {
     const mappings = [];
     
     for (const product of LumaprintsState.unmappedProducts) {
-        // Find matching user mapping by title
-        const userMapping = userMappings.find(m => m.title === product.product_name);
+        // Extract base title from product name
+        let baseTitle = product.product_name
+            .replace(/ - Canvas$/i, '')
+            .replace(/ - Fine Art Paper$/i, '')
+            .replace(/ - Foam-mounted Print$/i, '')
+            .replace(/ - Metal Print$/i, '')
+            .replace(/ - Metal$/i, '')
+            .trim();
+        
+        // Find matching user mapping by base title
+        const userMapping = userMappings.find(m => m.title === baseTitle);
         
         if (!userMapping) {
             // Skip products that don't have a mapping
@@ -1548,7 +1566,13 @@ async function applyLumaprintsMapping() {
             options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
         } else if (productType.includes('Glossy')) {
             subcategory = 'Glossy Fine Art Paper';
-            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
+            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];  
+        } else if (productType.includes('Metal')) {
+            subcategory = 'Metal Print';
+            options = [['Metal Finish', 'Glossy']];  
+        } else if (productType.includes('Foam')) {
+            subcategory = 'Foam-mounted Print';
+            options = [];
         } else {
             // Default to canvas
             subcategory = '0.75in Stretched Canvas';
