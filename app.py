@@ -4901,8 +4901,12 @@ def lumaprints_apply_mapping():
         output_path = os.path.join('/tmp', 'lumaprints_mapped.xlsx')
         print(f"\nSaving workbook to: {output_path}")
         
-        # Verify data before saving
-        print(f"Verifying row 3 before save: U={ws.cell(3, 21).value}, V={ws.cell(3, 22).value}, W={ws.cell(3, 23).value}")
+        # Verify data before saving (check multiple rows)
+        print(f"Verifying rows before save:")
+        print(f"  Row 3: U={ws.cell(3, 21).value}, V={ws.cell(3, 22).value}, W={ws.cell(3, 23).value}")
+        print(f"  Row 10: U={ws.cell(10, 21).value}, V={ws.cell(10, 22).value}, W={ws.cell(10, 23).value}")
+        print(f"  Row 15: U={ws.cell(15, 21).value}, V={ws.cell(15, 22).value}, W={ws.cell(15, 23).value}")
+        print(f"  Row 20: U={ws.cell(20, 21).value}, V={ws.cell(20, 22).value}, W={ws.cell(20, 23).value}")
         
         lm.save_excel(wb, output_path)
         print(f"Workbook saved successfully")
@@ -4931,7 +4935,11 @@ def lumaprints_download():
         # Verify file contents before sending
         print(f"\nDownload requested: {output_path}")
         wb, ws = lm.load_excel(output_path)
-        print(f"Verifying row 3 in download file: U={ws.cell(3, 21).value}, V={ws.cell(3, 22).value}, W={ws.cell(3, 23).value}")
+        print(f"Verifying rows in download file:")
+        print(f"  Row 3: U={ws.cell(3, 21).value}, V={ws.cell(3, 22).value}, W={ws.cell(3, 23).value}")
+        print(f"  Row 10: U={ws.cell(10, 21).value}, V={ws.cell(10, 22).value}, W={ws.cell(10, 23).value}")
+        print(f"  Row 15: U={ws.cell(15, 21).value}, V={ws.cell(15, 22).value}, W={ws.cell(15, 23).value}")
+        print(f"  Row 20: U={ws.cell(20, 21).value}, V={ws.cell(20, 22).value}, W={ws.cell(20, 23).value}")
         
         return send_file(
             output_path,
