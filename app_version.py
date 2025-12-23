@@ -1,12 +1,20 @@
 """
 Fifth Element Photography - Main Application
 ==============================================
-Version: v2.3.1
+Version: v2.3.2
 Date: 2024-12-22
 Description: Photography gallery with Shopify e-commerce integration
 
 CHANGELOG:
 ----------
+v2.3.2 (2024-12-22):
+  - FIXED: Gallery-optimized images now auto-generate on upload for Shopify product creation
+  - FIXED: No longer need to manually run "Generate Gallery Images" before creating Shopify products
+  - IMPROVED: Upload workflow - upload image → immediately create Shopify products
+  - TECHNICAL: Both upload_image() and upload_images_new() now create 1200px gallery versions
+  - TECHNICAL: Gallery images saved to /data/gallery-images/ at 90% JPEG quality
+  - Commit: b5859f0
+
 v2.3.1 (2024-12-22):
   - FIXED: Shopify tab now shows ALL images independently from Images tab filters
   - FIXED: Gallery filter from Images tab no longer carries over to Shopify tab
@@ -79,6 +87,5 @@ SHOPIFY INTEGRATION (v2.1.0):
 - Checkout handled by Shopify
 """
 
-__version__ = "2.3.1"
+__version__ = "2.3.2"
 __date__ = "2024-12-22"
-
