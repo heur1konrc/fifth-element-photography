@@ -474,7 +474,7 @@
                             <!-- Image Gallery (default view) -->
                             <div id="shopifyImageGallery" class="tab-section">
                                 <div id="shopifyImageGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px;">
-                                    {% for image in all_images %}
+                                    {% for image in all_images_unfiltered %}
                                     <div class="shopify-image-item" style="position: relative; background: #2a2a2a; border-radius: 8px; padding: 10px; cursor: pointer;" 
                                          data-filename="{{ image.filename }}" 
                                          data-date="{{ image.date_added or '' }}">

@@ -1420,7 +1420,8 @@ def admin():
         gallery_filter = request.args.get('gallery', '').strip()
         sort_by = request.args.get('sort', 'az').strip()
         
-        images = scan_images()
+        all_images_unfiltered = scan_images()  # Keep unfiltered copy for Shopify tab
+        images = list(all_images_unfiltered)  # Create copy for filtering
         all_categories = sorted(load_categories())
         
         # Get all galleries for filter dropdown
@@ -1486,7 +1487,8 @@ def admin():
         
         return render_template('admin_new.html', 
                              images=paginated_images,
-                             all_images=images,  # For stats
+                             all_images=images,  # Filtered images for Images tab stats
+                             all_images_unfiltered=all_images_unfiltered,  # Unfiltered images for Shopify tab
                              all_categories=all_categories,
                              all_galleries=all_galleries,  # For gallery filter dropdown
                              about_data=about_data,

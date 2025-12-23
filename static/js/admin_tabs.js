@@ -17,6 +17,17 @@ document.addEventListener('DOMContentLoaded', function() {
             this.classList.add('active');
             document.getElementById(`tab-${targetTab}`).classList.add('active');
             
+            // Clear URL parameters when switching to Shopify tab
+            if (targetTab === 'shopify') {
+                // Remove search, gallery, sort, and page parameters from URL
+                const url = new URL(window.location);
+                url.searchParams.delete('search');
+                url.searchParams.delete('gallery');
+                url.searchParams.delete('sort');
+                url.searchParams.delete('page');
+                window.history.replaceState({}, '', url);
+            }
+            
             // Store active tab in localStorage for persistence
             localStorage.setItem('activeAdminTab', targetTab);
         });
