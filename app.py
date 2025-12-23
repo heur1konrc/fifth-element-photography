@@ -4932,7 +4932,7 @@ def lumaprints_upload():
         return jsonify({
             'success': True,
             'unmapped_count': len(unmapped),
-            'unmapped_products': unmapped[:50]  # Limit to first 50 for display
+            'unmapped_products': unmapped  # Send all unmapped products
         })
     
     except Exception as e:
