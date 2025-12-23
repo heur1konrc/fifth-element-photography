@@ -267,7 +267,8 @@
                 <!-- Pagination Controls -->
                 {% if total_pages > 1 %}
                 <div class="pagination-controls" style="margin: 20px 0; display: flex; justify-content: center; align-items: center; gap: 10px;">
-                    {% set query_params = '&search=' + search_query if search_query else '' %}
+                    {% set query_params = '&sort=' + sort_by if sort_by else '' %}
+                    {% set query_params = query_params + '&search=' + search_query if search_query else query_params %}
                     {% set query_params = query_params + '&gallery=' + gallery_filter if gallery_filter else query_params %}
                     {% if page > 1 %}
                         <a href="?page=1{{ query_params }}" class="btn btn-small btn-secondary"><i class="fas fa-angle-double-left"></i> First</a>
@@ -389,7 +390,8 @@
                     <!-- Pagination Controls (Bottom) -->
                     {% if total_pages > 1 %}
                     <div class="pagination-controls" style="margin: 30px 0; display: flex; justify-content: center; align-items: center; gap: 10px;">
-                        {% set query_params = '&search=' + search_query if search_query else '' %}
+                        {% set query_params = '&sort=' + sort_by if sort_by else '' %}
+                        {% set query_params = query_params + '&search=' + search_query if search_query else query_params %}
                         {% set query_params = query_params + '&gallery=' + gallery_filter if gallery_filter else query_params %}
                         {% if page > 1 %}
                             <a href="?page=1{{ query_params }}" class="btn btn-small btn-secondary"><i class="fas fa-angle-double-left"></i> First</a>

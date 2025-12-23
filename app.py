@@ -1418,6 +1418,7 @@ def admin():
         # Search and filter parameters
         search_query = request.args.get('search', '').strip().lower()
         gallery_filter = request.args.get('gallery', '').strip()
+        sort_by = request.args.get('sort', 'az').strip()
         
         images = scan_images()
         all_categories = sorted(load_categories())
@@ -1433,6 +1434,20 @@ def admin():
         # Apply gallery filter
         if gallery_filter and gallery_filter != 'all':
             images = [img for img in images if any(g.get('slug') == gallery_filter for g in img.get('galleries', []))]
+        
+        # Apply sorting
+        if sort_by == 'az':
+            images = sorted(images, key=lambda x: (x.get('title') or x.get('filename', '')).lower())
+        elif sort_by == 'za':
+            images = sorted(images, key=lambda x: (x.get('title') or x.get('filename', '')).lower(), reverse=True)
+        elif sort_by == 'date-new':
+            images = sorted(images, key=lambda x: x.get('date_added', ''), reverse=True)
+        elif sort_by == 'date-old':
+            images = sorted(images, key=lambda x: x.get('date_added', ''))
+        elif sort_by == 'category':
+            images = sorted(images, key=lambda x: ','.join(x.get('categories', [])))
+        elif sort_by == 'gallery':
+            images = sorted(images, key=lambda x: ','.join([g.get('name', '') for g in x.get('galleries', [])]))
         
         about_data = load_about_data()
 
@@ -1465,7 +1480,8 @@ def admin():
                              total_pages=total_pages,
                              total_images=total_images,
                              search_query=search_query,
-                             gallery_filter=gallery_filter)
+                             gallery_filter=gallery_filter,
+                             sort_by=sort_by)
     except Exception as e:
         return f"Admin Error: {str(e)}", 500
 
