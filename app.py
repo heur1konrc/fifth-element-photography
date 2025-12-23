@@ -4887,6 +4887,7 @@ def lumaprints_apply_mapping():
             print(f"Processing mapping {i+1}/{len(mappings)}: row={row}, has_data={bool(mapping_data)}")
             
             if row and mapping_data:
+                print(f"  Received mapping_data: {mapping_data}")
                 lm.apply_mapping(ws, row, mapping_data)
                 processed_rows.append(row)
                 print(f"  ✓ Applied mapping to row {row}")
