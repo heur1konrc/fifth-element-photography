@@ -376,12 +376,12 @@ def create_shopify_product():
                     response_data = response.json()
                     shopify_product_id = str(response_data['product']['id'])
                     
-                    # Save to database for tracking
+                    # Save to database for tracking (using category handle)
                     cursor = conn.cursor()
                     cursor.execute("""
-                        INSERT OR REPLACE INTO shopify_products (image_filename, category, shopify_product_id, shopify_handle)
-                        VALUES (?, ?, ?, ?)
-                    """, (filename, category_name, shopify_product_id, category_handle))
+                        INSERT OR REPLACE INTO shopify_products (image_filename, shopify_product_id, shopify_handle)
+                        VALUES (?, ?, ?)
+                    """, (f"{filename}_{category_name}", shopify_product_id, category_handle))
                     conn.commit()
                 else:
                     error_msg = f"{category_title}: HTTP {response.status_code} - {response.text}"
@@ -610,44 +610,6 @@ def sync_shopify_prices():
             'updated': updated_count,
             'skipped': skipped_count,
             'errors': errors[:10]  # Limit to first 10 errors
-        })
-        
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-
-@shopify_api_creator_bp.route('/api/shopify-mapping/all', methods=['GET'])
-def get_all_shopify_mappings():
-    """Get all Shopify product mappings for frontend"""
-    try:
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        
-        cursor.execute("""
-            SELECT image_filename, category, shopify_handle
-            FROM shopify_products
-            ORDER BY image_filename, category
-        """)
-        
-        rows = cursor.fetchall()
-        conn.close()
-        
-        # Group by image filename
-        mappings = {}
-        for row in rows:
-            filename = row['image_filename']
-            category = row['category']
-            handle = row['shopify_handle']
-            
-            if filename not in mappings:
-                mappings[filename] = {}
-            
-            mappings[filename][category] = handle
-        
-        return jsonify({
-            'success': True,
-            'mappings': mappings
         })
         
     except Exception as e:
