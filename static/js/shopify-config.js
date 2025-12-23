@@ -18,6 +18,7 @@ async function loadProductMappings() {
         const response = await fetch('/admin/api/shopify-mapping/all');
         const data = await response.json();
         if (data.success) {
+            // New format: data.mappings is { filename: { category: handle, ... }, ... }
             PRODUCT_MAPPING = data.mappings;
             console.log('Shopify product mappings loaded:', PRODUCT_MAPPING);
         }

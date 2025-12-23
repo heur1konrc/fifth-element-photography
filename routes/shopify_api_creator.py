@@ -371,16 +371,21 @@ def create_shopify_product():
                 if response.status_code == 201:
                     created_products.append(category_title)
                     
-                    # Extract Shopify product ID from response
+                    # Extract Shopify product ID and handle from response
                     response_data = response.json()
                     shopify_product_id = str(response_data['product']['id'])
+                    actual_handle = response_data['product']['handle']  # Use actual handle from Shopify
                     
-                    # Save to database for tracking (using category handle)
+                    # Save to database for tracking with category column
                     cursor = conn.cursor()
                     cursor.execute("""
-                        INSERT OR REPLACE INTO shopify_products (image_filename, shopify_product_id, shopify_handle)
-                        VALUES (?, ?, ?)
-                    """, (f"{filename}_{category_name}", shopify_product_id, category_handle))
+                        INSERT INTO shopify_products (image_filename, category, shopify_product_id, shopify_handle)
+                        VALUES (?, ?, ?, ?)
+                        ON CONFLICT(image_filename, category) DO UPDATE SET
+                            shopify_product_id = excluded.shopify_product_id,
+                            shopify_handle = excluded.shopify_handle,
+                            updated_at = CURRENT_TIMESTAMP
+                    """, (filename, category_name, shopify_product_id, actual_handle))
                     conn.commit()
                 else:
                     error_msg = f"{category_title}: HTTP {response.status_code} - {response.text}"
@@ -609,6 +614,51 @@ def sync_shopify_prices():
             'updated': updated_count,
             'skipped': skipped_count,
             'errors': errors[:10]  # Limit to first 10 errors
+        })
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@shopify_api_creator_bp.route('/api/shopify/product-categories/<filename>', methods=['GET'])
+def get_product_categories(filename):
+    """
+    Get all Shopify product handles for a given image filename, organized by category
+    Returns: {
+        'Canvas': 'handle-canvas',
+        'Metal': 'handle-metal',
+        'Fine Art Paper': 'handle-fine-art-paper',
+        'Framed Canvas': 'handle-framed-canvas',
+        'Foam-mounted Print': 'handle-foam-mounted-print'
+    }
+    """
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT category, shopify_handle
+            FROM shopify_products
+            WHERE image_filename = ?
+            ORDER BY category
+        """, (filename,))
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        if not rows:
+            return jsonify({'success': False, 'error': 'No products found for this image'}), 404
+        
+        # Build category -> handle mapping
+        categories = {}
+        for row in rows:
+            categories[row['category']] = row['shopify_handle']
+        
+        return jsonify({
+            'success': True,
+            'filename': filename,
+            'categories': categories
         })
         
     except Exception as e:

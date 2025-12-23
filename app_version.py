@@ -1,12 +1,22 @@
 """
 Fifth Element Photography - Main Application
 ==============================================
-Version: v2.3.2
-Date: 2024-12-22
+Version: v2.3.3
+Date: 2024-12-23
 Description: Photography gallery with Shopify e-commerce integration
 
 CHANGELOG:
 ----------
+v2.3.3 (2024-12-23):
+  - AUTOMATED: Shopify product handles now auto-save to database when creating products
+  - AUTOMATED: All 5 category handles (Canvas, Metal, Paper, Framed Canvas, Foam-mounted) saved automatically
+  - ADDED: Category selector modal for Order Prints button (choose print type before checkout)
+  - ADDED: API endpoint /api/shopify/product-categories/<filename> to retrieve all handles
+  - IMPROVED: No manual mapping required - create products → handles saved → Order Prints works
+  - TECHNICAL: shopify_products table stores filename + category + handle (composite unique key)
+  - TECHNICAL: Frontend loads category-based mappings and shows selector modal
+  - TECHNICAL: Captures actual handle from Shopify API response (handles conflicts/normalization)
+
 v2.3.2 (2024-12-22):
   - FIXED: Gallery-optimized images now auto-generate on upload for Shopify product creation
   - FIXED: No longer need to manually run "Generate Gallery Images" before creating Shopify products
@@ -87,5 +97,5 @@ SHOPIFY INTEGRATION (v2.1.0):
 - Checkout handled by Shopify
 """
 
-__version__ = "2.3.2"
-__date__ = "2024-12-22"
+__version__ = "2.3.3"
+__date__ = "2024-12-23"

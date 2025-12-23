@@ -153,18 +153,28 @@ def get_shopify_mapping(filename):
 @shopify_admin_bp.route('/api/shopify-mapping/all')
 def get_all_mappings():
     """Get all Shopify mappings (public endpoint for frontend)"""
-    conn = sqlite3.connect(get_db_path())
+    # Use print_ordering.db which has the shopify_products table with categories
+    db_path = '/data/print_ordering.db' if os.path.exists('/data') else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'database', 'print_ordering.db')
+    
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     
-    cursor.execute('SELECT * FROM shopify_mappings WHERE order_prints_enabled = 1')
+    cursor.execute('SELECT image_filename, category, shopify_handle FROM shopify_products ORDER BY image_filename, category')
     rows = cursor.fetchall()
     conn.close()
     
+    # Build nested structure: { filename: { category: handle, ... }, ... }
     mappings = {}
     for row in rows:
-        if row['shopify_product_handle']:
-            mappings[row['image_filename']] = row['shopify_product_handle']
+        filename = row['image_filename']
+        category = row['category']
+        handle = row['shopify_handle']
+        
+        if filename not in mappings:
+            mappings[filename] = {}
+        
+        mappings[filename][category] = handle
     
     return jsonify({'success': True, 'mappings': mappings})
 
