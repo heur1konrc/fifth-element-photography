@@ -1610,8 +1610,14 @@ async function applyLumaprintsMapping() {
             options = [];
         }
         
+        // Add highres_ prefix for Lumaprints compatibility
+        let lumaprintsFilename = userMapping.filename;
+        if (!lumaprintsFilename.startsWith('highres_')) {
+            lumaprintsFilename = 'highres_' + lumaprintsFilename;
+        }
+        
         const mappingData = {
-            image_filename: userMapping.filename,
+            image_filename: lumaprintsFilename,
             subcategory: subcategory,
             width: width,
             length: length,
