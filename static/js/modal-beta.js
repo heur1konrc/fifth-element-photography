@@ -34,13 +34,13 @@ function openModalBeta(imageData) {
         descriptionDiv.innerHTML = '<p>No description available for this image.</p>';
     }
     
-    // Show/hide ORDER PRINTS button based on Shopify mapping (same logic as old modal)
+    // Show/hide ORDER PRINTS button based on Shopify mapping
     const orderBtn = document.getElementById('btnOrderPrints');
     
-    // Check if this image has a Shopify product mapping
-    const productHandle = typeof getProductHandleFromUrl === 'function' ? getProductHandleFromUrl(imageData.url) : null;
+    // Check if this image has Shopify product mappings (supports multiple categories)
+    const productHandles = typeof getAllProductHandlesFromUrl === 'function' ? getAllProductHandlesFromUrl(imageData.url) : [];
     
-    if (productHandle) {
+    if (productHandles && productHandles.length > 0) {
         orderBtn.style.display = 'block';
     } else {
         orderBtn.style.display = 'none';
