@@ -4922,10 +4922,16 @@ def lumaprints_apply_mapping():
 def lumaprints_download():
     """Download mapped Excel file"""
     try:
+        import lumaprints_mapper as lm
         output_path = os.path.join('/tmp', 'lumaprints_mapped.xlsx')
         
         if not os.path.exists(output_path):
             return jsonify({'error': 'No mapped file available'}), 404
+        
+        # Verify file contents before sending
+        print(f"\nDownload requested: {output_path}")
+        wb, ws = lm.load_excel(output_path)
+        print(f"Verifying row 3 in download file: U={ws.cell(3, 21).value}, V={ws.cell(3, 22).value}, W={ws.cell(3, 23).value}")
         
         return send_file(
             output_path,
