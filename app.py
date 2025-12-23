@@ -1433,7 +1433,20 @@ def admin():
         
         # Apply gallery filter
         if gallery_filter and gallery_filter != 'all':
-            images = [img for img in images if any(g.get('slug') == gallery_filter for g in img.get('galleries', []))]
+            def matches_gallery(img):
+                galleries = img.get('galleries', [])
+                if not galleries:
+                    return False
+                # Handle both string and object formats
+                for g in galleries:
+                    if isinstance(g, dict):
+                        if g.get('slug') == gallery_filter:
+                            return True
+                    elif isinstance(g, str):
+                        if g == gallery_filter:
+                            return True
+                return False
+            images = [img for img in images if matches_gallery(img)]
         
         # Apply sorting
         if sort_by == 'az':
