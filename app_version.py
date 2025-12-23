@@ -1,12 +1,18 @@
 """
 Fifth Element Photography - Main Application
 ==============================================
-Version: v2.3.4
+Version: v2.3.5
 Date: 2024-12-23
 Description: Photography gallery with Shopify e-commerce integration
 
 CHANGELOG:
 ----------
+v2.3.5 (2024-12-23):
+  - IMPROVED: Category selector modal now shows product descriptions
+  - IMPROVED: Vertical stack layout with horizontal cards (image left, text right)
+  - IMPROVED: Professional typography with bold titles and gray descriptions
+  - FIXED: CSS cache-busting to ensure new styles load immediately
+
 v2.3.4 (2024-12-23):
   - AUTOMATED: New Shopify products now auto-publish to Storefront API sales channel
   - FIXED: Products immediately available for Order Prints without manual channel toggle
@@ -103,5 +109,5 @@ SHOPIFY INTEGRATION (v2.1.0):
 - Checkout handled by Shopify
 """
 
-__version__ = "2.3.4"
+__version__ = "2.3.5"
 __date__ = "2024-12-23"
