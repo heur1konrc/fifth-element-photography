@@ -82,7 +82,6 @@ def map_product_type_to_shopify(db_product_type):
         '0.75" Stretched Canvas': '0.75" Stretched Canvas',
         '1.25" Stretched Canvas': '1.25" Stretched Canvas',
         '1.50" Stretched Canvas': '1.50" Stretched Canvas',
-        'Rolled Canvas': 'Rolled Canvas',
         # Framed Canvas
         '0.75" Framed Canvas': '0.75" Framed Canvas',
         '1.25" Framed Canvas': '1.25" Framed Canvas',
