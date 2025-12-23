@@ -1564,7 +1564,10 @@ async function applyLumaprintsMapping() {
             ];
         } else if (productType.includes('Rolled Canvas')) {
             subcategory = 'Rolled Canvas';
-            options = [];
+            options = [
+                ['Canvas Border', 'Mirror Wrap'],
+                ['Rolled Canvas Border Size', '2 inch border plus 1 inch white space']
+            ];
         } else {
             // Default: use as-is
             subcategory = productType;
