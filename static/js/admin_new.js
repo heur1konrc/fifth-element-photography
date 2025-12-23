@@ -1543,12 +1543,40 @@ async function applyLumaprintsMapping() {
             continue;
         }
         
-        // Simply map the filename - Lumaprints handles the rest
+        // Generate proper mapping data based on product type
+        const width = product.width || 0;
+        const length = product.length || 0;
+        
+        // Strip "Printed Product - " and convert to subcategory format
+        const productType = (product.option1 || '').replace(/^Printed Product - /i, '');
+        let subcategory = '';
+        let options = [];
+        
+        // Convert product type to Lumaprints subcategory format
+        if (productType.includes('Stretched Canvas')) {
+            // "0.75 Stretched Canvas" → "0.75in Stretched Canvas"
+            subcategory = productType.replace(/(\d+\.\d+)\s/, '$1in ');
+            options = [
+                ['Canvas Border', 'Mirror Wrap'],
+                ['Canvas Hanging Hardware', 'Sawtooth Hanger installed']
+            ];
+        } else if (productType.includes('Rolled Canvas')) {
+            subcategory = 'Rolled Canvas';
+            options = [];
+        } else {
+            // Default: use as-is
+            subcategory = productType;
+            options = [];
+        }
+        
         mappings.push({
             row: product.row,
             data: {
-                product_handling: 'Update',
-                image_filename: userMapping.filename
+                image_filename: userMapping.filename,
+                subcategory: subcategory,
+                width: width,
+                length: length,
+                options: options
             }
         });
     }
