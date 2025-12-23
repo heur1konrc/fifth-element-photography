@@ -1535,6 +1535,32 @@ def upload_image():
         except Exception as thumb_error:
             print(f"Warning: Failed to generate thumbnail for {filename}: {thumb_error}")
         
+        # Generate gallery-optimized image automatically for Shopify
+        try:
+            from PIL import Image
+            os.makedirs('/data/gallery-images', exist_ok=True)
+            gallery_path = os.path.join('/data/gallery-images', filename)
+            
+            with Image.open(filepath) as img:
+                if img.mode in ('RGBA', 'P'):
+                    img = img.convert('RGB')
+                
+                orig_width, orig_height = img.size
+                max_dimension = 1200
+                
+                if orig_width > orig_height:
+                    new_width = max_dimension
+                    new_height = int((max_dimension / orig_width) * orig_height)
+                else:
+                    new_height = max_dimension
+                    new_width = int((max_dimension / orig_height) * orig_width)
+                
+                img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                img.save(gallery_path, 'JPEG', quality=90, optimize=True)
+                print(f"Generated gallery image for {filename}")
+        except Exception as gallery_error:
+            print(f"Warning: Failed to generate gallery image for {filename}: {gallery_error}")
+        
         # Extract and store EXIF in database
         try:
             from exif_db_helper import store_exif_in_db
@@ -2264,6 +2290,32 @@ def upload_images_new():
                     generate_thumbnail_for_image(filename)
                 except Exception as thumb_error:
                     print(f"Warning: Failed to generate thumbnail for {filename}: {thumb_error}")
+                
+                # Generate gallery-optimized image automatically for Shopify
+                try:
+                    from PIL import Image
+                    os.makedirs('/data/gallery-images', exist_ok=True)
+                    gallery_path = os.path.join('/data/gallery-images', filename)
+                    
+                    with Image.open(filepath) as img:
+                        if img.mode in ('RGBA', 'P'):
+                            img = img.convert('RGB')
+                        
+                        orig_width, orig_height = img.size
+                        max_dimension = 1200
+                        
+                        if orig_width > orig_height:
+                            new_width = max_dimension
+                            new_height = int((max_dimension / orig_width) * orig_height)
+                        else:
+                            new_height = max_dimension
+                            new_width = int((max_dimension / orig_height) * orig_width)
+                        
+                        img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                        img.save(gallery_path, 'JPEG', quality=90, optimize=True)
+                        print(f"Generated gallery image for {filename}")
+                except Exception as gallery_error:
+                    print(f"Warning: Failed to generate gallery image for {filename}: {gallery_error}")
                 
                 # Extract and store EXIF in database
                 try:
