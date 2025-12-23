@@ -5,11 +5,11 @@ import os
 remove_foam_invalid_bp = Blueprint('remove_foam_invalid', __name__)
 
 def get_db_path():
-    """Get the correct database path"""
+    """Get the correct database path (same as shopify_api_creator.py)"""
     if os.path.exists('/data'):
-        return '/data/products.db'
+        return '/data/print_ordering.db'
     else:
-        return os.path.join(os.path.dirname(__file__), '..', 'database', 'products.db')
+        return os.path.join(os.path.dirname(__file__), '..', 'database', 'print_ordering.db')
 
 @remove_foam_invalid_bp.route('/admin/remove-foam-invalid-sizes')
 def remove_foam_invalid_sizes():
