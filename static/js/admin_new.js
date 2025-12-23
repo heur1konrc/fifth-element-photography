@@ -1545,7 +1545,8 @@ async function applyLumaprintsMapping() {
         const filename = userMapping.filename;
         const width = product.width || 12;
         const length = product.length || 18;
-        const productType = product.option1 || '';
+        // Strip "Printed Product - " prefix from Lumaprints option1 to match Shopify product types
+        const productType = (product.option1 || '').replace(/^Printed Product - /i, '');
         
         // Determine product type and map to Lumaprints subcategory
         let subcategory = '';
