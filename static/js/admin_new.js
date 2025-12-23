@@ -1398,6 +1398,7 @@ function displayUnmappedProducts() {
  * Extracts base title without product type suffix (e.g., "Oregon Hockey 16" from "Oregon Hockey 16 - Canvas")
  */
 function getUniqueProductTitles() {
+    console.log('DEBUG: Getting unique titles from', LumaprintsState.unmappedProducts.length, 'unmapped products');
     const titles = new Set();
     LumaprintsState.unmappedProducts.forEach(p => {
         if (p.product_name) {
@@ -1411,9 +1412,12 @@ function getUniqueProductTitles() {
                 .replace(/ - Metal$/i, '')
                 .trim();
             titles.add(baseTitle);
+            console.log('DEBUG: Added title:', baseTitle);
         }
     });
-    return Array.from(titles).sort();
+    const result = Array.from(titles).sort();
+    console.log('DEBUG: Unique titles found:', result);
+    return result;
 }
 
 /**
