@@ -1437,13 +1437,16 @@ def admin():
                 galleries = img.get('galleries', [])
                 if not galleries:
                     return False
-                # Handle both string and object formats
+                # Handle both string and object formats, case-insensitive
+                gallery_filter_lower = gallery_filter.lower()
                 for g in galleries:
                     if isinstance(g, dict):
-                        if g.get('slug') == gallery_filter:
+                        slug = g.get('slug', '').lower()
+                        name = g.get('name', '').lower()
+                        if slug == gallery_filter_lower or name == gallery_filter_lower:
                             return True
                     elif isinstance(g, str):
-                        if g == gallery_filter:
+                        if g.lower() == gallery_filter_lower:
                             return True
                 return False
             images = [img for img in images if matches_gallery(img)]
