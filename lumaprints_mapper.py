@@ -174,8 +174,8 @@ def apply_mapping(ws, row: int, mapping_data: Dict) -> None:
     ws.cell(row, 16).value = mapping_data.get("image_filename", "")
     
     # Column S (19) - Product Handling
-    # Leave as None - Lumaprints will handle this
-    # ws.cell(row, 19).value = mapping_data.get("product_handling", "Update")
+    # MUST be "Update" for Lumaprints to process the row
+    ws.cell(row, 19).value = mapping_data.get("product_handling", "Update")
     
     # Column T (20) - Image Filename (Mapping)
     ws.cell(row, 20).value = mapping_data.get("image_filename", "")
