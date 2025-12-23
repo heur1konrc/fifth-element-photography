@@ -1415,12 +1415,24 @@ def admin():
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 24, type=int)  # 24 images per page
         
+        # Search and filter parameters
+        search_query = request.args.get('search', '').strip().lower()
+        gallery_filter = request.args.get('gallery', '').strip()
+        
         images = scan_images()
         all_categories = sorted(load_categories())
         
         # Get all galleries for filter dropdown
         from gallery_db import get_all_galleries
         all_galleries = get_all_galleries()
+        
+        # Apply search filter
+        if search_query:
+            images = [img for img in images if search_query in img.get('filename', '').lower() or search_query in img.get('title', '').lower()]
+        
+        # Apply gallery filter
+        if gallery_filter and gallery_filter != 'all':
+            images = [img for img in images if gallery_filter in img.get('galleries', [])]
         
         about_data = load_about_data()
 
@@ -1451,7 +1463,9 @@ def admin():
                              page=page,
                              per_page=per_page,
                              total_pages=total_pages,
-                             total_images=total_images)
+                             total_images=total_images,
+                             search_query=search_query,
+                             gallery_filter=gallery_filter)
     except Exception as e:
         return f"Admin Error: {str(e)}", 500
 
