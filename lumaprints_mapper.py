@@ -170,8 +170,9 @@ def apply_mapping(ws, row: int, mapping_data: Dict) -> None:
     - length: product length in inches
     - options: list of (name, value) tuples
     """
-    # Column P (16) - Image Filename (Lumaprints Library)
-    ws.cell(row, 16).value = mapping_data.get("image_filename", "")
+    # Column P (16) - Existing Linked Image Printfile Name
+    # DO NOT EDIT - Lumaprints fills this automatically after mapping
+    # ws.cell(row, 16).value = mapping_data.get("image_filename", "")
     
     # Column S (19) - Product Handling
     # MUST be "Update" for Lumaprints to process the row
