@@ -1528,6 +1528,7 @@ async function applyLumaprintsMapping() {
         // Extract base title from product name
         let baseTitle = product.product_name
             .replace(/ - Canvas$/i, '')
+            .replace(/ - Framed Canvas$/i, '')
             .replace(/ - Fine Art Paper$/i, '')
             .replace(/ - Foam-mounted Print$/i, '')
             .replace(/ - Metal Print$/i, '')
@@ -1542,129 +1543,12 @@ async function applyLumaprintsMapping() {
             continue;
         }
         
-        const filename = userMapping.filename;
-        const width = product.width || 12;
-        const length = product.length || 18;
-        // Strip "Printed Product - " prefix from Lumaprints option1 to match Shopify product types
-        const productType = (product.option1 || '').replace(/^Printed Product - /i, '');
-        
-        // Determine product type and map to Lumaprints subcategory
-        let subcategory = '';
-        let options = [];
-        
-        // Match exact product type from Shopify to Lumaprints subcategory
-        // Order matters - check specific types before general ones
-        
-        // Metal products
-        if (productType.includes('Glossy White Metal')) {
-            subcategory = 'Glossy White Metal';
-            options = [];
-        } else if (productType.includes('Glossy Silver Metal')) {
-            subcategory = 'Glossy Silver Metal';
-            options = [];
-        }
-        // Foam-mounted products
-        else if (productType.includes('Foam-mounted Hot Press')) {
-            subcategory = 'Foam-mounted Hot Press';
-            options = [];
-        } else if (productType.includes('Foam-mounted Cold Press')) {
-            subcategory = 'Foam-mounted Cold Press';
-            options = [];
-        } else if (productType.includes('Foam-mounted Semi-Glossy') || productType.includes('Foam-mounted Semi-glossy')) {
-            subcategory = 'Foam-mounted Semi-Glossy';
-            options = [];
-        } else if (productType.includes('Foam-mounted Glossy')) {
-            subcategory = 'Foam-mounted Glossy';
-            options = [];
-        }
-        // Framed Canvas - check frame type and depth
-        else if (productType.includes('1.50') && productType.includes('Framed Canvas Black')) {
-            subcategory = '1.50 Framed Canvas Black';
-            options = [];
-        } else if (productType.includes('1.50') && productType.includes('Framed Canvas White')) {
-            subcategory = '1.50 Framed Canvas White';
-            options = [];
-        } else if (productType.includes('1.50') && productType.includes('Framed Canvas Oak')) {
-            subcategory = '1.50 Framed Canvas Oak';
-            options = [];
-        } else if (productType.includes('1.25') && productType.includes('Framed Canvas Black')) {
-            subcategory = '1.25 Framed Canvas Black';
-            options = [];
-        } else if (productType.includes('1.25') && productType.includes('Framed Canvas White')) {
-            subcategory = '1.25 Framed Canvas White';
-            options = [];
-        } else if (productType.includes('1.25') && productType.includes('Framed Canvas Oak')) {
-            subcategory = '1.25 Framed Canvas Oak';
-            options = [];
-        } else if (productType.includes('0.75') && productType.includes('Framed Canvas Black')) {
-            subcategory = '0.75 Framed Canvas Black';
-            options = [];
-        } else if (productType.includes('0.75') && productType.includes('Framed Canvas White')) {
-            subcategory = '0.75 Framed Canvas White';
-            options = [];
-        } else if (productType.includes('0.75') && productType.includes('Framed Canvas Gold')) {
-            subcategory = '0.75 Framed Canvas Gold';
-            options = [];
-        } else if (productType.includes('0.75') && productType.includes('Framed Canvas Silver')) {
-            subcategory = '0.75 Framed Canvas Silver';
-            options = [];
-        }
-        // Stretched Canvas
-        else if (productType.includes('1.50') && productType.includes('Stretched Canvas')) {
-            subcategory = '1.50 Stretched Canvas';
-            options = [
-                ['Canvas Border', 'Mirror Wrap'],
-                ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
-                ['Canvas Finish', 'Semi-Glossy']
-            ];
-        } else if (productType.includes('1.25') && productType.includes('Stretched Canvas')) {
-            subcategory = '1.25 Stretched Canvas';
-            options = [
-                ['Canvas Border', 'Mirror Wrap'],
-                ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
-                ['Canvas Finish', 'Semi-Glossy']
-            ];
-        } else if (productType.includes('0.75') && productType.includes('Stretched Canvas')) {
-            subcategory = '0.75 Stretched Canvas';
-            options = [
-                ['Canvas Border', 'Mirror Wrap'],
-                ['Canvas Hanging Hardware', 'Sawtooth Hanger installed'],
-                ['Canvas Finish', 'Semi-Glossy']
-            ];
-        } else if (productType.includes('Rolled Canvas')) {
-            subcategory = 'Rolled Canvas';
-            options = [];
-        }
-        // Fine Art Paper - check before general "Glossy" to avoid conflicts
-        else if (productType.includes('Hot Press')) {
-            subcategory = 'Hot Press';
-            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
-        } else if (productType.includes('Cold Press')) {
-            subcategory = 'Cold Press';
-            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
-        } else if (productType.includes('Semi-glossy') || productType.includes('Semi-Glossy')) {
-            subcategory = 'Semi-glossy';
-            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
-        } else if (productType.includes('Glossy')) {
-            subcategory = 'Glossy';
-            options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];
-        }
-        // Default fallback
-        else {
-            console.warn('Unknown product type:', productType);
-            subcategory = productType; // Use as-is
-            options = [];
-        }
-        
+        // Simply map the filename - Lumaprints handles the rest
         mappings.push({
             row: product.row,
             data: {
                 product_handling: 'Update',
-                image_filename: filename,
-                subcategory: subcategory,
-                width: width,
-                length: length,
-                options: options
+                image_filename: userMapping.filename
             }
         });
     }
