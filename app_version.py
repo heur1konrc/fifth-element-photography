@@ -1,12 +1,18 @@
 """
 Fifth Element Photography - Main Application
 ==============================================
-Version: v2.3.3
+Version: v2.3.4
 Date: 2024-12-23
 Description: Photography gallery with Shopify e-commerce integration
 
 CHANGELOG:
 ----------
+v2.3.4 (2024-12-23):
+  - AUTOMATED: New Shopify products now auto-publish to Storefront API sales channel
+  - FIXED: Products immediately available for Order Prints without manual channel toggle
+  - TECHNICAL: Product creation now calls Shopify Publications API to enable Storefront access
+  - TECHNICAL: Eliminates need to manually toggle "FIFTHE ELEMENT STROREFRONT API" for each product
+
 v2.3.3 (2024-12-23):
   - AUTOMATED: Shopify product handles now auto-save to database when creating products
   - AUTOMATED: All 5 category handles (Canvas, Metal, Paper, Framed Canvas, Foam-mounted) saved automatically
@@ -97,5 +103,5 @@ SHOPIFY INTEGRATION (v2.1.0):
 - Checkout handled by Shopify
 """
 
-__version__ = "2.3.3"
+__version__ = "2.3.4"
 __date__ = "2024-12-23"
