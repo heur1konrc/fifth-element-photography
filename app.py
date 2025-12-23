@@ -4936,7 +4936,7 @@ def lumaprints_download():
         return send_file(
             output_path,
             as_attachment=True,
-            download_name='lumaprints_mapped.xlsx',
+            download_name='lumaprints_MAPPED_WITH_DATA.xlsx',
             mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         )
     
