@@ -51,6 +51,9 @@ function sortShopifyImages() {
         const dateA = a.dataset.date;
         const dateB = b.dataset.date;
         
+        const hasShopifyA = a.querySelector('.fa-check') !== null;
+        const hasShopifyB = b.querySelector('.fa-check') !== null;
+        
         switch(sortBy) {
             case 'a-z':
                 return filenameA.localeCompare(filenameB);
@@ -58,6 +61,11 @@ function sortShopifyImages() {
                 return filenameB.localeCompare(filenameA);
             case 'date-asc':
                 return (dateA || '').localeCompare(dateB || '');
+            case 'live':
+                if (hasShopifyA === hasShopifyB) {
+                    return filenameA.localeCompare(filenameB);
+                }
+                return hasShopifyB ? 1 : -1;
             case 'date-desc':
             default:
                 return (dateB || '').localeCompare(dateA || '');

@@ -1454,6 +1454,18 @@ def admin():
                 return False
             images = [img for img in images if matches_gallery(img)]
         
+        # Check Shopify status for all images (needed for live sort)
+        import sqlite3
+        db_path = '/data/print_ordering.db' if os.path.exists('/data') else os.path.join(os.path.dirname(__file__), 'database', 'print_ordering.db')
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            cursor.execute('SELECT DISTINCT image_filename FROM shopify_products')
+            shopify_filenames = {row[0] for row in cursor.fetchall()}
+            conn.close()
+        except:
+            shopify_filenames = set()
+        
         # Apply sorting
         if sort_by == 'az':
             images = sorted(images, key=lambda x: (x.get('title') or x.get('filename', '')).lower())
@@ -1463,6 +1475,8 @@ def admin():
             images = sorted(images, key=lambda x: x.get('date_added', ''), reverse=True)
         elif sort_by == 'date-old':
             images = sorted(images, key=lambda x: x.get('date_added', ''))
+        elif sort_by == 'live':
+            images = sorted(images, key=lambda x: (x['filename'] not in shopify_filenames, (x.get('title') or x.get('filename', '')).lower()))
         elif sort_by == 'category':
             images = sorted(images, key=lambda x: ','.join(x.get('categories', [])))
         elif sort_by == 'gallery':
@@ -1479,18 +1493,6 @@ def admin():
                 if image["filename"] == hero_image_data["filename"]:
                     hero_image = image
                     break
-        
-        # Check Shopify status for all images
-        import sqlite3
-        db_path = '/data/print_ordering.db' if os.path.exists('/data') else os.path.join(os.path.dirname(__file__), 'database', 'print_ordering.db')
-        try:
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            cursor.execute('SELECT DISTINCT image_filename FROM shopify_products')
-            shopify_filenames = {row[0] for row in cursor.fetchall()}
-            conn.close()
-        except:
-            shopify_filenames = set()
         
         # Add has_shopify_products flag to each image
         for img in all_images_unfiltered:
