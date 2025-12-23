@@ -1603,7 +1603,64 @@ async function applyLumaprintsMapping() {
                 ['Canvas Border', 'Mirror Wrap'],
                 ['Canvas Hanging Hardware', 'Sawtooth Hanger installed']
             ];
-
+        } else if (productType.includes('Framed Canvas')) {
+            // "1.25 Framed Canvas Oak" → "1.25in Framed Canvas"
+            subcategory = productType.replace(/(\d+\.\d+)\s+Framed Canvas.*/, '$1in Framed Canvas');
+            // Extract frame style from product type
+            let frameStyle = '1.25in Oak Floating Frame'; // default
+            if (productType.includes('Black')) frameStyle = '1.25in Black Floating Frame';
+            else if (productType.includes('White')) frameStyle = '1.25in White Floating Frame';
+            options = [
+                ['Canvas Border', 'Mirror Wrap'],
+                ['1.25 Inch Frame Styles', frameStyle],
+                ['1.25in Framed Canvas Hanging Hardware', 'Hanging Wire installed']
+            ];
+        } else if (productType.includes('Foam-mounted')) {
+            // "Foam-mounted Glossy" → "Foam-mounted Glossy Fine Art Paper"
+            if (productType.includes('Glossy')) {
+                subcategory = 'Foam-mounted Glossy Fine Art Paper';
+            } else if (productType.includes('Semi-Glossy') || productType.includes('Semi-glossy')) {
+                subcategory = 'Foam-mounted Semi-Glossy Fine Art Paper';
+            } else if (productType.includes('Hot Press')) {
+                subcategory = 'Foam-mounted Hot Press Fine Art Paper';
+            } else if (productType.includes('Cold Press')) {
+                subcategory = 'Foam-mounted Cold Press Fine Art Paper';
+            } else {
+                subcategory = 'Foam-mounted Glossy Fine Art Paper'; // default
+            }
+            options = [
+                ['Bleed Size', '0.25in Bleed (0.25in on each side)']
+            ];
+        } else if (productType.includes('Metal')) {
+            // "Glossy White Metal" → "Glossy White Metal Print"
+            if (productType.includes('Silver')) {
+                subcategory = 'Silver Metal Print';
+            } else {
+                subcategory = 'Glossy White Metal Print';
+            }
+            options = [
+                ['Metal Hanging Hardware', 'Inset Frame']
+            ];
+        } else if (productType.includes('Semi-glossy') || productType.includes('Semi-Glossy')) {
+            subcategory = 'Semi-Glossy Fine Art Paper';
+            options = [
+                ['Bleed Size', 'No Bleed (Image goes to edge of paper)']
+            ];
+        } else if (productType.includes('Glossy')) {
+            subcategory = 'Glossy Fine Art Paper';
+            options = [
+                ['Bleed Size', 'No Bleed (Image goes to edge of paper)']
+            ];
+        } else if (productType.includes('Hot Press')) {
+            subcategory = 'Hot Press Fine Art Paper';
+            options = [
+                ['Bleed Size', 'No Bleed (Image goes to edge of paper)']
+            ];
+        } else if (productType.includes('Cold Press')) {
+            subcategory = 'Cold Press Fine Art Paper';
+            options = [
+                ['Bleed Size', 'No Bleed (Image goes to edge of paper)']
+            ];
         } else {
             // Default: use as-is
             subcategory = productType;
