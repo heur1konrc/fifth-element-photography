@@ -26,7 +26,7 @@ def remove_foam_invalid_sizes():
             JOIN product_categories pc ON ps.category_id = pc.category_id
             JOIN print_sizes pz ON bp.size_id = pz.size_id
             WHERE pc.display_name = 'Foam-mounted Fine Art Paper'
-            AND pz.size_name IN ('4×6', '40×60')
+            AND (pz.size_name IN ('4×6', '40×60', '4x6', '40x60') OR pz.size_name LIKE '4_6' OR pz.size_name LIKE '40_60')
         """)
         
         count_to_delete = cursor.fetchone()[0]
@@ -47,7 +47,7 @@ def remove_foam_invalid_sizes():
                 JOIN product_categories pc ON ps.category_id = pc.category_id
                 JOIN print_sizes pz ON bp.size_id = pz.size_id
                 WHERE pc.display_name = 'Foam-mounted Fine Art Paper'
-                AND pz.size_name IN ('4×6', '40×60')
+                AND (pz.size_name IN ('4×6', '40×60', '4x6', '40x60') OR pz.size_name LIKE '4_6' OR pz.size_name LIKE '40_60')
             )
         """)
         
