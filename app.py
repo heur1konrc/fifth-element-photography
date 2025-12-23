@@ -1480,6 +1480,16 @@ def admin():
                     hero_image = image
                     break
         
+        # Check Shopify status for all images
+        from routes.shopify_admin import get_shopify_product_mappings
+        shopify_mappings = get_shopify_product_mappings()
+        
+        # Add has_shopify_products flag to each image
+        for img in all_images_unfiltered:
+            img['has_shopify_products'] = img['filename'] in shopify_mappings
+        for img in images:
+            img['has_shopify_products'] = img['filename'] in shopify_mappings
+        
         # Calculate pagination
         total_images = len(images)
         total_pages = (total_images + per_page - 1) // per_page  # Ceiling division
