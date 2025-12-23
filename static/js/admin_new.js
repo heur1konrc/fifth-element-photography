@@ -1240,7 +1240,8 @@ const LumaprintsState = {
     unmappedProducts: [],
     availableImages: [],
     selectedImage: null,
-    mappings: []
+    mappings: [],
+    titleToFilenameMap: {}
 };
 
 /**
@@ -1300,6 +1301,9 @@ async function uploadLumaprintsFile() {
             // Load available images
             await loadLumaprintsImages();
             
+            // Load title-to-filename mapping from image library
+            await loadTitleToFilenameMap();
+            
             // Move to step 2
             setTimeout(() => {
                 document.getElementById('lumaprints-step-1').style.display = 'none';
@@ -1325,6 +1329,23 @@ async function loadLumaprintsImages() {
         LumaprintsState.availableImages = data.images;
     } catch (error) {
         console.error('Error loading images:', error);
+    }
+}
+
+/**
+ * Load title-to-filename mapping from image library
+ */
+async function loadTitleToFilenameMap() {
+    try {
+        const response = await fetch('/api/images/title-filename-map');
+        const data = await response.json();
+        
+        if (data.success) {
+            LumaprintsState.titleToFilenameMap = data.map;
+            console.log('Loaded title-to-filename map:', Object.keys(LumaprintsState.titleToFilenameMap).length, 'entries');
+        }
+    } catch (error) {
+        console.error('Error loading title-to-filename map:', error);
     }
 }
 
@@ -1446,6 +1467,20 @@ function addMappingRow() {
     `;
     
     container.appendChild(rowDiv);
+    
+    // Add event listener to autofill filename when title is selected
+    const titleSelect = rowDiv.querySelector('.mapping-title-select');
+    const filenameInput = rowDiv.querySelector('.mapping-filename-input');
+    
+    titleSelect.addEventListener('change', function() {
+        const selectedTitle = this.value;
+        if (selectedTitle && LumaprintsState.titleToFilenameMap) {
+            const filename = LumaprintsState.titleToFilenameMap[selectedTitle];
+            if (filename) {
+                filenameInput.value = filename;
+            }
+        }
+    });
 }
 
 /**

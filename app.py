@@ -4856,6 +4856,29 @@ def lumaprints_get_images():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/images/title-filename-map')
+@require_admin_auth
+def get_title_filename_map():
+    """Get mapping of image titles to filenames from image library"""
+    try:
+        image_titles = load_image_titles()
+        
+        # Create reverse map: title -> filename
+        title_to_filename = {}
+        for filename, title in image_titles.items():
+            title_to_filename[title] = filename
+        
+        return jsonify({
+            'success': True,
+            'map': title_to_filename
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
 @app.route('/api/lumaprints/apply-mapping', methods=['POST'])
 @require_admin_auth
 def lumaprints_apply_mapping():
