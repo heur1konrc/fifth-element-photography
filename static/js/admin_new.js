@@ -1616,6 +1616,13 @@ async function applyLumaprintsMapping() {
                 ['1.25in Framed Canvas Hanging Hardware', 'Hanging Wire installed']
             ];
         } else if (productType.includes('Foam-mounted')) {
+            // Skip Foam-mounted products with invalid sizes
+            // Min width: 5 inches, Max dimensions: 39.5 × 59.5 inches
+            if (width < 5 || length < 5 || width > 39.5 || length > 59.5) {
+                console.log(`Skipping Foam-mounted product at row ${product.row}: size ${width}×${length} outside valid range`);
+                continue;
+            }
+            
             // "Foam-mounted Glossy" → "Foam-mounted Glossy Fine Art Paper"
             if (productType.includes('Glossy')) {
                 subcategory = 'Foam-mounted Glossy Fine Art Paper';
