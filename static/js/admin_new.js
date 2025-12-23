@@ -1551,6 +1551,12 @@ async function applyLumaprintsMapping() {
         
         // Strip "Printed Product - " and convert to subcategory format
         const productType = (product.option1 || '').replace(/^Printed Product - /i, '');
+        
+        // Skip Rolled Canvas products entirely
+        if (productType.includes('Rolled Canvas')) {
+            continue;
+        }
+        
         let subcategory = '';
         let options = [];
         
@@ -1562,12 +1568,7 @@ async function applyLumaprintsMapping() {
                 ['Canvas Border', 'Mirror Wrap'],
                 ['Canvas Hanging Hardware', 'Sawtooth Hanger installed']
             ];
-        } else if (productType.includes('Rolled Canvas')) {
-            subcategory = 'Rolled Canvas';
-            options = [
-                ['Canvas Border', 'Mirror Wrap'],
-                ['Rolled Canvas Border Size', '2 inch border plus 1 inch white space']
-            ];
+
         } else {
             // Default: use as-is
             subcategory = productType;
