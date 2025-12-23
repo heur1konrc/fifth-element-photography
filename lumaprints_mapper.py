@@ -182,13 +182,19 @@ def apply_mapping(ws, row: int, mapping_data: Dict) -> None:
     ws.cell(row, 20).value = mapping_data.get("image_filename", "")
     
     # Column U (21) - Subcategory
-    ws.cell(row, 21).value = mapping_data.get("subcategory", "")
+    subcategory = mapping_data.get("subcategory", "")
+    ws.cell(row, 21).value = subcategory
+    print(f"    Writing to row {row}, col U (21): subcategory='{subcategory}'")
     
     # Column V (22) - Width
-    ws.cell(row, 22).value = mapping_data.get("width", "")
+    width = mapping_data.get("width", "")
+    ws.cell(row, 22).value = width
+    print(f"    Writing to row {row}, col V (22): width='{width}'")
     
     # Column W (23) - Length
-    ws.cell(row, 23).value = mapping_data.get("length", "")
+    length = mapping_data.get("length", "")
+    ws.cell(row, 23).value = length
+    print(f"    Writing to row {row}, col W (23): length='{length}'")
     
     # Columns X-AO (24-41) - Product Options
     options = mapping_data.get("options", [])
