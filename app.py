@@ -4899,7 +4899,13 @@ def lumaprints_apply_mapping():
         
         # Save updated workbook
         output_path = os.path.join('/tmp', 'lumaprints_mapped.xlsx')
+        print(f"\nSaving workbook to: {output_path}")
+        
+        # Verify data before saving
+        print(f"Verifying row 3 before save: U={ws.cell(3, 21).value}, V={ws.cell(3, 22).value}, W={ws.cell(3, 23).value}")
+        
         lm.save_excel(wb, output_path)
+        print(f"Workbook saved successfully")
         
         return jsonify({
             'success': True,
