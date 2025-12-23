@@ -40,3 +40,26 @@ function getProductHandleFromUrl(imageUrl) {
     return getProductHandle(filename);
 }
 
+
+// Get all product handles for an image (supports multiple categories)
+function getAllProductHandlesFromUrl(imageUrl) {
+    const filename = imageUrl.split('/').pop();
+    const mapping = PRODUCT_MAPPING[filename];
+    
+    if (!mapping) return [];
+    
+    // If mapping is a string (old format), return single handle
+    if (typeof mapping === 'string') {
+        return [{ handle: mapping, category: 'Canvas' }];
+    }
+    
+    // If mapping is an object with categories
+    if (typeof mapping === 'object') {
+        return Object.entries(mapping).map(([category, handle]) => ({
+            category,
+            handle
+        }));
+    }
+    
+    return [];
+}

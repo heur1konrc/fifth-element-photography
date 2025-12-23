@@ -342,3 +342,61 @@
 
 
 
+
+
+/* Category Selector Styles */
+.category-selector {
+    padding: 40px;
+    text-align: center;
+    color: #ffffff;
+}
+
+.category-selector h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.category-subtitle {
+    font-size: 18px;
+    color: #999;
+    margin-bottom: 40px;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.category-selector-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 30px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.category-selector-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+}
+
+.category-icon {
+    font-size: 48px;
+}
+
+.category-name {
+    text-align: center;
+    line-height: 1.4;
+}

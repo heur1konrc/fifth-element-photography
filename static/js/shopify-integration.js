@@ -131,14 +131,24 @@ async function createCartWithItem(variantId) {
 
 // Open product modal for a specific image
 function openShopifyProductModal(imageUrl, imageTitle) {
-    const productHandle = getProductHandleFromUrl(imageUrl);
+    // Get all product handles for this image (multiple categories)
+    const productHandles = getAllProductHandlesFromUrl(imageUrl);
     
-    if (!productHandle) {
+    if (!productHandles || productHandles.length === 0) {
         alert('This image is not yet available for purchase. Please check back soon!');
         console.error('No Shopify product mapped for:', imageUrl);
         return;
     }
 
+    // If multiple products exist, show category selector
+    if (productHandles.length > 1) {
+        showCategorySelector(imageUrl, imageTitle, productHandles);
+        return;
+    }
+
+    // Single product - open directly
+    const productHandle = productHandles[0].handle;
+    
     // Show loading state
     showLoadingModal(imageTitle);
 
@@ -498,3 +508,67 @@ window.closeShopifyModal = function() {
 
 console.log('Shopify Storefront API integration loaded');
 
+
+
+// Show category selector modal
+function showCategorySelector(imageUrl, imageTitle, productHandles) {
+    const modal = document.getElementById('shopify-product-modal');
+    const container = document.getElementById('shopify-product-component');
+    
+    if (!modal || !container) return;
+    
+    // Build category selector HTML
+    const categoriesHTML = productHandles.map(({category, handle}) => `
+        <button class="category-selector-btn" onclick="openProductByHandle('${handle}', '${imageTitle}')">
+            <span class="category-icon">${getCategoryIcon(category)}</span>
+            <span class="category-name">${category}</span>
+        </button>
+    `).join('');
+    
+    container.innerHTML = `
+        <div class="category-selector">
+            <h2>Select Print Type</h2>
+            <p class="category-subtitle">${imageTitle}</p>
+            <div class="category-grid">
+                ${categoriesHTML}
+            </div>
+        </div>
+    `;
+    
+    modal.style.display = 'block';
+}
+
+// Get icon for category
+function getCategoryIcon(category) {
+    const icons = {
+        'Canvas': '🖼️',
+        'Metal': '✨',
+        'Fine Art Paper': '📄',
+        'Framed Canvas': '🖼️',
+        'Foam-mounted Print': '📋'
+    };
+    return icons[category] || '🖼️';
+}
+
+// Open product by handle directly
+function openProductByHandle(handle, imageTitle) {
+    showLoadingModal(imageTitle);
+    
+    fetchProductByHandle(handle)
+        .then(product => {
+            if (!product) {
+                closeShopifyModal();
+                alert('Product not found. Please contact support.');
+                return;
+            }
+            displayProductModal(product, imageTitle);
+        })
+        .catch(error => {
+            closeShopifyModal();
+            alert('Error loading product. Please try again.');
+            console.error('Error:', error);
+        });
+}
+
+// Make function globally available
+window.openProductByHandle = openProductByHandle;
