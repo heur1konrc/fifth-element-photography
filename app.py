@@ -48,6 +48,7 @@ from routes.fix_metal_category_name import fix_metal_category_name_bp
 from routes.gallery_admin import gallery_admin_bp
 from routes.highres_image_viewer import highres_viewer_bp
 from routes.debug_image_storage import debug_storage_bp
+from routes.remove_foam_invalid_sizes import remove_foam_invalid_bp
 app.register_blueprint(pricing_admin_bp)
 app.register_blueprint(setup_pricing_bp)
 app.register_blueprint(shopify_admin_bp)
@@ -64,6 +65,7 @@ app.register_blueprint(fix_metal_category_name_bp)
 app.register_blueprint(gallery_admin_bp)
 app.register_blueprint(highres_viewer_bp)
 app.register_blueprint(debug_storage_bp)
+app.register_blueprint(remove_foam_invalid_bp)
 
 # Initialize database if it doesn't exist
 def ensure_database_exists():
