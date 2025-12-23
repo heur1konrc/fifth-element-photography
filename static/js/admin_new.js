@@ -1345,10 +1345,10 @@ function displayUnmappedProducts() {
     // Initialize mapping rows with first row
     initializeMappingRows();
     
-    // Show first 10 products as preview
-    const preview = LumaprintsState.unmappedProducts.slice(0, 10);
+    // Show all unmapped products
+    const preview = LumaprintsState.unmappedProducts;
     listElem.innerHTML = `
-        <h4>Preview (first 10 products):</h4>
+        <h4>Unmapped Products (${preview.length} total):</h4>
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr style="background: #f0f0f0;">
@@ -1369,7 +1369,6 @@ function displayUnmappedProducts() {
                 `).join('')}
             </tbody>
         </table>
-        ${LumaprintsState.unmappedProducts.length > 10 ? `<p style="margin-top: 10px; font-style: italic;">... and ${LumaprintsState.unmappedProducts.length - 10} more products</p>` : ''}
     `;
 }
 
