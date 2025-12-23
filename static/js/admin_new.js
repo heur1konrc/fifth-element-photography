@@ -1802,6 +1802,9 @@ async function generateShopifyCSVFromSelected() {
 async function createShopifyProductsViaAPI() {
     const selectedImages = getSelectedImages();
     
+    console.log('DEBUG: Selected images:', selectedImages);
+    console.log('DEBUG: Number of selected images:', selectedImages.length);
+    
     if (selectedImages.length === 0) {
         showAlert('Please select at least one image using the checkboxes.', 'warning');
         return;
@@ -1810,21 +1813,27 @@ async function createShopifyProductsViaAPI() {
     showAlert(`Creating ${selectedImages.length} Shopify product(s) via API...`, 'info');
     
     try {
+        const requestData = { 
+            images: selectedImages.map(filename => ({
+                filename: filename,
+                title: filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
+                description: ''
+            }))
+        };
+        
+        console.log('DEBUG: Sending request with data:', requestData);
+        console.log('DEBUG: Number of images in request:', requestData.images.length);
+        
         const response = await fetch('/api/shopify/create-product', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ 
-                images: selectedImages.map(filename => ({
-                    filename: filename,
-                    title: filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
-                    description: ''
-                }))
-            })
+            body: JSON.stringify(requestData)
         });
         
         const result = await response.json();
+        console.log('DEBUG: API response:', result);
         
         if (result.success) {
             let message = `✓ Successfully created ${result.created.length} product(s)!`;
