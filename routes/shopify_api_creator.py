@@ -376,6 +376,38 @@ def create_shopify_product():
                     shopify_product_id = str(response_data['product']['id'])
                     actual_handle = response_data['product']['handle']  # Use actual handle from Shopify
                     
+                    # Publish product to Storefront API sales channel
+                    try:
+                        # Get the publication ID for the Storefront API channel
+                        publications_url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/publications.json'
+                        pub_response = requests.get(publications_url, headers=headers)
+                        
+                        if pub_response.status_code == 200:
+                            publications = pub_response.json().get('publications', [])
+                            # Find the Storefront API publication (app_id: 580111)
+                            storefront_pub = next((p for p in publications if p.get('app_id') == 580111), None)
+                            
+                            if storefront_pub:
+                                # Publish product to Storefront API channel
+                                publish_url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/publications/{storefront_pub["id"]}/resource_publications.json'
+                                publish_data = {
+                                    'resource_publication': {
+                                        'resource_id': shopify_product_id,
+                                        'resource_type': 'Product',
+                                        'published': True
+                                    }
+                                }
+                                publish_response = requests.post(publish_url, headers=headers, json=publish_data)
+                                if publish_response.status_code in [200, 201]:
+                                    print(f"✓ Published {category_title} to Storefront API")
+                                else:
+                                    print(f"⚠ Failed to publish {category_title} to Storefront API: {publish_response.text}")
+                            else:
+                                print(f"⚠ Storefront API publication not found")
+                    except Exception as pub_error:
+                        print(f"⚠ Error publishing to Storefront API: {pub_error}")
+                        # Don't fail the whole operation if publishing fails
+                    
                     # Save to database for tracking with category column
                     cursor = conn.cursor()
                     cursor.execute("""
