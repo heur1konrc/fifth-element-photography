@@ -182,7 +182,19 @@
 
         <div class="gallery-grid">
             {% for image in images %}
-            <div class="gallery-item" onclick="openModalBeta({filename: '{{ image.filename }}', title: '{{ image.title }}', url: '/images/{{ image.filename }}', description: `{{ image.description|safe }}`, model: '{{ image.model }}', lens: '{{ image.lens }}', aperture: '{{ image.aperture }}', shutter_speed: '{{ image.shutter_speed }}', iso: '{{ image.iso }}', focal_length: '{{ image.focal_length }}'})" style="cursor: pointer;">
+            <div class="gallery-item" 
+                 data-filename="{{ image.filename }}"
+                 data-title="{{ image.title }}"
+                 data-url="/images/{{ image.filename }}"
+                 data-description="{{ image.description|safe|replace('"', '&quot;') }}"
+                 data-model="{{ image.model }}"
+                 data-lens="{{ image.lens }}"
+                 data-aperture="{{ image.aperture }}"
+                 data-shutter-speed="{{ image.shutter_speed }}"
+                 data-iso="{{ image.iso }}"
+                 data-focal-length="{{ image.focal_length }}"
+                 onclick="openModalFromData(this)"
+                 style="cursor: pointer;">
                 <img src="/gallery-image/{{ image.filename }}" alt="{{ image.title }}" loading="lazy">
             </div>
             {% endfor %}
@@ -211,5 +223,24 @@
     
     <!-- Modal JavaScript -->
     <script src="{{ url_for('static', filename='js/modal-beta.js') }}"></script>
+    
+    <!-- Gallery helper function -->
+    <script>
+    function openModalFromData(element) {
+        const data = {
+            filename: element.dataset.filename,
+            title: element.dataset.title,
+            url: element.dataset.url,
+            description: element.dataset.description,
+            model: element.dataset.model,
+            lens: element.dataset.lens,
+            aperture: element.dataset.aperture,
+            shutter_speed: element.dataset.shutterSpeed,
+            iso: element.dataset.iso,
+            focal_length: element.dataset.focalLength
+        };
+        openModalBeta(data);
+    }
+    </script>
 </body>
 </html>
