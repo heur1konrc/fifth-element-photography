@@ -1567,9 +1567,12 @@ async function applyLumaprintsMapping() {
         } else if (productType.includes('Glossy')) {
             subcategory = 'Glossy Fine Art Paper';
             options = [['Bleed Size', '0.25in Bleed (0.25in on each side)']];  
-        } else if (productType.includes('Metal')) {
-            subcategory = 'Metal Print';
-            options = [['Metal Finish', 'Glossy']];  
+        } else if (productType.includes('White Metal')) {
+            subcategory = 'Glossy White Metal';
+            options = [];
+        } else if (productType.includes('Silver Metal')) {
+            subcategory = 'Glossy Silver Metal';
+            options = [];  
         } else if (productType.includes('Foam')) {
             subcategory = 'Foam-mounted Print';
             options = [];
