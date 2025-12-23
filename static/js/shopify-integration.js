@@ -564,7 +564,7 @@ function showCategorySelector(imageUrl, imageTitle, productHandles) {
     // Build category selector HTML
     const categoriesHTML = productHandles.map(({category, handle}) => `
         <button class="category-selector-btn" onclick="openProductByHandle('${handle}', '${imageTitle}')">
-            <span class="category-icon">${getCategoryIcon(category)}</span>
+            <img src="${getCategoryIcon(category)}" alt="${category}" class="category-image" />
             <span class="category-name">${category}</span>
         </button>
     `).join('');
@@ -584,14 +584,14 @@ function showCategorySelector(imageUrl, imageTitle, productHandles) {
 
 // Get icon for category
 function getCategoryIcon(category) {
-    const icons = {
-        'Canvas': '🖼️',
-        'Metal': '✨',
-        'Fine Art Paper': '📄',
-        'Framed Canvas': '🖼️',
-        'Foam-mounted Print': '📋'
+    const images = {
+        'Canvas': '/static/images/products/canvas.png',
+        'Metal': '/static/images/products/metal.png',
+        'Fine Art Paper': '/static/images/products/fine-art-paper.png',
+        'Framed Canvas': '/static/images/products/framed-canvas.png',
+        'Foam-mounted Print': '/static/images/products/foam-mounted.png'
     };
-    return icons[category] || '🖼️';
+    return images[category] || '/static/images/products/canvas.png';
 }
 
 // Open product by handle directly
