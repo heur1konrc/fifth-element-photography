@@ -26,7 +26,7 @@ def remove_foam_invalid_sizes():
             JOIN product_categories pc ON ps.category_id = pc.category_id
             JOIN print_sizes pz ON bp.size_id = pz.size_id
             WHERE pc.display_name = 'Foam-mounted Fine Art Paper'
-            AND (pz.size_name IN ('4×6', '40×60', '4x6', '40x60') OR pz.size_name LIKE '4_6' OR pz.size_name LIKE '40_60')
+            AND pz.size_name IN ('4×6"', '40×60"')
         """)
         
         count_to_delete = cursor.fetchone()[0]
@@ -38,27 +38,28 @@ def remove_foam_invalid_sizes():
                 'deleted': 0
             })
         
-        # Delete the entries
+        # Mark as unavailable instead of deleting
         cursor.execute("""
-            DELETE FROM base_pricing 
+            UPDATE base_pricing 
+            SET is_available = 0
             WHERE pricing_id IN (
                 SELECT bp.pricing_id FROM base_pricing bp
                 JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
                 JOIN product_categories pc ON ps.category_id = pc.category_id
                 JOIN print_sizes pz ON bp.size_id = pz.size_id
                 WHERE pc.display_name = 'Foam-mounted Fine Art Paper'
-                AND (pz.size_name IN ('4×6', '40×60', '4x6', '40x60') OR pz.size_name LIKE '4_6' OR pz.size_name LIKE '40_60')
+                AND pz.size_name IN ('4×6"', '40×60"')
             )
         """)
         
-        deleted_count = cursor.rowcount
+        updated_count = cursor.rowcount
         conn.commit()
         conn.close()
         
         return jsonify({
             'success': True,
-            'message': f'Successfully removed {deleted_count} Foam-mounted products with invalid sizes (4×6, 40×60)',
-            'deleted': deleted_count
+            'message': f'Successfully marked {updated_count} Foam-mounted products as unavailable (4×6", 40×60")',
+            'updated': updated_count
         })
         
     except Exception as e:
