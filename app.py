@@ -3230,16 +3230,17 @@ def download_image(filename):
         if not filename or '..' in filename or '/' in filename:
             return "Invalid filename", 400
         
-        # Try high-res version first
-        highres_path = storage_manager.get_highres_path(filename)
+        # Try high-res version first (with highres_ prefix)
+        highres_filename = f"highres_{filename}"
+        highres_path = storage_manager.get_highres_path(highres_filename)
         
         if highres_path and os.path.exists(highres_path):
-            # Send high-res version
+            # Send high-res version with highres_ prefix in filename
             return send_from_directory(
                 os.path.dirname(highres_path), 
                 os.path.basename(highres_path), 
                 as_attachment=True,
-                download_name=filename
+                download_name=highres_filename
             )
         
         # Fall back to web version from /data
