@@ -238,6 +238,12 @@
     gap: 10px;
 }
 
+.panel-bottom-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
 .panel-btn {
     padding: 10px 16px;
     border-radius: 6px;
@@ -282,6 +288,16 @@
 
 .btn-download:hover {
     background: #138496;
+    transform: translateY(-1px);
+}
+
+.btn-replace {
+    background: #ffc107;
+    color: #000;
+}
+
+.btn-replace:hover {
+    background: #e0a800;
     transform: translateY(-1px);
 }
 

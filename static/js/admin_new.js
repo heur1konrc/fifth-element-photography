@@ -390,7 +390,7 @@ function replaceImageFile(originalFilename) {
 
 
 function downloadImage(filename) {
-    window.location.href = `/download_image/${filename}`;
+    window.location.href = `/admin/download-image/${filename}`;
 }
 
 function removeFeatured(filename) {
