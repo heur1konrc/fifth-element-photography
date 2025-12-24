@@ -10,17 +10,19 @@ import os
 
 shopify_status_api_bp = Blueprint('shopify_status_api', __name__)
 
-# Database path
+# Database paths
 if os.path.exists('/data'):
-    DB_PATH = '/data/print_ordering.db'
+    PRICING_DB_PATH = '/data/print_ordering.db'
+    GALLERY_DB_PATH = '/data/gallery_images.db'
     IMAGES_FOLDER = '/data'
 else:
-    DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'database', 'print_ordering.db')
+    PRICING_DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'database', 'print_ordering.db')
+    GALLERY_DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'gallery_images.db')
     IMAGES_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'images')
 
 def ensure_shopify_products_table():
     """Ensure shopify_products table exists"""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(PRICING_DB_PATH)
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS shopify_products (
@@ -35,10 +37,16 @@ def ensure_shopify_products_table():
     conn.commit()
     conn.close()
 
-def get_db():
-    """Get database connection"""
+def get_pricing_db():
+    """Get pricing database connection"""
     ensure_shopify_products_table()
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(PRICING_DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def get_gallery_db():
+    """Get gallery database connection"""
+    conn = sqlite3.connect(GALLERY_DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -67,7 +75,7 @@ def sync_shopify_products():
         products = response.json().get('products', [])
         
         # Save to database
-        conn = get_db()
+        conn = get_pricing_db()
         cursor = conn.cursor()
         synced_count = 0
         
@@ -109,15 +117,25 @@ def sync_shopify_products():
 def get_images_shopify_status():
     """Get all images with their Shopify product status"""
     try:
-        # Get all image files
+        # Get all image files from gallery database
         image_files = []
-        if os.path.exists(IMAGES_FOLDER):
-            for filename in os.listdir(IMAGES_FOLDER):
-                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
-                    image_files.append(filename)
+        try:
+            gallery_conn = get_gallery_db()
+            gallery_cursor = gallery_conn.cursor()
+            gallery_cursor.execute('SELECT filename FROM images ORDER BY filename')
+            image_rows = gallery_cursor.fetchall()
+            gallery_conn.close()
+            image_files = [row['filename'] for row in image_rows]
+        except Exception as e:
+            print(f"Error loading from gallery_images.db: {e}")
+            # Fallback to filesystem scan
+            if os.path.exists(IMAGES_FOLDER):
+                for filename in os.listdir(IMAGES_FOLDER):
+                    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+                        image_files.append(filename)
         
         # Get Shopify product status from database
-        conn = get_db()
+        conn = get_pricing_db()
         cursor = conn.cursor()
         cursor.execute("SELECT image_filename, shopify_product_id, shopify_handle FROM shopify_products")
         shopify_products = {row['image_filename']: {

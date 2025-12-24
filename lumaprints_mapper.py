@@ -155,6 +155,9 @@ def get_unmapped_products(ws) -> List[Dict]:
             }
             unmapped.append(product)
     
+    # Sort A-Z by product name (column A)
+    unmapped.sort(key=lambda p: (p['product_name'] or '').lower())
+    
     return unmapped
 
 
@@ -282,6 +285,47 @@ def generate_mapping_template(aspect_ratio: str, product_type: str, size: Tuple[
     }
 
 
+def sort_worksheet_by_product_name(ws) -> None:
+    """Sort all data rows A-Z by column A (Product Name)"""
+    # Get all data rows (skip header row 1)
+    data_rows = []
+    for row_num in range(2, ws.max_row + 1):
+        row_data = []
+        for col_num in range(1, ws.max_column + 1):
+            cell = ws.cell(row_num, col_num)
+            row_data.append({
+                'value': cell.value,
+                'font': cell.font.copy() if cell.font else None,
+                'fill': cell.fill.copy() if cell.fill else None,
+                'border': cell.border.copy() if cell.border else None,
+                'alignment': cell.alignment.copy() if cell.alignment else None,
+                'number_format': cell.number_format
+            })
+        data_rows.append(row_data)
+    
+    # Sort by column A (index 0) - case insensitive
+    data_rows.sort(key=lambda row: (row[0]['value'] or '').lower())
+    
+    # Write sorted data back to worksheet
+    for row_idx, row_data in enumerate(data_rows, start=2):
+        for col_idx, cell_data in enumerate(row_data, start=1):
+            cell = ws.cell(row_idx, col_idx)
+            cell.value = cell_data['value']
+            if cell_data['font']:
+                cell.font = cell_data['font']
+            if cell_data['fill']:
+                cell.fill = cell_data['fill']
+            if cell_data['border']:
+                cell.border = cell_data['border']
+            if cell_data['alignment']:
+                cell.alignment = cell_data['alignment']
+            cell.number_format = cell_data['number_format']
+
+
 def save_excel(wb: openpyxl.Workbook, output_path: str) -> None:
-    """Save workbook to file"""
+    """Save workbook to file after sorting by product name"""
+    # Sort the active worksheet A-Z by column A
+    ws = wb.active
+    sort_worksheet_by_product_name(ws)
+    
     wb.save(output_path)
