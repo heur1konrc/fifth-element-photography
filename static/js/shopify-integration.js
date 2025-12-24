@@ -562,8 +562,9 @@ function showCategorySelector(imageUrl, imageTitle, productHandles) {
     if (!container) return;
     
     // Build category selector HTML
+    const escapedTitle = imageTitle.replace(/'/g, "\\'");
     const categoriesHTML = productHandles.map(({category, handle}) => `
-        <button class="category-selector-btn" onclick="openProductByHandle('${handle}', '${imageTitle}')">
+        <button class="category-selector-btn" onclick="openProductByHandle('${handle}', '${escapedTitle}')">
             <img src="${getCategoryIcon(category)}" alt="${category}" class="category-image" />
             <div class="category-info">
                 <div class="category-title">${category}</div>
