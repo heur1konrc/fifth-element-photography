@@ -486,6 +486,7 @@
                                     <th style="padding: 0.75rem; text-align: right;">Markup</th>
                                     <th style="padding: 0.75rem; text-align: right;">Retail Price</th>
                                     <th style="padding: 0.75rem; text-align: center;">Status</th>
+                                    <th style="padding: 0.75rem; text-align: center;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -498,8 +499,13 @@
                                             {{ product.aspect_ratio }}
                                         </span>
                                     </td>
-                                    <td style="padding: 0.75rem; text-align: right; color: #2563eb; font-weight: 600;">
-                                        ${{ "%.2f"|format(product.cost_price) }}
+                                    <td style="padding: 0.75rem; text-align: right;">
+                                        <input type="number" 
+                                               value="{{ '%.2f'|format(product.cost_price) }}" 
+                                               step="0.01" 
+                                               min="0"
+                                               id="cost-{{ product.pricing_id }}"
+                                               style="width: 90px; padding: 0.4rem 0.6rem; border: 1px solid #ddd; border-radius: 3px; text-align: right; font-weight: 600; color: #2563eb;">
                                     </td>
                                     <td style="padding: 0.75rem; text-align: right; color: #059669;">
                                         {{ "%.1f"|format(product.markup_percent) }}%
@@ -508,11 +514,23 @@
                                         ${{ "%.2f"|format(product.cost_price * (1 + product.markup_percent / 100)) }}
                                     </td>
                                     <td style="padding: 0.75rem; text-align: center;">
-                                        {% if product.is_available %}
-                                        <span style="color: #10b981;">✓ Available</span>
-                                        {% else %}
-                                        <span style="color: #ef4444;">✗ Unavailable</span>
-                                        {% endif %}
+                                        <label class="toggle-switch" style="position: relative; display: inline-block; width: 50px; height: 24px; vertical-align: middle;" onclick="event.stopPropagation();">
+                                            <input type="checkbox" 
+                                                   id="available-{{ product.pricing_id }}"
+                                                   {% if product.is_available %}checked{% endif %}
+                                                   onchange="this.nextElementSibling.style.backgroundColor = this.checked ? '#10b981' : '#ccc'"
+                                                   style="opacity: 0; width: 0; height: 0;">
+                                            <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: {% if product.is_available %}#10b981{% else %}#ccc{% endif %}; transition: 0.4s; border-radius: 24px;"></span>
+                                            <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; transform: translateX({% if product.is_available %}26px{% else %}0{% endif %}); pointer-events: none;"></span>
+                                        </label>
+                                    </td>
+                                    <td style="padding: 0.75rem; text-align: center;">
+                                        <button onclick="saveProductChanges({{ product.pricing_id }}); event.stopPropagation();" 
+                                                style="padding: 0.5rem 1rem; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: background 0.2s;"
+                                                onmouseover="this.style.background='#5568d3'" 
+                                                onmouseout="this.style.background='#667eea'">
+                                            💾 Save
+                                        </button>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -736,6 +754,40 @@
                     setTimeout(() => location.reload(), 1500);
                 } else {
                     showAlert(data.error || 'Failed to add product', 'error');
+                }
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Save Product Changes (Cost and Availability)
+        async function saveProductChanges(pricingId) {
+            const costInput = document.getElementById(`cost-${pricingId}`);
+            const availableCheckbox = document.getElementById(`available-${pricingId}`);
+            
+            const newCost = parseFloat(costInput.value);
+            const isAvailable = availableCheckbox.checked;
+            
+            if (isNaN(newCost) || newCost < 0) {
+                showAlert('Please enter a valid cost price', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/admin/pricing/edit/${pricingId}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                    body: `cost_price=${newCost}&is_available=${isAvailable}`
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert('Product updated successfully!', 'success');
+                    // Reload after a short delay to show updated prices
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showAlert(data.error || 'Failed to update product', 'error');
                 }
             } catch (error) {
                 showAlert('Error: ' + error.message, 'error');
