@@ -79,13 +79,14 @@ def map_product_type_to_shopify(db_product_type):
         'Semi-Glossy Fine Art Paper': 'Semi-glossy',
         'Glossy Fine Art Paper': 'Glossy',
         # Canvas
-        '0.75" Stretched Canvas': '0.75" Stretched Canvas',
-        '1.25" Stretched Canvas': '1.25" Stretched Canvas',
-        '1.50" Stretched Canvas': '1.50" Stretched Canvas',
+        '0.75" Stretched Canvas': '0.75 Stretched Canvas',
+        '1.25" Stretched Canvas': '1.25 Stretched Canvas',
+        '1.50" Stretched Canvas': '1.50 Stretched Canvas',
+        'Rolled Canvas': 'Rolled Canvas',
         # Framed Canvas
-        '0.75" Framed Canvas': '0.75" Framed Canvas',
-        '1.25" Framed Canvas': '1.25" Framed Canvas',
-        '1.50" Framed Canvas': '1.50" Framed Canvas',
+        '0.75" Framed Canvas': '0.75 Framed Canvas',
+        '1.25" Framed Canvas': '1.25 Framed Canvas',
+        '1.50" Framed Canvas': '1.50 Framed Canvas',
         # Foam-mounted
         'Foam-mounted Hot Press': 'Foam-mounted Hot Press',
         'Foam-mounted Cold Press': 'Foam-mounted Cold Press',
@@ -328,8 +329,8 @@ def create_shopify_product():
                     sizes.add(size)
                     
                     variants.append({
-                        'option1': shopify_prod_type,
-                        'option2': size,
+                        'option1': f'Printed Product - {shopify_prod_type}',
+                        'option2': f'Size - {size}',
                         'price': str(price),
                         'inventory_quantity': 10,
                         'inventory_management': 'shopify'
@@ -348,8 +349,8 @@ def create_shopify_product():
                         'product_type': 'Art Print',
                         'status': 'active',
                         'options': [
-                            {'name': 'Printed Product', 'values': sorted(list(product_types))},
-                            {'name': 'Size', 'values': sorted(list(sizes))}
+                            {'name': 'Printed Product', 'values': sorted([f'Printed Product - {pt}' for pt in product_types])},
+                            {'name': 'Size', 'values': sorted([f'Size - {s}' for s in sizes])}
                         ],
                         'variants': variants,
                         'images': [image_attachment] if image_attachment else []
