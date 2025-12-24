@@ -340,11 +340,8 @@
                                         <div class="panel-title">Image Title: <span class="inline-edit-title" data-filename="{{ image.filename }}" contenteditable="true" onblur="saveInlineEdit(this, 'title')">{{ image.title }}</span></div>
                                     </div>
                                     
-                                    <div class="panel-action-buttons">
+                                    <div class="panel-bottom-buttons">
                                         <button class="panel-btn btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>                                    <div class="panel-bottom-buttons">
-                                        <button class="panel-btn btn-edit" onclick="openEditModal('{{ image.filename }}')" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                         <button class="panel-btn btn-replace" onclick="openReplaceImageModal('{{ image.filename }}')" title="Replace Image">

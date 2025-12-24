@@ -389,6 +389,10 @@ function replaceImageFile(originalFilename) {
 }
 
 
+function downloadImage(filename) {
+    window.location.href = `/download_image/${filename}`;
+}
+
 function removeFeatured(filename) {
     if (!confirm('Remove featured status from this image?')) {
         return;
