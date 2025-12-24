@@ -1818,14 +1818,9 @@ async function applyLumaprintsMapping() {
             options = [];
         }
         
-        // Add highres_ prefix to filename for Lumaprints
-        let lumaprintsFilename = userMapping.filename;
-        if (!lumaprintsFilename.startsWith('highres_')) {
-            lumaprintsFilename = 'highres_' + lumaprintsFilename;
-        }
-        
+        // Use filename as-is (user will rename files themselves)
         const mappingData = {
-            image_filename: lumaprintsFilename,
+            image_filename: userMapping.filename,
             subcategory: subcategory,
             width: width,
             length: length,
