@@ -1687,9 +1687,9 @@ async function applyLumaprintsMapping() {
                 ['Bleed Size', '0.25in Bleed (0.25in on each side)']
             ];
         } else if (productType.includes('Metal')) {
-            // "Glossy White Metal" → "Glossy White Metal Print"
+            // "Glossy White Metal Print" or "Glossy Silver Metal Print"
             if (productType.includes('Silver')) {
-                subcategory = 'Silver Metal Print';
+                subcategory = 'Glossy Silver Metal Print';
             } else {
                 subcategory = 'Glossy White Metal Print';
             }
