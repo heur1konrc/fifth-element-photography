@@ -460,8 +460,7 @@
                         <div style="padding: 1rem; background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
                             <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                                 <span style="font-weight: 600; color: #495057;">Filter by Aspect Ratio:</span>
-                                {% set all_ratios = category.products | map(attribute='aspect_ratio') | unique | list %}
-                                {% set ratios = all_ratios | select('in', ['3:2', '1:1']) | list %}
+                                {% set ratios = ['Standard', '1:1'] %}
                                 {% for ratio in ratios %}
                                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="event.stopPropagation();">
                                     <input type="checkbox" 
@@ -492,6 +491,7 @@
                             </thead>
                             <tbody>
                                 {% for product in category.products %}
+                                {% if product.aspect_ratio in ['Standard', '1:1'] %}
                                 <tr style="border-bottom: 1px solid #e9ecef;" data-category="{{ category.category_id }}" data-ratio="{{ product.aspect_ratio }}">
                                     <td style="padding: 0.75rem;">{{ product.product_name }}</td>
                                     <td style="padding: 0.75rem;">{{ product.size_name }}</td>
@@ -534,6 +534,7 @@
                                         </button>
                                     </td>
                                 </tr>
+                                {% endif %}
                                 {% endfor %}
                             </tbody>
                         </table>
