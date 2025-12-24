@@ -42,6 +42,18 @@
             <p>Map 5 product types per image: Metal, Canvas, Fine Art Paper, Framed Canvas, Foam-mounted Print</p>
         </div>
         
+        {% if error %}
+        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <strong>Error:</strong> {{ error }}
+        </div>
+        {% endif %}
+        
+        {% if images|length == 0 %}
+        <div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <strong>No images found.</strong> Please add images to the gallery first.
+        </div>
+        {% endif %}
+        
         <div class="grid">
             {% for image in images %}
             <div class="card" data-title="{{ image.title }}">

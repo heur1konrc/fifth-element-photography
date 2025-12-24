@@ -42,16 +42,23 @@ def shopify_mapping():
     # Get all images from gallery
     gallery_db = get_db_path('gallery_images.db')
     
+    images = []
+    error_msg = None
     try:
-        conn = sqlite3.connect(gallery_db)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        cursor.execute('SELECT id, filename, title FROM images ORDER BY created_at DESC')
-        images = cursor.fetchall()
-        conn.close()
+        if not os.path.exists(gallery_db):
+            error_msg = f"Gallery database not found at {gallery_db}"
+        else:
+            conn = sqlite3.connect(gallery_db)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            cursor.execute('SELECT id, filename, title FROM images ORDER BY created_at DESC')
+            images = cursor.fetchall()
+            conn.close()
     except Exception as e:
-        print(f"Error loading images: {e}")
-        images = []
+        error_msg = f"Error loading images: {e}"
+        print(error_msg)
+        import traceback
+        traceback.print_exc()
     
     # Get existing mappings from shopify_products table
     print_db = get_db_path('print_ordering.db')
@@ -102,7 +109,8 @@ def shopify_mapping():
     
     return render_template('admin/shopify_mapping.html', 
                          images=images_data,
-                         categories=PRODUCT_CATEGORIES)
+                         categories=PRODUCT_CATEGORIES,
+                         error=error_msg)
 
 @shopify_admin_bp.route('/api/shopify-mapping/save', methods=['POST'])
 def save_shopify_mapping():
