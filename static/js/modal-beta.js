@@ -38,7 +38,9 @@ function openModalBeta(imageData) {
     const orderBtn = document.getElementById('btnOrderPrints');
     
     // Check if this image has Shopify product mappings (supports multiple categories)
+    console.log('[ORDER PRINTS DEBUG] imageData.url:', imageData.url);
     const productHandles = typeof getAllProductHandlesFromUrl === 'function' ? getAllProductHandlesFromUrl(imageData.url) : [];
+    console.log('[ORDER PRINTS DEBUG] productHandles:', productHandles);
     
     if (productHandles && productHandles.length > 0) {
         orderBtn.style.display = 'block';
