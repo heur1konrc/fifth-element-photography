@@ -3261,20 +3261,31 @@ def download_image(filename):
 @app.route('/admin/debug/list-originals')
 @require_admin_auth
 def list_originals():
-    """DEBUG: List files in /data/originals directory"""
+    """DEBUG: Check multiple possible locations for highres files"""
     try:
-        originals_dir = '/data/originals'
-        if os.path.exists(originals_dir):
-            files = os.listdir(originals_dir)
-            files.sort()
-            return {
-                'success': True,
-                'directory': originals_dir,
-                'file_count': len(files),
-                'files': files[:50]  # First 50 files
-            }
-        else:
-            return {'success': False, 'error': 'Directory does not exist'}
+        locations = [
+            '/data/originals',
+            '/data/highres_images',
+            '/data',
+        ]
+        
+        results = {}
+        for loc in locations:
+            if os.path.exists(loc):
+                files = [f for f in os.listdir(loc) if os.path.isfile(os.path.join(loc, f))]
+                # Look for highres_ prefix files
+                highres_files = [f for f in files if f.startswith('highres_')]
+                results[loc] = {
+                    'exists': True,
+                    'total_files': len(files),
+                    'highres_files': len(highres_files),
+                    'sample_files': files[:10],
+                    'sample_highres': highres_files[:10]
+                }
+            else:
+                results[loc] = {'exists': False}
+        
+        return {'success': True, 'locations': results}
     except Exception as e:
         return {'success': False, 'error': str(e)}
 
