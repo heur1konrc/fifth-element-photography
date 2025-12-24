@@ -467,7 +467,7 @@
                                            class="ratio-filter" 
                                            data-category="{{ category.category_id }}" 
                                            data-ratio="{{ ratio }}" 
-                                           checked
+                                           {% if ratio in ['Standard', 'Square'] %}checked{% endif %}
                                            style="cursor: pointer;">
                                     <span style="background: #e0e7ff; color: #4c51bf; padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.85rem;">
                                         {{ ratio }}
