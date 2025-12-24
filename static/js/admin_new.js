@@ -1632,8 +1632,11 @@ async function applyLumaprintsMapping() {
         
         console.log(`Product row ${product.row}: width=${width}, length=${length}, option1="${product.option1}"`);
         
-        // Strip "Printed Product - " and convert to subcategory format
-        const productType = (product.option1 || '').replace(/^Printed Product - /i, '');
+        // Strip ALL occurrences of "Printed Product - " prefix (handles doubled prefixes)
+        let productType = (product.option1 || '');
+        while (productType.startsWith('Printed Product - ')) {
+            productType = productType.replace(/^Printed Product - /i, '');
+        }
         
         // Skip Rolled Canvas products entirely
         if (productType.includes('Rolled Canvas')) {
