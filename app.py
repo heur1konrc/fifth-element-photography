@@ -5070,16 +5070,16 @@ def lumaprints_upload():
         # Load and process
         wb, ws = lm.load_excel(temp_path)
         
-        # Sort by Column A (keeping header)
-        # DISABLED: Sorting was corrupting existing mappings
-        # lm.sort_by_column_a(ws)
+        # Delete all rows with "Mapped" status
+        deleted_count = lm.delete_mapped_rows(ws)
+        print(f"Deleted {deleted_count} mapped rows")
         
         # Get unmapped products
         unmapped = lm.get_unmapped_products(ws)
         
-        # Save sorted workbook (sort BEFORE mapping is applied)
+        # Save workbook (no sorting - just delete mapped rows)
         sorted_path = os.path.join('/tmp', 'lumaprints_sorted.xlsx')
-        lm.save_excel(wb, sorted_path, sort_rows=True)
+        lm.save_excel(wb, sorted_path, sort_rows=False)
         
         return jsonify({
             'success': True,

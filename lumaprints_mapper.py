@@ -126,6 +126,27 @@ def parse_size_from_option(option_text: str) -> Tuple[int, int]:
     return (0, 0)
 
 
+def delete_mapped_rows(ws) -> int:
+    """
+    Delete all rows where Mapping Status (column O) = "Mapped"
+    Returns count of deleted rows
+    """
+    deleted_count = 0
+    row = 2  # Start from row 2 (after header)
+    
+    while row <= ws.max_row:
+        mapping_status = ws.cell(row, 15).value  # Column O (15)
+        
+        if mapping_status == "Mapped":
+            ws.delete_rows(row, 1)
+            deleted_count += 1
+            # Don't increment row since we deleted current row
+        else:
+            row += 1
+    
+    return deleted_count
+
+
 def get_unmapped_products(ws) -> List[Dict]:
     """
     Get all unmapped products from worksheet
