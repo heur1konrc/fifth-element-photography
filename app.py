@@ -452,8 +452,11 @@ def get_image_info(filepath, skip_network_fetch=False):
     
     # If not cached, fetch from URL
     try:
+        # Strip highres_ prefix if present (Lumaprints uses it, but actual URLs don't)
+        url_filename = filename.replace('highres_', '') if filename.startswith('highres_') else filename
+        
         # Construct the URL for the image (use production where images actually exist)
-        image_url = f"https://fifthelement.photos/images/{filename}"
+        image_url = f"https://fifthelement.photos/images/{url_filename}"
         
         # Import required modules
         import requests
