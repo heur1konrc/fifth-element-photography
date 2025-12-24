@@ -167,6 +167,44 @@
         .edit-btn:hover {
             background: #5568d3;
         }
+        
+        .save-all-btn {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .save-all-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+        }
+        
+        .save-all-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .changes-indicator {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            font-size: 14px;
+        }
 
         .expand-all-btn {
             padding: 0.75rem 1.5rem;
@@ -206,6 +244,10 @@
     </div>
 
     <div class="container">
+        <button class="save-all-btn" id="saveAllBtn" onclick="saveAllChanges()" disabled>
+            💾 Save All Changes
+            <span class="changes-indicator" id="changesCount">0 changes</span>
+        </button>
         <button class="expand-all-btn" onclick="toggleAll()">Expand All Categories</button>
 
         {% if pricing_by_category %}
@@ -278,6 +320,7 @@
 
     <script>
         let allExpanded = false;
+        let pendingChanges = {}; // Track all pending changes
 
         function toggleCategory(index) {
             const accordion = document.getElementById(`category-${index}`);
@@ -300,6 +343,15 @@
             
             btn.textContent = allExpanded ? 'Collapse All Categories' : 'Expand All Categories';
         }
+        
+        function updateChangesIndicator() {
+            const count = Object.keys(pendingChanges).length;
+            const btn = document.getElementById('saveAllBtn');
+            const indicator = document.getElementById('changesCount');
+            
+            indicator.textContent = `${count} change${count !== 1 ? 's' : ''}`;
+            btn.disabled = count === 0;
+        }
 
         function editPrice(pricingId, currentCost, isAvailable) {
             const newCost = prompt('Enter new cost price:', currentCost);
@@ -307,26 +359,57 @@
             
             const newAvailable = confirm('Is this product available?');
             
-            fetch(`/admin/pricing/edit/${pricingId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `cost_price=${newCost}&is_available=${newAvailable}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Price updated successfully!');
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.error);
+            // Store change instead of saving immediately
+            pendingChanges[pricingId] = {
+                cost_price: newCost,
+                is_available: newAvailable
+            };
+            
+            updateChangesIndicator();
+        }
+        
+        async function saveAllChanges() {
+            const btn = document.getElementById('saveAllBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Saving...';
+            
+            const changes = Object.entries(pendingChanges);
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (const [pricingId, data] of changes) {
+                try {
+                    const response = await fetch(`/admin/pricing/edit/${pricingId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `cost_price=${data.cost_price}&is_available=${data.is_available}`
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        successCount++;
+                        delete pendingChanges[pricingId];
+                    } else {
+                        errorCount++;
+                    }
+                } catch (error) {
+                    errorCount++;
+                    console.error('Error saving pricing ID', pricingId, error);
                 }
-            })
-            .catch(error => {
-                alert('Error updating price');
-                console.error(error);
-            });
+            }
+            
+            // Show results without reloading
+            alert(`Saved ${successCount} changes successfully!${errorCount > 0 ? ` ${errorCount} errors occurred.` : ''}`);
+            
+            if (successCount > 0) {
+                // Reload to show updated data
+                location.reload();
+            } else {
+                btn.textContent = '💾 Save All Changes';
+                updateChangesIndicator();
+            }
         }
     </script>
 </body>
