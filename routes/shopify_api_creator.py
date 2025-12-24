@@ -322,7 +322,13 @@ def create_shopify_product():
                     if shopify_prod_type is None:
                         shopify_prod_type = db_prod_type  # Use as-is if no mapping
                     
+                    # DEFENSIVE: Strip any existing prefixes to prevent doubling
+                    shopify_prod_type = shopify_prod_type.replace('Printed Product - ', '').replace('Size - ', '')
+                    
                     size = row['size_name'].strip('"')
+                    # DEFENSIVE: Strip any existing Size prefix
+                    size = size.replace('Size - ', '')
+                    
                     price = round(row['cost_price'] * markup_multiplier, 2)
                     
                     product_types.add(shopify_prod_type)
