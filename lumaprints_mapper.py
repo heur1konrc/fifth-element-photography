@@ -155,9 +155,7 @@ def get_unmapped_products(ws) -> List[Dict]:
             }
             unmapped.append(product)
     
-    # Sort A-Z by product name (column A)
-    unmapped.sort(key=lambda p: (p['product_name'] or '').lower())
-    
+    # No need to sort here - worksheet is already sorted during upload
     return unmapped
 
 
