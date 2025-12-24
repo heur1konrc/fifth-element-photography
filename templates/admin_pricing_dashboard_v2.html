@@ -460,7 +460,8 @@
                         <div style="padding: 1rem; background: #f8f9fa; border-bottom: 1px solid #dee2e6;">
                             <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                                 <span style="font-weight: 600; color: #495057;">Filter by Aspect Ratio:</span>
-                                {% set ratios = category.products | map(attribute='aspect_ratio') | unique | list %}
+                                {% set all_ratios = category.products | map(attribute='aspect_ratio') | unique | list %}
+                                {% set ratios = all_ratios | select('in', ['3:2', '1:1']) | list %}
                                 {% for ratio in ratios %}
                                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="event.stopPropagation();">
                                     <input type="checkbox" 
