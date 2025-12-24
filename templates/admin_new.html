@@ -343,11 +343,14 @@
                                     <div class="panel-action-buttons">
                                         <button class="panel-btn btn-edit" onclick="editImage('{{ image.filename }}')" title="Edit">
                                             <i class="fas fa-edit"></i>
+                                        </button>                                    <div class="panel-bottom-buttons">
+                                        <button class="panel-btn btn-edit" onclick="openEditModal('{{ image.filename }}')" title="Edit">
+                                            <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="panel-btn btn-analyze" onclick="analyzeImage('{{ image.filename }}', '{{ image.title|replace("'", "\\'")|replace('"', '\\"') }}')" title="Analyze">
-                                            <i class="fas fa-search"></i>
+                                        <button class="panel-btn btn-replace" onclick="openReplaceImageModal('{{ image.filename }}')" title="Replace Image">
+                                            <i class="fas fa-exchange-alt"></i>
                                         </button>
-                                        <button class="panel-btn btn-download" onclick="downloadHighres('{{ image.filename }}')" title="Download">
+                                        <button class="panel-btn btn-download" onclick="downloadImage('{{ image.filename }}')" title="Download">
                                             <i class="fas fa-download"></i>
                                         </button>
                                         <button class="panel-btn btn-delete" onclick="deleteImage('{{ image.filename }}')" title="Delete">

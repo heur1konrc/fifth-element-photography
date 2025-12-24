@@ -2366,6 +2366,102 @@ def upload_images_new():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
+
+@app.route('/api/replace_image', methods=['POST'])
+@require_admin_auth
+def replace_image():
+    """Replace an existing image file while keeping the same filename and all metadata"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'message': 'No file provided'}), 400
+        
+        file = request.files['file']
+        original_filename = request.form.get('original_filename')
+        
+        if not original_filename:
+            return jsonify({'success': False, 'message': 'Original filename not provided'}), 400
+        
+        if file.filename == '':
+            return jsonify({'success': False, 'message': 'No file selected'}), 400
+        
+        if not allowed_file(file.filename):
+            return jsonify({'success': False, 'message': 'Invalid file type'}), 400
+        
+        # Check if original file exists
+        original_filepath = os.path.join(IMAGES_FOLDER, original_filename)
+        if not os.path.exists(original_filepath):
+            return jsonify({'success': False, 'message': 'Original file not found'}), 404
+        
+        # Create backup of original file
+        backup_path = os.path.join(IMAGES_FOLDER, f'.backup_{original_filename}')
+        shutil.copy2(original_filepath, backup_path)
+        
+        try:
+            # Save new file with the same filename (overwrites original)
+            file.save(original_filepath)
+            
+            # Regenerate thumbnail
+            try:
+                generate_thumbnail_for_image(original_filename)
+            except Exception as thumb_error:
+                print(f"Warning: Failed to generate thumbnail for {original_filename}: {thumb_error}")
+            
+            # Regenerate gallery-optimized image
+            try:
+                from PIL import Image
+                os.makedirs('/data/gallery-images', exist_ok=True)
+                gallery_path = os.path.join('/data/gallery-images', original_filename)
+                
+                with Image.open(original_filepath) as img:
+                    if img.mode in ('RGBA', 'P'):
+                        img = img.convert('RGB')
+                    
+                    orig_width, orig_height = img.size
+                    max_dimension = 1200
+                    
+                    if orig_width > orig_height:
+                        new_width = max_dimension
+                        new_height = int((max_dimension / orig_width) * orig_height)
+                    else:
+                        new_height = max_dimension
+                        new_width = int((max_dimension / orig_height) * orig_width)
+                    
+                    img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                    img.save(gallery_path, 'JPEG', quality=90, optimize=True)
+                    print(f"Regenerated gallery image for {original_filename}")
+            except Exception as gallery_error:
+                print(f"Warning: Failed to regenerate gallery image for {original_filename}: {gallery_error}")
+            
+            # Update EXIF data in database
+            try:
+                from exif_db_helper import store_exif_in_db
+                exif_data = extract_exif_data(original_filepath)
+                store_exif_in_db(original_filename, exif_data)
+            except Exception as exif_error:
+                print(f"Warning: Failed to update EXIF for {original_filename}: {exif_error}")
+            
+            # Remove backup after successful replacement
+            if os.path.exists(backup_path):
+                os.remove(backup_path)
+            
+            return jsonify({
+                'success': True,
+                'message': f'Successfully replaced {original_filename}',
+                'filename': original_filename
+            })
+        
+        except Exception as e:
+            # Restore from backup if replacement failed
+            if os.path.exists(backup_path):
+                shutil.copy2(backup_path, original_filepath)
+                os.remove(backup_path)
+            raise e
+    
+    except Exception as e:
+        print(f"Error replacing image: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
 @app.route('/toggle_background/<filename>', methods=['POST'])
 def toggle_background(filename):
     """Toggle background image setting"""

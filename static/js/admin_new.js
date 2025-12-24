@@ -300,6 +300,95 @@ function deleteImage(filename) {
     });
 }
 
+
+function openReplaceImageModal(filename) {
+    const modal = document.createElement('div');
+    modal.id = 'replaceImageModal';
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+    
+    modal.innerHTML = `
+        <div style="background: #1a1a1a; padding: 30px; border-radius: 8px; max-width: 500px; width: 90%;">
+            <h2 style="color: #fff; margin-bottom: 20px; font-size: 24px;">Replace Image</h2>
+            <p style="color: #ccc; margin-bottom: 20px;">
+                Select a new image file to replace <strong style="color: #96bf48;">${filename}</strong>.<br>
+                The filename will stay the same, preserving all metadata, categories, galleries, and Shopify links.
+            </p>
+            <input type="file" id="replaceImageInput" accept="image/*" style="display: block; width: 100%; padding: 10px; margin-bottom: 20px; background: #2a2a2a; color: #fff; border: 1px solid #444; border-radius: 4px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button onclick="closeReplaceImageModal()" style="padding: 10px 20px; background: #444; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+                <button onclick="replaceImageFile('${filename}')" style="padding: 10px 20px; background: #96bf48; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">Replace Image</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close on background click
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeReplaceImageModal();
+        }
+    });
+}
+
+function closeReplaceImageModal() {
+    const modal = document.getElementById('replaceImageModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function replaceImageFile(originalFilename) {
+    const fileInput = document.getElementById('replaceImageInput');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('Please select a file to upload.');
+        return;
+    }
+    
+    if (!confirm(`Replace ${originalFilename} with ${file.name}?\n\nThe filename will remain ${originalFilename} and all metadata will be preserved.`)) {
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('original_filename', originalFilename);
+    
+    // Show loading indicator
+    const modal = document.getElementById('replaceImageModal');
+    modal.innerHTML = `
+        <div style="background: #1a1a1a; padding: 30px; border-radius: 8px; text-align: center;">
+            <div style="color: #96bf48; font-size: 48px; margin-bottom: 20px;">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            <p style="color: #fff; font-size: 18px;">Replacing image...</p>
+        </div>
+    `;
+    
+    fetch('/api/replace_image', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeReplaceImageModal();
+            alert(`Successfully replaced ${originalFilename}!`);
+            location.reload();
+        } else {
+            closeReplaceImageModal();
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        closeReplaceImageModal();
+        alert('Error replacing image. Please try again.');
+    });
+}
+
+
 function removeFeatured(filename) {
     if (!confirm('Remove featured status from this image?')) {
         return;
