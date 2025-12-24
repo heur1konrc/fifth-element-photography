@@ -714,7 +714,32 @@
 
         // Toggle Category Accordion
         function toggleCategory(element) {
+            const wasExpanded = element.classList.contains('expanded');
             element.classList.toggle('expanded');
+            
+            // Apply aspect ratio filters when expanding
+            if (!wasExpanded) {
+                setTimeout(() => {
+                    const categoryId = element.querySelector('.ratio-filter')?.dataset.category;
+                    if (categoryId) {
+                        applyAspectRatioFilters(categoryId);
+                    }
+                }, 100);
+            }
+        }
+        
+        function applyAspectRatioFilters(categoryId) {
+            const filterCheckboxes = document.querySelectorAll(`.ratio-filter[data-category="${categoryId}"]`);
+            
+            filterCheckboxes.forEach(checkbox => {
+                const ratio = checkbox.dataset.ratio;
+                const isChecked = checkbox.checked;
+                
+                const rows = document.querySelectorAll(`tr[data-category="${categoryId}"][data-ratio="${ratio}"]`);
+                rows.forEach(row => {
+                    row.style.display = isChecked ? '' : 'none';
+                });
+            });
         }
 
         // Expand All Categories
@@ -735,6 +760,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const filterCheckboxes = document.querySelectorAll('.ratio-filter');
             
+            // Add event listeners
             filterCheckboxes.forEach(checkbox => {
                 checkbox.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -743,15 +769,7 @@
                 checkbox.addEventListener('change', function(e) {
                     e.stopPropagation();
                     const categoryId = this.dataset.category;
-                    const ratio = this.dataset.ratio;
-                    const isChecked = this.checked;
-                    
-                    // Find all rows for this category and ratio
-                    const rows = document.querySelectorAll(`tr[data-category="${categoryId}"][data-ratio="${ratio}"]`);
-                    
-                    rows.forEach(row => {
-                        row.style.display = isChecked ? '' : 'none';
-                    });
+                    applyAspectRatioFilters(categoryId);
                 });
             });
         });
@@ -928,6 +946,11 @@
             });
         });
     </script>
+    
+    <!-- Template identifier -->
+    <div style="position: fixed; bottom: 0; right: 0; background: rgba(0,0,0,0.7); color: white; padding: 4px 12px; font-size: 11px; font-family: monospace; z-index: 9999; border-top-left-radius: 4px;">
+        admin_pricing_dashboard_v2.html
+    </div>
 </body>
 </html>
 
