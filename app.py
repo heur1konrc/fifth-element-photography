@@ -3258,6 +3258,26 @@ def download_image(filename):
     except Exception as e:
         return f"Error downloading image: {str(e)}", 500
 
+@app.route('/admin/debug/list-originals')
+@require_admin_auth
+def list_originals():
+    """DEBUG: List files in /data/originals directory"""
+    try:
+        originals_dir = '/data/originals'
+        if os.path.exists(originals_dir):
+            files = os.listdir(originals_dir)
+            files.sort()
+            return {
+                'success': True,
+                'directory': originals_dir,
+                'file_count': len(files),
+                'files': files[:50]  # First 50 files
+            }
+        else:
+            return {'success': False, 'error': 'Directory does not exist'}
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
+
 @app.route('/admin/download-thumbnail/<filename>')
 @require_admin_auth
 def download_thumbnail(filename):
