@@ -695,3 +695,88 @@ def get_product_categories(filename):
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@shopify_api_creator_bp.route('/api/shopify/sync-products', methods=['POST'])
+def sync_shopify_products():
+    """
+    Sync all products from Shopify to update the shopify_products table
+    This refreshes the LIVE status badges in the admin panel
+    """
+    try:
+        # Fetch all products from Shopify
+        url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit=250'
+        auth = (SHOPIFY_API_KEY, SHOPIFY_API_SECRET)
+        
+        all_products = []
+        while url:
+            response = requests.get(url, auth=auth)
+            if response.status_code != 200:
+                return jsonify({
+                    'success': False,
+                    'error': f'Shopify API error: {response.status_code}'
+                }), 500
+            
+            data = response.json()
+            all_products.extend(data.get('products', []))
+            
+            # Check for pagination
+            link_header = response.headers.get('Link', '')
+            url = None
+            if 'rel="next"' in link_header:
+                # Extract next URL from Link header
+                for link in link_header.split(','):
+                    if 'rel="next"' in link:
+                        url = link.split(';')[0].strip('<> ')
+                        break
+        
+        # Clear existing shopify_products table
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM shopify_products')
+        
+        # Repopulate with current products
+        synced_count = 0
+        for product in all_products:
+            # Extract image filename from product title or tags
+            title = product.get('title', '')
+            
+            # Try to extract filename from title (format: "Title - Category")
+            # The filename should be in the database based on the title
+            cursor.execute("""
+                SELECT DISTINCT image_filename 
+                FROM base_pricing bp
+                WHERE EXISTS (
+                    SELECT 1 FROM images 
+                    WHERE filename = bp.image_filename 
+                    AND title = ?
+                )
+            """, (title.split(' - ')[0] if ' - ' in title else title,))
+            
+            result = cursor.fetchone()
+            if result:
+                image_filename = result[0]
+                
+                # Insert into shopify_products
+                cursor.execute("""
+                    INSERT OR REPLACE INTO shopify_products 
+                    (image_filename, shopify_product_id, shopify_handle)
+                    VALUES (?, ?, ?)
+                """, (image_filename, str(product['id']), product['handle']))
+                
+                synced_count += 1
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'total_shopify_products': len(all_products),
+            'synced': synced_count
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
