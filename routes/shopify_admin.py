@@ -7,6 +7,7 @@ Supports mapping 5 product types per image
 from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 import sqlite3
 import os
+import json
 from functools import wraps
 
 shopify_admin_bp = Blueprint('shopify_admin', __name__, url_prefix='/admin')
@@ -25,6 +26,17 @@ def get_db_path(db_name='print_ordering.db'):
         return f'/data/{db_name}'
     return os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', db_name)
 
+def load_image_titles():
+    """Load image titles from JSON file"""
+    titles_path = '/data/image_titles.json' if os.path.exists('/data') else 'image_titles.json'
+    try:
+        if os.path.exists(titles_path):
+            with open(titles_path, 'r') as f:
+                return json.load(f)
+    except:
+        pass
+    return {}
+
 def login_required(f):
     """Decorator to require login for admin routes"""
     @wraps(f)
@@ -39,26 +51,25 @@ def login_required(f):
 @shopify_admin_bp.route('/shopify-mapping')
 def shopify_mapping():
     """Shopify product mapping management page - supports multiple products per image"""
-    # Get all images from gallery
-    gallery_db = get_db_path('gallery_images.db')
+    # Get all image files from /data directory
+    images_dir = '/data' if os.path.exists('/data') else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'images')
     
-    images = []
+    image_files = []
     error_msg = None
+    
     try:
-        if not os.path.exists(gallery_db):
-            error_msg = f"Gallery database not found at {gallery_db}"
+        if not os.path.exists(images_dir):
+            error_msg = f"Images directory not found at {images_dir}"
         else:
-            conn = sqlite3.connect(gallery_db)
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
-            cursor.execute('SELECT id, filename, title FROM images ORDER BY created_at DESC')
-            images = cursor.fetchall()
-            conn.close()
+            for filename in os.listdir(images_dir):
+                if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+                    image_files.append(filename)
     except Exception as e:
         error_msg = f"Error loading images: {e}"
         print(error_msg)
-        import traceback
-        traceback.print_exc()
+    
+    # Load image titles
+    image_titles_map = load_image_titles()
     
     # Get existing mappings from shopify_products table
     print_db = get_db_path('print_ordering.db')
@@ -97,12 +108,12 @@ def shopify_mapping():
     
     # Build images data with mappings
     images_data = []
-    for img in images:
-        img_title = img['title'] or img['filename']
+    for filename in sorted(image_files):
+        # Get title from image_titles.json or use filename
+        img_title = image_titles_map.get(filename, filename.replace('-', ' ').replace('_', ' ').rsplit('.', 1)[0])
         img_mappings = mappings.get(img_title, {})
         images_data.append({
-            'id': img['id'],
-            'filename': img['filename'],
+            'filename': filename,
             'title': img_title,
             'mappings': {cat: img_mappings.get(cat, '') for cat in PRODUCT_CATEGORIES}
         })
@@ -160,21 +171,13 @@ def get_all_mappings():
         rows = cursor.fetchall()
         conn.close()
         
-        # Get gallery images to map title -> filename
-        gallery_db = get_db_path('gallery_images.db')
+        # Load image titles to map title -> filename
+        image_titles_map = load_image_titles()
         
-        if not os.path.exists(gallery_db):
-            return jsonify({'success': True, 'mappings': {}})
-        
-        gallery_conn = sqlite3.connect(gallery_db)
-        gallery_conn.row_factory = sqlite3.Row
-        gallery_cursor = gallery_conn.cursor()
-        gallery_cursor.execute('SELECT filename, title FROM images')
-        gallery_rows = gallery_cursor.fetchall()
-        gallery_conn.close()
-        
-        # Build title -> filename mapping
-        title_to_filename = {row['title']: row['filename'] for row in gallery_rows if row['title']}
+        # Build reverse map: title -> filename
+        title_to_filename = {}
+        for filename, title in image_titles_map.items():
+            title_to_filename[title] = filename
         
         # Build nested structure: { filename: { category: handle, ... }, ... }
         mappings = {}
@@ -185,6 +188,13 @@ def get_all_mappings():
             
             # Get filename from title
             filename = title_to_filename.get(title)
+            if not filename:
+                # Try to find filename by matching title (fallback)
+                for fn, t in image_titles_map.items():
+                    if t == title:
+                        filename = fn
+                        break
+            
             if not filename:
                 continue  # Skip if we can't find the image file
             
