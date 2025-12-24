@@ -322,10 +322,16 @@ def sort_worksheet_by_product_name(ws) -> None:
             cell.number_format = cell_data['number_format']
 
 
-def save_excel(wb: openpyxl.Workbook, output_path: str) -> None:
-    """Save workbook to file after sorting by product name"""
-    # Sort the active worksheet A-Z by column A
-    ws = wb.active
-    sort_worksheet_by_product_name(ws)
+def save_excel(wb: openpyxl.Workbook, output_path: str, sort_rows: bool = False) -> None:
+    """Save workbook to file
+    
+    Args:
+        wb: Workbook to save
+        output_path: Path to save file
+        sort_rows: If True, sort rows A-Z by column A. WARNING: Only use BEFORE mapping is applied!
+    """
+    if sort_rows:
+        ws = wb.active
+        sort_worksheet_by_product_name(ws)
     
     wb.save(output_path)

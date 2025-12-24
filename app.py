@@ -4949,9 +4949,9 @@ def lumaprints_upload():
         # Get unmapped products
         unmapped = lm.get_unmapped_products(ws)
         
-        # Save sorted workbook
+        # Save sorted workbook (sort BEFORE mapping is applied)
         sorted_path = os.path.join('/tmp', 'lumaprints_sorted.xlsx')
-        lm.save_excel(wb, sorted_path)
+        lm.save_excel(wb, sorted_path, sort_rows=True)
         
         return jsonify({
             'success': True,
