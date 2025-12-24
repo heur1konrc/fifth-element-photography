@@ -198,6 +198,49 @@
             background: #3182ce;
         }
 
+        .save-all-container {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: white;
+            padding: 1rem 0;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .save-all-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            transition: all 0.3s;
+        }
+
+        .save-all-btn:hover:not(:disabled) {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .save-all-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .changes-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
         /* Section */
         .section {
             background: white;
@@ -441,6 +484,13 @@
                 </button>
             </div>
 
+            <div class="save-all-container">
+                <button class="save-all-btn" id="saveAllBtn" onclick="saveAllPendingChanges()" disabled>
+                    💾 Save All Changes
+                    <span class="changes-badge" id="changesBadge">0 changes</span>
+                </button>
+            </div>
+
             <!-- Category List (clickable accordions) -->
             <div style="margin-top: 2rem;">
                 {% for category in categories %}
@@ -505,7 +555,8 @@
                                                step="0.01" 
                                                min="0"
                                                id="cost-{{ product.pricing_id }}"
-                                               style="width: 90px; padding: 0.4rem 0.6rem; border: 1px solid #ddd; border-radius: 3px; text-align: right; font-weight: 600; color: #2563eb;">
+                                                oninput="trackChange({{ product.pricing_id }})"
+                                                style="width: 90px; padding: 0.4rem 0.6rem; border: 1px solid #ddd; border-radius: 3px; text-align: right; font-weight: 600; color: #2563eb;">
                                     </td>
                                     <td style="padding: 0.75rem; text-align: right; color: #059669;">
                                         {{ "%.1f"|format(product.markup_percent) }}%
@@ -518,7 +569,7 @@
                                             <input type="checkbox" 
                                                    id="available-{{ product.pricing_id }}"
                                                    {% if product.is_available %}checked{% endif %}
-                                                   onchange="this.nextElementSibling.style.backgroundColor = this.checked ? '#10b981' : '#ccc'"
+                                                   onchange="this.nextElementSibling.style.backgroundColor = this.checked ? '#10b981' : '#ccc'; trackChange({{ product.pricing_id }})"
                                                    style="opacity: 0; width: 0; height: 0;">
                                             <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: {% if product.is_available %}#10b981{% else %}#ccc{% endif %}; transition: 0.4s; border-radius: 24px;"></span>
                                             <span style="position: absolute; content: ''; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: 0.4s; border-radius: 50%; transform: translateX({% if product.is_available %}26px{% else %}0{% endif %}); pointer-events: none;"></span>
@@ -599,6 +650,68 @@
     </div>
 
     <script>
+        // Pending changes tracker
+        let pendingChanges = new Map();
+
+        function trackChange(pricingId) {
+            const costInput = document.getElementById(`cost-${pricingId}`);
+            const availableCheckbox = document.getElementById(`available-${pricingId}`);
+            
+            pendingChanges.set(pricingId, {
+                cost: parseFloat(costInput.value),
+                available: availableCheckbox.checked
+            });
+            
+            updateSaveAllButton();
+        }
+
+        function updateSaveAllButton() {
+            const btn = document.getElementById('saveAllBtn');
+            const badge = document.getElementById('changesBadge');
+            const count = pendingChanges.size;
+            
+            badge.textContent = `${count} change${count !== 1 ? 's' : ''}`;
+            btn.disabled = count === 0;
+        }
+
+        async function saveAllPendingChanges() {
+            const btn = document.getElementById('saveAllBtn');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Saving...';
+            
+            let successCount = 0;
+            let errorCount = 0;
+            
+            for (const [pricingId, data] of pendingChanges.entries()) {
+                try {
+                    const response = await fetch(`/admin/pricing/edit/${pricingId}`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                        body: `cost_price=${data.cost}&is_available=${data.available}`
+                    });
+                    
+                    const result = await response.json();
+                    if (result.success) {
+                        successCount++;
+                    } else {
+                        errorCount++;
+                    }
+                } catch (error) {
+                    errorCount++;
+                }
+            }
+            
+            showAlert(`Saved ${successCount} changes!${errorCount > 0 ? ` ${errorCount} errors.` : ''}`, successCount > 0 ? 'success' : 'error');
+            
+            if (successCount > 0) {
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                btn.innerHTML = '💾 Save All Changes <span class="changes-badge" id="changesBadge">0 changes</span>';
+                pendingChanges.clear();
+                updateSaveAllButton();
+            }
+        }
+
         // Toggle Category Accordion
         function toggleCategory(element) {
             element.classList.toggle('expanded');
