@@ -1,7 +1,8 @@
+
 """
 Fifth Element Photography - Shopify CSV Generator
 Automatically generates Shopify product CSVs with pricing from database
-Version: 1.0.0
+Version: 1.1.0
 """
 
 from flask import Blueprint, request, jsonify, send_file
@@ -109,13 +110,23 @@ def generate_shopify_csv():
             
             # Generate product handle
             handle = slugify(title)
-            
-            # Query pricing for Fine Art Paper and Canvas
+
+            # Get available frame options for 1.25" Framed Canvas
+            cursor.execute("""
+                SELECT DISTINCT fo.frame_name 
+                FROM frame_options fo
+                JOIN product_subcategories ps ON fo.subcategory_id = ps.subcategory_id
+                WHERE ps.display_name = '1.25" Framed Canvas' AND fo.is_available = TRUE
+            """)
+            frame_options_125 = [row['frame_name'] for row in cursor.fetchall()]
+
+            # Query pricing for all product types
             cursor.execute("""
                 SELECT 
                     ps.display_name as product_type,
                     pz.size_name,
-                    bp.cost_price
+                    bp.cost_price,
+                    pc.display_name as category_name
                 FROM base_pricing bp
                 JOIN product_subcategories ps ON bp.subcategory_id = ps.subcategory_id
                 JOIN product_categories pc ON ps.category_id = pc.category_id
@@ -123,12 +134,8 @@ def generate_shopify_csv():
                 JOIN aspect_ratios ar ON pz.aspect_ratio_id = ar.aspect_ratio_id
                 WHERE bp.is_available = TRUE
                 AND ar.display_name = ?
-                AND pc.display_name IN ('Canvas', 'Fine Art Paper')
                 ORDER BY 
-                    CASE pc.display_name 
-                        WHEN 'Fine Art Paper' THEN 1 
-                        WHEN 'Canvas' THEN 2 
-                    END,
+                    pc.display_name, 
                     ps.display_order, 
                     pz.width, 
                     pz.height
@@ -138,141 +145,32 @@ def generate_shopify_csv():
             
             if not pricing_data:
                 continue
-            
-            # Group by product type and map to Shopify names
-            product_types = {}
-            for row in pricing_data:
-                db_prod_type = row['product_type']
-                shopify_prod_type = map_product_type_to_shopify(db_prod_type)
-                # Skip if mapped to None (excluded product type)
-                if shopify_prod_type is None:
-                    continue
-                if shopify_prod_type not in product_types:
-                    product_types[shopify_prod_type] = []
-                product_types[shopify_prod_type].append({
-                    'size': row['size_name'].strip('"'),  # Remove quotes from size
-                    'cost': row['cost_price'],
-                    'price': round(row['cost_price'] * markup_multiplier, 2)
-                })
-            
+
             # Generate CSV rows
             first_row = True
-            for prod_type, variants in product_types.items():
-                for variant in variants:
+            for row in pricing_data:
+                db_prod_type = row['product_type']
+                size = row['size_name'].strip('\'')
+                cost = row['cost_price']
+                price = round(cost * markup_multiplier, 2)
+                category = row['category_name']
+
+                # Special handling for Framed Canvas
+                if "Framed Canvas" in db_prod_type:
+                    if db_prod_type == '1.25" Framed Canvas':
+                        for frame in frame_options_125:
+                            if first_row:
+                                csv_rows.append(get_product_row(handle, title, description, image_url, 'Framed Canvas', size, price, frame, True))
+                                first_row = False
+                            else:
+                                csv_rows.append(get_variant_row(handle, 'Framed Canvas', size, price, frame))
+                else:
                     if first_row:
-                        # First row has full product details
-                        csv_rows.append({
-                            'Handle': handle,
-                            'Title': title,
-                            'Body (HTML)': description,
-                            'Vendor': 'Lumaprints',
-                            'Product Category': 'Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork',
-                            'Type': 'Canvas Print' if 'Canvas' in prod_type else 'Art Print',
-                            'Tags': '',
-                            'Published': 'true',
-                            'Option1 Name': 'Printed Product',
-                            'Option1 Value': prod_type,
-                            'Option1 Linked To': '',
-                            'Option2 Name': 'Size',
-                            'Option2 Value': variant['size'],
-                            'Option2 Linked To': '',
-                            'Option3 Name': '',
-                            'Option3 Value': '',
-                            'Option3 Linked To': '',
-                            'Variant SKU': '',
-                            'Variant Grams': '0.0',
-                            'Variant Inventory Tracker': 'shopify',
-                            'Variant Inventory Qty': '10',
-                            'Variant Inventory Policy': 'deny',
-                            'Variant Fulfillment Service': 'manual',
-                            'Variant Price': str(variant['price']),
-                            'Variant Compare At Price': '',
-                            'Variant Requires Shipping': 'true',
-                            'Variant Taxable': 'true',
-                            'Unit Price Total Measure': '',
-                            'Unit Price Total Measure Unit': '',
-                            'Unit Price Base Measure': '',
-                            'Unit Price Base Measure Unit': '',
-                            'Variant Barcode': '',
-                            'Image Src': image_url,
-                            'Image Position': '',
-                            'Image Alt Text': '',
-                            'Gift Card': 'false',
-                            'SEO Title': '',
-                            'SEO Description': '',
-                            'Color (product.metafields.shopify.color-pattern)': '',
-                            'Frame style (product.metafields.shopify.frame-style)': 'canvas',
-                            'Material (product.metafields.shopify.material)': 'canvas' if 'Canvas' in prod_type else '',
-                            'Plant characteristics (product.metafields.shopify.plant-characteristics)': '',
-                            'Plant class (product.metafields.shopify.plant-class)': '',
-                            'Plant name (product.metafields.shopify.plant-name)': '',
-                            'Suitable space (product.metafields.shopify.suitable-space)': '',
-                            'Sunlight (product.metafields.shopify.sunlight)': '',
-                            'Theme (product.metafields.shopify.theme)': '',
-                            'Variant Image': '',
-                            'Variant Weight Unit': 'lb',
-                            'Variant Tax Code': '',
-                            'Cost per item': '',
-                            'Status': 'active'
-                        })
+                        csv_rows.append(get_product_row(handle, title, description, image_url, category, size, price, None, True))
                         first_row = False
                     else:
-                        # Subsequent rows only have variant details
-                        csv_rows.append({
-                            'Handle': handle,
-                            'Title': '',
-                            'Body (HTML)': '',
-                            'Vendor': '',
-                            'Product Category': '',
-                            'Type': '',
-                            'Tags': '',
-                            'Published': '',
-                            'Option1 Name': '',
-                            'Option1 Value': prod_type,
-                            'Option1 Linked To': '',
-                            'Option2 Name': '',
-                            'Option2 Value': variant['size'],
-                            'Option2 Linked To': '',
-                            'Option3 Name': '',
-                            'Option3 Value': '',
-                            'Option3 Linked To': '',
-                            'Variant SKU': '',
-                            'Variant Grams': '0.0',
-                            'Variant Inventory Tracker': 'shopify',
-                            'Variant Inventory Qty': '10',
-                            'Variant Inventory Policy': 'deny',
-                            'Variant Fulfillment Service': 'manual',
-                            'Variant Price': str(variant['price']),
-                            'Variant Compare At Price': '',
-                            'Variant Requires Shipping': 'true',
-                            'Variant Taxable': 'true',
-                            'Unit Price Total Measure': '',
-                            'Unit Price Total Measure Unit': '',
-                            'Unit Price Base Measure': '',
-                            'Unit Price Base Measure Unit': '',
-                            'Variant Barcode': '',
-                            'Image Src': '',
-                            'Image Position': '',
-                            'Image Alt Text': '',
-                            'Gift Card': '',
-                            'SEO Title': '',
-                            'SEO Description': '',
-                            'Color (product.metafields.shopify.color-pattern)': '',
-                            'Frame style (product.metafields.shopify.frame-style)': 'canvas',
-                            'Material (product.metafields.shopify.material)': '',
-                            'Plant characteristics (product.metafields.shopify.plant-characteristics)': '',
-                            'Plant class (product.metafields.shopify.plant-class)': '',
-                            'Plant name (product.metafields.shopify.plant-name)': '',
-                            'Suitable space (product.metafields.shopify.suitable-space)': '',
-                            'Sunlight (product.metafields.shopify.sunlight)': '',
-                            'Theme (product.metafields.shopify.theme)': '',
-                            'Variant Image': '',
-                            'Variant Weight Unit': 'lb',
-                            'Variant Tax Code': '',
-                            'Cost per item': '',
-                            'Status': ''
-                        })
-        
+                        csv_rows.append(get_variant_row(handle, category, size, price, None))
+
         conn.close()
         
         if not csv_rows:
@@ -304,3 +202,73 @@ def generate_shopify_csv():
         
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+def get_product_row(handle, title, description, image_url, prod_type, size, price, frame, is_first):
+    row = {
+        'Handle': handle,
+        'Title': title,
+        'Body (HTML)': description,
+        'Vendor': 'Lumaprints',
+        'Product Category': 'Home & Garden > Decor > Artwork > Posters, Prints, & Visual Artwork',
+        'Type': prod_type,
+        'Tags': '',
+        'Published': 'true',
+        'Option1 Name': 'Size',
+        'Option1 Value': size,
+        'Option2 Name': 'Frame' if frame else '',
+        'Option2 Value': frame if frame else '',
+        'Option3 Name': '',
+        'Option3 Value': '',
+        'Variant SKU': '',
+        'Variant Grams': '0.0',
+        'Variant Inventory Tracker': 'shopify',
+        'Variant Inventory Qty': '10',
+        'Variant Inventory Policy': 'deny',
+        'Variant Fulfillment Service': 'manual',
+        'Variant Price': str(price),
+        'Variant Compare At Price': '',
+        'Variant Requires Shipping': 'true',
+        'Variant Taxable': 'true',
+        'Variant Barcode': '',
+        'Image Src': image_url,
+        'Image Position': '1' if is_first else '',
+        'Image Alt Text': title if is_first else '',
+        'Gift Card': 'false',
+        'Status': 'active'
+    }
+    return row
+
+def get_variant_row(handle, prod_type, size, price, frame):
+    row = {
+        'Handle': handle,
+        'Title': '',
+        'Body (HTML)': '',
+        'Vendor': '',
+        'Product Category': '',
+        'Type': '',
+        'Tags': '',
+        'Published': '',
+        'Option1 Name': '',
+        'Option1 Value': size,
+        'Option2 Name': '',
+        'Option2 Value': frame if frame else '',
+        'Option3 Name': '',
+        'Option3 Value': '',
+        'Variant SKU': '',
+        'Variant Grams': '0.0',
+        'Variant Inventory Tracker': 'shopify',
+        'Variant Inventory Qty': '10',
+        'Variant Inventory Policy': 'deny',
+        'Variant Fulfillment Service': 'manual',
+        'Variant Price': str(price),
+        'Variant Compare At Price': '',
+        'Variant Requires Shipping': 'true',
+        'Variant Taxable': 'true',
+        'Variant Barcode': '',
+        'Image Src': '',
+        'Image Position': '',
+        'Image Alt Text': '',
+        'Gift Card': 'false',
+        'Status': 'active'
+    }
+    return row

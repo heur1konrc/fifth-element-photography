@@ -442,6 +442,7 @@
                 <input type="number" id="globalMarkupInput" placeholder="123.0" step="0.1" min="0">
                 <span style="font-size: 1.2rem; font-weight: bold;">%</span>
                 <button onclick="applyGlobalMarkup()">💾 Update</button>
+                <button onclick="syncPricesToShopify()" style="background: #28a745;">🔄 Sync to Shopify</button>
                 <span class="current-markup">Current multiplier: <span id="currentMultiplier">{{ current_multiplier or '1.00' }}x</span></span>
             </div>
         </div>
@@ -801,6 +802,36 @@
                 }
             } catch (error) {
                 showAlert('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Sync Prices to Shopify
+        async function syncPricesToShopify() {
+            if (!confirm('This will update ALL product prices in Shopify based on the current database pricing and global markup. This may take several minutes. Continue?')) {
+                return;
+            }
+
+            showAlert('Syncing prices to Shopify... This may take a few minutes. Please wait.', 'success');
+
+            try {
+                const response = await fetch('/api/shopify/sync-prices', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`✅ Success! Updated ${data.products_updated} products (${data.variants_updated} variants) in ${data.duration_minutes} minutes`, 'success');
+                    if (data.errors && data.errors.length > 0) {
+                        console.log('Sync errors:', data.errors);
+                        showAlert(`⚠️ ${data.errors.length} errors occurred. Check console for details.`, 'error');
+                    }
+                } else {
+                    showAlert('❌ ' + (data.error || 'Failed to sync prices'), 'error');
+                }
+            } catch (error) {
+                showAlert('❌ Error: ' + error.message, 'error');
             }
         }
 
