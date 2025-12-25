@@ -350,6 +350,9 @@
                                         <button class="panel-btn btn-replace" onclick="openReplaceImageModal('{{ image.filename }}')" title="Replace Image">
                                             <i class="fas fa-exchange-alt"></i>
                                         </button>
+                                        <button class="panel-btn btn-regenerate" onclick="regenerateGalleryImage('{{ image.filename }}')" title="Force Regenerate Gallery Image" style="background: #ff9800;">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
                                         <button class="panel-btn btn-download" onclick="downloadImage('{{ image.filename }}')" title="Download">
                                             <i class="fas fa-download"></i>
                                         </button>
@@ -889,6 +892,7 @@
     <script src="{{ url_for('static', filename='js/shopify_tab.js') }}"></script>
     <script src="{{ url_for('static', filename='js/image_sort_filter.js') }}"></script>
     <script src="{{ url_for('static', filename='js/selector_modals.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/regenerate_gallery.js') }}"></script>
     <script>
         function toggleCollapsible(header) {
             const content = header.nextElementSibling;

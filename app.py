@@ -52,6 +52,7 @@ from routes.remove_foam_invalid_sizes import remove_foam_invalid_bp
 from routes.debug_foam_sizes import debug_foam_bp
 from routes.migrate_shopify_products_category import migrate_category_bp
 from routes.disable_sizes import disable_sizes_bp
+from routes.regenerate_gallery_image import register_regenerate_gallery_image_route
 app.register_blueprint(pricing_admin_bp)
 app.register_blueprint(setup_pricing_bp)
 app.register_blueprint(shopify_admin_bp)
@@ -72,6 +73,9 @@ app.register_blueprint(remove_foam_invalid_bp)
 app.register_blueprint(debug_foam_bp)
 app.register_blueprint(migrate_category_bp)
 app.register_blueprint(disable_sizes_bp)
+
+# Register regenerate gallery image route
+register_regenerate_gallery_image_route(app, require_admin_auth, IMAGES_FOLDER)
 
 # Initialize database if it doesn't exist
 def ensure_database_exists():
@@ -1109,11 +1113,19 @@ def get_gallery_image(filename):
     try:
         from PIL import Image
         import io
+        from flask import make_response
+        import os.path
         
         # Check if gallery image already exists
         gallery_path = os.path.join('/data/gallery-images', filename)
         if os.path.exists(gallery_path):
-            return send_file(gallery_path)
+            # Get file modification time for cache busting
+            mtime = os.path.getmtime(gallery_path)
+            response = make_response(send_file(gallery_path))
+            response.headers['Cache-Control'] = 'public, max-age=300'  # 5 minute cache
+            response.headers['Last-Modified'] = str(int(mtime))
+            response.headers['ETag'] = f'"{filename}-{int(mtime)}"'
+            return response
         
         # Create gallery-images directory if it doesn't exist
         os.makedirs('/data/gallery-images', exist_ok=True)
@@ -1146,7 +1158,13 @@ def get_gallery_image(filename):
             # Save gallery image with good quality
             img.save(gallery_path, 'JPEG', quality=90, optimize=True)
             
-            return send_file(gallery_path)
+            # Return with cache headers
+            mtime = os.path.getmtime(gallery_path)
+            response = make_response(send_file(gallery_path))
+            response.headers['Cache-Control'] = 'public, max-age=300'  # 5 minute cache
+            response.headers['Last-Modified'] = str(int(mtime))
+            response.headers['ETag'] = f'"{filename}-{int(mtime)}"'
+            return response
             
     except Exception as e:
         # Fallback to original image if gallery image generation fails
@@ -2412,8 +2430,10 @@ def replace_image():
             # Regenerate gallery-optimized image
             try:
                 from PIL import Image
+                print(f"[REPLACE] Starting gallery image regeneration for {original_filename}")
                 os.makedirs('/data/gallery-images', exist_ok=True)
                 gallery_path = os.path.join('/data/gallery-images', original_filename)
+                print(f"[REPLACE] Gallery path: {gallery_path}")
                 
                 with Image.open(original_filepath) as img:
                     if img.mode in ('RGBA', 'P'):
@@ -2421,6 +2441,7 @@ def replace_image():
                     
                     orig_width, orig_height = img.size
                     max_dimension = 1200
+                    print(f"[REPLACE] Original dimensions: {orig_width}x{orig_height}")
                     
                     if orig_width > orig_height:
                         new_width = max_dimension
@@ -2429,11 +2450,14 @@ def replace_image():
                         new_height = max_dimension
                         new_width = int((max_dimension / orig_height) * orig_width)
                     
+                    print(f"[REPLACE] Resizing to: {new_width}x{new_height}")
                     img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
                     img.save(gallery_path, 'JPEG', quality=90, optimize=True)
-                    print(f"Regenerated gallery image for {original_filename}")
+                    print(f"[REPLACE] ✓ Successfully regenerated gallery image for {original_filename} at {gallery_path}")
             except Exception as gallery_error:
-                print(f"Warning: Failed to regenerate gallery image for {original_filename}: {gallery_error}")
+                print(f"[REPLACE] ✗ Failed to regenerate gallery image for {original_filename}: {gallery_error}")
+                import traceback
+                traceback.print_exc()
             
             # Update EXIF data in database
             try:
