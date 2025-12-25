@@ -176,11 +176,17 @@ def sync_shopify_prices():
             product_updated = False
             for variant in product.get('variants', []):
                 variant_id = variant.get('id')
-                option1 = variant.get('option1')  # Product type
-                option2 = variant.get('option2')  # Size
+                option1_raw = variant.get('option1')  # Product type
+                option2_raw = variant.get('option2')  # Size
                 
-                if not option1 or not option2:
+                if not option1_raw or not option2_raw:
                     continue
+                
+                # Strip prefixes from Shopify option values
+                # e.g., "Printed Product - 0.75 Stretched Canvas" -> "0.75 Stretched Canvas"
+                # e.g., "Size - 8×12" -> "8×12"
+                option1 = option1_raw.replace('Printed Product - ', '').strip()
+                option2 = option2_raw.replace('Size - ', '').strip()
                 
                 # Find matching price in database
                 matching_price = None
@@ -190,7 +196,7 @@ def sync_shopify_prices():
                     if shopify_prod_type is None:
                         shopify_prod_type = db_prod_type
                     
-                    db_size = price_row['size_name'].strip('"')
+                    db_size = price_row['size_name'].strip('"').strip()
                     
                     if shopify_prod_type == option1 and db_size == option2:
                         matching_price = round(price_row['cost_price'] * markup_multiplier, 2)
