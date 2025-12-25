@@ -69,9 +69,19 @@ def register_regenerate_gallery_image_route(app, require_admin_auth, IMAGES_FOLD
             if os.path.exists(gallery_path):
                 file_size = os.path.getsize(gallery_path)
                 print(f"[REGENERATE] ✓ Gallery image verified: {file_size} bytes")
+                
+                # Also regenerate thumbnail
+                try:
+                    from thumbnail_helper import generate_thumbnail_for_image
+                    print(f"[REGENERATE] Force regenerating thumbnail for {filename}")
+                    generate_thumbnail_for_image(filename, images_folder=IMAGES_FOLDER, force=True)
+                    print(f"[REGENERATE] ✓ Thumbnail regenerated successfully")
+                except Exception as thumb_error:
+                    print(f"[REGENERATE] ✗ Failed to regenerate thumbnail: {thumb_error}")
+                
                 return jsonify({
                     'success': True,
-                    'message': f'Gallery image regenerated successfully for {filename}',
+                    'message': f'Gallery image and thumbnail regenerated successfully for {filename}',
                     'gallery_path': gallery_path,
                     'file_size': file_size
                 })

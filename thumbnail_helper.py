@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-def generate_thumbnail_for_image(filename, images_folder='/data', thumbnails_folder=None, thumb_width=600, thumb_quality=95):
+def generate_thumbnail_for_image(filename, images_folder='/data', thumbnails_folder=None, thumb_width=600, thumb_quality=95, force=False):
     """
     Generate a thumbnail for a given image file
     
@@ -11,6 +11,7 @@ def generate_thumbnail_for_image(filename, images_folder='/data', thumbnails_fol
         thumbnails_folder: Path to thumbnails directory (default: static/thumbnails relative to script)
         thumb_width: Width of thumbnail in pixels (default: 600)
         thumb_quality: JPEG quality 0-100 (default: 95)
+        force: If True, regenerate even if thumbnail already exists (default: False)
     
     Returns:
         Path to generated thumbnail or None if failed
@@ -33,10 +34,15 @@ def generate_thumbnail_for_image(filename, images_folder='/data', thumbnails_fol
         print(f"Error: Input image not found: {input_path}")
         return None
     
-    # Check if thumbnail already exists
-    if os.path.exists(output_path):
+    # Check if thumbnail already exists (skip if force=True)
+    if os.path.exists(output_path) and not force:
         print(f"Thumbnail already exists: {thumb_filename}")
         return output_path
+    
+    # Delete existing thumbnail if force regeneration
+    if force and os.path.exists(output_path):
+        os.remove(output_path)
+        print(f"Deleted existing thumbnail for force regeneration: {thumb_filename}")
     
     try:
         # Generate thumbnail using ImageMagick

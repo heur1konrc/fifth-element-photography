@@ -2421,11 +2421,13 @@ def replace_image():
             # Save new file with the same filename (overwrites original)
             file.save(original_filepath)
             
-            # Regenerate thumbnail
+            # Regenerate thumbnail (force=True to overwrite existing)
             try:
-                generate_thumbnail_for_image(original_filename)
+                print(f"[REPLACE] Force regenerating thumbnail for {original_filename}")
+                generate_thumbnail_for_image(original_filename, force=True)
+                print(f"[REPLACE] ✓ Thumbnail regenerated successfully")
             except Exception as thumb_error:
-                print(f"Warning: Failed to generate thumbnail for {original_filename}: {thumb_error}")
+                print(f"[REPLACE] ✗ Failed to generate thumbnail for {original_filename}: {thumb_error}")
             
             # Regenerate gallery-optimized image
             try:
