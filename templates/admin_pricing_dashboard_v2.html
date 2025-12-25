@@ -356,6 +356,125 @@
             border-left: 4px solid #f56565;
         }
 
+        /* Progress Monitor */
+        .progress-monitor {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            min-width: 400px;
+            max-width: 600px;
+            z-index: 2000;
+            display: none;
+        }
+
+        .progress-monitor.active {
+            display: block;
+        }
+
+        .progress-monitor h3 {
+            margin-bottom: 1rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-monitor .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 30px;
+            background: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .progress-status {
+            color: #666;
+            font-size: 0.95rem;
+            margin: 0.5rem 0;
+        }
+
+        .progress-time {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .progress-results {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .progress-results h4 {
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .progress-results .result-item {
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .progress-results .result-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .progress-results .result-warning {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .progress-close-btn {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.75rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .progress-close-btn:hover {
+            background: #5568d3;
+        }
+
         /* Category Accordion */
         .category-card {
             padding: 1rem;
@@ -811,28 +930,93 @@
                 return;
             }
 
-            showAlert('Syncing prices to Shopify... This may take a few minutes. Please wait.', 'success');
+            // Show progress monitor
+            const monitor = document.getElementById('progressMonitor');
+            const progressBar = document.getElementById('progressBar');
+            const progressStatus = document.getElementById('progressStatus');
+            const progressTime = document.getElementById('progressTime');
+            const progressResults = document.getElementById('progressResults');
+            const progressResultsContent = document.getElementById('progressResultsContent');
+            const progressSpinner = document.getElementById('progressSpinner');
+            
+            monitor.classList.add('active');
+            progressResults.style.display = 'none';
+            progressSpinner.style.display = 'block';
+            
+            const startTime = Date.now();
+            let timeInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                progressTime.textContent = `Time elapsed: ${elapsed}s`;
+            }, 1000);
 
             try {
+                progressStatus.textContent = 'Connecting to Shopify...';
+                progressBar.style.width = '10%';
+                progressBar.textContent = '10%';
+
                 const response = await fetch('/api/shopify/sync-prices', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'}
                 });
 
+                progressStatus.textContent = 'Processing response...';
+                progressBar.style.width = '90%';
+                progressBar.textContent = '90%';
+
                 const data = await response.json();
                 
+                clearInterval(timeInterval);
+                progressSpinner.style.display = 'none';
+                progressBar.style.width = '100%';
+                progressBar.textContent = '100%';
+                
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                progressTime.textContent = `Completed in ${elapsed}s`;
+                
                 if (data.success) {
-                    showAlert(`✅ Success! Updated ${data.products_updated} products (${data.variants_updated} variants) in ${data.duration_minutes} minutes`, 'success');
+                    progressStatus.textContent = '✅ Sync completed successfully!';
+                    
+                    let resultsHTML = `
+                        <div class="result-item result-success">
+                            ✅ Updated ${data.products_updated} products (${data.variants_updated} variants)
+                        </div>
+                    `;
+                    
                     if (data.errors && data.errors.length > 0) {
                         console.log('Sync errors:', data.errors);
-                        showAlert(`⚠️ ${data.errors.length} errors occurred. Check console for details.`, 'error');
+                        resultsHTML += `
+                            <div class="result-item result-warning">
+                                ⚠️ ${data.errors.length} variants could not be matched (likely unavailable products)
+                            </div>
+                        `;
                     }
+                    
+                    progressResultsContent.innerHTML = resultsHTML;
+                    progressResults.style.display = 'block';
                 } else {
-                    showAlert('❌ ' + (data.error || 'Failed to sync prices'), 'error');
+                    progressStatus.textContent = '❌ Sync failed';
+                    progressResultsContent.innerHTML = `
+                        <div class="result-item result-warning">
+                            ❌ Error: ${data.error || 'Unknown error occurred'}
+                        </div>
+                    `;
+                    progressResults.style.display = 'block';
                 }
             } catch (error) {
-                showAlert('❌ Error: ' + error.message, 'error');
+                clearInterval(timeInterval);
+                progressSpinner.style.display = 'none';
+                progressStatus.textContent = '❌ Connection error';
+                progressResultsContent.innerHTML = `
+                    <div class="result-item result-warning">
+                        ❌ Error: ${error.message}
+                    </div>
+                `;
+                progressResults.style.display = 'block';
             }
+        }
+
+        function closeProgressMonitor() {
+            document.getElementById('progressMonitor').classList.remove('active');
         }
 
         // Show/Hide Modals
@@ -978,6 +1162,24 @@
         });
     </script>
     
+    <!-- Progress Monitor -->
+    <div id="progressMonitor" class="progress-monitor">
+        <h3>
+            <div class="spinner" id="progressSpinner"></div>
+            <span id="progressTitle">Syncing Prices to Shopify</span>
+        </h3>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
+        </div>
+        <div class="progress-status" id="progressStatus">Initializing...</div>
+        <div class="progress-time" id="progressTime">Time elapsed: 0s</div>
+        <div class="progress-results" id="progressResults" style="display: none;">
+            <h4>Results:</h4>
+            <div id="progressResultsContent"></div>
+            <button class="progress-close-btn" onclick="closeProgressMonitor()">Close</button>
+        </div>
+    </div>
+
     <!-- Template identifier -->
     <div style="position: fixed; bottom: 0; right: 0; background: rgba(0,0,0,0.7); color: white; padding: 4px 12px; font-size: 11px; font-family: monospace; z-index: 9999; border-top-left-radius: 4px;">
         admin_pricing_dashboard_v2.html
