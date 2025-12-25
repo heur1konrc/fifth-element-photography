@@ -17,16 +17,16 @@ def generate_thumbnail_for_image(filename, images_folder='/data', thumbnails_fol
         Path to generated thumbnail or None if failed
     """
     if thumbnails_folder is None:
-        # Default to static/thumbnails relative to this script's directory
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        thumbnails_folder = os.path.join(script_dir, 'static', 'thumbnails')
+        # Default to /data/thumbnails to match the /thumbnail/<filename> route
+        thumbnails_folder = '/data/thumbnails'
     
     # Ensure thumbnails directory exists
     os.makedirs(thumbnails_folder, exist_ok=True)
     
     # Paths
     input_path = os.path.join(images_folder, filename)
-    thumb_filename = f"thumb_{filename}"
+    # No thumb_ prefix - admin route expects /thumbnail/PineCone.jpg not /thumbnail/thumb_PineCone.jpg
+    thumb_filename = filename
     output_path = os.path.join(thumbnails_folder, thumb_filename)
     
     # Check if input exists
