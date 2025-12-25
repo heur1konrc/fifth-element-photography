@@ -74,9 +74,6 @@ app.register_blueprint(debug_foam_bp)
 app.register_blueprint(migrate_category_bp)
 app.register_blueprint(disable_sizes_bp)
 
-# Register regenerate gallery image route
-register_regenerate_gallery_image_route(app, require_admin_auth, IMAGES_FOLDER)
-
 # Initialize database if it doesn't exist
 def ensure_database_exists():
     """Ensure the database exists and has the required schema"""
@@ -340,6 +337,9 @@ STATIC_FOLDER = 'static'
 CATEGORIES_FILE = '/data/categories.json'
 FEATURED_FILE = '/data/featured.json'
 ABOUT_FILE = '/data/about.json'
+
+# Register regenerate gallery image route (must be after require_admin_auth is defined)
+register_regenerate_gallery_image_route(app, require_admin_auth, IMAGES_FOLDER)
 
 # Lumaprints configuration
 ORDERS_FILE = '/data/lumaprints_orders.json'
