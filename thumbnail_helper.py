@@ -1,9 +1,9 @@
 import os
-import subprocess
+from PIL import Image
 
 def generate_thumbnail_for_image(filename, images_folder='/data', thumbnails_folder=None, thumb_width=600, thumb_quality=95, force=False):
     """
-    Generate a thumbnail for a given image file
+    Generate a thumbnail for a given image file using PIL/Pillow
     
     Args:
         filename: Name of the image file
@@ -45,22 +45,30 @@ def generate_thumbnail_for_image(filename, images_folder='/data', thumbnails_fol
         print(f"Deleted existing thumbnail for force regeneration: {thumb_filename}")
     
     try:
-        # Generate thumbnail using ImageMagick
-        cmd = [
-            'convert',
-            input_path,
-            '-resize', f'{thumb_width}x',
-            '-quality', str(thumb_quality),
-            output_path
-        ]
-        
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        print(f"Generated thumbnail: {thumb_filename}")
+        # Open and process image with PIL
+        with Image.open(input_path) as img:
+            # Convert RGBA/P to RGB for JPEG compatibility
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+            
+            # Get original dimensions
+            orig_width, orig_height = img.size
+            
+            # Calculate new height maintaining aspect ratio
+            new_width = thumb_width
+            new_height = int((thumb_width / orig_width) * orig_height)
+            
+            # Resize with high quality LANCZOS resampling
+            img_resized = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Save thumbnail
+            img_resized.save(output_path, 'JPEG', quality=thumb_quality, optimize=True)
+            
+        print(f"Generated thumbnail: {thumb_filename} ({new_width}x{new_height})")
         return output_path
         
-    except subprocess.CalledProcessError as e:
-        print(f"Error generating thumbnail for {filename}: {e.stderr}")
-        return None
     except Exception as e:
-        print(f"Unexpected error generating thumbnail for {filename}: {e}")
+        print(f"Error generating thumbnail for {filename}: {e}")
+        import traceback
+        traceback.print_exc()
         return None
