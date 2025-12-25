@@ -24,29 +24,16 @@ def get_db_connection():
     return conn
 
 def map_product_type_to_shopify(db_product_type):
-    """Map database product type names to Shopify product type names (matches shopify_api_creator.py)"""
+    """Map database product type names to Shopify-friendly names (copied from shopify_api_creator)"""
     mapping = {
-        # Fine Art Paper
         'Hot Press Fine Art Paper': 'Hot Press (recommended for photos)',
         'Cold Press Fine Art Paper': 'Cold Press',
         'Semi-Glossy Fine Art Paper': 'Semi-glossy',
         'Glossy Fine Art Paper': 'Glossy',
-        # Canvas
-        '0.75" Stretched Canvas': '0.75 Stretched Canvas',
-        '1.25" Stretched Canvas': '1.25 Stretched Canvas',
-        '1.50" Stretched Canvas': '1.50 Stretched Canvas',
-        # Framed Canvas
-        '0.75" Framed Canvas': '0.75 Framed Canvas',
-        '1.25" Framed Canvas': '1.25 Framed Canvas',
-        '1.50" Framed Canvas': '1.50 Framed Canvas',
-        # Foam-mounted
         'Foam-mounted Hot Press': 'Foam-mounted Hot Press',
         'Foam-mounted Cold Press': 'Foam-mounted Cold Press',
         'Foam-mounted Semi-Glossy': 'Foam-mounted Semi-Glossy',
         'Foam-mounted Glossy': 'Foam-mounted Glossy',
-        # Metal
-        'Glossy White Metal': 'Glossy White Metal Print',
-        'Glossy Silver Metal': 'Glossy Silver Metal Print'
     }
     return mapping.get(db_product_type, db_product_type)
 
