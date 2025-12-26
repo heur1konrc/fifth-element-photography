@@ -54,7 +54,7 @@ from routes.migrate_shopify_products_category import migrate_category_bp
 from routes.disable_sizes import disable_sizes_bp
 from routes.regenerate_gallery_image import register_regenerate_gallery_image_route
 from routes.watermark_routes import watermark_bp
-from routes.download_images import download_images_bp
+from routes.download_images import download_bp as download_images_bp
 app.register_blueprint(pricing_admin_bp)
 app.register_blueprint(setup_pricing_bp)
 app.register_blueprint(shopify_admin_bp)
