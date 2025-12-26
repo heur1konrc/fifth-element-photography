@@ -28,9 +28,9 @@ This manual documents the complete process for managing products in the Fifth El
 
 | Tool | Purpose | Location |
 |------|---------|----------|
-| **Create Shopify Products** | Generate Shopify product CSV from your images and pricing database | Admin Dashboard → Tools Tab |
-| **Lumaprints Bulk Mapping** | Map gallery images to Lumaprints products in bulk | Admin Dashboard → Lumaprints Tab |
-| **Shopify Price Sync** | Synchronize prices from local database to live Shopify store | Admin Dashboard → Pricing Tab |
+| **Create Shopify Products** | Generate Shopify product CSV from your images and pricing database | Admin Dashboard → Shopify Tab |
+| **Lumaprints Bulk Mapping** | Map gallery images to Lumaprints products in bulk | Admin Dashboard → Shopify Tab (or Tools Tab) |
+| **Shopify Price Sync** | Synchronize prices from local database to live Shopify store | Admin Dashboard → Shopify Tab |
 
 ### Why Three Tools?
 
@@ -129,7 +129,7 @@ STEP 3: SYNC PRICES (WHEN NEEDED)
 This tool generates a Shopify-compatible CSV file containing all product variants for your selected images. It reads from your pricing database to determine available sizes, frame options, and prices.
 
 ### Location
-**Admin Dashboard → Tools Tab → "Create Shopify Products" button**
+**Admin Dashboard → Shopify Tab → "Create Shopify Products" button**
 
 ---
 
@@ -149,9 +149,9 @@ Before creating products, ensure your images are properly configured:
 #### Step 2: Access the Tool
 
 1. Navigate to **Admin Dashboard**
-2. Click the **Tools** tab in the main navigation
-3. Find the **"Create Shopify Products"** section
-4. Click the **"Create Products"** button
+2. Click the **Shopify** tab in the main navigation
+3. In the left sidebar, find **"Shopify Actions"** section
+4. Click the **"Create Shopify Products"** button
 
 #### Step 3: Select Images
 
@@ -346,7 +346,7 @@ Images must meet these requirements to be included:
 This tool automates the process of linking your gallery images to Lumaprints products for print fulfillment. Instead of manually mapping each product variation (Canvas 8x10, Canvas 11x14, Art Paper 8x10, etc.), you map once per image title, and the tool applies it to all variations automatically.
 
 ### Location
-**Admin Dashboard → Lumaprints Tab → "Bulk Mapping Tool" button**
+**Admin Dashboard → Shopify Tab → "Lumaprints Bulk Mapping" button** (also available in Tools Tab)
 
 ---
 
@@ -382,9 +382,9 @@ Manually mapping each one is tedious and error-prone.
 #### Step 2: Open the Bulk Mapping Tool
 
 1. Navigate to **Admin Dashboard**
-2. Click the **Lumaprints** tab
-3. Find the **"Bulk Mapping Tool"** section
-4. Click **"Open Bulk Mapping Tool"** button
+2. Click the **Shopify** tab (or **Tools** tab)
+3. In the left sidebar, find **"Shopify Actions"** section
+4. Click **"Lumaprints Bulk Mapping"** button
 
 A modal window will open with three steps.
 
@@ -577,7 +577,7 @@ Keep a simple text file listing which images map to which product titles. Helpfu
 This tool synchronizes product prices from your local pricing database to your live Shopify store. Use it when you update cost prices or adjust your global markup percentage.
 
 ### Location
-**Admin Dashboard → Pricing Tab → "🔄 Sync to Shopify" button**
+**Admin Dashboard → Shopify Tab → "Sync Prices to Shopify" button**
 
 ---
 
@@ -638,7 +638,7 @@ Before syncing, ensure your local pricing database is correct:
 
 #### Step 2: Initiate the Sync
 
-1. On the **Pricing Tab**, locate the **"🔄 Sync to Shopify"** button
+1. On the **Shopify Tab**, in the left sidebar under **"Shopify Actions"**, locate the **"Sync Prices to Shopify"** button
 2. Click the button
 3. A confirmation dialog appears:
    ```
@@ -1163,9 +1163,9 @@ railway up
 
 | Tool | Navigation Path |
 |------|----------------|
-| Create Shopify Products | Admin Dashboard → Tools Tab → "Create Products" |
-| Lumaprints Bulk Mapping | Admin Dashboard → Lumaprints Tab → "Bulk Mapping Tool" |
-| Shopify Price Sync | Admin Dashboard → Pricing Tab → "🔄 Sync to Shopify" |
+| Create Shopify Products | Admin Dashboard → Shopify Tab → "Create Shopify Products" |
+| Lumaprints Bulk Mapping | Admin Dashboard → Shopify Tab → "Lumaprints Bulk Mapping" |
+| Shopify Price Sync | Admin Dashboard → Shopify Tab → "Sync Prices to Shopify" |
 
 ---
 
