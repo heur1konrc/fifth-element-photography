@@ -70,6 +70,31 @@ def apply_watermark_route():
         print(f"Error in watermark route: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@watermark_bp.route('/api/watermark/debug', methods=['GET'])
+def debug_watermark_route():
+    """Debug endpoint to check paths"""
+    import os
+    from flask import current_app
+    
+    images_folder = current_app.config.get('IMAGES_FOLDER', '/data')
+    
+    # Check watermarks
+    wm_dir_prod = '/data/watermarks'
+    wm_dir_local = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'watermarks')
+    
+    debug_info = {
+        'images_folder': images_folder,
+        'images_folder_exists': os.path.exists(images_folder),
+        'wm_dir_prod': wm_dir_prod,
+        'wm_dir_prod_exists': os.path.exists(wm_dir_prod),
+        'wm_dir_local': wm_dir_local,
+        'wm_dir_local_exists': os.path.exists(wm_dir_local),
+        'wm_files_prod': os.listdir(wm_dir_prod) if os.path.exists(wm_dir_prod) else [],
+        'wm_files_local': os.listdir(wm_dir_local) if os.path.exists(wm_dir_local) else []
+    }
+    
+    return jsonify(debug_info)
+
 @watermark_bp.route('/api/watermark/remove', methods=['POST'])
 def remove_watermark_route():
     """Remove watermark (by regenerating from original)"""

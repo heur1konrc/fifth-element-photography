@@ -45,9 +45,16 @@ def apply_watermark(image_path, output_path=None, position='bottom-right', size=
     if output_path is None:
         output_path = image_path
         
+    print(f"DEBUG: Applying watermark to {image_path}")
+    
     try:
         # Open base image
+        if not os.path.exists(image_path):
+            print(f"DEBUG: Source image not found at {image_path}")
+            return False
+            
         base_image = Image.open(image_path).convert('RGBA')
+        print(f"DEBUG: Opened source image. Size: {base_image.size}")
         width, height = base_image.size
         
         # Determine watermark size
@@ -68,11 +75,14 @@ def apply_watermark(image_path, output_path=None, position='bottom-right', size=
             wm_color = 'black'
             
         wm_path = get_watermark_path(wm_color)
+        print(f"DEBUG: Using watermark file: {wm_path}")
+        
         if not wm_path:
             print(f"Watermark file not found for color {wm_color}")
             return False
             
         wm_img = Image.open(wm_path).convert('RGBA')
+        print(f"DEBUG: Opened watermark. Size: {wm_img.size}")
         wm_aspect = wm_img.height / wm_img.width
         target_wm_height = int(target_wm_width * wm_aspect)
         
@@ -124,12 +134,14 @@ def apply_watermark(image_path, output_path=None, position='bottom-right', size=
         base_image.paste(wm_resized, (x, y), wm_resized)
         
         # Save result (convert back to RGB for JPEG)
+        print(f"DEBUG: Saving to {output_path}")
         if output_path.lower().endswith(('.jpg', '.jpeg')):
             base_image = base_image.convert('RGB')
             base_image.save(output_path, quality=95)
         else:
             base_image.save(output_path)
             
+        print("DEBUG: Save successful")
         return True
         
     except Exception as e:
