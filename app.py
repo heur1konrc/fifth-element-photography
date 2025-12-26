@@ -5315,6 +5315,12 @@ def image_size_report_page():
     return render_template('image_size_report.html')
 
 
+@app.route('/data/gallery-images/<path:filename>')
+def serve_gallery_image(filename):
+    """Serve watermarked gallery images"""
+    return send_from_directory('/data/gallery-images', filename)
+
+
 @app.route('/api/generate-gallery-images', methods=['POST'])
 @require_admin_auth
 def generate_gallery_images():
