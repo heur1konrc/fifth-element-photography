@@ -353,6 +353,9 @@
                                         <button class="panel-btn btn-regenerate" onclick="regenerateGalleryImage('{{ image.filename }}')" title="Force Regenerate Gallery Image" style="background: #ff9800;">
                                             <i class="fas fa-sync-alt"></i>
                                         </button>
+                                        <button class="panel-btn btn-watermark" onclick="openWatermarkModal('{{ image.filename }}')" title="Watermark Tool" style="background: #9c27b0;">
+                                            <i class="fas fa-stamp"></i>
+                                        </button>
                                         <button class="panel-btn btn-download" onclick="downloadImage('{{ image.filename }}')" title="Download">
                                             <i class="fas fa-download"></i>
                                         </button>
@@ -998,6 +1001,194 @@
             </div>
         </div>
     </div>
+
+    <!-- Watermark Modal -->
+    <div id="watermarkModal" class="selector-modal">
+        <div class="selector-modal-content" style="max-width: 500px;">
+            <div class="selector-modal-header">
+                <h3><i class="fas fa-stamp"></i> Watermark Tool</h3>
+                <button class="selector-modal-close" onclick="closeWatermarkModal()">&times;</button>
+            </div>
+            <div class="selector-modal-body">
+                <div class="watermark-preview-container" style="text-align: center; margin-bottom: 20px;">
+                    <p id="watermarkTargetFile" style="color: #aaa; margin-bottom: 10px; font-family: monospace;"></p>
+                </div>
+                
+                <div class="watermark-controls" style="display: grid; gap: 15px;">
+                    <!-- Position Control -->
+                    <div class="control-group">
+                        <label>Position</label>
+                        <div class="position-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; width: 120px; margin: 0 auto;">
+                            <button class="pos-btn" data-pos="top-left" onclick="selectWatermarkPos('top-left')">↖</button>
+                            <button class="pos-btn" data-pos="top-center" onclick="selectWatermarkPos('top-center')" disabled>↑</button>
+                            <button class="pos-btn" data-pos="top-right" onclick="selectWatermarkPos('top-right')">↗</button>
+                            <button class="pos-btn" data-pos="center-left" onclick="selectWatermarkPos('center-left')" disabled>←</button>
+                            <button class="pos-btn" data-pos="center" onclick="selectWatermarkPos('center')">●</button>
+                            <button class="pos-btn" data-pos="center-right" onclick="selectWatermarkPos('center-right')" disabled>→</button>
+                            <button class="pos-btn" data-pos="bottom-left" onclick="selectWatermarkPos('bottom-left')">↙</button>
+                            <button class="pos-btn" data-pos="bottom-center" onclick="selectWatermarkPos('bottom-center')" disabled>↓</button>
+                            <button class="pos-btn active" data-pos="bottom-right" onclick="selectWatermarkPos('bottom-right')">↘</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Size Control -->
+                    <div class="control-group">
+                        <label>Size</label>
+                        <div class="btn-group" style="display: flex; justify-content: center; gap: 10px;">
+                            <button class="size-btn" onclick="selectWatermarkSize('small')">Small</button>
+                            <button class="size-btn active" onclick="selectWatermarkSize('medium')">Medium</button>
+                            <button class="size-btn" onclick="selectWatermarkSize('large')">Large</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Color Control -->
+                    <div class="control-group">
+                        <label>Color</label>
+                        <div class="btn-group" style="display: flex; justify-content: center; gap: 10px;">
+                            <button class="color-btn active" onclick="selectWatermarkColor('auto')">Auto (Smart)</button>
+                            <button class="color-btn" onclick="selectWatermarkColor('white')">White</button>
+                            <button class="color-btn" onclick="selectWatermarkColor('black')">Black</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="selector-modal-footer" style="justify-content: space-between;">
+                <button class="selector-btn selector-btn-cancel" onclick="removeWatermark()" style="background: #f44336; border-color: #d32f2f;">Remove Watermark</button>
+                <div>
+                    <button class="selector-btn selector-btn-cancel" onclick="closeWatermarkModal()">Cancel</button>
+                    <button class="selector-btn selector-btn-save" onclick="applyWatermark()">Apply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .pos-btn {
+            padding: 10px;
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .pos-btn:hover:not(:disabled) { background: #444; }
+        .pos-btn.active { background: #2196F3; border-color: #1976D2; }
+        .pos-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        .size-btn, .color-btn {
+            padding: 8px 16px;
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .size-btn.active, .color-btn.active { background: #2196F3; border-color: #1976D2; }
+    </style>
+
+    <script>
+        let currentWatermarkFile = '';
+        let currentWatermarkPos = 'bottom-right';
+        let currentWatermarkSize = 'medium';
+        let currentWatermarkColor = 'auto';
+
+        function openWatermarkModal(filename) {
+            currentWatermarkFile = filename;
+            document.getElementById('watermarkTargetFile').textContent = filename;
+            document.getElementById('watermarkModal').classList.add('active');
+        }
+
+        function closeWatermarkModal() {
+            document.getElementById('watermarkModal').classList.remove('active');
+        }
+
+        function selectWatermarkPos(pos) {
+            currentWatermarkPos = pos;
+            document.querySelectorAll('.pos-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.pos === pos);
+            });
+        }
+
+        function selectWatermarkSize(size) {
+            currentWatermarkSize = size;
+            document.querySelectorAll('.size-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(size));
+            });
+        }
+
+        function selectWatermarkColor(color) {
+            currentWatermarkColor = color;
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.textContent.toLowerCase().includes(color));
+            });
+        }
+
+        function applyWatermark() {
+            const btn = document.querySelector('.selector-btn-save');
+            const originalText = btn.textContent;
+            btn.textContent = 'Applying...';
+            btn.disabled = true;
+
+            fetch('/api/watermark/apply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: currentWatermarkFile,
+                    position: currentWatermarkPos,
+                    size: currentWatermarkSize,
+                    color: currentWatermarkColor
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Force reload image to show change
+                    const img = document.querySelector(`div[data-filename="${currentWatermarkFile}"] img`);
+                    if (img) {
+                        const src = img.src.split('?')[0];
+                        img.src = `${src}?t=${new Date().getTime()}`;
+                    }
+                    closeWatermarkModal();
+                    // Show success toast
+                    const flash = document.createElement('div');
+                    flash.className = 'flash-message';
+                    flash.innerHTML = '<i class="fas fa-check-circle"></i> Watermark applied successfully';
+                    document.querySelector('.flash-messages').appendChild(flash);
+                    setTimeout(() => flash.remove(), 3000);
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(err => alert('Error applying watermark: ' + err))
+            .finally(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            });
+        }
+
+        function removeWatermark() {
+            if (!confirm('Remove watermark? This will regenerate the image from the original.')) return;
+            
+            fetch('/api/watermark/remove', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename: currentWatermarkFile })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const img = document.querySelector(`div[data-filename="${currentWatermarkFile}"] img`);
+                    if (img) {
+                        const src = img.src.split('?')[0];
+                        img.src = `${src}?t=${new Date().getTime()}`;
+                    }
+                    closeWatermarkModal();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+    </script>
 
     <!-- Template identifier -->
     <div style="position: fixed; bottom: 0; right: 0; background: rgba(0,0,0,0.7); color: white; padding: 4px 12px; font-size: 11px; font-family: monospace; z-index: 9999; border-top-left-radius: 4px;">
