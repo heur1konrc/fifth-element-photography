@@ -351,7 +351,7 @@ railway status
 | **Repository** | fifth-element-photography |
 | **URL** | `https://github.com/heur1konrc/fifth-element-photography` |
 | **Branch** | main |
-| **Access Token** | (stored in git remote config) |
+| **Access Token** | **REQUIRED FROM USER** (GitHub Classic Token) |
 
 ### Git Configuration
 
@@ -461,13 +461,20 @@ def verify_password(username, password):
 
 Follow these steps to restore full project context:
 
-#### Step 1: Clone Repository (if needed)
+#### Step 1: Authenticate & Clone Repository
+
+**CRITICAL**: In a new session, the environment may lose git authentication. You MUST ask the user for their **GitHub Classic Token** if the clone fails.
 
 ```bash
 cd /home/ubuntu
-# Token is already configured in sandbox git remote
+
+# Try cloning first (if token persisted)
 git clone https://github.com/heur1konrc/fifth-element-photography.git
-cd fifth-element-photography
+
+# IF CLONE FAILS (403/Authentication failed):
+# 1. Ask user: "Please provide your GitHub Classic Token to clone the repository."
+# 2. Run this command with their token:
+# git clone https://[USER_PROVIDED_TOKEN]@github.com/heur1konrc/fifth-element-photography.git
 ```
 
 #### Step 2: Verify Project Structure
@@ -744,9 +751,18 @@ finally:
 2. Verify `thumbnail_helper.py` uses PIL (not ImageMagick)
 3. Check `/data/thumbnails` directory exists in production
 
-### Issue: "Git push rejected"
+### Issue: "Git push rejected" or "Authentication failed"
 
-**Cause**: Local branch behind remote, or authentication issue.
+**Cause**: Missing GitHub token in remote URL.
+
+**Solution**:
+1. Ask user for GitHub Classic Token.
+2. Update remote URL:
+```bash
+git remote set-url origin https://[USER_PROVIDED_TOKEN]@github.com/heur1konrc/fifth-element-photography.git
+```
+
+**Cause**: Local branch behind remote.
 
 **Solution**:
 ```bash
