@@ -30,7 +30,7 @@ def calculate_brightness(image_region):
     stat = ImageStat.Stat(grayscale)
     return stat.mean[0]
 
-def apply_watermark(image_path, output_path=None, position='bottom-right', size='medium', color_mode='auto', opacity=0.8):
+def apply_watermark(image_path, output_path=None, position='bottom-right', size='medium', color_mode='auto', opacity=1.0):
     """
     Apply watermark to an image.
     
