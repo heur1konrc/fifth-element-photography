@@ -15,7 +15,13 @@ function openModalBeta(imageData) {
     document.getElementById('modalBetaTitle').textContent = imageData.title || 'Untitled';
     
     // Populate image
-    document.getElementById('modalBetaImage').src = imageData.url || '';
+    // Force use of gallery image (watermarked) if filename exists
+    if (imageData.filename) {
+        // Add timestamp to prevent caching issues
+        document.getElementById('modalBetaImage').src = `/data/gallery-images/${imageData.filename}?t=${new Date().getTime()}`;
+    } else {
+        document.getElementById('modalBetaImage').src = imageData.url || '';
+    }
     document.getElementById('modalBetaImage').alt = imageData.title || 'Image';
     
     // Populate EXIF data (now loaded from database in gallery data - instant!)
