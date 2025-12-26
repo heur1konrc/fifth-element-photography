@@ -9,6 +9,30 @@ from datetime import datetime
 
 download_bp = Blueprint('download', __name__)
 
+@download_bp.route('/admin/download-single/<path:filename>')
+def download_single_image(filename):
+    """
+    Download a single original image from /data directory
+    """
+    # Define the data directory
+    data_dir = '/data'
+    
+    # Construct full path
+    file_path = os.path.join(data_dir, filename)
+    
+    # Security check: ensure path is within data_dir
+    if not os.path.abspath(file_path).startswith(os.path.abspath(data_dir)):
+        return "Access denied", 403
+        
+    if not os.path.exists(file_path):
+        return f"File not found: {filename}", 404
+        
+    return send_file(
+        file_path,
+        as_attachment=True,
+        download_name=os.path.basename(filename)
+    )
+
 @download_bp.route('/admin/download-images')
 def download_images():
     """

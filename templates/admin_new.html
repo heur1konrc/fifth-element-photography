@@ -1227,8 +1227,8 @@
         function downloadImage(filename) {
             // Create a temporary anchor element
             const link = document.createElement('a');
-            // Point directly to the original file in /data/
-            link.href = `/data/${filename}`;
+            // Point to the secure download route
+            link.href = `/admin/download-single/${filename}`;
             link.download = filename; // Force download with original filename
             document.body.appendChild(link);
             link.click();
