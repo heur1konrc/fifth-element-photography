@@ -91,6 +91,17 @@ def debug_watermark_route():
     wm_dir_prod = '/data/watermarks'
     wm_dir_local = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'watermarks')
     
+    # Recursive list of /data (max depth 2 to avoid huge output)
+    data_structure = {}
+    try:
+        for root, dirs, files in os.walk('/data'):
+            # limit depth
+            depth = root[len('/data'):].count(os.sep)
+            if depth < 2:
+                data_structure[root] = files[:20] # Limit to 20 files per dir
+    except Exception as e:
+        data_structure = str(e)
+
     debug_info = {
         'images_folder': images_folder,
         'images_folder_exists': os.path.exists(images_folder),
@@ -99,7 +110,8 @@ def debug_watermark_route():
         'wm_dir_local': wm_dir_local,
         'wm_dir_local_exists': os.path.exists(wm_dir_local),
         'wm_files_prod': os.listdir(wm_dir_prod) if os.path.exists(wm_dir_prod) else [],
-        'wm_files_local': os.listdir(wm_dir_local) if os.path.exists(wm_dir_local) else []
+        'wm_files_local': os.listdir(wm_dir_local) if os.path.exists(wm_dir_local) else [],
+        'DATA_STRUCTURE': data_structure
     }
     
     return jsonify(debug_info)
