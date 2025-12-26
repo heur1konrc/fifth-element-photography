@@ -82,10 +82,19 @@ document.getElementById('btnViewHighRes').onclick = function() {
 
 // Download Full Size
 document.getElementById('btnDownload').onclick = function() {
-    if (currentImageDataBeta && currentImageDataBeta.url) {
+    if (currentImageDataBeta && currentImageDataBeta.filename) {
+        const link = document.createElement('a');
+        // Use the secure route to download the ORIGINAL from /data/
+        link.href = `/admin/download-single/${currentImageDataBeta.filename}`;
+        link.download = currentImageDataBeta.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else if (currentImageDataBeta && currentImageDataBeta.url) {
+        // Fallback if filename is missing (shouldn't happen)
         const link = document.createElement('a');
         link.href = currentImageDataBeta.url;
-        link.download = currentImageDataBeta.filename || 'image.jpg';
+        link.download = 'image.jpg';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
