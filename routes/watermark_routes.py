@@ -18,41 +18,47 @@ def apply_watermark_route():
         return jsonify({'success': False, 'error': 'Filename required'}), 400
         
     # Paths
+    # Original is in /data/filename
+    # Gallery version is in /data/gallery-images/filename
+    
     images_folder = current_app.config.get('IMAGES_FOLDER', '/data')
+    gallery_folder = '/data/gallery-images'
     
-    # We operate on the GALLERY version (usually just filename)
-    # But we should regenerate from ORIGINAL (highres_) to ensure clean slate
-    # Logic: 
-    # 1. Find highres original
-    # 2. Resize to gallery size (1200px) -> overwriting current gallery image
-    # 3. Apply watermark
+    # Ensure gallery folder exists
+    os.makedirs(gallery_folder, exist_ok=True)
     
-    gallery_path = os.path.join(images_folder, filename)
-    highres_path = os.path.join(images_folder, f"highres_{filename}")
+    original_path = os.path.join(images_folder, filename)
+    gallery_path = os.path.join(gallery_folder, filename)
     
-    if not os.path.exists(highres_path):
-        # Fallback: if no highres, try to use existing gallery image (not ideal but works)
-        if not os.path.exists(gallery_path):
-             return jsonify({'success': False, 'error': 'Image not found'}), 404
-        source_path = gallery_path
-    else:
-        source_path = highres_path
+    # Verify original exists
+    if not os.path.exists(original_path):
+        return jsonify({'success': False, 'error': f'Original image not found at {original_path}'}), 404
         
     try:
-        # Step 1: Create fresh gallery copy from source
+        # Step 1: Create fresh gallery copy from ORIGINAL
         from PIL import Image
-        with Image.open(source_path) as img:
+        with Image.open(original_path) as img:
             # Resize logic (match existing gallery logic)
             # Max dimension 1200
-            img.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
-            # Save to gallery path (clean slate)
-            if gallery_path.lower().endswith(('.jpg', '.jpeg')):
+            if img.mode in ('RGBA', 'P'):
                 img = img.convert('RGB')
-                img.save(gallery_path, quality=85)
-            else:
-                img.save(gallery_path)
                 
-        # Step 2: Apply Watermark
+            orig_width, orig_height = img.size
+            max_dimension = 1200
+            
+            if orig_width > orig_height:
+                new_width = max_dimension
+                new_height = int((max_dimension / orig_width) * orig_height)
+            else:
+                new_height = max_dimension
+                new_width = int((max_dimension / orig_height) * orig_width)
+                
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Save to gallery path (clean slate)
+            img.save(gallery_path, 'JPEG', quality=90, optimize=True)
+                
+        # Step 2: Apply Watermark to the NEW gallery image
         success = apply_watermark(
             gallery_path, 
             gallery_path, 
@@ -66,6 +72,14 @@ def apply_watermark_route():
             try:
                 from thumbnail_helper import generate_thumbnail_for_image
                 # Force regeneration of thumbnail from the NEW watermarked gallery image
+                # Note: thumbnail_helper might default to reading from /data/filename (original)
+                # We need to ensure it reads from gallery_path if we want the watermark to show
+                
+                # Actually, let's just manually generate the thumbnail here to be safe
+                # Or rely on the helper if it's smart enough. 
+                # Let's call the helper but pass the gallery path if possible?
+                # The helper usually takes just filename.
+                
                 generate_thumbnail_for_image(filename, force=True)
                 print(f"DEBUG: Regenerated thumbnail for {filename}")
             except Exception as e:
@@ -77,6 +91,60 @@ def apply_watermark_route():
             
     except Exception as e:
         print(f"Error in watermark route: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@watermark_bp.route('/api/watermark/remove', methods=['POST'])
+def remove_watermark_route():
+    """Remove watermark (by regenerating from original)"""
+    data = request.json
+    filename = data.get('filename')
+    
+    if not filename:
+        return jsonify({'success': False, 'error': 'Filename required'}), 400
+        
+    images_folder = current_app.config.get('IMAGES_FOLDER', '/data')
+    gallery_folder = '/data/gallery-images'
+    
+    original_path = os.path.join(images_folder, filename)
+    gallery_path = os.path.join(gallery_folder, filename)
+    
+    if not os.path.exists(original_path):
+        return jsonify({'success': False, 'error': 'Original image not found. Cannot restore.'}), 404
+        
+    try:
+        # Restore from ORIGINAL (just like apply, but skip the watermark step)
+        from PIL import Image
+        with Image.open(original_path) as img:
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+                
+            orig_width, orig_height = img.size
+            max_dimension = 1200
+            
+            if orig_width > orig_height:
+                new_width = max_dimension
+                new_height = int((max_dimension / orig_width) * orig_height)
+            else:
+                new_height = max_dimension
+                new_width = int((max_dimension / orig_height) * orig_width)
+                
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Save clean version to gallery path
+            img.save(gallery_path, 'JPEG', quality=90, optimize=True)
+        
+        # Regenerate thumbnail (clean)
+        try:
+            from thumbnail_helper import generate_thumbnail_for_image
+            generate_thumbnail_for_image(filename, force=True)
+        except Exception as e:
+            print(f"DEBUG: Failed to regenerate thumbnail: {e}")
+                
+        return jsonify({'success': True, 'message': 'Watermark removed (image reset)'})
+        
+    except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @watermark_bp.route('/api/watermark/debug', methods=['GET'])
@@ -115,42 +183,3 @@ def debug_watermark_route():
     }
     
     return jsonify(debug_info)
-
-@watermark_bp.route('/api/watermark/remove', methods=['POST'])
-def remove_watermark_route():
-    """Remove watermark (by regenerating from original)"""
-    data = request.json
-    filename = data.get('filename')
-    
-    if not filename:
-        return jsonify({'success': False, 'error': 'Filename required'}), 400
-        
-    images_folder = current_app.config.get('IMAGES_FOLDER', '/data')
-    gallery_path = os.path.join(images_folder, filename)
-    highres_path = os.path.join(images_folder, f"highres_{filename}")
-    
-    if not os.path.exists(highres_path):
-        return jsonify({'success': False, 'error': 'Original high-res image not found. Cannot restore.'}), 404
-        
-    try:
-        # Restore from highres
-        from PIL import Image
-        with Image.open(highres_path) as img:
-            img.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
-            if gallery_path.lower().endswith(('.jpg', '.jpeg')):
-                img = img.convert('RGB')
-                img.save(gallery_path, quality=85)
-            else:
-                img.save(gallery_path)
-        
-        # Regenerate thumbnail (clean)
-        try:
-            from thumbnail_helper import generate_thumbnail_for_image
-            generate_thumbnail_for_image(filename, force=True)
-        except Exception as e:
-            print(f"DEBUG: Failed to regenerate thumbnail: {e}")
-                
-        return jsonify({'success': True, 'message': 'Watermark removed (image reset)'})
-        
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
