@@ -1146,7 +1146,9 @@
                     const img = document.querySelector(`div[data-filename="${currentWatermarkFile}"] img`);
                     if (img) {
                         const src = img.src.split('?')[0];
+                        // Force browser to reload by updating src with timestamp
                         img.src = `${src}?t=${new Date().getTime()}`;
+                        console.log('Refreshed thumbnail:', img.src);
                     }
                     closeWatermarkModal();
                     // Show success toast
