@@ -62,6 +62,15 @@ def apply_watermark_route():
         )
         
         if success:
+            # Step 3: Regenerate Thumbnail so Admin UI updates
+            try:
+                from thumbnail_helper import generate_thumbnail_for_image
+                # Force regeneration of thumbnail from the NEW watermarked gallery image
+                generate_thumbnail_for_image(filename, force=True)
+                print(f"DEBUG: Regenerated thumbnail for {filename}")
+            except Exception as e:
+                print(f"DEBUG: Failed to regenerate thumbnail: {e}")
+                
             return jsonify({'success': True, 'message': 'Watermark applied successfully'})
         else:
             return jsonify({'success': False, 'error': 'Failed to apply watermark'}), 500
@@ -121,6 +130,13 @@ def remove_watermark_route():
                 img.save(gallery_path, quality=85)
             else:
                 img.save(gallery_path)
+        
+        # Regenerate thumbnail (clean)
+        try:
+            from thumbnail_helper import generate_thumbnail_for_image
+            generate_thumbnail_for_image(filename, force=True)
+        except Exception as e:
+            print(f"DEBUG: Failed to regenerate thumbnail: {e}")
                 
         return jsonify({'success': True, 'message': 'Watermark removed (image reset)'})
         
