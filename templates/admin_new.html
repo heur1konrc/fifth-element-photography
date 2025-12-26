@@ -1228,7 +1228,7 @@
             // Create a temporary anchor element
             const link = document.createElement('a');
             // Point to the secure download route
-            link.href = `/admin/download-single/${filename}`;
+            link.href = `/admin/download-single/${encodeURIComponent(filename)}`;
             link.download = filename; // Force download with original filename
             document.body.appendChild(link);
             link.click();

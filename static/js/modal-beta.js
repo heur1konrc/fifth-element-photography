@@ -85,7 +85,7 @@ document.getElementById('btnDownload').onclick = function() {
     if (currentImageDataBeta && currentImageDataBeta.filename) {
         const link = document.createElement('a');
         // Use the secure route to download the ORIGINAL from /data/
-        link.href = `/admin/download-single/${currentImageDataBeta.filename}`;
+        link.href = `/admin/download-single/${encodeURIComponent(currentImageDataBeta.filename)}`;
         link.download = currentImageDataBeta.filename;
         document.body.appendChild(link);
         link.click();

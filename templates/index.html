@@ -175,7 +175,7 @@
                                 <button class="action-btn" onclick="viewFullscreen('{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}', '{{ featured_image.title if featured_image else "No Featured Image" }}')">
                                     <span></span> View High Resolution (New Window)
                                 </button>
-                                <a href="/admin/download-single/{{ featured_image.filename if featured_image else 'placeholder.jpg' }}" download="{{ featured_image.filename if featured_image else 'placeholder.jpg' }}" class="action-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
+                                <a href="/admin/download-single/{{ featured_image.filename|urlencode if featured_image else 'placeholder.jpg' }}" download="{{ featured_image.filename if featured_image else 'placeholder.jpg' }}" class="action-btn" style="text-decoration: none; display: flex; align-items: center; justify-content: center;">
                                     <span></span> Download Full Size Image
                                 </a>
                                 <button class="action-btn" onclick="shareOnSocial('{{ featured_image.title if featured_image else "No Featured Image" }}', '{{ featured_image.url if featured_image else "/static/images/placeholder.jpg" }}')">
