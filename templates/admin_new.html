@@ -1178,6 +1178,11 @@
         function removeWatermark() {
             if (!confirm('Remove watermark? This will regenerate the image from the original.')) return;
             
+            const btn = document.querySelector('.selector-btn-cancel[onclick="removeWatermark()"]');
+            const originalText = btn.textContent;
+            btn.textContent = 'Removing...';
+            btn.disabled = true;
+
             fetch('/api/watermark/remove', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1192,10 +1197,42 @@
                         img.src = `${src}?t=${new Date().getTime()}`;
                     }
                     closeWatermarkModal();
+                    
+                    // Show success toast
+                    let flashContainer = document.querySelector('.flash-messages');
+                    if (!flashContainer) {
+                        flashContainer = document.createElement('div');
+                        flashContainer.className = 'flash-messages';
+                        document.querySelector('.dashboard-header').after(flashContainer);
+                    }
+                    
+                    const flash = document.createElement('div');
+                    flash.className = 'flash-message';
+                    flash.innerHTML = '<i class="fas fa-check-circle"></i> Watermark removed successfully';
+                    flashContainer.appendChild(flash);
+                    setTimeout(() => flash.remove(), 3000);
                 } else {
                     alert('Error: ' + data.error);
                 }
+            })
+            .catch(err => alert('Error removing watermark: ' + err))
+            .finally(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
             });
+        }
+    </script>
+
+    <script>
+        function downloadImage(filename) {
+            // Create a temporary anchor element
+            const link = document.createElement('a');
+            // Point directly to the original file in /data/
+            link.href = `/data/${filename}`;
+            link.download = filename; // Force download with original filename
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 

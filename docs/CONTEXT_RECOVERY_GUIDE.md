@@ -132,17 +132,18 @@ The admin dashboard has **4 main tabs**:
 ├── lumaprints_pricing.db          # MAIN DATABASE (all products, pricing, mappings)
 ├── print_ordering.db              # Print ordering database
 │
-├── [image files].jpg              # Original uploaded images
-├── [image files].png              # Original uploaded images
+├── [filename].jpg                 # ORIGINAL HIGH-RES IMAGES (Source of Truth)
+├── [filename].png                 # ORIGINAL HIGH-RES IMAGES (Source of Truth)
 │
-├── thumbnails/                    # Generated 400px thumbnails
+├── thumbnails/                    # Generated 400px thumbnails (Watermarked if applied)
 │   └── [filename].jpg
 │
-├── gallery-images/                # Generated 1200px gallery images
+├── gallery-images/                # Generated 1200px gallery images (Watermarked if applied)
 │   └── [filename].jpg
 │
-├── originals/                     # High-resolution originals (optional)
-│   └── [filename].jpg
+├── watermarks/                    # Watermark signature files (White/Black)
+│   ├── WATERMARK_RCorey_WHITE.png
+│   └── WATERMARK_RCorey_BLACK.png
 │
 ├── about/                         # About page images
 │   └── [filename].jpg
