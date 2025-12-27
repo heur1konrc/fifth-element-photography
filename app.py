@@ -5810,7 +5810,12 @@ def download_lumaprints_backup():
 @app.route('/api/settings/carousel-speed', methods=['GET', 'POST'])
 def manage_carousel_speed():
     """Get or set the homepage carousel speed (in milliseconds)"""
-    conn = get_db_connection()
+    def get_db_conn():
+        conn = sqlite3.connect('/data/lumaprints_pricing.db')
+        conn.row_factory = sqlite3.Row
+        return conn
+
+    conn = get_db_conn()
     cursor = conn.cursor()
     
     if request.method == 'POST':
