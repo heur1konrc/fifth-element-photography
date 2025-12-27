@@ -202,9 +202,18 @@
         
         async function loadAllImages() {
             const res = await fetch('/api/images');
-            allImages = await res.json();
-            
-            const select = document.getElementById('heroImage');
+    allImages = await res.json();
+    
+    // Sort images alphabetically by title (or filename if title is missing)
+    allImages.sort((a, b) => {
+        const nameA = (a.title || a.filename).toLowerCase();
+        const nameB = (b.title || b.filename).toLowerCase();
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0;
+    });
+    
+    const select = document.getElementById('heroImage');
             select.innerHTML = '<option value="">Select hero image...</option>' +
                 allImages.map(img => `<option value="${img.filename}">${img.title || img.filename}</option>`).join('');
         }
