@@ -220,3 +220,17 @@ def serve_image(filename):
     else:
         images_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'images')
         return send_from_directory(images_dir, filename)
+
+@shopify_admin_bp.route('/thumbnail/<filename>')
+def serve_thumbnail(filename):
+    """Serve thumbnail from /data/thumbnails directory"""
+    from flask import send_from_directory
+    
+    # Try to serve from /data/thumbnails first
+    if os.path.exists('/data/thumbnails'):
+        # Check if thumbnail exists
+        if os.path.exists(os.path.join('/data/thumbnails', filename)):
+            return send_from_directory('/data/thumbnails', filename)
+    
+    # Fallback to original image if thumbnail doesn't exist
+    return serve_image(filename)
