@@ -5820,6 +5820,44 @@ def download_lumaprints_backup():
     except Exception as e:
         return f"Error: {str(e)}", 500
 
+@app.route('/api/tools/fix-shopify-table', methods=['POST'])
+def fix_shopify_table():
+    """Fix the shopify_products table schema"""
+    if not session.get('admin_logged_in'):
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+        
+    try:
+        db_path = '/data/lumaprints_pricing.db'
+        if not os.path.exists('/data'):
+             # Fallback for local dev
+            db_path = os.path.join(app.root_path, 'data', 'lumaprints_pricing.db')
+            
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Drop table
+        cursor.execute("DROP TABLE IF EXISTS shopify_products")
+        
+        # Recreate table
+        cursor.execute("""
+            CREATE TABLE shopify_products (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                image_filename TEXT NOT NULL,
+                category TEXT,
+                shopify_product_id TEXT NOT NULL,
+                shopify_handle TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(image_filename, category)
+            )
+        """)
+        
+        conn.commit()
+        conn.close()
+        return jsonify({'success': True, 'message': 'Table recreated successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/settings/carousel-speed', methods=['GET', 'POST'])
 def manage_carousel_speed():
     """Get or set the homepage carousel speed (in milliseconds)"""

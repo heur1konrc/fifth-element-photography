@@ -34,11 +34,13 @@ def ensure_shopify_products_table():
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS shopify_products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            image_filename TEXT UNIQUE NOT NULL,
+            image_filename TEXT NOT NULL,
+            category TEXT,
             shopify_product_id TEXT NOT NULL,
             shopify_handle TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(image_filename, category)
         )
     """)
     conn.commit()

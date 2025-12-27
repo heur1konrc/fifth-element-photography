@@ -2369,3 +2369,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // Also try to load immediately if we're already on the page
     loadCarouselSpeed();
 });
+
+function fixShopifyTable() {
+    if (!confirm('WARNING: This will recreate the shopify_products table. Any existing data in that table will be lost. Are you sure?')) {
+        return;
+    }
+    
+    const btn = event.target.closest('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fixing...';
+    btn.disabled = true;
+    
+    fetch('/api/tools/fix-shopify-table', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Success: ' + data.message);
+        } else {
+            alert('Error: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error);
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
