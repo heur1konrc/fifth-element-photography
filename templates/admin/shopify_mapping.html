@@ -40,6 +40,11 @@
         <div class="header">
             <h1>🛍️ Shopify Product Mapping</h1>
             <p>Map 5 product types per image: Metal, Canvas, Fine Art Paper, Framed Canvas, Foam-mounted Print</p>
+            <div style="margin-top: 15px;">
+                <input type="text" id="searchInput" placeholder="🔍 Search images by title or filename..." 
+                       style="width: 100%; max-width: 500px; padding: 12px; border-radius: 6px; border: none; font-size: 1em;"
+                       onkeyup="filterImages()">
+            </div>
         </div>
         
         {% if error %}
@@ -83,6 +88,24 @@
     </div>
     
     <script>
+        function filterImages() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toLowerCase();
+            const cards = document.getElementsByClassName('card');
+            
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                const filename = card.dataset.filename.toLowerCase();
+                
+                if (title.includes(filter) || filename.includes(filter)) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            }
+        }
+
         async function saveMapping(button) {
             const card = button.closest('.card');
             const filename = card.dataset.filename;
