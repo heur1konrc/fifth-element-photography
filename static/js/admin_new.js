@@ -2301,3 +2301,71 @@ async function removeSelectedFromCarousel() {
         showAlert('Error removing images from carousel', 'error');
     }
 }
+
+// Carousel Speed Settings
+async function loadCarouselSpeed() {
+    try {
+        const response = await fetch('/api/settings/carousel-speed');
+        const data = await response.json();
+        
+        const speedSeconds = data.speed / 1000;
+        const slider = document.getElementById('carouselSpeedRange');
+        const display = document.getElementById('carouselSpeedValue');
+        
+        if (slider && display) {
+            slider.value = speedSeconds;
+            display.textContent = speedSeconds.toFixed(1);
+            
+            // Update display on slide
+            slider.addEventListener('input', function() {
+                display.textContent = parseFloat(this.value).toFixed(1);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading carousel speed:', error);
+    }
+}
+
+async function saveCarouselSpeed() {
+    const slider = document.getElementById('carouselSpeedRange');
+    if (!slider) return;
+    
+    const speedMs = parseFloat(slider.value) * 1000;
+    
+    try {
+        const response = await fetch('/api/settings/carousel-speed', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ speed: speedMs })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert('Carousel speed updated successfully!', 'success');
+        } else {
+            showAlert('Error updating carousel speed: ' + (data.error || 'Unknown error'), 'error');
+        }
+    } catch (error) {
+        console.error('Error saving carousel speed:', error);
+        showAlert('Error saving carousel speed', 'error');
+    }
+}
+
+// Initialize settings when tab is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add listener for tab changes to load settings when Settings tab is active
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (this.dataset.tab === 'settings') {
+                loadCarouselSpeed();
+            }
+        });
+    });
+    
+    // Also try to load immediately if we're already on the page
+    loadCarouselSpeed();
+});

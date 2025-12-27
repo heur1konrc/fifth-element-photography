@@ -5806,3 +5806,33 @@ def download_lumaprints_backup():
             return "Backup file not found", 404
     except Exception as e:
         return f"Error: {str(e)}", 500
+
+@app.route('/api/settings/carousel-speed', methods=['GET', 'POST'])
+def manage_carousel_speed():
+    """Get or set the homepage carousel speed (in milliseconds)"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    if request.method == 'POST':
+        try:
+            data = request.json
+            speed = int(data.get('speed', 5000))
+            
+            # Ensure speed is within reasonable limits (1s to 20s)
+            speed = max(1000, min(20000, speed))
+            
+            cursor.execute("INSERT OR REPLACE INTO settings (key_name, value) VALUES ('carousel_speed', ?)", (str(speed),))
+            conn.commit()
+            conn.close()
+            return jsonify({'success': True, 'speed': speed})
+        except Exception as e:
+            conn.close()
+            return jsonify({'success': False, 'error': str(e)}), 500
+            
+    else:
+        cursor.execute("SELECT value FROM settings WHERE key_name = 'carousel_speed'")
+        row = cursor.fetchone()
+        conn.close()
+        
+        speed = int(row['value']) if row else 5000
+        return jsonify({'speed': speed})

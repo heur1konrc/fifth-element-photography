@@ -194,11 +194,22 @@
         let carouselImages = [];
         let currentIndex = 0;
         let autoplayInterval;
-        const AUTOPLAY_SPEED = 5000; // 5 seconds default
+        let AUTOPLAY_SPEED = 5000; // 5 seconds default
         
         // Load images marked for carousel
         async function loadCarousel() {
             try {
+                // Load speed setting first
+                try {
+                    const speedRes = await fetch('/api/settings/carousel-speed');
+                    const speedData = await speedRes.json();
+                    if (speedData.speed) {
+                        AUTOPLAY_SPEED = speedData.speed;
+                    }
+                } catch (e) {
+                    console.error('Error loading carousel speed:', e);
+                }
+
                 const imgRes = await fetch('/api/images');
                 const images = await imgRes.json();
                 
