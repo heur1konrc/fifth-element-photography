@@ -37,14 +37,18 @@ function getProductHandle(imageFilename) {
 
 // Get product handle from image URL
 function getProductHandleFromUrl(imageUrl) {
-    const filename = imageUrl.split('/').pop();
+    // Remove query parameters (e.g. ?t=123) and get filename
+    const cleanUrl = imageUrl.split('?')[0];
+    const filename = cleanUrl.split('/').pop();
     return getProductHandle(filename);
 }
 
 
 // Get all product handles for an image (supports multiple categories)
 function getAllProductHandlesFromUrl(imageUrl) {
-    const filename = imageUrl.split('/').pop();
+    // Remove query parameters (e.g. ?t=123) and get filename
+    const cleanUrl = imageUrl.split('?')[0];
+    const filename = cleanUrl.split('/').pop();
     const mapping = PRODUCT_MAPPING[filename];
     
     if (!mapping) return [];
