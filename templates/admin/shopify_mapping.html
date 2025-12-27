@@ -56,11 +56,12 @@
         
         <div class="grid">
             {% for image in images %}
-            <div class="card" data-title="{{ image.title }}">
-                <img src="/data/gallery-images/{{ image.filename }}" alt="{{ image.title }}" class="card-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect fill=\'%23ddd\' width=\'200\' height=\'200\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23999\'%3ENo Image%3C/text%3E%3C/svg%3E'">
+            <div class="card" data-filename="{{ image.filename }}">
+                <img src="/admin/image/{{ image.filename }}" alt="{{ image.title }}" class="card-image" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect fill=\'%23ddd\' width=\'200\' height=\'200\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23999\'%3ENo Image%3C/text%3E%3C/svg%3E'">
                 
                 <div class="card-content">
                     <div class="card-title">{{ image.title }}</div>
+                    <div style="font-size: 0.8em; color: #888; margin-bottom: 10px;">{{ image.filename }}</div>
                     
                     {% for category in categories %}
                     <div class="product-group">
@@ -84,7 +85,7 @@
     <script>
         async function saveMapping(button) {
             const card = button.closest('.card');
-            const title = card.dataset.title;
+            const filename = card.dataset.filename;
             const inputs = card.querySelectorAll('.product-input');
             const statusEl = card.querySelector('.status');
             
@@ -107,7 +108,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        image_title: title,
+                        image_filename: filename,
                         mappings: mappings
                     })
                 });

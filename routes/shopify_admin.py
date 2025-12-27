@@ -1,6 +1,6 @@
 """
 Shopify Product Mapping Admin - Multi-Product Support
-Fifth Element Photography - v3.0.0
+Fifth Element Photography - v3.0.1
 Supports mapping 5 product types per image
 """
 
@@ -81,37 +81,37 @@ def shopify_mapping():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS shopify_products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            image_title TEXT NOT NULL,
+            image_filename TEXT NOT NULL,
             category TEXT NOT NULL,
             shopify_product_id TEXT,
             shopify_handle TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(image_title, category)
+            UNIQUE(image_filename, category)
         )
     ''')
     
     try:
-        cursor.execute('SELECT image_title, category, shopify_handle FROM shopify_products')
+        cursor.execute('SELECT image_filename, category, shopify_handle FROM shopify_products')
         mappings_rows = cursor.fetchall()
     except sqlite3.OperationalError:
         mappings_rows = []
     conn.close()
     
-    # Build mappings dict: {image_title: {category: handle}}
+    # Build mappings dict: {image_filename: {category: handle}}
     mappings = {}
     for row in mappings_rows:
-        title = row['image_title']
-        if title not in mappings:
-            mappings[title] = {}
-        mappings[title][row['category']] = row['shopify_handle']
+        filename = row['image_filename']
+        if filename not in mappings:
+            mappings[filename] = {}
+        mappings[filename][row['category']] = row['shopify_handle']
     
     # Build images data with mappings
     images_data = []
     for filename in sorted(image_files):
         # Get title from image_titles.json or use filename
         img_title = image_titles_map.get(filename, filename.replace('-', ' ').replace('_', ' ').rsplit('.', 1)[0])
-        img_mappings = mappings.get(img_title, {})
+        img_mappings = mappings.get(filename, {})
         images_data.append({
             'filename': filename,
             'title': img_title,
@@ -127,11 +127,11 @@ def shopify_mapping():
 def save_shopify_mapping():
     """Save multiple product mappings for an image"""
     data = request.json
-    image_title = data.get('image_title')
+    image_filename = data.get('image_filename')
     mappings = data.get('mappings', {})  # {category: handle}
     
-    if not image_title:
-        return jsonify({'success': False, 'error': 'Image title required'}), 400
+    if not image_filename:
+        return jsonify({'success': False, 'error': 'Image filename required'}), 400
     
     print_db = get_db_path('print_ordering.db')
     conn = sqlite3.connect(print_db)
@@ -139,15 +139,15 @@ def save_shopify_mapping():
     
     try:
         # Delete existing mappings for this image
-        cursor.execute('DELETE FROM shopify_products WHERE image_title = ?', (image_title,))
+        cursor.execute('DELETE FROM shopify_products WHERE image_filename = ?', (image_filename,))
         
         # Insert new mappings
         for category, handle in mappings.items():
             if handle and handle.strip():  # Only save non-empty handles
                 cursor.execute('''
-                    INSERT INTO shopify_products (image_title, category, shopify_handle)
+                    INSERT INTO shopify_products (image_filename, category, shopify_handle)
                     VALUES (?, ?, ?)
-                ''', (image_title, category, handle.strip()))
+                ''', (image_filename, category, handle.strip()))
         
         conn.commit()
         conn.close()
@@ -166,37 +166,20 @@ def get_all_mappings():
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
         
-        # Get shopify products with image titles
-        cursor.execute('SELECT image_title, category, shopify_handle FROM shopify_products ORDER BY image_title, category')
+        # Get shopify products with image filenames
+        cursor.execute('SELECT image_filename, category, shopify_handle FROM shopify_products ORDER BY image_filename, category')
         rows = cursor.fetchall()
         conn.close()
-        
-        # Load image titles to map title -> filename
-        image_titles_map = load_image_titles()
-        
-        # Build reverse map: title -> filename
-        title_to_filename = {}
-        for filename, title in image_titles_map.items():
-            title_to_filename[title] = filename
         
         # Build nested structure: { filename: { category: handle, ... }, ... }
         mappings = {}
         for row in rows:
-            title = row['image_title']
+            filename = row['image_filename']
             category = row['category']
             handle = row['shopify_handle']
             
-            # Get filename from title
-            filename = title_to_filename.get(title)
             if not filename:
-                # Try to find filename by matching title (fallback)
-                for fn, t in image_titles_map.items():
-                    if t == title:
-                        filename = fn
-                        break
-            
-            if not filename:
-                continue  # Skip if we can't find the image file
+                continue
             
             if filename not in mappings:
                 mappings[filename] = {}
