@@ -215,7 +215,10 @@
     
     const select = document.getElementById('heroImage');
             select.innerHTML = '<option value="">Select hero image...</option>' +
-                allImages.map(img => `<option value="${img.filename}">${img.title || img.filename}</option>`).join('');
+                allImages.map(img => {
+                    const label = img.title ? `${img.title} (${img.filename})` : img.filename;
+                    return `<option value="${img.filename}">${label}</option>`;
+                }).join('');
         }
         
         function openCreateModal() {
