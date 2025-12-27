@@ -5828,34 +5828,50 @@ def fix_shopify_table():
     #    return jsonify({'success': False, 'error': 'Unauthorized'}), 401
         
     try:
-        db_path = '/data/lumaprints_pricing.db'
-        if not os.path.exists('/data'):
-             # Fallback for local dev
-            db_path = os.path.join(app.root_path, 'data', 'lumaprints_pricing.db')
+        messages = []
+        
+        # List of databases to fix
+        databases = ['lumaprints_pricing.db', 'print_ordering.db']
+        
+        for db_name in databases:
+            if os.path.exists('/data'):
+                db_path = f'/data/{db_name}'
+            else:
+                # Fallback for local dev
+                db_path = os.path.join(app.root_path, 'data', db_name)
             
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+            if not os.path.exists(db_path):
+                messages.append(f"Skipped {db_name} (not found)")
+                continue
+                
+            try:
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                
+                # Drop table
+                cursor.execute("DROP TABLE IF EXISTS shopify_products")
+                
+                # Recreate table
+                cursor.execute("""
+                    CREATE TABLE shopify_products (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        image_filename TEXT NOT NULL,
+                        category TEXT,
+                        shopify_product_id TEXT NOT NULL,
+                        shopify_handle TEXT NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        UNIQUE(image_filename, category)
+                    )
+                """)
+                
+                conn.commit()
+                conn.close()
+                messages.append(f"Fixed {db_name}")
+            except Exception as e:
+                messages.append(f"Failed {db_name}: {str(e)}")
         
-        # Drop table
-        cursor.execute("DROP TABLE IF EXISTS shopify_products")
-        
-        # Recreate table
-        cursor.execute("""
-            CREATE TABLE shopify_products (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                image_filename TEXT NOT NULL,
-                category TEXT,
-                shopify_product_id TEXT NOT NULL,
-                shopify_handle TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(image_filename, category)
-            )
-        """)
-        
-        conn.commit()
-        conn.close()
-        return jsonify({'success': True, 'message': 'Table recreated successfully'})
+        return jsonify({'success': True, 'message': ', '.join(messages)})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
