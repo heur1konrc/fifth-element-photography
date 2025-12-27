@@ -1,6 +1,6 @@
 """
 Shopify Product Mapping Admin - Multi-Product Support
-Fifth Element Photography - v3.0.1
+Fifth Element Photography - v3.0.2
 Supports mapping 5 product types per image
 """
 
@@ -135,19 +135,37 @@ def save_shopify_mapping():
     
     print_db = get_db_path('print_ordering.db')
     conn = sqlite3.connect(print_db)
+    conn.row_factory = sqlite3.Row  # Enable row access by name
     cursor = conn.cursor()
     
     try:
+        # Get existing mappings to preserve shopify_product_id
+        cursor.execute('SELECT category, shopify_product_id FROM shopify_products WHERE image_filename = ?', (image_filename,))
+        existing_rows = cursor.fetchall()
+        existing_ids = {row['category']: row['shopify_product_id'] for row in existing_rows}
+        
         # Delete existing mappings for this image
         cursor.execute('DELETE FROM shopify_products WHERE image_filename = ?', (image_filename,))
         
         # Insert new mappings
         for category, handle in mappings.items():
             if handle and handle.strip():  # Only save non-empty handles
+                # Use existing shopify_product_id if available, otherwise use a placeholder or None
+                # Note: If the table has NOT NULL constraint on shopify_product_id, we must provide a value.
+                # Since these are manually mapped or updated, we might not have the ID if it wasn't created via API.
+                # However, the error suggests it IS required.
+                
+                shopify_id = existing_ids.get(category)
+                
+                # If we don't have an ID (e.g. manual entry), we might need to fetch it from Shopify or use a placeholder.
+                # For now, if it's missing, we'll use a placeholder to satisfy the constraint if it's a manual mapping.
+                if not shopify_id:
+                    shopify_id = f"manual_{handle.strip()}"
+                
                 cursor.execute('''
-                    INSERT INTO shopify_products (image_filename, category, shopify_handle)
-                    VALUES (?, ?, ?)
-                ''', (image_filename, category, handle.strip()))
+                    INSERT INTO shopify_products (image_filename, category, shopify_handle, shopify_product_id)
+                    VALUES (?, ?, ?, ?)
+                ''', (image_filename, category, handle.strip(), shopify_id))
         
         conn.commit()
         conn.close()
