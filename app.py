@@ -28,6 +28,19 @@ from thumbnail_helper import generate_thumbnail_for_image
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
 
+# Import version info
+try:
+    import version
+    APP_VERSION = version.VERSION
+    APP_REVISION = version.REVISION
+except ImportError:
+    APP_VERSION = "1.0.0"
+    APP_REVISION = "unknown"
+
+@app.context_processor
+def inject_version():
+    return dict(app_version=APP_VERSION, app_revision=APP_REVISION)
+
 # Register Pictorem admin blueprint (DISABLED)
 # app.register_blueprint(pictorem_admin_bp)
 
