@@ -3216,7 +3216,8 @@ def contact():
     """Handle contact form page and submission"""
     if request.method == 'GET':
         # Display contact form page
-        galleries = get_galleries()
+        from gallery_db import get_all_galleries
+        galleries = get_all_galleries()
         return render_template('contact.html', galleries=galleries, app_version=APP_VERSION, app_revision=APP_REVISION)
     
     # Handle POST - form submission
