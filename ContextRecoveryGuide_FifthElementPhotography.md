@@ -12,9 +12,11 @@ This document allows any AI agent to immediately resume work on the **Fifth Elem
 **The live production website uses `templates/index_new.html` NOT `templates/index.html`**
 
 - **Main Homepage Template**: `templates/index_new.html`
+- **Admin Dashboard Template**: `templates/admin_new.html`
 - **Contact Page Template**: `templates/contact.html`
-- **Admin Templates**: Located in `templates/admin/`
+- **Admin Tool Templates**: Located in `templates/admin/` (e.g., `shopify_mapping.html`)
 - **DO NOT modify `templates/index.html`** - it is NOT the live template
+- **DO NOT modify `templates/admin.html`** - it is NOT the live admin template
 - The site uses a horizontal navigation bar (NO SIDEBAR)
 - Navigation links: HOME, galleries, ABOUT, CONTACT, BUY ME A COFFEE
 
