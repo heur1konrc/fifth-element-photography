@@ -1,6 +1,6 @@
 # Context Recovery Guide: Fifth Element Photography
-**Date**: Dec 27, 2025
-**Status**: STABLE (Critical Bugs Fixed & Features Added)
+**Date**: Dec 28, 2025
+**Status**: STABLE (Contact Form Added & Email Integration Working)
 **Repository**: `heur1konrc/fifth-element-photography` (Public)
 
 ---
@@ -14,6 +14,10 @@ This document allows any AI agent to immediately resume work on the **Fifth Elem
     *   **Performance**: Uses **thumbnails** for fast loading.
     *   **Schema**: Fixed (`image_filename` used consistently).
     *   **Save**: Fixed (`NOT NULL constraint` resolved).
+*   **Contact Form**: **FULLY FUNCTIONAL**.
+    *   **Email Integration**: Gmail SMTP working with App Password authentication.
+    *   **Fields**: Name, Email, Phone, Text opt-in, Interests dropdown, Event date, Referral source checkboxes.
+    *   **Design**: Matches site aesthetic (Poppins font, #6799c2 accent).
 *   **Order Prints**: Active and functional.
 *   **Deployment**: All fixes pushed to `main` branch on GitHub.
 
@@ -43,7 +47,50 @@ The GitHub Personal Access Token (PAT) and authentication details are stored sec
 
 ---
 
-## 3. Recent Fixes & Features (Dec 27, 2025)
+## 3. Email Configuration (CRITICAL)
+
+**Gmail SMTP Credentials Location**:
+The Gmail App Password for the contact form is stored securely in the sandbox at:
+```
+/home/ubuntu/.email_credentials
+```
+
+**Email Settings**:
+*   **SMTP Server**: `smtp.gmail.com`
+*   **Port**: `587` (TLS/STARTTLS)
+*   **Username**: `rick@fifthelement.photos`
+*   **App Password**: Stored in `/home/ubuntu/.email_credentials`
+*   **Recipient**: `rick@fifthelement.photos`
+
+**Important Notes**:
+*   The App Password is NOT the regular Gmail password
+*   2-Step Verification must be enabled on the Google account
+*   IMAP/SMTP access must be enabled in Google Workspace settings
+*   App Password is valid until revoked
+
+---
+
+## 4. Recent Fixes & Features
+
+### Dec 28, 2025: Contact Form
+*   **Feature**: Professional contact form with Gmail SMTP email delivery.
+*   **Location**: 
+    *   Frontend: `templates/contact_form_new.html` (included in `templates/index.html`)
+    *   Backend: `routes/contact_form.py`
+    *   API Endpoint: `/api/contact/submit` (POST)
+*   **Fields**:
+    *   Name (required)
+    *   Email (required)
+    *   Phone (required)
+    *   Can we text that number? (dropdown: Yes/No)
+    *   I am interested in: (dropdown with 9 options including "Other")
+    *   Other text field (appears when "Other" is selected)
+    *   Date of Event or deadline (date picker)
+    *   How did you hear about my services? (checkboxes: Facebook, Instagram, Google, Printed ad, Referral)
+*   **Email Template**: Professional HTML email with all form data formatted nicely
+*   **Result**: Emails are delivered to rick@fifthelement.photos successfully
+
+### Dec 27, 2025: Shopify Mapping Improvements
 
 ### A. Search & Filter (New!)
 *   **Feature**: Added a search bar to the top of the Shopify Mapping page.
@@ -63,7 +110,7 @@ The GitHub Personal Access Token (PAT) and authentication details are stored sec
 
 ---
 
-## 4. System Architecture
+## 5. System Architecture
 
 ### Database (`print_ordering.db`)
 *   **Table**: `shopify_products`
@@ -83,7 +130,13 @@ The GitHub Personal Access Token (PAT) and authentication details are stored sec
 
 ---
 
-## 5. Immediate Next Steps
+## 6. Immediate Next Steps
+
+**Contact Form Verification**:
+*   Navigate to the Contact section on the website
+*   Fill out and submit the form
+*   Verify email is received at rick@fifthelement.photos
+*   Check that all form fields are included in the email
 
 **1. Verify Search Functionality**:
 *   Open the Shopify Mapping page.
@@ -95,7 +148,13 @@ The GitHub Personal Access Token (PAT) and authentication details are stored sec
 
 ---
 
-## 6. Troubleshooting
+## 7. Troubleshooting
+
+**Contact Form Email Not Sending**:
+*   Verify the App Password in `/home/ubuntu/.email_credentials` is correct
+*   Check that `routes/contact_form.py` has the correct SMTP settings
+*   Ensure 2-Step Verification is enabled on rick@fifthelement.photos
+*   Verify IMAP/SMTP is enabled in Google Workspace settings
 
 **"Repository not found" Error**:
 *   Ensure you are using the correct URL: `https://github.com/heur1konrc/fifth-element-photography.git`
