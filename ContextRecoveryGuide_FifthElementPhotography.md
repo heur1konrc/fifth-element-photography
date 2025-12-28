@@ -8,6 +8,16 @@
 ## 1. Executive Summary
 This document allows any AI agent to immediately resume work on the **Fifth Element Photography** project without losing context.
 
+### ⚠️ CRITICAL: Live Template Information
+**The live production website uses `templates/index_new.html` NOT `templates/index.html`**
+
+- **Main Homepage Template**: `templates/index_new.html`
+- **Contact Page Template**: `templates/contact.html`
+- **Admin Templates**: Located in `templates/admin/`
+- **DO NOT modify `templates/index.html`** - it is NOT the live template
+- The site uses a horizontal navigation bar (NO SIDEBAR)
+- Navigation links: HOME, galleries, ABOUT, CONTACT, BUY ME A COFFEE
+
 **Current State**:
 *   **Shopify Mapping Tool**: **FULLY OPTIMIZED**.
     *   **Search Bar**: **ADDED**. You can now filter images by title or filename instantly.
@@ -15,6 +25,9 @@ This document allows any AI agent to immediately resume work on the **Fifth Elem
     *   **Schema**: Fixed (`image_filename` used consistently).
     *   **Save**: Fixed (`NOT NULL constraint` resolved).
 *   **Contact Form**: **FULLY FUNCTIONAL**.
+    *   **Page**: Accessible at `/contact` route (GET request displays form, POST submits)
+    *   **Template**: `templates/contact.html` (standalone page)
+    *   **API Endpoint**: `/api/contact/submit` (POST) - handled by `routes/contact_form.py`
     *   **Email Integration**: Gmail SMTP working with App Password authentication.
     *   **Fields**: Name, Email, Phone, Text opt-in, Interests dropdown, Event date, Referral source checkboxes.
     *   **Design**: Matches site aesthetic (Poppins font, #6799c2 accent).
