@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Fifth Element Photography</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: #000;
+            padding: 55px 0 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            max-width: 560px;
+            margin: 0 auto 20px;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: auto;
+        }
+        
+        nav {
+            background: #000;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 0;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: #7B68EE;
+        }
+        
+        .contact-section {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .contact-section h1 {
+            color: #6799c2;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .contact-section p {
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #6799c2;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-weight: 400;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .submit-btn {
+            background: #6799c2;
+            color: #fff;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .submit-btn:hover {
+            background: #5788b1;
+        }
+        
+        .submit-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .status-message.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .status-message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #f44336;
+        }
+        
+        .footer-note {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        footer {
+            background: #000;
+            padding: 30px 0;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 50px;
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .social-icons a {
+            color: #fff;
+            font-size: 24px;
+            transition: color 0.3s;
+        }
+        
+        .social-icons a:hover {
+            color: #7B68EE;
+        }
+        
+        @media (max-width: 768px) {
+            .contact-section {
+                padding: 20px;
+                margin: 20px auto;
+            }
+            
+            .contact-section h1 {
+                font-size: 2em;
+            }
+            
+            nav ul {
+                gap: 15px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="/static/images/logo-horizontal.png" alt="Fifth Element Photography" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <h1 style="display:none;">FIFTH ELEMENT PHOTOGRAPHY</h1>
+            </div>
+        </div>
+    </header>
+    
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="/">HOME</a></li>
+                {% for gallery in galleries %}
+                <li><a href="/gallery/{{ gallery.slug }}">{{ gallery.name|upper }}</a></li>
+                {% endfor %}
+                <li><a href="/about">ABOUT</a></li>
+                <li><a href="/contact">CONTACT</a></li>
+                <li><a href="https://ko-fi.com/fifthelementphotography" target="_blank">BUY ME A COFFEE</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="contact-section">
+            <h1>Get in Touch</h1>
+            <p>I'd love to hear about your photography needs. Fill out the form below and I'll get back to you as soon as possible.</p>
+            
+            <div id="statusMessage" class="status-message"></div>
+            
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">Name: *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email: *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone: *</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="can_text">Can we text that number? *</label>
+                    <select id="can_text" name="can_text" required>
+                        <option value="">-- Select --</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interested_in">I am interested in: *</label>
+                    <select id="interested_in" name="interested_in" required>
+                        <option value="">-- Select --</option>
+                        <option value="business-portraiture">Business Portraiture Shoot (head shots)</option>
+                        <option value="family-portraiture">Family Portraiture</option>
+                        <option value="pet-portraiture">Pet Portraiture</option>
+                        <option value="corporate-event">Corporate Event</option>
+                        <option value="sporting-event">Sporting Event</option>
+                        <option value="real-estate">Real Estate Marketing Shoot</option>
+                        <option value="product-marketing">Product Marketing Shoot</option>
+                        <option value="artist-band">Artist/Band Promotional shoot</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="otherFieldGroup" style="display: none;">
+                    <label for="other_text">Other:</label>
+                    <input type="text" id="other_text" name="other_text">
+                </div>
+                
+                <div class="form-group">
+                    <label for="event_date">Date of Event or deadline:</label>
+                    <input type="date" id="event_date" name="event_date">
+                </div>
+                
+                <div class="form-group">
+                    <label>How did you hear about my services?</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" name="how_heard" value="Facebook"> Facebook</label>
+                        <label><input type="checkbox" name="how_heard" value="Instagram"> Instagram</label>
+                        <label><input type="checkbox" name="how_heard" value="Google"> Google</label>
+                        <label><input type="checkbox" name="how_heard" value="Printed ad"> Printed ad</label>
+                        <label><input type="checkbox" name="how_heard" value="Referral"> Referral</label>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">Send Message</button>
+                
+                <div class="footer-note">
+                    <p>*I monitor this form daily and will reach out to you as soon as I am able and usually the same day.</p>
+                    <p>Thank You for your interest in my photography services and I look forward to chatting with you.</p>
+                    <p><strong>Rick</strong></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <div class="social-icons">
+                <a href="https://www.facebook.com/fifthelementphotography" target="_blank" aria-label="Facebook">
+                    <i class="fab fa-facebook"></i>
+                </a>
+                <a href="https://www.instagram.com/fifthelementphotography" target="_blank" aria-label="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
+            <p>&copy; 2025 Fifth Element Photography. All rights reserved.</p>
+            <p style="font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 10px;">v{{ app_version }} ({{ app_revision }})</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Show/hide "Other" text field
+        document.getElementById('interested_in').addEventListener('change', function() {
+            const otherField = document.getElementById('otherFieldGroup');
+            if (this.value === 'other') {
+                otherField.style.display = 'block';
+            } else {
+                otherField.style.display = 'none';
+            }
+        });
+        
+        // Handle form submission
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const statusMessage = document.getElementById('statusMessage');
+            
+            // Disable submit button
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            // Collect form data
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                can_text: document.getElementById('can_text').value,
+                interested_in: document.getElementById('interested_in').value,
+                other_text: document.getElementById('other_text').value,
+                event_date: document.getElementById('event_date').value,
+                how_heard: Array.from(document.querySelectorAll('input[name="how_heard"]:checked')).map(cb => cb.value)
+            };
+            
+            try {
+                const response = await fetch('/api/contact/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusMessage.className = 'status-message success';
+                    statusMessage.textContent = 'Thank you! Your message has been sent successfully. I will get back to you soon.';
+                    statusMessage.style.display = 'block';
+                    
+                    // Reset form
+                    document.getElementById('contactForm').reset();
+                    document.getElementById('otherFieldGroup').style.display = 'none';
+                } else {
+                    throw new Error(result.error || 'Failed to send message');
+                }
+            } catch (error) {
+                statusMessage.className = 'status-message error';
+                statusMessage.textContent = 'Sorry, there was an error sending your message. Please try again or contact me directly.';
+                statusMessage.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Message';
+                
+                // Scroll to status message
+                statusMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -3211,9 +3211,15 @@ This email was sent automatically from the Fifth Element Photography contact for
         print(f"Error sending email: {e}")
         return False
 
-@app.route('/contact', methods=['POST'])
+@app.route('/contact', methods=['GET', 'POST'])
 def contact():
-    """Handle contact form submission"""
+    """Handle contact form page and submission"""
+    if request.method == 'GET':
+        # Display contact form page
+        galleries = get_galleries()
+        return render_template('contact.html', galleries=galleries, app_version=APP_VERSION, app_revision=APP_REVISION)
+    
+    # Handle POST - form submission
     try:
         data = request.get_json()
         
