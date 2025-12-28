@@ -106,12 +106,20 @@
         .form-group textarea {
             width: 100%;
             padding: 12px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.1) !important;
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 4px;
-            color: #fff;
+            color: #fff !important;
             font-family: 'Poppins', sans-serif;
             font-size: 14px;
+        }
+        
+        .form-group input:-webkit-autofill,
+        .form-group input:-webkit-autofill:hover,
+        .form-group input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #fff !important;
+            -webkit-box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0.1) inset !important;
+            transition: background-color 5000s ease-in-out 0s;
         }
         
         .form-group input:focus,
