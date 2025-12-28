@@ -117,6 +117,18 @@ The Gmail App Password for the contact form is stored securely in the sandbox at
 
 ## 4. Recent Fixes & Features
 
+### Dec 28, 2025: Lumaprints Bulk Mapping Tool - Automatic Preprocessing
+*   **Feature**: Automated preprocessing of Lumaprints Excel exports to eliminate manual editing.
+*   **Location**: `/api/lumaprints/upload` route in `app.py` (lines ~5125-5131)
+*   **Module**: `lumaprints_mapper.py`
+*   **What It Does**:
+    1. **Sorts uploaded Excel file A-Z by Column A (Product Name)** - Keeps header row (Row 1) in place
+    2. **Deletes all rows where Column O (Mapping Status) = "Mapped"** - Keeps only "Unmapped" products
+    3. **Proceeds with existing mapping workflow** - No changes to mapping functionality
+*   **Result**: User can upload raw Lumaprints export directly without manual Excel editing
+*   **Testing**: Verified with 975-product file (842 Mapped + 133 Unmapped) → Result: 133 Unmapped products, sorted A-Z
+*   **Version**: 1.1.0 (Dec 28, 2025)
+
 ### Dec 28, 2025: Contact Form
 *   **Feature**: Professional contact form with Gmail SMTP email delivery.
 *   **Location**: 
