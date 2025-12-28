@@ -5122,11 +5122,7 @@ def lumaprints_upload():
         # Load and process
         wb, ws = lm.load_excel(temp_path)
         
-        # PREPROCESSING STEP 1: Sort A-Z by Column A (Product Name)
-        print("Sorting worksheet A-Z by Product Name...")
-        lm.sort_worksheet_by_product_name(ws)
-        
-        # PREPROCESSING STEP 2: Delete all rows with "Mapped" status
+        # Delete all rows with "Mapped" status
         deleted_count = lm.delete_mapped_rows(ws)
         print(f"Deleted {deleted_count} mapped rows")
         
