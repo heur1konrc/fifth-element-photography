@@ -26,13 +26,34 @@ This document allows any AI agent to immediately resume work on the **Fifth Elem
     *   **Performance**: Uses **thumbnails** for fast loading.
     *   **Schema**: Fixed (`image_filename` used consistently).
     *   **Save**: Fixed (`NOT NULL constraint` resolved).
-*   **Contact Form**: **FULLY FUNCTIONAL**.
+*   **Contact Form**: **FULLY FUNCTIONAL** (Version 1.0.0 - Dec 28, 2025).
     *   **Page**: Accessible at `/contact` route (GET request displays form, POST submits)
     *   **Template**: `templates/contact.html` (standalone page)
+    *   **Route Handler**: `/contact` in `app.py` (lines ~3214-3280)
     *   **API Endpoint**: `/api/contact/submit` (POST) - handled by `routes/contact_form.py`
     *   **Email Integration**: Gmail SMTP working with App Password authentication.
-    *   **Fields**: Name, Email, Phone, Text opt-in, Interests dropdown, Event date, Referral source checkboxes.
-    *   **Design**: Matches site aesthetic (Poppins font, #6799c2 accent).
+    *   **Email Credentials**: Stored in `/home/ubuntu/.email_credentials`
+    *   **Fields**: 
+        - Name (required text input)
+        - Email (required text input)
+        - Phone (required text input)
+        - Can we text that number? (dropdown: Yes/No)
+        - I am interested in: (dropdown with 9 options including "Other")
+        - Other: (conditional text field, appears when "Other" selected)
+        - Date of Event or deadline (date picker)
+        - How did you hear about my services? (checkboxes: Facebook, Instagram, Google, Printed ad, Referral)
+    *   **Design**: Dark theme matching site aesthetic
+        - Font: Poppins
+        - Primary accent: #6799c2 (blue)
+        - Secondary accent: #ff6b35 (orange)
+        - Background: rgba(255, 255, 255, 0.1) for inputs
+        - Text: #fff (white)
+    *   **Styling Issues Fixed**:
+        - Dropdown options: Dark background (#1a1a1a) with white text
+        - Input fields: Forced dark semi-transparent background with !important flags
+        - Webkit autofill: Override to maintain dark theme
+    *   **Version History**:
+        - v1.0.0 (Dec 28, 2025): Initial implementation with all fields and email integration
 *   **Order Prints**: Active and functional.
 *   **Deployment**: All fixes pushed to `main` branch on GitHub.
 
