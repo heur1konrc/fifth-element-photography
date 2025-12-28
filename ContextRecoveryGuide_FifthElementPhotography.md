@@ -1,0 +1,191 @@
+# Context Recovery Guide: Fifth Element Photography
+**Date**: Dec 27, 2025
+**Status**: STABLE (Critical Bugs Fixed & Features Added)
+**Repository**: `heur1konrc/fifth-element-photography` (Public)
+
+---
+
+## 1. Executive Summary
+This document allows any AI agent to immediately resume work on the **Fifth Element Photography** project without losing context.
+
+**Current State**:
+*   **Shopify Mapping Tool**: **FULLY OPTIMIZED**.
+    *   **Search Bar**: **ADDED**. You can now filter images by title or filename instantly.
+    *   **Performance**: Uses **thumbnails** for fast loading.
+    *   **Schema**: Fixed (`image_filename` used consistently).
+    *   **Save**: Fixed (`NOT NULL constraint` resolved).
+*   **Order Prints**: Active and functional.
+*   **Deployment**: All fixes pushed to `main` branch on GitHub.
+
+---
+
+## 2. Critical Authentication (READ THIS FIRST)
+
+**GitHub Credentials Location**:
+The GitHub Personal Access Token (PAT) and authentication details are stored securely in the sandbox at:
+```
+/home/ubuntu/.github_credentials
+```
+
+**How to Use**:
+1. Read the credentials file to get the PAT:
+   ```bash
+   cat /home/ubuntu/.github_credentials
+   ```
+
+2. Set the git remote URL using the credentials:
+   ```bash
+   git remote set-url origin https://[USERNAME]:[PAT]@github.com/heur1konrc/fifth-element-photography.git
+   ```
+   (Replace `[USERNAME]` and `[PAT]` with values from the credentials file)
+
+*Note: The token is valid for 90 days from Dec 27, 2025.*
+
+---
+
+## 3. Recent Fixes & Features (Dec 27, 2025)
+
+### A. Search & Filter (New!)
+*   **Feature**: Added a search bar to the top of the Shopify Mapping page.
+*   **Implementation**: Client-side JavaScript filtering in `templates/admin/shopify_mapping.html`.
+*   **Result**: Users can instantly find specific images without scrolling through hundreds of cards.
+
+### B. Performance Optimization (Thumbnails)
+*   **Issue**: The Mapping Page was loading full-resolution images, causing massive lag.
+*   **Fix**:
+    1.  Added `/admin/thumbnail/<filename>` route to `routes/shopify_admin.py`.
+    2.  Updated `templates/admin/shopify_mapping.html` to use this route.
+*   **Result**: Page loads significantly faster.
+
+### C. Schema & Save Fixes
+*   **Schema**: Fixed mismatch between `image_title` and `image_filename`.
+*   **Save**: Fixed `NOT NULL constraint` error by preserving existing Shopify IDs during updates.
+
+---
+
+## 4. System Architecture
+
+### Database (`print_ordering.db`)
+*   **Table**: `shopify_products`
+*   **Schema**:
+    *   `id` (INTEGER PRIMARY KEY)
+    *   `image_filename` (TEXT NOT NULL) - **Key Identifier**
+    *   `category` (TEXT NOT NULL) - e.g., "Metal", "Canvas"
+    *   `shopify_product_id` (TEXT) - The ID from Shopify
+    *   `shopify_handle` (TEXT NOT NULL) - The handle used for URLs
+    *   `UNIQUE(image_filename, category)`
+
+### File Structure
+*   `/data`: Stores high-res images and the database.
+*   `/data/thumbnails`: Stores generated thumbnails.
+*   `routes/shopify_admin.py`: Backend logic for the admin tool.
+*   `templates/admin/shopify_mapping.html`: Frontend interface.
+
+---
+
+## 5. Immediate Next Steps
+
+**1. Verify Search Functionality**:
+*   Open the Shopify Mapping page.
+*   Type in the search bar.
+*   Confirm that non-matching images disappear instantly.
+
+**2. Verify Thumbnail Loading**:
+*   Confirm that images load quickly and are not full-resolution (check network tab if unsure).
+
+---
+
+## 6. Troubleshooting
+
+**"Repository not found" Error**:
+*   Ensure you are using the correct URL: `https://github.com/heur1konrc/fifth-element-photography.git`
+*   Ensure you are using the PAT from `/home/ubuntu/.github_credentials`.
+
+**"No such column" Error**:
+*   This should be fixed. If it recurs, check if `routes/shopify_admin.py` was reverted. It MUST use `image_filename`.
+
+---
+
+# ADDENDUM: Controlling Shopify Product Selection
+**Date**: Dec 27, 2025
+**Related File**: `routes/shopify_api_creator.py`
+
+---
+
+## A1. Purpose
+This addendum explains how to **Add** or **Remove** specific product variants (e.g., "Rolled Canvas", "4x6 Prints", "Silver Frames") from the "Create Shopify Product" tool.
+
+The tool does not simply "copy" the database; it uses specific **Filters** and **Lists** to decide what to send to Shopify.
+
+## A2. Removing "Rolled Canvas" (or other Sub-Categories)
+**Mechanism**: SQL Query Filtering
+**Location**: `routes/shopify_api_creator.py` (Lines ~166-190)
+
+The code fetches products using a SQL query. To remove a specific type like "Rolled Canvas", you must add an exclusion condition to the `WHERE` clause.
+
+**Current Code:**
+```python
+WHERE bp.is_available = TRUE
+AND ar.display_name = ?
+AND pc.display_name IN ('Canvas', 'Fine Art Paper', 'Foam-mounted Fine Art Paper', 'Metal')
+```
+
+**How to Modify (Exclude Rolled Canvas):**
+Add `AND ps.display_name NOT LIKE '%Rolled%'` to the query.
+
+```python
+WHERE bp.is_available = TRUE
+AND ar.display_name = ?
+AND pc.display_name IN ('Canvas', 'Fine Art Paper', 'Foam-mounted Fine Art Paper', 'Metal')
+AND ps.display_name NOT LIKE '%Rolled%'  # <--- ADD THIS LINE
+```
+
+## A3. Adding/Removing Frame Options
+**Mechanism**: Hardcoded List
+**Location**: `routes/shopify_api_creator.py` (Lines ~195-212)
+
+Framed canvases are NOT fetched purely from the database. They are defined in a manual list called `framed_canvas_config`.
+
+**Current Code:**
+```python
+framed_canvas_config = [
+    ('0.75" Framed Canvas', [
+        ('Black', 'black_floating_075'),
+        ('White', 'white_floating_075'),
+        ('Silver', 'silver_floating_075'), # <--- TO REMOVE SILVER, DELETE THIS LINE
+        ('Gold', 'gold_plein_air'),
+    ]),
+    # ...
+]
+```
+
+**How to Modify:**
+*   **To Remove**: Simply delete the line (e.g., the 'Silver' line).
+*   **To Add**: Add a new tuple: `('Color Name', 'database_option_name')`.
+    *   *Note*: The `database_option_name` must exist in the `product_options` table in your database.
+
+## A4. Renaming Products (The Mapping)
+**Mechanism**: Dictionary Lookup
+**Location**: `routes/shopify_api_creator.py` (Function `map_product_type_to_shopify`, Lines ~75-100)
+
+If you want "Glossy White Metal" to appear as "High-Gloss Metal Print" on Shopify, change it here.
+
+**Current Code:**
+```python
+mapping = {
+    'Glossy White Metal': 'Glossy White Metal Print',
+    # ...
+}
+```
+
+**How to Modify:**
+Change the value on the right side.
+```python
+mapping = {
+    'Glossy White Metal': 'High-Gloss Metal Print', # <--- CHANGED
+    # ...
+}
+```
+
+---
+**End of Context Recovery Guide**
