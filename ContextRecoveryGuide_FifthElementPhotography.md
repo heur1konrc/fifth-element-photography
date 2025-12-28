@@ -8,6 +8,15 @@
 ## 1. Executive Summary
 This document allows any AI agent to immediately resume work on the **Fifth Element Photography** project without losing context.
 
+### 🔴 MANDATORY REQUIREMENT FOR ALL AI AGENTS
+**When ANY feature or fix is completed, you MUST:**
+1. **Update this Context Recovery Guide** with complete implementation details
+2. **Create or update version documentation** for the feature/component
+3. **Commit and push documentation changes** to the repository
+4. **DO NOT ask for permission** - this is a standing requirement
+
+Failure to maintain documentation causes context loss and wastes client money.
+
 ### ⚠️ CRITICAL: Live Template Information
 **The live production website uses `templates/index_new.html` NOT `templates/index.html`**
 
