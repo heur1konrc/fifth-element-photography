@@ -3213,6 +3213,14 @@ This email was sent automatically from the Fifth Element Photography contact for
         print(f"Error sending email: {e}")
         return False
 
+@app.route('/about')
+def about():
+    """About page with bio and image"""
+    from gallery_db import get_all_galleries
+    galleries = get_all_galleries()
+    about_data = load_about_data()
+    return render_template('about.html', galleries=galleries, about_data=about_data, app_version=APP_VERSION, app_revision=APP_REVISION)
+
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     """Handle contact form page and submission"""
