@@ -464,6 +464,10 @@
                                     <i class="fas fa-file-excel"></i>
                                     Lumaprints Bulk Mapping
                                 </button>
+                                <button class="sidebar-button btn-success" onclick="openExcelCleanupModal()">
+                                    <i class="fas fa-broom"></i>
+                                    Excel Cleanup Tool
+                                </button>
                                 <button class="sidebar-button btn-danger" onclick="fixShopifyTable()">
                                     <i class="fas fa-database"></i>
                                     Fix Shopify Table
@@ -525,6 +529,10 @@
                                 <button class="sidebar-button btn-warning" onclick="openLumaprintsModal()">
                                     <i class="fas fa-file-excel"></i>
                                     Lumaprints Bulk Mapping
+                                </button>
+                                <button class="sidebar-button btn-success" onclick="openExcelCleanupModal()">
+                                    <i class="fas fa-broom"></i>
+                                    Excel Cleanup Tool
                                 </button>
                                 <button class="sidebar-button btn-danger" onclick="fixShopifyTable()">
                                     <i class="fas fa-database"></i>
@@ -921,6 +929,39 @@
         </div>
     </div>
 
+    <!-- Excel Cleanup Tool Modal -->
+    <div id="excel-cleanup-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🧹 Excel Cleanup Tool</h2>
+                <button class="modal-close" onclick="closeExcelCleanupModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>This tool will:</p>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li>Sort the Excel file A-Z by Column A (Product Name)</li>
+                    <li>Remove all rows with "Mapped" status in Column O</li>
+                    <li>Provide a cleaned file ready for the Lumaprints Bulk Mapping Tool</li>
+                </ul>
+                
+                <div style="margin: 20px 0;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: bold;">Upload Lumaprints Excel Export:</label>
+                    <input type="file" id="excel-cleanup-file-input" accept=".xlsx" style="margin-bottom: 15px;">
+                    <button id="btn-excel-cleanup-process" class="btn btn-primary">Process File</button>
+                </div>
+                
+                <div id="excel-cleanup-status" style="margin-top: 20px;"></div>
+                
+                <div id="excel-cleanup-download-section" style="display: none; margin-top: 20px;">
+                    <button id="btn-excel-cleanup-download" class="btn btn-success">Download Cleaned File</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeExcelCleanupModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ url_for('static', filename='js/admin_new.js') }}"></script>
     <script src="{{ url_for('static', filename='js/thumbnail_admin.js') }}"></script>
     <script src="{{ url_for('static', filename='js/image_analysis.js') }}"></script>
@@ -930,6 +971,7 @@
     <script src="{{ url_for('static', filename='js/image_sort_filter.js') }}"></script>
     <script src="{{ url_for('static', filename='js/selector_modals.js') }}"></script>
     <script src="{{ url_for('static', filename='js/regenerate_gallery.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/excel_cleanup.js') }}"></script>
     <script>
         function toggleCollapsible(header) {
             const content = header.nextElementSibling;

@@ -69,6 +69,7 @@ from routes.regenerate_gallery_image import register_regenerate_gallery_image_ro
 from routes.watermark_routes import watermark_bp
 from routes.download_images import download_bp as download_images_bp
 from routes.contact_form import contact_form_bp
+from routes.excel_cleanup import excel_cleanup_bp
 app.register_blueprint(pricing_admin_bp)
 app.register_blueprint(setup_pricing_bp)
 app.register_blueprint(shopify_admin_bp)
@@ -92,6 +93,7 @@ app.register_blueprint(disable_sizes_bp)
 app.register_blueprint(watermark_bp)
 app.register_blueprint(download_images_bp)
 app.register_blueprint(contact_form_bp)
+app.register_blueprint(excel_cleanup_bp)
 
 # Initialize database if it doesn't exist
 def ensure_database_exists():
