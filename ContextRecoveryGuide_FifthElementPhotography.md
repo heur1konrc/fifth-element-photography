@@ -122,6 +122,23 @@ The Gmail App Password for the contact form is stored securely in the sandbox at
 
 ## 4. Recent Fixes & Features
 
+### Dec 29, 2025: Navigation & About Page
+*   **Feature**: Implemented nested dropdown navigation and created a new About page.
+*   **Navigation Dropdown**:
+    *   **Location**: `templates/index_new.html`, `templates/contact.html`, `templates/gallery_page.html`
+    *   **Implementation**: A "GALLERIES" dropdown now houses all photo gallery links (Geology, Nature, etc.), cleaning up the main nav bar.
+    *   **Mobile Support**: Fully responsive with touch support. Tapping "GALLERIES" on mobile toggles the dropdown.
+    *   **Hover Fix**: Corrected a CSS issue where the dropdown would disappear when the mouse moved from the nav item to the menu. The gap was bridged by removing `margin-top` and adding `padding-top` with a pseudo-element.
+    *   **Link Fix**: Added the missing "Buy Me A Coffee" link to the `gallery_page.html` template.
+*   **About Page**:
+    *   **Route**: `/about` (defined in `app.py`)
+    *   **Template**: `templates/about.html`
+    *   **Content**: Displays the bio and image managed from the Admin -> Settings tab.
+    *   **Layout**: Features text wrapping around the floated image on desktop, and a stacked layout on mobile.
+    *   **Title**: Page title changed from "About the Photographer" to "My Story".
+*   **Styling Updates**:
+    *   **Contact Form**: Changed the "Get in Touch" heading color to `#7B68EE` to match the site's primary accent color.
+
 ### Dec 28, 2025: Excel Cleanup Tool (Standalone)
 *   **Feature**: Separate standalone tool to prepare Lumaprints Excel exports before bulk mapping.
 *   **Location**: 
