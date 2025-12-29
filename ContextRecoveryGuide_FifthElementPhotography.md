@@ -36,6 +36,11 @@ Failure to maintain documentation causes context loss and wastes client money.
     *   **Schema**: Fixed (`image_filename` used consistently).
     *   **Save**: Fixed (`NOT NULL constraint` resolved).
 *   **Contact Form**: **FULLY FUNCTIONAL** (Version 1.0.0 - Dec 28, 2025).
+*   **Excel Cleanup Tool**: **FULLY FUNCTIONAL** (Version 1.0.0 - Dec 28, 2025).
+        - Standalone tool on Admin/Shopify tab
+        - Sorts Excel A-Z by Column A and removes "Mapped" rows
+        - Processing time: 8.5 seconds for 975-row file
+        - API: `/api/excel-cleanup/process` (POST), `/api/excel-cleanup/download` (GET)
     *   **Page**: Accessible at `/contact` route (GET request displays form, POST submits)
     *   **Template**: `templates/contact.html` (standalone page)
     *   **Route Handler**: `/contact` in `app.py` (lines ~3214-3280)
@@ -117,17 +122,30 @@ The Gmail App Password for the contact form is stored securely in the sandbox at
 
 ## 4. Recent Fixes & Features
 
-### Dec 28, 2025: Lumaprints Bulk Mapping Tool - Automatic Preprocessing
-*   **Feature**: Automated preprocessing of Lumaprints Excel exports to eliminate manual editing.
-*   **Location**: `/api/lumaprints/upload` route in `app.py` (lines ~5125-5131)
-*   **Module**: `lumaprints_mapper.py`
+### Dec 28, 2025: Excel Cleanup Tool (Standalone)
+*   **Feature**: Separate standalone tool to prepare Lumaprints Excel exports before bulk mapping.
+*   **Location**: 
+    *   Button: Admin/Shopify tab → "Excel Cleanup Tool" button
+    *   Modal: `templates/admin_new.html` (Excel Cleanup Tool modal)
+    *   Backend: `routes/excel_cleanup.py`
+    *   Frontend JS: `static/js/excel_cleanup.js`
+    *   API Endpoints: 
+        - `/api/excel-cleanup/process` (POST) - Process uploaded file
+        - `/api/excel-cleanup/download` (GET) - Download cleaned file
 *   **What It Does**:
     1. **Sorts uploaded Excel file A-Z by Column A (Product Name)** - Keeps header row (Row 1) in place
-    2. **Deletes all rows where Column O (Mapping Status) = "Mapped"** - Keeps only "Unmapped" products
-    3. **Proceeds with existing mapping workflow** - No changes to mapping functionality
-*   **Result**: User can upload raw Lumaprints export directly without manual Excel editing
+    2. **Removes all rows where Column O (Mapping Status) = "Mapped"** - Keeps only "Unmapped" products
+    3. **Provides cleaned file for download** - Ready for Lumaprints Bulk Mapping Tool
+*   **Performance**: Optimized to process 975-row file in **8.5 seconds** (17x faster than initial version)
+*   **Workflow**:
+    1. Export from Lumaprints
+    2. Use Excel Cleanup Tool to remove mapped rows and sort
+    3. Download cleaned file
+    4. Use Lumaprints Bulk Mapping Tool with cleaned file
+*   **Result**: Eliminates manual Excel editing step, saves 5-10 minutes per upload
 *   **Testing**: Verified with 975-product file (842 Mapped + 133 Unmapped) → Result: 133 Unmapped products, sorted A-Z
-*   **Version**: 1.1.0 (Dec 28, 2025)
+*   **Version**: 1.0.0 (Dec 28, 2025)
+*   **Note**: This is a SEPARATE tool from Lumaprints Bulk Mapping Tool - preprocessing was removed from the mapping tool to keep it simple
 
 ### Dec 28, 2025: Contact Form
 *   **Feature**: Professional contact form with Gmail SMTP email delivery.
