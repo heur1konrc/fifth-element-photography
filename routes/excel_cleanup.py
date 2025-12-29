@@ -34,44 +34,34 @@ def process_excel():
         # Get total rows before processing
         total_rows_before = ws.max_row - 1  # Exclude header
         
-        # Step 1: Sort by Column A (Product Name)
-        # Get all data rows (skip header row 1)
+        # Step 1 & 2 Combined: Read, sort, and filter in one pass
+        # Get all data rows (skip header row 1) - values only, no formatting
         data_rows = []
         for row_idx in range(2, ws.max_row + 1):
-            row_data = []
-            for col_idx in range(1, ws.max_column + 1):
-                cell = ws.cell(row=row_idx, column=col_idx)
-                row_data.append({
-                    'value': cell.value,
-                    'style': cell._style
-                })
+            row_data = [ws.cell(row=row_idx, column=col_idx).value 
+                       for col_idx in range(1, ws.max_column + 1)]
             data_rows.append(row_data)
         
         # Sort by Column A (index 0)
-        data_rows.sort(key=lambda x: str(x[0]['value']).lower() if x[0]['value'] else '')
+        data_rows.sort(key=lambda x: str(x[0]).lower() if x[0] else '')
+        
+        # Filter out "Mapped" rows (Column O is index 14)
+        deleted_count = 0
+        filtered_rows = []
+        for row_data in data_rows:
+            mapping_status = row_data[14]  # Column O (15th column, index 14)
+            if mapping_status and str(mapping_status).strip().lower() == 'mapped':
+                deleted_count += 1
+            else:
+                filtered_rows.append(row_data)
         
         # Clear existing data (keep header)
         for row_idx in range(ws.max_row, 1, -1):
             ws.delete_rows(row_idx)
         
-        # Write sorted data back
-        for row_data in data_rows:
-            new_row_idx = ws.max_row + 1
-            for col_idx, cell_data in enumerate(row_data, start=1):
-                cell = ws.cell(row=new_row_idx, column=col_idx)
-                cell.value = cell_data['value']
-                cell._style = cell_data['style']
-        
-        # Step 2: Delete rows with "Mapped" in Column O (column 15)
-        deleted_count = 0
-        row_idx = 2  # Start from first data row
-        while row_idx <= ws.max_row:
-            mapping_status = ws.cell(row=row_idx, column=15).value
-            if mapping_status and str(mapping_status).strip().lower() == 'mapped':
-                ws.delete_rows(row_idx)
-                deleted_count += 1
-            else:
-                row_idx += 1
+        # Write filtered and sorted data back (values only)
+        for row_data in filtered_rows:
+            ws.append(row_data)
         
         # Get total rows after processing
         total_rows_after = ws.max_row - 1  # Exclude header
