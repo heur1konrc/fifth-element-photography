@@ -67,6 +67,70 @@
             color: #7B68EE;
         }
 
+        /* Dropdown Navigation */
+        nav li {
+            position: relative;
+        }
+        
+        nav li.dropdown {
+            cursor: pointer;
+        }
+        
+        nav li.dropdown > a {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        nav li.dropdown > a::after {
+            content: '▼';
+            font-size: 10px;
+            transition: transform 0.3s;
+        }
+        
+        nav li.dropdown:hover > a::after {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            padding: 10px 0;
+            min-width: 180px;
+            margin-top: 10px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        
+        nav li.dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        .dropdown-menu li {
+            padding: 0;
+        }
+        
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 20px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        
+        .dropdown-menu a:hover {
+            background: rgba(123, 104, 238, 0.1);
+        }
+        
+        .dropdown-menu.active {
+            display: block;
+        }
+
         /* Hero Image */
         .hero-image {
             width: 100%;
@@ -164,9 +228,16 @@
         <div class="container">
             <ul>
                 <li><a href="/">HOME</a></li>
-                {% for g in galleries %}
-                <li><a href="/gallery/{{ g.slug }}" {% if g.id == gallery.id %}class="active"{% endif %}>{{ g.name|upper }}</a></li>
-                {% endfor %}
+                {% if galleries %}
+                <li class="dropdown">
+                    <a href="#">GALLERIES</a>
+                    <ul class="dropdown-menu">
+                        {% for g in galleries %}
+                        <li><a href="/gallery/{{ g.slug }}" {% if g.id == gallery.id %}class="active"{% endif %}>{{ g.name|upper }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% endif %}
                 <li><a href="/about">ABOUT</a></li>
                 <li><a href="/contact">CONTACT</a></li>
             </ul>
@@ -241,6 +312,40 @@
         };
         openModalBeta(data);
     }
+    
+    // Mobile dropdown functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdowns = document.querySelectorAll('.dropdown');
+        
+        dropdowns.forEach(dropdown => {
+            const link = dropdown.querySelector('a');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            
+            // Prevent default click behavior on mobile
+            link.addEventListener('click', function(e) {
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                    
+                    // Close other dropdowns
+                    document.querySelectorAll('.dropdown-menu').forEach(m => {
+                        if (m !== menu) m.classList.remove('active');
+                    });
+                    
+                    // Toggle this dropdown
+                    menu.classList.toggle('active');
+                }
+            });
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                    menu.classList.remove('active');
+                });
+            }
+        });
+    });
     </script>
 </body>
 </html>
