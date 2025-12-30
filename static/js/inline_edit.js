@@ -95,6 +95,7 @@ async function toggleFeatured(filename) {
 // Toggle Carousel status
 async function toggleCarousel(filename) {
     try {
+        console.log('Toggling carousel for:', filename);
         const response = await fetch('/admin/toggle-carousel', {
             method: 'POST',
             headers: {
@@ -103,10 +104,26 @@ async function toggleCarousel(filename) {
             body: JSON.stringify({ filename: filename })
         });
         
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server error:', errorText);
+            showNotification(`Server error: ${response.status}`, 'error');
+            return;
+        }
+        
         const data = await response.json();
+        console.log('Response data:', data);
         
         if (data.success) {
             const icon = document.querySelector(`.image-panel-horizontal[data-filename="${filename}"] .fa-images`);
+            if (!icon) {
+                console.error('Icon not found for filename:', filename);
+                showNotification('UI error: icon not found', 'error');
+                return;
+            }
+            
             if (data.in_carousel) {
                 icon.classList.add('active');
                 icon.title = 'Remove from Carousel';
@@ -121,7 +138,7 @@ async function toggleCarousel(filename) {
         }
     } catch (error) {
         console.error('Error toggling carousel:', error);
-        showNotification('Error toggling carousel status', 'error');
+        showNotification(`Error: ${error.message}`, 'error');
     }
 }
 
