@@ -122,6 +122,30 @@ The Gmail App Password for the contact form is stored securely in the sandbox at
 
 ## 4. Recent Fixes & Features
 
+### Dec 30, 2025: Hero Image Focal Point Control
+*   **Feature**: Added ability to control the focal point of hero images on gallery pages.
+*   **Implementation**:
+    *   **Database**: Added `hero_focal_point` column to `galleries` table in `gallery_db.py` (default: 'center-center')
+    *   **Admin UI**: Added focal point selector dropdown to Gallery Admin edit form with 9 preset positions:
+        - top-left, top-center, top-right
+        - center-left, center-center, center-right
+        - bottom-left, bottom-center, bottom-right
+    *   **Frontend**: Updated `templates/gallery_page.html` to apply focal point using CSS `object-position` property
+    *   **Hero Height Reduction**: Reduced hero image height by 25%:
+        - Desktop: 500px → 375px
+        - Mobile: 300px → 225px
+*   **How It Works**:
+    *   Gallery admin selects focal point from dropdown when editing gallery
+    *   Focal point value is stored in database (e.g., 'top-left', 'center-center')
+    *   Template converts hyphenated value to CSS format (e.g., 'top left', 'center center')
+    *   CSS variable `--hero-focal-point` is set on `.hero-image` div
+    *   `object-position` property controls which part of the image is centered when cropped
+*   **Files Modified**:
+    *   `gallery_db.py`: Added column and migration logic
+    *   `templates/gallery_admin.html`: Added focal point selector to edit form
+    *   `templates/gallery_page.html`: Reduced hero height and added CSS object-position
+*   **Result**: Gallery owners can now control which part of their hero image is visible when it's cropped to fit the hero container, ensuring important subjects remain in frame.
+
 ### Dec 30, 2025: Watermark Positioning & Replacement
 *   **Feature**: Replaced watermark images with new signature-style versions and adjusted positioning for a tighter fit.
 *   **Watermark Files**:
