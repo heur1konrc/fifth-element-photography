@@ -63,7 +63,7 @@ def apply_watermark(image_path, output_path=None, position='bottom-right', size=
         target_wm_width = int(width * scale)
         
         # Determine position coordinates
-        padding = int(width * 0.02) # 2% padding
+        padding = 5  # 5 pixels from edge
         
         # Define regions for brightness calculation if auto
         # We need to know where the watermark WILL go to check brightness there
