@@ -155,6 +155,11 @@
                     <small style="color: rgba(255,255,255,0.6);">Controls which part of the hero image is centered when cropped</small>
                 </div>
                 <div class="form-group">
+                    <label>Category</label>
+                    <input type="text" id="galleryCategory" placeholder="e.g., Sports, Nature, Events">
+                    <small style="color: rgba(255,255,255,0.6);">Optional - Groups galleries in navigation dropdown</small>
+                </div>
+                <div class="form-group">
                     <label>Description</label>
                     <textarea id="galleryDescription" rows="3"></textarea>
                 </div>
@@ -330,6 +335,7 @@
             document.getElementById('gallerySlug').value = gallery.slug;
             document.getElementById('heroImage').value = gallery.hero_image || '';
             document.getElementById('heroFocalPoint').value = gallery.hero_focal_point || 'center-center';
+            document.getElementById('galleryCategory').value = gallery.category || '';
             document.getElementById('galleryDescription').value = gallery.description || '';
             document.getElementById('displayOrder').value = gallery.display_order || 0;
             
@@ -352,6 +358,7 @@
                 slug: document.getElementById('gallerySlug').value,
                 hero_image: document.getElementById('heroImage').value,
                 hero_focal_point: document.getElementById('heroFocalPoint').value,
+                category: document.getElementById('galleryCategory').value,
                 description: document.getElementById('galleryDescription').value,
                 display_order: parseInt(document.getElementById('displayOrder').value)
             };

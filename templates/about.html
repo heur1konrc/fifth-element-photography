@@ -145,6 +145,29 @@
             display: block;
         }
         
+        /* Nested dropdown for categories */
+        .dropdown-menu .category-item {
+            position: relative;
+        }
+        
+        .dropdown-menu .category-header {
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #7B68EE;
+            cursor: default;
+            white-space: nowrap;
+        }
+        
+        .dropdown-menu .category-submenu {
+            padding-left: 15px;
+        }
+        
+        .dropdown-menu .category-submenu a {
+            padding: 8px 20px;
+            font-size: 12px;
+        }
+        
         /* About Content */
         .about-section {
             max-width: 1200px;
@@ -290,7 +313,31 @@
                 <li class="dropdown">
                     <a href="#">GALLERIES</a>
                     <ul class="dropdown-menu">
+                        {% set categories = {} %}
+                        {% set uncategorized = [] %}
                         {% for gallery in galleries %}
+                            {% if gallery.category %}
+                                {% if gallery.category not in categories %}
+                                    {% set _ = categories.update({gallery.category: []}) %}
+                                {% endif %}
+                                {% set _ = categories[gallery.category].append(gallery) %}
+                            {% else %}
+                                {% set _ = uncategorized.append(gallery) %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% for category in categories|sort %}
+                        <li class="category-item">
+                            <div class="category-header">{{ category|upper }}</div>
+                            <ul class="category-submenu">
+                                {% for gallery in categories[category] %}
+                                <li><a href="/gallery/{{ gallery.slug }}">{{ gallery.name|upper }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                        
+                        {% for gallery in uncategorized %}
                         <li><a href="/gallery/{{ gallery.slug }}">{{ gallery.name|upper }}</a></li>
                         {% endfor %}
                     </ul>

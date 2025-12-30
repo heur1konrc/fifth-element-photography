@@ -141,6 +141,29 @@
         .dropdown-menu.active {
             display: block;
         }
+        
+        /* Nested dropdown for categories */
+        .dropdown-menu .category-item {
+            position: relative;
+        }
+        
+        .dropdown-menu .category-header {
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #7B68EE;
+            cursor: default;
+            white-space: nowrap;
+        }
+        
+        .dropdown-menu .category-submenu {
+            padding-left: 15px;
+        }
+        
+        .dropdown-menu .category-submenu a {
+            padding: 8px 20px;
+            font-size: 12px;
+        }
 
         /* Hero Image */
         .hero-image {
@@ -284,7 +307,31 @@
                 <li class="dropdown">
                     <a href="#">GALLERIES</a>
                     <ul class="dropdown-menu">
+                        {% set categories = {} %}
+                        {% set uncategorized = [] %}
                         {% for g in galleries %}
+                            {% if g.category %}
+                                {% if g.category not in categories %}
+                                    {% set _ = categories.update({g.category: []}) %}
+                                {% endif %}
+                                {% set _ = categories[g.category].append(g) %}
+                            {% else %}
+                                {% set _ = uncategorized.append(g) %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% for category in categories|sort %}
+                        <li class="category-item">
+                            <div class="category-header">{{ category|upper }}</div>
+                            <ul class="category-submenu">
+                                {% for g in categories[category] %}
+                                <li><a href="/gallery/{{ g.slug }}" {% if g.id == gallery.id %}class="active"{% endif %}>{{ g.name|upper }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                        
+                        {% for g in uncategorized %}
                         <li><a href="/gallery/{{ g.slug }}" {% if g.id == gallery.id %}class="active"{% endif %}>{{ g.name|upper }}</a></li>
                         {% endfor %}
                     </ul>
