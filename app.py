@@ -5449,19 +5449,7 @@ def apply_watermark_api():
         if not os.path.exists(original_path):
             return jsonify({'success': False, 'error': 'Image not found'}), 404
         
-        # Apply watermark to original
-        success = apply_watermark(
-            original_path,
-            output_path=original_path,
-            position=position,
-            size=size,
-            color_mode=color
-        )
-        
-        if not success:
-            return jsonify({'success': False, 'error': 'Failed to apply watermark'}), 500
-        
-        # Regenerate gallery-optimized version with watermark
+        # First, create gallery-optimized version WITHOUT watermark
         gallery_path = os.path.join('/data/gallery-images', filename)
         os.makedirs('/data/gallery-images', exist_ok=True)
         
@@ -5487,6 +5475,18 @@ def apply_watermark_api():
             
             # Save gallery image with good quality
             img.save(gallery_path, 'JPEG', quality=90, optimize=True)
+        
+        # Now apply watermark to the gallery-sized image
+        success = apply_watermark(
+            gallery_path,
+            output_path=gallery_path,
+            position=position,
+            size=size,
+            color_mode=color
+        )
+        
+        if not success:
+            return jsonify({'success': False, 'error': 'Failed to apply watermark'}), 500
         
         return jsonify({'success': True, 'message': 'Watermark applied successfully'})
         
