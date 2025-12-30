@@ -73,7 +73,7 @@ async function toggleFeatured(filename) {
         const data = await response.json();
         
         if (data.success) {
-            const icon = document.querySelector(`.image-panel-horizontal[data-filename="${filename}"] .fa-star`);
+            const icon = document.querySelector(`.image-panel-new[data-filename="${filename}"] .fa-star`);
             if (data.is_featured) {
                 icon.classList.add('active');
                 icon.title = 'Remove from Featured';
@@ -117,7 +117,7 @@ async function toggleCarousel(filename) {
         console.log('Response data:', data);
         
         if (data.success) {
-            const icon = document.querySelector(`.image-panel-horizontal[data-filename="${filename}"] .fa-images`);
+            const icon = document.querySelector(`.image-panel-new[data-filename="${filename}"] .fa-images`);
             if (!icon) {
                 console.error('Icon not found for filename:', filename);
                 showNotification('UI error: icon not found', 'error');
