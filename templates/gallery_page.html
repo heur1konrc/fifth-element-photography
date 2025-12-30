@@ -145,7 +145,7 @@
         /* Hero Image */
         .hero-image {
             width: 100%;
-            height: 500px;
+            height: 375px;
             margin-bottom: 50px;
             overflow: hidden;
             border-radius: 8px;
@@ -156,6 +156,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: var(--hero-focal-point, center center);
         }
         
         .hero-overlay {
@@ -250,7 +251,7 @@
             }
 
             .hero-image {
-                height: 300px;
+                height: 225px;
             }
             
             .hero-overlay {
@@ -298,7 +299,7 @@
 
     <div class="container">
         {% if gallery.hero_image %}
-        <div class="hero-image">
+        <div class="hero-image" style="--hero-focal-point: {{ gallery.hero_focal_point|default('center center')|replace('-', ' ') }}">
             <img src="/gallery-image/{{ gallery.hero_image }}" alt="{{ gallery.name }}">
             <div class="hero-overlay">
                 <h1>{{ gallery.name }}</h1>

@@ -20,6 +20,7 @@ def init_gallery_db():
             name TEXT UNIQUE NOT NULL,
             slug TEXT UNIQUE NOT NULL,
             hero_image TEXT,
+            hero_focal_point TEXT DEFAULT 'center-center',
             description TEXT,
             display_order INTEGER DEFAULT 0,
             visible INTEGER DEFAULT 1,
@@ -27,6 +28,13 @@ def init_gallery_db():
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+    
+    # Add hero_focal_point column if it doesn't exist (for existing databases)
+    try:
+        cursor.execute('ALTER TABLE galleries ADD COLUMN hero_focal_point TEXT DEFAULT "center-center"')
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # Column already exists
     
     # Gallery images (many-to-many relationship)
     cursor.execute('''
@@ -123,7 +131,7 @@ def update_gallery(gallery_id, **kwargs):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    allowed_fields = ['name', 'slug', 'hero_image', 'description', 'display_order', 'visible']
+    allowed_fields = ['name', 'slug', 'hero_image', 'hero_focal_point', 'description', 'display_order', 'visible']
     updates = []
     values = []
     
