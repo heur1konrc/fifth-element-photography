@@ -5427,6 +5427,132 @@ def generate_gallery_images():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@app.route('/api/watermark/apply', methods=['POST'])
+@require_admin_auth
+def apply_watermark_api():
+    """Apply watermark to image and regenerate gallery version"""
+    try:
+        from watermark_helper import apply_watermark
+        from PIL import Image
+        
+        data = request.json
+        filename = data.get('filename')
+        position = data.get('position', 'bottom-right')
+        size = data.get('size', 'medium')
+        color = data.get('color', 'auto')
+        
+        if not filename:
+            return jsonify({'success': False, 'error': 'Missing filename'}), 400
+        
+        # Path to original image
+        original_path = os.path.join(IMAGES_FOLDER, filename)
+        if not os.path.exists(original_path):
+            return jsonify({'success': False, 'error': 'Image not found'}), 404
+        
+        # Apply watermark to original
+        success = apply_watermark(
+            original_path,
+            output_path=original_path,
+            position=position,
+            size=size,
+            color_mode=color
+        )
+        
+        if not success:
+            return jsonify({'success': False, 'error': 'Failed to apply watermark'}), 500
+        
+        # Regenerate gallery-optimized version with watermark
+        gallery_path = os.path.join('/data/gallery-images', filename)
+        os.makedirs('/data/gallery-images', exist_ok=True)
+        
+        with Image.open(original_path) as img:
+            # Convert to RGB if necessary
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+            
+            # Get original dimensions
+            orig_width, orig_height = img.size
+            
+            # Calculate new dimensions (max 1200px on longest side)
+            max_dimension = 1200
+            if orig_width > orig_height:
+                new_width = max_dimension
+                new_height = int((max_dimension / orig_width) * orig_height)
+            else:
+                new_height = max_dimension
+                new_width = int((max_dimension / orig_height) * orig_width)
+            
+            # Resize image with high quality
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Save gallery image with good quality
+            img.save(gallery_path, 'JPEG', quality=90, optimize=True)
+        
+        return jsonify({'success': True, 'message': 'Watermark applied successfully'})
+        
+    except Exception as e:
+        print(f"Error applying watermark: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/watermark/remove', methods=['POST'])
+@require_admin_auth
+def remove_watermark_api():
+    """Remove watermark by restoring from backup and regenerating gallery version"""
+    try:
+        from PIL import Image
+        
+        data = request.json
+        filename = data.get('filename')
+        
+        if not filename:
+            return jsonify({'success': False, 'error': 'Missing filename'}), 400
+        
+        # Check if backup exists
+        backup_path = os.path.join(IMAGES_FOLDER, f"{filename}.backup")
+        original_path = os.path.join(IMAGES_FOLDER, filename)
+        
+        if not os.path.exists(backup_path):
+            return jsonify({'success': False, 'error': 'No backup found - cannot remove watermark'}), 404
+        
+        # Restore from backup
+        import shutil
+        shutil.copy2(backup_path, original_path)
+        
+        # Regenerate gallery-optimized version without watermark
+        gallery_path = os.path.join('/data/gallery-images', filename)
+        os.makedirs('/data/gallery-images', exist_ok=True)
+        
+        with Image.open(original_path) as img:
+            # Convert to RGB if necessary
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+            
+            # Get original dimensions
+            orig_width, orig_height = img.size
+            
+            # Calculate new dimensions (max 1200px on longest side)
+            max_dimension = 1200
+            if orig_width > orig_height:
+                new_width = max_dimension
+                new_height = int((max_dimension / orig_width) * orig_height)
+            else:
+                new_height = max_dimension
+                new_width = int((max_dimension / orig_height) * orig_width)
+            
+            # Resize image with high quality
+            img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            
+            # Save gallery image with good quality
+            img.save(gallery_path, 'JPEG', quality=90, optimize=True)
+        
+        return jsonify({'success': True, 'message': 'Watermark removed successfully'})
+        
+    except Exception as e:
+        print(f"Error removing watermark: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @app.route('/api/populate-exif-database', methods=['POST'])
 @require_admin_auth
 def populate_exif_database():
