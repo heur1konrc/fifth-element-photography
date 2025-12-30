@@ -122,6 +122,17 @@ The Gmail App Password for the contact form is stored securely in the sandbox at
 
 ## 4. Recent Fixes & Features
 
+### Dec 30, 2025: Watermark Positioning & Replacement
+*   **Feature**: Replaced watermark images with new signature-style versions and adjusted positioning for a tighter fit.
+*   **Watermark Files**:
+    *   **Location**: `watermarks/` directory
+    *   **Files**: `WATERMARK_RCorey_WHITE.png` and `WATERMARK_RCorey_BLACK.png` were replaced with new, properly cropped versions that have minimal transparent padding.
+*   **Positioning Fix**:
+    *   **File**: `watermark_helper.py`
+    *   **Change**: The `padding` variable was changed from `int(width * 0.02)` (2% of image width) to a hardcoded `2` pixels.
+    *   **Result**: Watermarks are now positioned just 2 pixels from the edge of the image, providing a much tighter and more professional look.
+*   **Troubleshooting**: Initial attempts to fix positioning were unsuccessful because the original watermark PNG files had excessive transparent space around the signature. The issue was resolved by replacing the files with properly cropped versions.
+
 ### Dec 29, 2025: Navigation & About Page
 *   **Feature**: Implemented nested dropdown navigation and created a new About page.
 *   **Navigation Dropdown**:
