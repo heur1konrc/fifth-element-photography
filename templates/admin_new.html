@@ -368,9 +368,9 @@
                                         <i class="fas fa-star status-icon {% if image.is_featured %}active{% endif %}" 
                                            onclick="toggleFeatured('{{ image.filename }}')" 
                                            title="{% if image.is_featured %}Remove from Featured{% else %}Set as Featured{% endif %}"></i>
-                                        <i class="fas fa-images status-icon {% if image.in_carousel %}active{% endif %}" 
-                                           onclick="toggleCarousel('{{ image.filename }}')" 
-                                           title="{% if image.in_carousel %}Remove from Carousel{% else %}Add to Carousel{% endif %}"></i>
+                        <i class="fas fa-images status-icon {% if image.show_in_carousel %}active{% endif %}" 
+                           onclick="toggleCarousel('{{ image.filename }}')" 
+                           title="{% if image.show_in_carousel %}Remove from Carousel{% else %}Add to Carousel{% endif %}"></i>
                                         <input type="checkbox" class="image-select" data-filename="{{ image.filename }}" onchange="updateSelectionCount()">
                                     </div>
                                 </div>
