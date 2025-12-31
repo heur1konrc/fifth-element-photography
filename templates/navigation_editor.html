@@ -321,6 +321,22 @@
         </div>
     </div>
     
+    <!-- Edit/Rename Modal -->
+    <div id="edit-item-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Rename Item</div>
+            <div class="form-group">
+                <label class="form-label">New Name</label>
+                <input type="text" id="edit-item-name" class="form-input" placeholder="Enter new name">
+            </div>
+            <input type="hidden" id="edit-item-id">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('edit-item-modal')">CANCEL</button>
+                <button class="btn-save" onclick="saveEditedItem()">DONE</button>
+            </div>
+        </div>
+    </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         let navItems = [];
@@ -381,6 +397,7 @@
                         <span class="nav-item-name">${item.name}</span>
                         <div class="nav-item-actions">
                             <button class="btn-icon" onclick="addGalleryToCategory(${item.id})" title="Add gallery">+</button>
+                            <button class="btn-icon" onclick="editNavItem(${item.id}, '${item.name}')" title="Edit">✎</button>
                             <button class="btn-icon delete" onclick="deleteNavItem(${item.id})" title="Delete">×</button>
                         </div>
                         <span class="arrow-icon">›</span>
@@ -392,6 +409,7 @@
                                     <span class="drag-handle">☰</span>
                                     <span class="nav-item-name">${child.name}</span>
                                     <div class="nav-item-actions" style="margin-left: auto;">
+                                        <button class="btn-icon" onclick="editNavItem(${child.id}, '${child.name}')" title="Edit">✎</button>
                                         <button class="btn-icon delete" onclick="deleteNavItem(${child.id})" title="Delete">×</button>
                                     </div>
                                 </div>
@@ -488,6 +506,47 @@
                 }
             } catch (error) {
                 alert('Error saving gallery: ' + error);
+            }
+        }
+        
+        // Edit nav item
+        function editNavItem(itemId, currentName) {
+            document.getElementById('edit-item-id').value = itemId;
+            document.getElementById('edit-item-name').value = currentName;
+            document.getElementById('edit-item-modal').classList.add('active');
+            // Focus the input field
+            setTimeout(() => {
+                document.getElementById('edit-item-name').focus();
+                document.getElementById('edit-item-name').select();
+            }, 100);
+        }
+        
+        // Save edited item
+        async function saveEditedItem() {
+            const itemId = document.getElementById('edit-item-id').value;
+            const newName = document.getElementById('edit-item-name').value.trim();
+            
+            if (!newName) {
+                alert('Please enter a name');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/navigation/items/${itemId}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ name: newName })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    closeModal('edit-item-modal');
+                    loadNavigation();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error updating item: ' + error);
             }
         }
         
