@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ gallery.name }} - Fifth Element Photography</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-beta.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/shopify-modal.css') }}?v=2.3.5">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        /* Header */
+        header {
+            padding: 55px 0 30px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 560px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px 0;
+            margin-bottom: 40px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: #7B68EE;
+        }
+
+        /* Hero Image */
+        .hero-image {
+            width: 100%;
+            height: 500px;
+            margin-bottom: 50px;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Gallery Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .social-icons a {
+            color: #fff;
+            font-size: 24px;
+            transition: color 0.3s;
+        }
+
+        .social-icons a:hover {
+            color: #7B68EE;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            nav ul {
+                gap: 15px;
+            }
+
+            nav a {
+                font-size: 12px;
+            }
+
+            .hero-image {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <img src="/static/images/logo-horizontal.png" alt="Fifth Element Photography" class="logo">
+        </header>
+    </div>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="/">HOME</a></li>
+                {% for g in galleries %}
+                <li><a href="/gallery/{{ g.slug }}" {% if g.id == gallery.id %}class="active"{% endif %}>{{ g.name|upper }}</a></li>
+                {% endfor %}
+                <li><a href="/about">ABOUT</a></li>
+                <li><a href="/contact">CONTACT</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if gallery.hero_image %}
+        <div class="hero-image">
+            <img src="/gallery-image/{{ gallery.hero_image }}" alt="{{ gallery.name }}">
+        </div>
+        {% endif %}
+
+        <div class="gallery-grid">
+            {% for image in images %}
+            <div class="gallery-item" 
+                 data-filename="{{ image.filename }}"
+                 data-title="{{ image.title }}"
+                 data-url="/images/{{ image.filename }}"
+                 data-description="{{ image.description|safe|replace('"', '&quot;') }}"
+                 data-model="{{ image.model }}"
+                 data-lens="{{ image.lens }}"
+                 data-aperture="{{ image.aperture }}"
+                 data-shutter-speed="{{ image.shutter_speed }}"
+                 data-iso="{{ image.iso }}"
+                 data-focal-length="{{ image.focal_length }}"
+                 onclick="openModalFromData(this)"
+                 style="cursor: pointer;">
+                <img src="/gallery-image/{{ image.filename }}" alt="{{ image.title }}" loading="lazy">
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Fifth Element Photography. All rights reserved.</p>
+            <div class="social-icons">
+                <a href="https://facebook.com/fifthelementphotography" target="_blank"><i class="fab fa-facebook"></i></a>
+                <a href="https://instagram.com/fifthelementphotography" target="_blank"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Image Modal -->
+    {% include 'modal_beta.html' %}
+
+    <!-- Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    <!-- Shopify Integration Scripts -->
+    <script src="{{ url_for('static', filename='js/shopify-config.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/shopify-integration.js') }}"></script>
+    
+    <!-- Modal JavaScript -->
+    <script src="{{ url_for('static', filename='js/modal-beta.js') }}"></script>
+    
+    <!-- Gallery helper function -->
+    <script>
+    function openModalFromData(element) {
+        const data = {
+            filename: element.dataset.filename,
+            title: element.dataset.title,
+            url: element.dataset.url,
+            description: element.dataset.description,
+            model: element.dataset.model,
+            lens: element.dataset.lens,
+            aperture: element.dataset.aperture,
+            shutter_speed: element.dataset.shutterSpeed,
+            iso: element.dataset.iso,
+            focal_length: element.dataset.focalLength
+        };
+        openModalBeta(data);
+    }
+    </script>
+</body>
+</html>
