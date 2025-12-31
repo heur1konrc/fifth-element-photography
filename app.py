@@ -3222,7 +3222,7 @@ def about():
     """About page with bio and image"""
     from navigation_helpers import get_navigation_for_template
     galleries = get_all_galleries()
-    about_data = get_about_data()
+    about_data = load_about_data()
     nav_items = get_navigation_for_template()
     return render_template('about.html', galleries=galleries, about_data=about_data, nav_items=nav_items, app_version=APP_VERSION, app_revision=APP_REVISION)
 
