@@ -96,6 +96,16 @@ def get_gallery_by_slug(slug):
     conn.close()
     return dict(gallery) if gallery else None
 
+def get_gallery_by_id(gallery_id):
+    """Get gallery by ID"""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM galleries WHERE id = ?', (gallery_id,))
+    gallery = cursor.fetchone()
+    conn.close()
+    return dict(gallery) if gallery else None
+
 def add_image_to_gallery(gallery_id, image_filename, display_order=0):
     """Add image to gallery"""
     conn = sqlite3.connect(DB_PATH)

@@ -70,6 +70,7 @@ from routes.watermark_routes import watermark_bp
 from routes.download_images import download_bp as download_images_bp
 from routes.contact_form import contact_form_bp
 from routes.excel_cleanup import excel_cleanup_bp
+from routes.navigation import navigation_bp
 app.register_blueprint(pricing_admin_bp)
 app.register_blueprint(setup_pricing_bp)
 app.register_blueprint(shopify_admin_bp)
@@ -94,6 +95,7 @@ app.register_blueprint(watermark_bp)
 app.register_blueprint(download_images_bp)
 app.register_blueprint(contact_form_bp)
 app.register_blueprint(excel_cleanup_bp)
+app.register_blueprint(navigation_bp)
 
 # Initialize database if it doesn't exist
 def ensure_database_exists():
@@ -804,8 +806,10 @@ def scan_images():
 def index():
     """Main homepage with carousel"""
     from gallery_db import get_all_galleries
+    from navigation_helpers import get_navigation_for_template
     galleries = get_all_galleries()
-    return render_template('index_new.html', galleries=galleries)
+    nav_items = get_navigation_for_template()
+    return render_template('index_new.html', galleries=galleries, nav_items=nav_items)
 
 @app.route('/portfolio')
 def portfolio():
@@ -3216,10 +3220,14 @@ This email was sent automatically from the Fifth Element Photography contact for
 @app.route('/about')
 def about():
     """About page with bio and image"""
-    from gallery_db import get_all_galleries
     galleries = get_all_galleries()
-    about_data = load_about_data()
+    about_data = get_about_data()
     return render_template('about.html', galleries=galleries, about_data=about_data, app_version=APP_VERSION, app_revision=APP_REVISION)
+
+@app.route('/navigation-editor')
+def navigation_editor():
+    """Navigation editor admin page"""
+    return render_template('navigation_editor.html')
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
