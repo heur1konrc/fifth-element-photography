@@ -321,9 +321,11 @@
         </div>
     </div>
     
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <script>
         let navItems = [];
         let galleries = [];
+        let sortableInstances = [];
         
         // Tab switching
         document.querySelectorAll('.tab').forEach(tab => {
@@ -398,6 +400,9 @@
                     ` : ''}
                 </div>
             `).join('');
+            
+            // Initialize drag-and-drop
+            initializeDragDrop();
         }
         
         // Modal functions
@@ -505,6 +510,65 @@
                 }
             } catch (error) {
                 alert('Error deleting item: ' + error);
+            }
+        }
+        
+        // Initialize drag and drop
+        function initializeDragDrop() {
+            // Destroy existing sortable instances
+            sortableInstances.forEach(instance => instance.destroy());
+            sortableInstances = [];
+            
+            // Make top-level categories sortable
+            const navList = document.getElementById('nav-list');
+            if (navList && navList.children.length > 0) {
+                const sortable = new Sortable(navList, {
+                    animation: 150,
+                    handle: '.drag-handle',
+                    ghostClass: 'dragging',
+                    onEnd: async function(evt) {
+                        // Update order_index for all categories
+                        const items = Array.from(navList.children);
+                        for (let i = 0; i < items.length; i++) {
+                            const itemId = items[i].dataset.id;
+                            await updateItemOrder(itemId, i);
+                        }
+                        loadNavigation();
+                    }
+                });
+                sortableInstances.push(sortable);
+            }
+            
+            // Make children within each category sortable
+            document.querySelectorAll('.nav-item-children').forEach(childrenContainer => {
+                const sortable = new Sortable(childrenContainer, {
+                    animation: 150,
+                    handle: '.drag-handle',
+                    ghostClass: 'dragging',
+                    onEnd: async function(evt) {
+                        // Update order_index for all children
+                        const items = Array.from(childrenContainer.children);
+                        for (let i = 0; i < items.length; i++) {
+                            const itemId = items[i].dataset.id;
+                            await updateItemOrder(itemId, i);
+                        }
+                        loadNavigation();
+                    }
+                });
+                sortableInstances.push(sortable);
+            });
+        }
+        
+        // Update item order
+        async function updateItemOrder(itemId, newOrder) {
+            try {
+                await fetch(`/api/navigation/items/${itemId}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ order_index: newOrder })
+                });
+            } catch (error) {
+                console.error('Error updating order:', error);
             }
         }
         

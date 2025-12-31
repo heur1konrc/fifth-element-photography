@@ -6,8 +6,11 @@ Manages hierarchical navigation structure for the website
 import sqlite3
 from typing import List, Dict, Optional
 import json
+import os
 
-DB_PATH = 'navigation.db'
+# Use /data directory for persistence on Railway
+DB_DIR = os.environ.get('DB_DIR', '/data')
+DB_PATH = os.path.join(DB_DIR, 'navigation.db')
 
 def init_db():
     """Initialize the navigation database"""
