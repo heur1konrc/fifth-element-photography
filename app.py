@@ -3229,6 +3229,56 @@ def navigation_editor():
     """Navigation editor admin page"""
     return render_template('navigation_editor.html')
 
+@app.route('/migrate-navigation')
+def migrate_navigation_route():
+    """Migrate existing gallery categories to navigation system"""
+    from gallery_db import get_all_galleries
+    from navigation_db import add_nav_item, get_all_nav_items
+    
+    # Check if navigation already has items
+    existing_nav = get_all_nav_items()
+    if existing_nav:
+        return f"Navigation already has {len(existing_nav)} items. Migration skipped."
+    
+    # Get all galleries
+    galleries = get_all_galleries()
+    
+    # Group galleries by category
+    categories = {}
+    for gallery in galleries:
+        if gallery.get('category'):
+            cat = gallery['category']
+            if cat not in categories:
+                categories[cat] = []
+            categories[cat].append(gallery)
+    
+    # Create navigation items
+    result = []
+    category_order = 0
+    for category_name in sorted(categories.keys()):
+        category_id = add_nav_item(
+            name=category_name,
+            item_type='category',
+            order_index=category_order
+        )
+        result.append(f"Created category: {category_name} (ID: {category_id})")
+        
+        gallery_order = 0
+        for gallery in categories[category_name]:
+            add_nav_item(
+                name=gallery['name'],
+                item_type='gallery',
+                parent_id=category_id,
+                gallery_id=gallery['id'],
+                order_index=gallery_order
+            )
+            result.append(f"  Added gallery: {gallery['name']}")
+            gallery_order += 1
+        
+        category_order += 1
+    
+    return "<h1>Migration Complete!</h1><pre>" + "\n".join(result) + "</pre><br><a href='/'>Go to Homepage</a>"
+
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     """Handle contact form page and submission"""
