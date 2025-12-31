@@ -122,6 +122,39 @@ The Gmail App Password for the contact form is stored securely in the sandbox at
 
 ## 4. Recent Fixes & Features
 
+### Dec 30, 2025: Navigation Dropdown Spacing Fix (COMPLETED)
+*   **Issue**: Dropdown menu items had excessive 30px vertical spacing between gallery items, making the menu unusably large.
+*   **Root Cause**: The CSS rule `nav ul` was applying `display: flex`, `flex-direction: row`, and `gap: 30px` to ALL `<ul>` elements inside `<nav>`, including nested `category-submenu` lists. This caused gallery items to display horizontally with large gaps instead of vertically stacked.
+*   **Solution**: Added explicit CSS override for `.dropdown-menu .category-submenu`:
+    ```css
+    .dropdown-menu .category-submenu {
+        padding-left: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+    ```
+*   **Files Modified**:
+    *   `templates/index_new.html`
+    *   `templates/gallery_page.html`
+    *   `templates/about.html`
+    *   `templates/contact.html`
+*   **Result**: Dropdown menu now displays vertically with compact spacing. Category headers (NATURE, SPORTS) appear in purple with gallery items properly nested and indented beneath them.
+*   **Commit**: `853ee81` - "Fix dropdown menu spacing - override nav ul flex properties for category-submenu"
+
+### Dec 30, 2025: Buy Me A Coffee URL Correction (CRITICAL FIX)
+*   **Issue**: "BUY ME A COFFEE" navigation link was pointing to incorrect URL `https://ko-fi.com/fifthelementphotography` instead of the correct `https://buymeacoffee.com/fifthelementphotography`.
+*   **Impact**: Live since December 19, 2025 (11 days). Clients clicking the link were directed to wrong site.
+*   **Root Cause**: When creating new homepage templates on Dec 19, incorrect URL was used without checking original `index.html` which had correct `buymeacoffee.com` URL.
+*   **Solution**: Corrected URL in all 4 templates to `https://buymeacoffee.com/fifthelementphotography`
+*   **Files Modified**:
+    *   `templates/index_new.html`
+    *   `templates/gallery_page.html`
+    *   `templates/about.html`
+    *   `templates/contact.html`
+*   **Commit**: `1b36c16` - "URGENT: Fix Buy Me A Coffee URL - restore correct buymeacoffee.com link"
+*   **Status**: FIXED and deployed to production.
+
 ### Dec 30, 2025: Hero Image Focal Point Control
 *   **Feature**: Added ability to control the focal point of hero images on gallery pages.
 *   **Implementation**:
