@@ -3220,6 +3220,7 @@ This email was sent automatically from the Fifth Element Photography contact for
 @app.route('/about')
 def about():
     """About page with bio and image"""
+    from gallery_db import get_all_galleries
     from navigation_helpers import get_navigation_for_template
     galleries = get_all_galleries()
     about_data = load_about_data()
