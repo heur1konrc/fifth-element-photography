@@ -429,4 +429,100 @@ mapping = {
 ```
 
 ---
+
+## Recent Fixes (December 31, 2025)
+
+### 1. Navigation System Overhaul - SmugMug Style
+**Status**: ✅ COMPLETED
+**Commit**: cdfc4bf, 83bbc61, 69e3ebf
+
+**Implementation**:
+- Replaced single "GALLERIES" dropdown with category-based top-level navigation
+- Categories (NATURE, SPORTS, FLORA, etc.) now appear as individual nav items with dropdowns
+- Each category dropdown shows its galleries
+
+**Components Added**:
+- `navigation_db.py` - Database module for navigation structure (stores in `/data/navigation.db`)
+- `navigation_helpers.py` - Template helper functions
+- `routes/navigation.py` - API endpoints for CRUD operations
+- `templates/navigation_editor.html` - Admin UI for managing navigation
+
+**Navigation Editor Features**:
+- Add/remove/rename categories and galleries
+- Drag-and-drop reordering (SortableJS library)
+- Hierarchical tree view
+- Accessible from Admin → Images → Navigation Editor
+
+**Database Schema**:
+```sql
+CREATE TABLE navigation (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    type TEXT NOT NULL,  -- 'category' or 'gallery'
+    parent_id INTEGER,
+    gallery_id INTEGER,
+    display_order INTEGER,
+    visible INTEGER DEFAULT 1
+)
+```
+
+**Key Files Modified**:
+- All templates (index_new.html, gallery_page.html, about.html, contact.html) - Updated navigation HTML
+- `app.py` - Added nav_items to all route handlers
+- `templates/admin_new.html` - Added Navigation Editor button
+
+### 2. Dropdown Menu Spacing Fix
+**Status**: ✅ COMPLETED  
+**Commit**: ee4d606
+
+**Root Cause**: `nav ul` CSS rule applied `display: flex`, `flex-direction: row`, and `gap: 30px` to ALL nested `<ul>` elements, including dropdown submenus.
+
+**Solution**: Added explicit override for dropdown menus:
+```css
+.dropdown-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+```
+
+**Files Fixed**: All 4 templates (index_new.html, gallery_page.html, about.html, contact.html)
+
+### 3. Buy Me A Coffee URL Correction
+**Status**: ✅ COMPLETED
+**Commit**: ee4d606
+
+**Issue**: URL was incorrectly changed to `https://ko-fi.com/fifthelementphotography` (potentially malicious)
+
+**Fix**: Restored correct URL: `https://buymeacoffee.com/fifthelementphotography`
+
+**Impact**: Live for 11 days (Dec 19-30), affected all pages
+
+### 4. Logo Update
+**Status**: ✅ COMPLETED
+**Commit**: 83bbc61
+
+**File**: `static/images/logo.png` replaced with horizontal logo featuring signature and tagline
+
+### 5. Gallery Image Sizing
+**Status**: ✅ COMPLETED
+**Commit**: 70b4936
+
+**Change**: Gallery grid images changed from `object-fit: cover` to `object-fit: contain`
+
+**Reason**: Prevents cropping of images and watermarks
+
+**Note**: Hero images remain as `object-fit: cover` for full-width display
+
+### 6. About Page Fixes
+**Status**: ✅ COMPLETED
+**Commits**: f0fb656, cdfc4bf
+
+**Issues Fixed**:
+1. Function name typo: `get_about_data()` → `load_about_data()`
+2. Missing import: Added `from gallery_db import get_all_galleries`
+
+**Root Cause**: Errors introduced when adding navigation system support to About route
+
+---
 **End of Context Recovery Guide**
