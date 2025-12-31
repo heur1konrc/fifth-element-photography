@@ -3220,9 +3220,11 @@ This email was sent automatically from the Fifth Element Photography contact for
 @app.route('/about')
 def about():
     """About page with bio and image"""
+    from navigation_helpers import get_navigation_for_template
     galleries = get_all_galleries()
     about_data = get_about_data()
-    return render_template('about.html', galleries=galleries, about_data=about_data, app_version=APP_VERSION, app_revision=APP_REVISION)
+    nav_items = get_navigation_for_template()
+    return render_template('about.html', galleries=galleries, about_data=about_data, nav_items=nav_items, app_version=APP_VERSION, app_revision=APP_REVISION)
 
 @app.route('/navigation-editor')
 def navigation_editor():
@@ -3285,8 +3287,10 @@ def contact():
     if request.method == 'GET':
         # Display contact form page
         from gallery_db import get_all_galleries
+        from navigation_helpers import get_navigation_for_template
         galleries = get_all_galleries()
-        return render_template('contact.html', galleries=galleries, app_version=APP_VERSION, app_revision=APP_REVISION)
+        nav_items = get_navigation_for_template()
+        return render_template('contact.html', galleries=galleries, nav_items=nav_items, app_version=APP_VERSION, app_revision=APP_REVISION)
     
     # Handle POST - form submission
     try:
@@ -5745,6 +5749,10 @@ def gallery_page(slug):
     # Get all galleries for navigation
     galleries = get_all_galleries()
     
+    # Get navigation items
+    from navigation_helpers import get_navigation_for_template
+    nav_items = get_navigation_for_template()
+    
     # Get images for this gallery
     image_filenames = get_gallery_images(gallery['id'])
     
@@ -5752,7 +5760,7 @@ def gallery_page(slug):
     all_images = scan_images()
     images = [img for img in all_images if img['filename'] in image_filenames]
     
-    return render_template('gallery_page.html', gallery=gallery, galleries=galleries, images=images)
+    return render_template('gallery_page.html', gallery=gallery, galleries=galleries, nav_items=nav_items, images=images)
 
 
 @app.route('/admin/update-image-field', methods=['POST'])
