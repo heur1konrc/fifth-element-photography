@@ -122,25 +122,47 @@ The Gmail App Password for the contact form is stored securely in the sandbox at
 
 ## 4. Recent Fixes & Features
 
-### Dec 30, 2025: Navigation Dropdown Spacing Fix (COMPLETED)
-*   **Issue**: Dropdown menu items had excessive 30px vertical spacing between gallery items, making the menu unusably large.
-*   **Root Cause**: The CSS rule `nav ul` was applying `display: flex`, `flex-direction: row`, and `gap: 30px` to ALL `<ul>` elements inside `<nav>`, including nested `category-submenu` lists. This caused gallery items to display horizontally with large gaps instead of vertically stacked.
-*   **Solution**: Added explicit CSS override for `.dropdown-menu .category-submenu`:
-    ```css
-    .dropdown-menu .category-submenu {
-        padding-left: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-    }
-    ```
+### Dec 30, 2025: SmugMug-Style Navigation System (COMPLETED)
+*   **Feature**: Complete navigation system overhaul with SmugMug-style top-level categories, drag-and-drop editor, and database persistence.
+*   **Issues Fixed**:
+    1. **Dropdown Spacing Inconsistency**: Gallery pages had wide vertical spacing between dropdown items, homepage had compact spacing
+    2. **Non-Functional Drag Handles**: Navigation editor had drag handles but no JavaScript implementation
+    3. **Data Loss**: Navigation items disappeared after deployment (database not persisted)
+*   **Root Causes**:
+    1. Gallery page templates missing `flex-direction: column` and `gap: 0` for `.dropdown-menu`
+    2. No drag-drop library or event handlers in navigation editor
+    3. Navigation database stored in app root (`navigation.db`) instead of persisted `/data` directory
+*   **Solutions**:
+    1. **Spacing Fix**: Added `flex-direction: column; gap: 0;` to `.dropdown-menu:hover` and `.dropdown-menu.active` in gallery_page.html, about.html, contact.html
+    2. **Drag-Drop**: Integrated SortableJS library with order persistence via `/api/navigation/items/{id}` PUT endpoint
+    3. **Database Persistence**: Moved navigation database from `navigation.db` to `/data/navigation.db` to use Railway volume
+*   **Implementation Details**:
+    *   **Database**: `navigation_db.py` with `nav_items` table (hierarchical structure with parent_id)
+    *   **API Routes**: Full CRUD at `/api/navigation/*` (GET, POST, PUT, DELETE)
+    *   **Admin UI**: Navigation editor at `/navigation-editor` (accessible from Admin → Tools)
+    *   **Frontend**: Dynamic navigation rendered from database via `navigation_helpers.py`
+    *   **Structure**: Categories as top-level nav items (HOME | NATURE ▼ | SPORTS ▼ | FLORA ▼ | ABOUT | CONTACT)
 *   **Files Modified**:
-    *   `templates/index_new.html`
-    *   `templates/gallery_page.html`
-    *   `templates/about.html`
-    *   `templates/contact.html`
-*   **Result**: Dropdown menu now displays vertically with compact spacing. Category headers (NATURE, SPORTS) appear in purple with gallery items properly nested and indented beneath them.
-*   **Commit**: `853ee81` - "Fix dropdown menu spacing - override nav ul flex properties for category-submenu"
+    *   `navigation_db.py` - Database schema and CRUD operations
+    *   `routes/navigation.py` - API endpoints
+    *   `navigation_helpers.py` - Template helper functions
+    *   `templates/navigation_editor.html` - Admin interface with SortableJS
+    *   `templates/index_new.html` - Dynamic navigation rendering
+    *   `templates/gallery_page.html` - Fixed spacing + dynamic navigation
+    *   `templates/about.html` - Fixed spacing + dynamic navigation
+    *   `templates/contact.html` - Fixed spacing + dynamic navigation
+    *   `templates/admin_new.html` - Added Navigation Editor button to Tools sidebar
+    *   `app.py` - Registered navigation blueprint and routes
+*   **Result**: 
+    *   Categories appear as top-level navigation items with dropdown galleries
+    *   Consistent compact spacing across all pages
+    *   Fully functional drag-and-drop reordering in admin
+    *   Navigation data persists across deployments
+*   **Commits**: 
+    *   `a97eff5` - "Fix: Update all templates and routes to use dynamic navigation"
+    *   `d156ef4` - "Add Navigation Editor to Admin Tools menu"
+    *   `ee4d606` - "Fix navigation issues"
+*   **Status**: ✅ Deployed to production
 
 ### Dec 30, 2025: Buy Me A Coffee URL Correction (CRITICAL FIX)
 *   **Issue**: "BUY ME A COFFEE" navigation link was pointing to incorrect URL `https://ko-fi.com/fifthelementphotography` instead of the correct `https://buymeacoffee.com/fifthelementphotography`.
