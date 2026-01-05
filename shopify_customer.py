@@ -106,8 +106,11 @@ def create_shopify_customer(first_name, last_name, email, tags=None):
                 'send_email_welcome': False,  # Don't send welcome email automatically
                 'tags': ', '.join(tags) if tags else 'Print Notification Request',
                 'note': f'Added via print notification system on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}',
-                'accepts_marketing': True,  # Opt-in for marketing emails
-                'marketing_opt_in_level': 'single_opt_in'
+                'email_marketing_consent': {
+                    'state': 'subscribed',
+                    'opt_in_level': 'single_opt_in',
+                    'consent_updated_at': datetime.now().isoformat()
+                }
             }
         }
         
