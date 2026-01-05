@@ -51,9 +51,9 @@ def delete_notification(request_id):
 # Email configuration
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-SMTP_EMAIL = os.environ.get('SMTP_EMAIL', 'info@fifthelement.photos')
-SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'info@fifthelement.photos')
+SMTP_EMAIL = 'rick@fifthelement.photos'
+SMTP_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD', '')  # Gmail App Password
+ADMIN_EMAIL = 'info@fifthelement.photos'
 
 @print_notifications_bp.route('/api/print-notifications/request', methods=['POST'])
 def request_notification():
