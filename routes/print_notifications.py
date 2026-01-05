@@ -1,0 +1,133 @@
+"""
+API routes for print availability notifications
+"""
+from flask import Blueprint, request, jsonify
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import os
+
+print_notifications_bp = Blueprint('print_notifications', __name__)
+
+@print_notifications_bp.route('/admin/notification-requests')
+def admin_notification_requests():
+    """Admin page to view notification requests"""
+    from flask import render_template
+    return render_template('notification_requests_admin.html')
+
+@print_notifications_bp.route('/api/print-notifications/list', methods=['GET'])
+def list_notifications():
+    """API endpoint to list all notification requests"""
+    try:
+        from print_notifications_db import get_all_notification_requests
+        requests = get_all_notification_requests()
+        return jsonify({'success': True, 'requests': requests})
+    except Exception as e:
+        print(f"Error listing notification requests: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@print_notifications_bp.route('/api/print-notifications/mark-notified/<int:request_id>', methods=['POST'])
+def mark_notified(request_id):
+    """Mark a notification request as notified"""
+    try:
+        from print_notifications_db import mark_as_notified
+        mark_as_notified(request_id)
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error marking request as notified: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@print_notifications_bp.route('/api/print-notifications/delete/<int:request_id>', methods=['DELETE'])
+def delete_notification(request_id):
+    """Delete a notification request"""
+    try:
+        from print_notifications_db import delete_notification_request
+        delete_notification_request(request_id)
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error deleting notification request: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# Email configuration
+SMTP_SERVER = 'smtp.gmail.com'
+SMTP_PORT = 587
+SMTP_USERNAME = 'info@fifthelement.photos'
+SMTP_PASSWORD = 'ahrc paio vwsm scro'
+ADMIN_EMAIL = 'info@fifthelement.photos'
+
+@print_notifications_bp.route('/api/print-notifications/request', methods=['POST'])
+def request_notification():
+    """Handle print availability notification request"""
+    try:
+        data = request.get_json()
+        
+        image_filename = data.get('image_filename')
+        image_title = data.get('image_title', 'Untitled')
+        first_name = data.get('first_name', '').strip()
+        last_name = data.get('last_name', '').strip()
+        email = data.get('email', '').strip()
+        
+        # Validation
+        if not image_filename:
+            return jsonify({'success': False, 'error': 'Image filename is required'}), 400
+        
+        if not first_name or not last_name:
+            return jsonify({'success': False, 'error': 'First and last name are required'}), 400
+        
+        if not email or '@' not in email:
+            return jsonify({'success': False, 'error': 'Valid email address is required'}), 400
+        
+        # Save to database
+        from print_notifications_db import add_notification_request
+        request_id = add_notification_request(image_filename, image_title, first_name, last_name, email)
+        
+        # Send email to admin
+        send_admin_notification(image_filename, image_title, first_name, last_name, email)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Thank you! You will be notified when this print becomes available.',
+            'request_id': request_id
+        })
+        
+    except Exception as e:
+        print(f"Error processing notification request: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+def send_admin_notification(image_filename, image_title, first_name, last_name, email):
+    """Send email notification to admin"""
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = SMTP_USERNAME
+        msg['To'] = ADMIN_EMAIL
+        msg['Subject'] = f'Print Availability Request: {image_title}'
+        
+        body = f"""
+A customer has requested to be notified when a print becomes available for purchase.
+
+Image Details:
+- Filename: {image_filename}
+- Title: {image_title}
+
+Customer Information:
+- Name: {first_name} {last_name}
+- Email: {email}
+
+Action Required:
+When you add this image to Shopify, remember to notify this customer at {email}.
+
+You can view all pending notification requests in the Admin panel.
+"""
+        
+        msg.attach(MIMEText(body, 'plain'))
+        
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(SMTP_USERNAME, SMTP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+        
+        return True
+    except Exception as e:
+        print(f"Error sending admin notification email: {e}")
+        return False

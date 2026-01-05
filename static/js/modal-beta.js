@@ -40,8 +40,10 @@ function openModalBeta(imageData) {
         descriptionDiv.innerHTML = '<p>No description available for this image.</p>';
     }
     
-    // Show/hide ORDER PRINTS button based on Shopify mapping
+    // Show/hide ORDER PRINTS button or NOTIFY ME button based on Shopify mapping
     const orderBtn = document.getElementById('btnOrderPrints');
+    const notifyMeSection = document.getElementById('notifyMeSection');
+    const notificationForm = document.getElementById('notificationForm');
     
     // Check if this image has Shopify product mappings (supports multiple categories)
     console.log('[ORDER PRINTS DEBUG] imageData.url:', imageData.url);
@@ -50,9 +52,14 @@ function openModalBeta(imageData) {
     
     if (productHandles && productHandles.length > 0) {
         orderBtn.style.display = 'block';
+        notifyMeSection.style.display = 'none';
     } else {
         orderBtn.style.display = 'none';
+        notifyMeSection.style.display = 'block';
     }
+    
+    // Always hide notification form when opening modal
+    notificationForm.style.display = 'none';
     
     // Show modal
     modalBeta.style.display = 'block';
@@ -151,3 +158,93 @@ document.getElementById('btnOrderPrints').onclick = function() {
 
 // Expose openModalBeta globally
 window.openModalBeta = openModalBeta;
+
+// NOTIFY ME button handler
+document.getElementById('btnNotifyMe').onclick = function() {
+    const notifyMeSection = document.getElementById('notifyMeSection');
+    const notificationForm = document.getElementById('notificationForm');
+    
+    notifyMeSection.style.display = 'none';
+    notificationForm.style.display = 'block';
+};
+
+// Cancel notification button
+document.getElementById('btnCancelNotify').onclick = function() {
+    const notifyMeSection = document.getElementById('notifyMeSection');
+    const notificationForm = document.getElementById('notificationForm');
+    const notificationMessage = document.getElementById('notificationMessage');
+    
+    notificationForm.style.display = 'none';
+    notifyMeSection.style.display = 'block';
+    notificationMessage.style.display = 'none';
+    
+    // Clear form
+    document.getElementById('printNotificationForm').reset();
+};
+
+// Handle notification form submission
+document.getElementById('printNotificationForm').onsubmit = async function(e) {
+    e.preventDefault();
+    
+    const firstName = document.getElementById('notifyFirstName').value.trim();
+    const lastName = document.getElementById('notifyLastName').value.trim();
+    const email = document.getElementById('notifyEmail').value.trim();
+    const notificationMessage = document.getElementById('notificationMessage');
+    
+    if (!currentImageDataBeta) {
+        notificationMessage.textContent = 'Error: No image selected';
+        notificationMessage.style.display = 'block';
+        notificationMessage.style.background = '#d32f2f';
+        notificationMessage.style.color = '#fff';
+        return;
+    }
+    
+    // Show loading state
+    notificationMessage.textContent = 'Submitting...';
+    notificationMessage.style.display = 'block';
+    notificationMessage.style.background = '#666';
+    notificationMessage.style.color = '#fff';
+    
+    try {
+        const response = await fetch('/api/print-notifications/request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                image_filename: currentImageDataBeta.filename,
+                image_title: currentImageDataBeta.title || 'Untitled',
+                first_name: firstName,
+                last_name: lastName,
+                email: email
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            notificationMessage.textContent = data.message || 'Thank you! You will be notified when this print becomes available.';
+            notificationMessage.style.background = '#4caf50';
+            notificationMessage.style.color = '#fff';
+            
+            // Clear form
+            document.getElementById('printNotificationForm').reset();
+            
+            // Hide form after 3 seconds
+            setTimeout(() => {
+                document.getElementById('notificationForm').style.display = 'none';
+                document.getElementById('notifyMeSection').style.display = 'block';
+                notificationMessage.style.display = 'none';
+            }, 3000);
+        } else {
+            notificationMessage.textContent = 'Error: ' + (data.error || 'Failed to submit request');
+            notificationMessage.style.background = '#d32f2f';
+            notificationMessage.style.color = '#fff';
+        }
+    } catch (error) {
+        console.error('Error submitting notification request:', error);
+        notificationMessage.textContent = 'Error: Failed to submit request. Please try again.';
+        notificationMessage.style.background = '#d32f2f';
+        notificationMessage.style.color = '#fff';
+    }
+};

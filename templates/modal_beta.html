@@ -55,6 +55,38 @@
                 
                 <button class="btn-beta btn-beta-order" id="btnOrderPrints">🛒 ORDER PRINTS</button>
                 
+                <!-- Notify Me Button (shown when no Shopify product exists) -->
+                <div id="notifyMeSection" style="display: none;">
+                    <button class="btn-beta btn-beta-notify" id="btnNotifyMe">🔔 NOTIFY ME WHEN AVAILABLE</button>
+                    <p style="color: #999; font-size: 0.9em; margin-top: 10px; line-height: 1.4;">
+                        This image is new and has not been prepared for the printing process. Click above to be notified when this print is available for purchase.
+                    </p>
+                </div>
+                
+                <!-- Notification Form (hidden by default) -->
+                <div id="notificationForm" style="display: none; margin-top: 20px;">
+                    <h3 style="color: #fff; margin-bottom: 15px; font-size: 1.2em;">Get Notified</h3>
+                    <form id="printNotificationForm">
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; color: #ccc; margin-bottom: 5px; font-size: 0.9em;">First Name *</label>
+                            <input type="text" id="notifyFirstName" required style="width: 100%; padding: 10px; border: 1px solid #444; background: #2a2a2a; color: #fff; border-radius: 4px; font-size: 1em;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; color: #ccc; margin-bottom: 5px; font-size: 0.9em;">Last Name *</label>
+                            <input type="text" id="notifyLastName" required style="width: 100%; padding: 10px; border: 1px solid #444; background: #2a2a2a; color: #fff; border-radius: 4px; font-size: 1em;">
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; color: #ccc; margin-bottom: 5px; font-size: 0.9em;">Email Address *</label>
+                            <input type="email" id="notifyEmail" required style="width: 100%; padding: 10px; border: 1px solid #444; background: #2a2a2a; color: #fff; border-radius: 4px; font-size: 1em;">
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn-beta btn-beta-primary" style="flex: 1;">Submit</button>
+                            <button type="button" id="btnCancelNotify" class="btn-beta" style="flex: 1; background: #666;">Cancel</button>
+                        </div>
+                    </form>
+                    <div id="notificationMessage" style="display: none; margin-top: 15px; padding: 10px; border-radius: 4px;"></div>
+                </div>
+                
                 <a href="https://buymeacoffee.com/fifthelementphotography" target="_blank" class="btn-beta btn-beta-coffee" style="text-decoration: none; display: block; text-align: center;">☕ BUY ME A COFFEE</a>
                 
                 <!-- Logo -->

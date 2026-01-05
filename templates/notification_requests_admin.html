@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Notification Requests - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            color: #4285f4;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #4285f4;
+        }
+        
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: #999;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4285f4;
+        }
+        
+        .filters {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .filters label {
+            margin-right: 10px;
+            color: #ccc;
+        }
+        
+        .filters select {
+            padding: 8px 12px;
+            background: #1a1a1a;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 4px;
+            margin-right: 20px;
+        }
+        
+        table {
+            width: 100%;
+            background: #2a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #333;
+        }
+        
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #4285f4;
+            border-bottom: 2px solid #444;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+        }
+        
+        tr:hover {
+            background: #333;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #ff9800;
+            color: #fff;
+        }
+        
+        .status-notified {
+            background: #4caf50;
+            color: #fff;
+        }
+        
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #4285f4;
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            background: #357ae8;
+        }
+        
+        .btn-success {
+            background: #4caf50;
+            color: #fff;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        .btn-danger {
+            background: #d32f2f;
+            color: #fff;
+        }
+        
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Print Notification Requests</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total Requests</h3>
+                <div class="value" id="totalRequests">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending</h3>
+                <div class="value" id="pendingRequests">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Notified</h3>
+                <div class="value" id="notifiedRequests">0</div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <label for="statusFilter">Filter by Status:</label>
+            <select id="statusFilter" onchange="filterRequests()">
+                <option value="all">All</option>
+                <option value="pending" selected>Pending</option>
+                <option value="notified">Notified</option>
+            </select>
+        </div>
+        
+        <div id="tableContainer">
+            <!-- Table will be populated by JavaScript -->
+        </div>
+    </div>
+    
+    <script>
+        let allRequests = [];
+        
+        async function loadRequests() {
+            try {
+                const response = await fetch('/api/print-notifications/list');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allRequests = data.requests;
+                    updateStats();
+                    filterRequests();
+                } else {
+                    console.error('Failed to load requests:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading requests:', error);
+            }
+        }
+        
+        function updateStats() {
+            const total = allRequests.length;
+            const pending = allRequests.filter(r => !r.notified).length;
+            const notified = allRequests.filter(r => r.notified).length;
+            
+            document.getElementById('totalRequests').textContent = total;
+            document.getElementById('pendingRequests').textContent = pending;
+            document.getElementById('notifiedRequests').textContent = notified;
+        }
+        
+        function filterRequests() {
+            const filter = document.getElementById('statusFilter').value;
+            let filtered = allRequests;
+            
+            if (filter === 'pending') {
+                filtered = allRequests.filter(r => !r.notified);
+            } else if (filter === 'notified') {
+                filtered = allRequests.filter(r => r.notified);
+            }
+            
+            renderTable(filtered);
+        }
+        
+        function renderTable(requests) {
+            const container = document.getElementById('tableContainer');
+            
+            if (requests.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 4rem; margin-bottom: 20px; opacity: 0.3;">📭</div>
+                        <h2>No requests found</h2>
+                        <p>There are no notification requests matching your filter.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Image Title</th>
+                            <th>Customer Name</th>
+                            <th>Email</th>
+                            <th>Requested</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            requests.forEach(req => {
+                const imageUrl = `/data/gallery-images/${req.image_filename}`;
+                const statusClass = req.notified ? 'status-notified' : 'status-pending';
+                const statusText = req.notified ? 'Notified' : 'Pending';
+                const date = new Date(req.created_at).toLocaleDateString();
+                
+                html += `
+                    <tr>
+                        <td><img src="${imageUrl}" alt="${req.image_title}" class="thumbnail"></td>
+                        <td><strong>${req.image_title}</strong><br><small style="color: #999;">${req.image_filename}</small></td>
+                        <td>${req.first_name} ${req.last_name}</td>
+                        <td><a href="mailto:${req.email}" style="color: #4285f4;">${req.email}</a></td>
+                        <td>${date}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            <div class="actions">
+                                ${!req.notified ? `<button class="btn btn-success" onclick="markAsNotified(${req.id})">Mark as Notified</button>` : ''}
+                                <button class="btn btn-danger" onclick="deleteRequest(${req.id})">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        async function markAsNotified(id) {
+            if (!confirm('Mark this request as notified?')) return;
+            
+            try {
+                const response = await fetch(`/api/print-notifications/mark-notified/${id}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadRequests();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error marking as notified:', error);
+                alert('Failed to update request');
+            }
+        }
+        
+        async function deleteRequest(id) {
+            if (!confirm('Are you sure you want to delete this notification request?')) return;
+            
+            try {
+                const response = await fetch(`/api/print-notifications/delete/${id}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadRequests();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error deleting request:', error);
+                alert('Failed to delete request');
+            }
+        }
+        
+        // Load requests on page load
+        loadRequests();
+        
+        // Refresh every 30 seconds
+        setInterval(loadRequests, 30000);
+    </script>
+</body>
+</html>

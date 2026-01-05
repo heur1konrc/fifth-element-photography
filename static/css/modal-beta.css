@@ -265,3 +265,18 @@ body .btn-beta {
         width: 100%;
     }
 }
+
+/* Notify Me Button */
+.btn-beta-notify {
+    background: #ff9800;
+    color: #fff;
+    font-size: 1.2rem;
+    padding: 18px 30px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.btn-beta-notify:hover {
+    background: #f57c00;
+    transform: translateY(-2px);
+}
