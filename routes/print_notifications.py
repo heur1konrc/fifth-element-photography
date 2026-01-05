@@ -51,9 +51,9 @@ def delete_notification(request_id):
 # Email configuration
 SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
-SMTP_USERNAME = 'info@fifthelement.photos'
-SMTP_PASSWORD = 'ahrc paio vwsm scro'
-ADMIN_EMAIL = 'info@fifthelement.photos'
+SMTP_EMAIL = os.environ.get('SMTP_EMAIL', 'info@fifthelement.photos')
+SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'info@fifthelement.photos')
 
 @print_notifications_bp.route('/api/print-notifications/request', methods=['POST'])
 def request_notification():
@@ -85,7 +85,9 @@ def request_notification():
         shopify_result = create_shopify_customer_for_notification(first_name, last_name, email, image_title)
         
         # Send email to admin
-        send_admin_notification(image_filename, image_title, first_name, last_name, email, shopify_result)
+        email_sent = send_admin_notification(image_filename, image_title, first_name, last_name, email, shopify_result)
+        if not email_sent:
+            print(f"Warning: Failed to send admin notification email for {image_title}")
         
         return jsonify({
             'success': True,
@@ -120,8 +122,13 @@ def create_shopify_customer_for_notification(first_name, last_name, email, image
 def send_admin_notification(image_filename, image_title, first_name, last_name, email, shopify_result=None):
     """Send email notification to admin"""
     try:
+        # Check if SMTP is configured
+        if not SMTP_PASSWORD:
+            print("SMTP password not configured, skipping email notification")
+            return False
+        
         msg = MIMEMultipart()
-        msg['From'] = SMTP_USERNAME
+        msg['From'] = SMTP_EMAIL
         msg['To'] = ADMIN_EMAIL
         msg['Subject'] = f'Print Availability Request: {image_title}'
         
@@ -154,12 +161,12 @@ You can view all pending notification requests in the Admin panel.
         
         msg.attach(MIMEText(body, 'plain'))
         
-        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        server.starttls()
-        server.login(SMTP_USERNAME, SMTP_PASSWORD)
-        server.send_message(msg)
-        server.quit()
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            server.send_message(msg)
         
+        print(f"Admin notification email sent successfully for {image_title}")
         return True
     except Exception as e:
         print(f"Error sending admin notification email: {e}")
