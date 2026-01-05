@@ -9,8 +9,38 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
 from datetime import datetime
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 contact_form_bp = Blueprint('contact_form', __name__, url_prefix='/api/contact')
+
+def create_shopify_customer_for_contact(name, email, interested_in):
+    """Create customer in Shopify for email marketing purposes"""
+    try:
+        from shopify_customer import create_shopify_customer
+        
+        # Split name into first and last (best effort)
+        name_parts = name.strip().split()
+        if len(name_parts) >= 2:
+            first_name = name_parts[0]
+            last_name = ' '.join(name_parts[1:])
+        else:
+            first_name = name_parts[0] if name_parts else 'Unknown'
+            last_name = ''
+        
+        # Create customer with appropriate tags
+        tags = ['Contact Form Inquiry', f'Interested in: {interested_in}']
+        result = create_shopify_customer(first_name, last_name, email, tags)
+        
+        if result.get('success'):
+            print(f"Shopify customer created/updated from contact form: {email} (ID: {result.get('customer_id')})")
+        else:
+            print(f"Failed to create Shopify customer from contact form: {result.get('error')}")
+        
+        return result
+    except Exception as e:
+        print(f"Exception creating Shopify customer from contact form: {e}")
+        return {'success': False, 'error': str(e)}
 
 # Email configuration
 SMTP_SERVER = 'smtp.gmail.com'
@@ -170,6 +200,9 @@ I am interested in: {interested_in_display}
         msg.attach(part1)
         msg.attach(part2)
         
+        # Create customer in Shopify for email marketing
+        shopify_result = create_shopify_customer_for_contact(name, email, interested_in_display)
+        
         # Send email
         if not SMTP_PASSWORD:
             return jsonify({'success': False, 'error': 'Email configuration not set up'}), 500
@@ -179,7 +212,11 @@ I am interested in: {interested_in_display}
             server.login(SMTP_EMAIL, SMTP_PASSWORD)
             server.send_message(msg)
         
-        return jsonify({'success': True, 'message': 'Contact form submitted successfully'})
+        return jsonify({
+            'success': True, 
+            'message': 'Contact form submitted successfully',
+            'shopify_customer_created': shopify_result.get('success', False)
+        })
     
     except Exception as e:
         print(f"Error sending contact form email: {e}")
