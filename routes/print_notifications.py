@@ -53,7 +53,7 @@ SMTP_SERVER = 'smtp.gmail.com'
 SMTP_PORT = 587
 SMTP_EMAIL = 'rick@fifthelement.photos'
 SMTP_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD', '')  # Gmail App Password
-ADMIN_EMAIL = 'info@fifthelement.photos'
+ADMIN_EMAIL = 'rick@fifthelement.photos'  # Same as contact form
 
 @print_notifications_bp.route('/api/print-notifications/request', methods=['POST'])
 def request_notification():
