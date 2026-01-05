@@ -268,7 +268,7 @@ body .btn-beta {
 
 /* Notify Me Button */
 .btn-beta-notify {
-    background: #ff9800;
+    background: #4285f4;
     color: #fff;
     font-size: 1.2rem;
     padding: 18px 30px;
@@ -277,6 +277,6 @@ body .btn-beta {
 }
 
 .btn-beta-notify:hover {
-    background: #f57c00;
+    background: #357ae8;
     transform: translateY(-2px);
 }
