@@ -81,26 +81,59 @@ def request_notification():
         from print_notifications_db import add_notification_request
         request_id = add_notification_request(image_filename, image_title, first_name, last_name, email)
         
+        # Create customer in Shopify for email marketing
+        shopify_result = create_shopify_customer_for_notification(first_name, last_name, email, image_title)
+        
         # Send email to admin
-        send_admin_notification(image_filename, image_title, first_name, last_name, email)
+        send_admin_notification(image_filename, image_title, first_name, last_name, email, shopify_result)
         
         return jsonify({
             'success': True,
             'message': 'Thank you! You will be notified when this print becomes available.',
-            'request_id': request_id
+            'request_id': request_id,
+            'shopify_customer_created': shopify_result.get('success', False)
         })
         
     except Exception as e:
         print(f"Error processing notification request: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-def send_admin_notification(image_filename, image_title, first_name, last_name, email):
+def create_shopify_customer_for_notification(first_name, last_name, email, image_title):
+    """Create customer in Shopify for email marketing purposes"""
+    try:
+        from shopify_customer import create_shopify_customer
+        
+        # Create customer with appropriate tags
+        tags = ['Print Notification Request', f'Interested in: {image_title}']
+        result = create_shopify_customer(first_name, last_name, email, tags)
+        
+        if result.get('success'):
+            print(f"Shopify customer created/updated: {email} (ID: {result.get('customer_id')})")
+        else:
+            print(f"Failed to create Shopify customer: {result.get('error')}")
+        
+        return result
+    except Exception as e:
+        print(f"Exception creating Shopify customer: {e}")
+        return {'success': False, 'error': str(e)}
+
+def send_admin_notification(image_filename, image_title, first_name, last_name, email, shopify_result=None):
     """Send email notification to admin"""
     try:
         msg = MIMEMultipart()
         msg['From'] = SMTP_USERNAME
         msg['To'] = ADMIN_EMAIL
         msg['Subject'] = f'Print Availability Request: {image_title}'
+        
+        shopify_status = ''
+        if shopify_result:
+            if shopify_result.get('success'):
+                if shopify_result.get('existing'):
+                    shopify_status = f"\n\nShopify Status: Customer already exists (ID: {shopify_result.get('customer_id')})\nTags have been updated."
+                else:
+                    shopify_status = f"\n\nShopify Status: New customer created successfully (ID: {shopify_result.get('customer_id')})\nCustomer is now in your Shopify database for email marketing."
+            else:
+                shopify_status = f"\n\nShopify Status: Failed to create customer - {shopify_result.get('error')}"
         
         body = f"""
 A customer has requested to be notified when a print becomes available for purchase.
@@ -111,7 +144,7 @@ Image Details:
 
 Customer Information:
 - Name: {first_name} {last_name}
-- Email: {email}
+- Email: {email}{shopify_status}
 
 Action Required:
 When you add this image to Shopify, remember to notify this customer at {email}.
