@@ -72,6 +72,7 @@ from routes.contact_form import contact_form_bp
 from routes.excel_cleanup import excel_cleanup_bp
 from routes.navigation import navigation_bp
 from routes.print_notifications import print_notifications_bp
+from routes.clean_descriptions_admin import clean_descriptions_admin_bp
 app.register_blueprint(pricing_admin_bp)
 app.register_blueprint(setup_pricing_bp)
 app.register_blueprint(shopify_admin_bp)
@@ -98,6 +99,7 @@ app.register_blueprint(contact_form_bp)
 app.register_blueprint(excel_cleanup_bp)
 app.register_blueprint(navigation_bp)
 app.register_blueprint(print_notifications_bp)
+app.register_blueprint(clean_descriptions_admin_bp)
 
 # Initialize database if it doesn't exist
 def ensure_database_exists():
