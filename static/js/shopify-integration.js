@@ -131,8 +131,15 @@ async function createCartWithItem(variantId) {
 
 // Open product modal for a specific image
 function openShopifyProductModal(imageUrl, imageTitle) {
+    // Store original image URL and title for back button
+    window.originalImageUrl = imageUrl;
+    window.originalImageTitle = imageTitle;
+    
     // Get all product handles for this image (multiple categories)
     const productHandles = getAllProductHandlesFromUrl(imageUrl);
+    
+    // Store product handles for back button
+    window.originalProductHandles = productHandles;
     
     if (!productHandles || productHandles.length === 0) {
         alert('This image is not yet available for purchase. Please check back soon!');
@@ -228,9 +235,7 @@ function displayProductModal(product, imageTitle) {
 
     const imageUrl = product.images.edges[0]?.node.url || '';
 
-    // Store context for back button
-    window.currentImageUrl = product.images.edges[0]?.node.url || '';
-    window.currentImageTitle = imageTitle;
+    // Context already stored in openShopifyProductModal
     
     // Build product HTML with badge selectors and description panel
     let productHTML = `
@@ -321,12 +326,11 @@ function displayProductModal(product, imageTitle) {
     }
     
     // Show back button if there are multiple product categories
-    const productHandles = getAllProductHandlesFromUrl(window.currentImageUrl);
     const backBtn = document.getElementById('back-to-categories-btn');
-    if (backBtn && productHandles && productHandles.length > 1) {
+    if (backBtn && window.originalProductHandles && window.originalProductHandles.length > 1) {
         backBtn.style.display = 'inline-flex';
         backBtn.addEventListener('click', function() {
-            showCategorySelector(window.currentImageUrl, window.currentImageTitle, productHandles);
+            showCategorySelector(window.originalImageUrl, window.originalImageTitle, window.originalProductHandles);
         });
     }
 }
