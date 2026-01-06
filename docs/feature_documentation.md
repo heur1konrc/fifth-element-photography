@@ -123,7 +123,11 @@ The back button only appears when multiple print types are available for the ima
 
 ### 6.2. Implementation Details
 
-The back button functionality is implemented entirely in JavaScript. When the product modal is displayed, the system checks if multiple product categories exist for the current image. If they do, the back button is shown and configured to call the `showCategorySelector` function, which displays the print type selection screen.
+The back button functionality is implemented entirely in JavaScript. When the product modal is first opened via `openShopifyProductModal`, the system stores the original image URL, image title, and all available product handles in global variables. This ensures that regardless of which print type the user is viewing, the back button can always access the correct information to return to the print type selection screen.
+
+When the product modal is displayed, the system checks if multiple product categories exist for the current image. If they do, the back button is shown and configured to call the `showCategorySelector` function with the stored original values, which displays the print type selection screen.
+
+This approach solves the problem of the Shopify product image URL being different from the original site image URL, ensuring the back button works consistently across all print types (Canvas, Metal, Fine Art Paper, Foam-mounted Print, and Framed Canvas).
 
 ### 6.3. Key Files
 

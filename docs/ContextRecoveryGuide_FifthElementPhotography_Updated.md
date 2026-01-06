@@ -119,7 +119,8 @@ git remote set-url origin https://heur1konrc:<TOKEN>@github.com/heur1konrc/fifth
 ### D. Back Button Navigation (New!)
 
 *   **Feature**: A "Back to Print Types" button allows users to return from the size selection screen to the print type selection screen.
-*   **Implementation**: The button only appears when multiple print types are available for an image. It's implemented in JavaScript with styling in the shopify-modal.css file.
+*   **Implementation**: The button appears on ALL print types (Canvas, Metal, Fine Art Paper, Foam-mounted, Framed Canvas) when multiple print types are available. The original image URL and product handles are stored globally when the modal opens, ensuring the back button works correctly regardless of which print type is being viewed.
+*   **Fix Applied**: Initially only worked on Canvas due to URL mismatch. Now stores original values at modal open to work on all print types.
 *   **Key Files**:
     *   `static/js/shopify-integration.js`: Back button logic and event handlers.
     *   `static/css/shopify-modal.css`: Back button styling.

@@ -59,3 +59,19 @@ This guide provides solutions to common problems and outlines maintenance proced
 
 -   **Check Railway Logs**: Regularly review the logs in your Railway project for any errors or warnings that may indicate a problem with the application.
 -   **Keep GitHub Updated**: Ensure that all changes to the code are committed and pushed to the `main` branch of the GitHub repository to maintain a single source of truth.
+
+
+---
+
+## 6. Back Button Navigation
+
+### 6.1. Troubleshooting
+
+| Problem | Cause | Solution |
+| :--- | :--- | :--- |
+| **Back button not appearing on some print types** | The original image URL and product handles are not being stored correctly when the modal opens. | Verify that `window.originalImageUrl`, `window.originalImageTitle`, and `window.originalProductHandles` are being set in the `openShopifyProductModal` function in `static/js/shopify-integration.js`. |
+| **Back button appears but doesn't work** | The stored values may be incorrect or the `showCategorySelector` function is not being called properly. | Check the browser console for JavaScript errors. Verify that the click event handler is properly attached to the back button. |
+
+### 6.2. Maintenance
+
+-   **Verify Functionality**: Periodically test the back button on all print types (Canvas, Metal, Fine Art Paper, Foam-mounted Print, Framed Canvas) to ensure it continues to work as expected after any code changes.
