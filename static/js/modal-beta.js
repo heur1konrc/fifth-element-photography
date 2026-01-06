@@ -35,7 +35,13 @@ function openModalBeta(imageData) {
     // Populate description
     const descriptionDiv = document.getElementById('modalBetaDescription');
     if (imageData.description) {
-        descriptionDiv.innerHTML = imageData.description;
+        // Clean up excessive line breaks and empty paragraphs
+        let cleanDescription = imageData.description
+            .replace(/<p>\s*<\/p>/g, '') // Remove empty paragraphs
+            .replace(/<p>\s*&nbsp;\s*<\/p>/g, '') // Remove paragraphs with only nbsp
+            .replace(/(<\/p>)\s*(<p>)/g, '$1$2') // Remove whitespace between paragraphs
+            .trim();
+        descriptionDiv.innerHTML = cleanDescription;
     } else {
         descriptionDiv.innerHTML = '<p>No description available for this image.</p>';
     }
