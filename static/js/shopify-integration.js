@@ -234,7 +234,7 @@ function displayProductModal(product, imageTitle) {
             <div class="product-image">
                 <img src="${imageUrl}" alt="${product.title}" />
                 <!-- Substrate Description Panel -->
-                <div id="substrate-description-panel" class="substrate-description-panel" style="display: none;">
+                <div id="substrate-description-panel" class="substrate-description-panel">
                     <h4 id="substrate-title"></h4>
                     <p id="substrate-description"></p>
                     <ul id="substrate-specs"></ul>
@@ -647,23 +647,37 @@ window.openProductByHandle = openProductByHandle;
  * Shows detailed information when hovering over product option badges
  */
 function initializeSubstrateHoverListeners() {
+    console.log('[SUBSTRATE HOVER] Initializing hover listeners');
+    
     const descriptionPanel = document.getElementById('substrate-description-panel');
     const titleElement = document.getElementById('substrate-title');
     const descriptionElement = document.getElementById('substrate-description');
     const specsElement = document.getElementById('substrate-specs');
     
+    console.log('[SUBSTRATE HOVER] Elements found:', {
+        panel: !!descriptionPanel,
+        title: !!titleElement,
+        description: !!descriptionElement,
+        specs: !!specsElement
+    });
+    
     if (!descriptionPanel || !titleElement || !descriptionElement || !specsElement) {
-        console.warn('Substrate description panel elements not found');
+        console.warn('[SUBSTRATE HOVER] Some elements not found - aborting');
         return;
     }
     
+    console.log('[SUBSTRATE HOVER] All elements found, attaching listeners');
+    
     // Get all option badges (buttons)
     const optionBadges = document.querySelectorAll('.option-badge-full, .option-badge-small');
+    
+    console.log('[SUBSTRATE HOVER] Found', optionBadges.length, 'option badges');
     
     optionBadges.forEach(badge => {
         // Mouse enter - show description
         badge.addEventListener('mouseenter', function() {
             const optionValue = this.dataset.optionValue;
+            console.log('[SUBSTRATE HOVER] Hovering over:', optionValue);
             
             // Get description from substrate descriptions database
             if (typeof window.getSubstrateDescription === 'function') {
