@@ -107,3 +107,33 @@ In both cases, the system properly handles email marketing consent, ensuring com
 
 -   `/home/ubuntu/fifth-element-photography/routes/contact.py`: Handles the contact form submission and Shopify customer creation.
 -   `/home/ubuntu/fifth-element-photography/routes/print_notifications.py`: Handles the notification request and Shopify customer creation.
+
+
+---
+
+## 6. Back Button Navigation
+
+This feature improves the user experience during the print ordering process by allowing customers to easily navigate back from the size selection screen to the print type selection screen.
+
+### 6.1. How It Works
+
+When a customer is viewing the product options (sizes, substrates) for a specific print type (e.g., Canvas), a "Back to Print Types" button appears at the top of the options. Clicking this button returns the user to the print type selection screen, where they can choose a different category (Metal, Fine Art Paper, etc.).
+
+The back button only appears when multiple print types are available for the image. If only one print type is available, the back button is hidden since there's nothing to go back to.
+
+### 6.2. Implementation Details
+
+The back button functionality is implemented entirely in JavaScript. When the product modal is displayed, the system checks if multiple product categories exist for the current image. If they do, the back button is shown and configured to call the `showCategorySelector` function, which displays the print type selection screen.
+
+### 6.3. Key Files
+
+-   `/home/ubuntu/fifth-element-photography/static/js/shopify-integration.js`: Contains the back button logic and event handlers.
+-   `/home/ubuntu/fifth-element-photography/static/css/shopify-modal.css`: Contains the styling for the back button.
+
+---
+
+## 7. Summary
+
+The Fifth Element Photography website now includes a comprehensive set of features designed to improve the customer experience and streamline business operations. The description cleaning system ensures that all image descriptions are consistently formatted and professional. The substrate hover descriptions provide customers with detailed information to help them make informed purchasing decisions. The print availability notification system allows customers to express interest in prints that are not yet available, and the Shopify customer creation integration helps build a marketing database. Finally, the back button navigation makes it easy for customers to explore different print options without frustration.
+
+All of these features work together to create a polished, user-friendly e-commerce experience that reflects the quality of the photography on display.

@@ -114,3 +114,12 @@ git remote set-url origin https://heur1konrc:<TOKEN>@github.com/heur1konrc/fifth
 ---
 
 **End of Guide**
+
+
+### D. Back Button Navigation (New!)
+
+*   **Feature**: A "Back to Print Types" button allows users to return from the size selection screen to the print type selection screen.
+*   **Implementation**: The button only appears when multiple print types are available for an image. It's implemented in JavaScript with styling in the shopify-modal.css file.
+*   **Key Files**:
+    *   `static/js/shopify-integration.js`: Back button logic and event handlers.
+    *   `static/css/shopify-modal.css`: Back button styling.
