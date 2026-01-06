@@ -228,6 +228,10 @@ function displayProductModal(product, imageTitle) {
 
     const imageUrl = product.images.edges[0]?.node.url || '';
 
+    // Store context for back button
+    window.currentImageUrl = product.images.edges[0]?.node.url || '';
+    window.currentImageTitle = imageTitle;
+    
     // Build product HTML with badge selectors and description panel
     let productHTML = `
         <div class="product-details">
@@ -246,6 +250,14 @@ function displayProductModal(product, imageTitle) {
                 <div class="product-price">
                     <span class="price" id="variant-price">Select a size</span>
                 </div>
+                
+                <!-- Back Button -->
+                <button id="back-to-categories-btn" class="back-button" style="display: none;">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px;">
+                        <path d="M8 0L6.59 1.41 12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8z" transform="rotate(180 8 8)"/>
+                    </svg>
+                    Back to Print Types
+                </button>
                 
                 <div class="product-options">
     `;
@@ -306,6 +318,16 @@ function displayProductModal(product, imageTitle) {
     const addToCartBtn = document.getElementById('add-to-cart-btn');
     if (addToCartBtn) {
         addToCartBtn.addEventListener('click', addToCart);
+    }
+    
+    // Show back button if there are multiple product categories
+    const productHandles = getAllProductHandlesFromUrl(window.currentImageUrl);
+    const backBtn = document.getElementById('back-to-categories-btn');
+    if (backBtn && productHandles && productHandles.length > 1) {
+        backBtn.style.display = 'inline-flex';
+        backBtn.addEventListener('click', function() {
+            showCategorySelector(window.currentImageUrl, window.currentImageTitle, productHandles);
+        });
     }
 }
 

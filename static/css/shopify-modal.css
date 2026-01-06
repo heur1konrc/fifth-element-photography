@@ -513,3 +513,28 @@
         font-size: 0.85rem;
     }
 }
+
+/* Back Button Styling */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    background-color: transparent;
+    color: #4285f4;
+    border: 1px solid #4285f4;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.back-button:hover {
+    background-color: #4285f4;
+    color: #ffffff;
+}
+
+.back-button svg {
+    flex-shrink: 0;
+}
