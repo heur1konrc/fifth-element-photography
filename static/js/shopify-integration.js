@@ -685,20 +685,14 @@ function initializeSubstrateHoverListeners() {
                     }
                     
                     // Show panel with fade-in effect
-                    descriptionPanel.style.display = 'block';
-                    setTimeout(() => {
-                        descriptionPanel.style.opacity = '1';
-                    }, 10);
+                    descriptionPanel.classList.add('visible');
                 }
             }
         });
         
         // Mouse leave - hide description
         badge.addEventListener('mouseleave', function() {
-            descriptionPanel.style.opacity = '0';
-            setTimeout(() => {
-                descriptionPanel.style.display = 'none';
-            }, 300);
+            descriptionPanel.classList.remove('visible');
         });
     });
 }

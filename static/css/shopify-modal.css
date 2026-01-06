@@ -424,19 +424,21 @@
 
 /* Substrate Description Panel */
 .substrate-description-panel {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(26, 26, 26, 0.98);
-    padding: 30px;
+    background: rgba(26, 26, 26, 0.95);
+    padding: 25px;
     border-radius: 8px;
+    border: 1px solid rgba(66, 133, 244, 0.3);
+    margin-top: 20px;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+.substrate-description-panel.visible {
+    opacity: 1;
+    max-height: 500px;
     overflow-y: auto;
-    z-index: 10;
-    backdrop-filter: blur(10px);
 }
 
 .substrate-description-panel h4 {
@@ -479,9 +481,11 @@
     margin-right: 8px;
 }
 
-/* Ensure product image container is positioned for absolute positioning */
+/* Product image container */
 .product-image {
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Add subtle hover effect to option badges to indicate interactivity */
