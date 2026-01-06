@@ -1985,6 +1985,11 @@ def assign_category(filename):
 def update_description(filename):
     """Update image description"""
     new_description = request.form.get('description', '').strip()
+    
+    # Clean description to remove excessive line breaks
+    from clean_descriptions import clean_html_description
+    new_description = clean_html_description(new_description)
+    
     image_descriptions = load_image_descriptions()
     image_descriptions[filename] = new_description
     if save_image_descriptions(image_descriptions):
