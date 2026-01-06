@@ -178,13 +178,17 @@ body .btn-beta {
 .modal-beta-description {
     font-family: 'Poppins', sans-serif;
     font-size: 1rem;
-    line-height: 1.7;
+    line-height: 1.6;
     color: #e0e0e0;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .modal-beta-description p {
-    margin-bottom: 15px;
+    margin-bottom: 8px;
+}
+
+.modal-beta-description p:last-child {
+    margin-bottom: 0;
 }
 
 .modal-beta-description strong {
