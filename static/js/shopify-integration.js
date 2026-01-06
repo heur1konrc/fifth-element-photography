@@ -228,11 +228,17 @@ function displayProductModal(product, imageTitle) {
 
     const imageUrl = product.images.edges[0]?.node.url || '';
 
-    // Build product HTML with badge selectors
+    // Build product HTML with badge selectors and description panel
     let productHTML = `
         <div class="product-details">
             <div class="product-image">
                 <img src="${imageUrl}" alt="${product.title}" />
+                <!-- Substrate Description Panel -->
+                <div id="substrate-description-panel" class="substrate-description-panel" style="display: none;">
+                    <h4 id="substrate-title"></h4>
+                    <p id="substrate-description"></p>
+                    <ul id="substrate-specs"></ul>
+                </div>
             </div>
             <div class="product-info">
                 <h3>${product.title}</h3>
@@ -292,6 +298,9 @@ function displayProductModal(product, imageTitle) {
     // Store product data
     window.currentProduct = product;
     window.selectedOptions = {};
+    
+    // Initialize substrate description hover listeners
+    initializeSubstrateHoverListeners();
     
     // Attach Add to Cart button event listener
     const addToCartBtn = document.getElementById('add-to-cart-btn');
@@ -632,3 +641,64 @@ function openProductByHandle(handle, imageTitle) {
 
 // Make function globally available
 window.openProductByHandle = openProductByHandle;
+
+/**
+ * Initialize hover listeners for substrate descriptions
+ * Shows detailed information when hovering over product option badges
+ */
+function initializeSubstrateHoverListeners() {
+    const descriptionPanel = document.getElementById('substrate-description-panel');
+    const titleElement = document.getElementById('substrate-title');
+    const descriptionElement = document.getElementById('substrate-description');
+    const specsElement = document.getElementById('substrate-specs');
+    
+    if (!descriptionPanel || !titleElement || !descriptionElement || !specsElement) {
+        console.warn('Substrate description panel elements not found');
+        return;
+    }
+    
+    // Get all option badges (buttons)
+    const optionBadges = document.querySelectorAll('.option-badge-full, .option-badge-small');
+    
+    optionBadges.forEach(badge => {
+        // Mouse enter - show description
+        badge.addEventListener('mouseenter', function() {
+            const optionValue = this.dataset.optionValue;
+            
+            // Get description from substrate descriptions database
+            if (typeof window.getSubstrateDescription === 'function') {
+                const substrateInfo = window.getSubstrateDescription(optionValue);
+                
+                if (substrateInfo) {
+                    // Update panel content
+                    titleElement.textContent = substrateInfo.title;
+                    descriptionElement.textContent = substrateInfo.description;
+                    
+                    // Build specs list
+                    specsElement.innerHTML = '';
+                    if (substrateInfo.specs && substrateInfo.specs.length > 0) {
+                        substrateInfo.specs.forEach(spec => {
+                            const li = document.createElement('li');
+                            li.textContent = spec;
+                            specsElement.appendChild(li);
+                        });
+                    }
+                    
+                    // Show panel with fade-in effect
+                    descriptionPanel.style.display = 'block';
+                    setTimeout(() => {
+                        descriptionPanel.style.opacity = '1';
+                    }, 10);
+                }
+            }
+        });
+        
+        // Mouse leave - hide description
+        badge.addEventListener('mouseleave', function() {
+            descriptionPanel.style.opacity = '0';
+            setTimeout(() => {
+                descriptionPanel.style.display = 'none';
+            }, 300);
+        });
+    });
+}
