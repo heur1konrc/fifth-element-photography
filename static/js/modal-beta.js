@@ -35,11 +35,17 @@ function openModalBeta(imageData) {
     // Populate description
     const descriptionDiv = document.getElementById('modalBetaDescription');
     if (imageData.description) {
-        // Clean up excessive line breaks and empty paragraphs
+        // Aggressively clean up excessive line breaks and empty paragraphs
         let cleanDescription = imageData.description
-            .replace(/<p>\s*<\/p>/g, '') // Remove empty paragraphs
-            .replace(/<p>\s*&nbsp;\s*<\/p>/g, '') // Remove paragraphs with only nbsp
-            .replace(/(<\/p>)\s*(<p>)/g, '$1$2') // Remove whitespace between paragraphs
+            // Remove all empty paragraphs (with or without whitespace/nbsp)
+            .replace(/<p[^>]*>\s*(&nbsp;|\s)*\s*<\/p>/gi, '')
+            // Remove multiple consecutive <br> tags
+            .replace(/(<br\s*\/?>\s*){2,}/gi, '<br>')
+            // Remove all whitespace (including newlines) between closing and opening paragraph tags
+            .replace(/<\/p>\s+<p>/gi, '</p><p>')
+            // Remove leading/trailing whitespace inside paragraphs
+            .replace(/<p>\s+/gi, '<p>')
+            .replace(/\s+<\/p>/gi, '</p>')
             .trim();
         descriptionDiv.innerHTML = cleanDescription;
     } else {
