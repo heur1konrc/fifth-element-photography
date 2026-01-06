@@ -14,16 +14,11 @@ clean_descriptions_admin_bp = Blueprint('clean_descriptions_admin', __name__)
 @clean_descriptions_admin_bp.route('/admin/clean-descriptions')
 def clean_descriptions_page():
     """Display page for cleaning descriptions"""
-    if not session.get('admin_logged_in'):
-        return redirect(url_for('admin_login'))
-    
     return render_template('admin/clean_descriptions.html')
 
 @clean_descriptions_admin_bp.route('/admin/api/clean-descriptions', methods=['POST'])
 def clean_descriptions_api():
     """API endpoint to trigger description cleaning"""
-    if not session.get('admin_logged_in'):
-        return jsonify({'error': 'Unauthorized'}), 401
     
     try:
         # Determine file path based on environment
