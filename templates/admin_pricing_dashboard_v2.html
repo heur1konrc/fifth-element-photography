@@ -1092,7 +1092,7 @@
         async function loadProductsForCategory() {
             const categoryId = document.getElementById('pricingCategory').value;
             const subcategorySelect = document.getElementById('pricingSubcategory');
-            const sizeSelect = document.getElementById('pricingSize');
+            const sizeSelect = document.getElementById('pricingSizeSelect');
             const costInput = document.getElementById('pricingCost');
             
             // Reset dependent fields
@@ -1280,7 +1280,7 @@
         // Add event listeners when product or size changes
         document.addEventListener('DOMContentLoaded', function() {
             const subcategorySelect = document.getElementById('pricingSubcategory');
-            const sizeSelect = document.getElementById('pricingSize');
+            const sizeSelect = document.getElementById('pricingSizeSelect');
             const costInput = document.getElementById('pricingCost');
             
             if (subcategorySelect) {
