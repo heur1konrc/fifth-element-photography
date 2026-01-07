@@ -662,6 +662,38 @@ def add_pricing_entry():
 # GET SIZES FOR DROPDOWN
 # ============================================================================
 
+@pricing_admin_bp.route('/api/pricing/subcategories')
+# @admin_required  # Temporarily disabled for testing
+def get_subcategories():
+    """Get all subcategories (products) for a specific category"""
+    try:
+        category_id = request.args.get('category_id', type=int)
+        
+        if not category_id:
+            return jsonify({'success': False, 'error': 'Category ID required'}), 400
+        
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT 
+                subcategory_id,
+                subcategory_name,
+                display_name,
+                description
+            FROM product_subcategories
+            WHERE category_id = ? AND is_enabled = TRUE
+            ORDER BY display_order
+        ''', (category_id,))
+        
+        subcategories = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        
+        return jsonify({'success': True, 'subcategories': subcategories})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @pricing_admin_bp.route('/api/pricing/sizes')
 # @admin_required  # Temporarily disabled for testing
 def get_sizes():
