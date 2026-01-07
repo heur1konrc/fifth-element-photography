@@ -617,7 +617,8 @@ def add_pricing_entry():
         
         subcategory_id = int(data.get('subcategory_id'))
         cost_price = float(data.get('cost_price'))
-        is_available = data.get('is_available', 'true').lower() == 'true'
+        is_available_raw = data.get('is_available', True)
+        is_available = is_available_raw if isinstance(is_available_raw, bool) else str(is_available_raw).lower() == 'true'
         notes = data.get('notes', '').strip()
         
         if cost_price < 0:
