@@ -75,3 +75,17 @@ This guide provides solutions to common problems and outlines maintenance proced
 ### 6.2. Maintenance
 
 -   **Verify Functionality**: Periodically test the back button on all print types (Canvas, Metal, Fine Art Paper, Foam-mounted Print, Framed Canvas) to ensure it continues to work as expected after any code changes.
+
+
+## 7. Enhanced "Add Product" Form
+
+### 7.1. Troubleshooting
+
+| Problem | Cause | Solution |
+| :--- | :--- | :--- |
+| **Product Type dropdown freezes on "Loading..."** | A JavaScript error is preventing the subcategories from being loaded. | This was caused by an incorrect element ID in the JavaScript. The issue has been fixed. If it recurs, check the browser console for errors in `admin_pricing_dashboard_v2.html`. |
+| **500 Internal Server Error on form submission** | The backend is receiving invalid data from the form. | This was caused by the backend expecting a string for `is_available` but receiving a boolean. The issue has been fixed. If it recurs, check the Railway logs for the exact error message. |
+
+### 7.2. Maintenance
+
+-   **Verify Functionality**: Periodically test the "Add New Pricing Entry" form to ensure it continues to work as expected after any code changes.

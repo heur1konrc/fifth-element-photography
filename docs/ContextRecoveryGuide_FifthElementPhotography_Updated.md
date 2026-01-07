@@ -124,3 +124,15 @@ git remote set-url origin https://heur1konrc:<TOKEN>@github.com/heur1konrc/fifth
 *   **Key Files**:
     *   `static/js/shopify-integration.js`: Back button logic and event handlers.
     *   `static/css/shopify-modal.css`: Back button styling.
+
+
+### E. Enhanced "Add Product" Form (New!)
+
+*   **Feature**: The admin pricing tool now allows for the easy addition of new product size variants, including sizes that do not yet exist in the database.
+*   **Implementation**: The "Add New Pricing Entry" form allows an administrator to select a category and product type, then either enter a new size or select an existing one. The form automatically calculates the retail price based on the global markup and creates the new pricing entry in the database.
+*   **Fixes Applied**:
+    *   Fixed a bug where the Product Type dropdown would freeze on "Loading..." due to an incorrect element ID in the JavaScript.
+    *   Fixed a 500 Internal Server Error on form submission caused by the backend expecting a string for `is_available` but receiving a boolean.
+*   **Key Files**:
+    *   `templates/admin_pricing_dashboard_v2.html`: HTML and JavaScript for the form.
+    *   `routes/pricing_admin.py`: Backend logic for adding pricing entries and creating new sizes.

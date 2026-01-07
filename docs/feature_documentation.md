@@ -141,3 +141,39 @@ This approach solves the problem of the Shopify product image URL being differen
 The Fifth Element Photography website now includes a comprehensive set of features designed to improve the customer experience and streamline business operations. The description cleaning system ensures that all image descriptions are consistently formatted and professional. The substrate hover descriptions provide customers with detailed information to help them make informed purchasing decisions. The print availability notification system allows customers to express interest in prints that are not yet available, and the Shopify customer creation integration helps build a marketing database. Finally, the back button navigation makes it easy for customers to explore different print options without frustration.
 
 All of these features work together to create a polished, user-friendly e-commerce experience that reflects the quality of the photography on display.
+
+
+## 8. Enhanced "Add Product" Form
+
+This feature enhances the admin pricing tool to allow for the easy addition of new product size variants, including sizes that do not yet exist in the database.
+
+### 8.1. The Problem
+
+The original "Add New Product" form was too simplistic. It only allowed for the creation of a product subcategory (e.g., "0.75\" Stretched Canvas") but did not provide a way to add the individual size variants (8x12, 16x24, etc.) with their associated costs. This made it impossible to add new, complete products to the pricing system.
+
+### 8.2. The Solution
+
+The "Add New Product" form was completely redesigned to streamline the process of adding new pricing entries. The new form, now titled "Add New Pricing Entry," allows an administrator to add a single size variant to an existing product type, and even create new sizes on the fly.
+
+**How It Works:**
+
+1.  **Select Category:** Choose from the list of existing categories (e.g., Canvas, Framed Canvas, Metal).
+2.  **Select Product Type:** The dropdown is dynamically populated with the product subcategories that belong to the selected category.
+3.  **Enter New Size or Select Existing:**
+    *   To create a new size, type it into the text field (e.g., "26x42").
+    *   To use an existing size, select it from the dropdown.
+4.  **Select Aspect Ratio:** If creating a new size, select the appropriate aspect ratio from the dropdown.
+5.  **Enter Cost Price:** Input the cost of the item from the print vendor (e.g., Lumaprints).
+6.  **Retail Price Auto-Calculates:** The retail price is automatically calculated based on the current global markup percentage.
+7.  **Submit:** Clicking "Add Pricing Entry" sends the data to the backend.
+
+**Backend Process:**
+
+-   If a new size was entered, the system first checks if it already exists in the `print_sizes` table. If not, it creates it.
+-   The system then creates a new entry in the `base_pricing` table, linking the product subcategory, the size, and the cost price.
+-   The new pricing entry is immediately available in the pricing tool and is included in all global markup calculations.
+
+### 8.3. Key Files
+
+-   `/home/ubuntu/fifth-element-photography/templates/admin_pricing_dashboard_v2.html`: Contains the HTML and JavaScript for the enhanced form.
+-   `/home/ubuntu/fifth-element-photography/routes/pricing_admin.py`: Contains the backend Flask routes for adding the new pricing entry and creating new sizes.
