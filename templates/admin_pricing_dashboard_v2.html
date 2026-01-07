@@ -758,8 +758,19 @@
             </div>
             <div class="form-group">
                 <label>Size</label>
-                <select id="pricingSize" disabled>
-                    <option value="">Select product first...</option>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="pricingSizeInput" placeholder="e.g., 26x42" disabled style="flex: 1;">
+                    <span style="color: #666;">or</span>
+                    <select id="pricingSizeSelect" disabled style="flex: 1;">
+                        <option value="">Select existing...</option>
+                    </select>
+                </div>
+                <small style="color: #666; display: block; margin-top: 5px;">Enter new size (e.g., 26x42) or select existing</small>
+            </div>
+            <div class="form-group">
+                <label>Aspect Ratio</label>
+                <select id="pricingAspectRatio" disabled>
+                    <option value="">Select aspect ratio...</option>
                 </select>
             </div>
             <div class="form-group">
@@ -1119,35 +1130,56 @@
             }
         }
         
-        // Load sizes when product is selected
+        // Load sizes and aspect ratios when product is selected
         async function loadSizesForProduct() {
-            const sizeSelect = document.getElementById('pricingSize');
+            const sizeSelect = document.getElementById('pricingSizeSelect');
+            const sizeInput = document.getElementById('pricingSizeInput');
+            const aspectRatioSelect = document.getElementById('pricingAspectRatio');
             const costInput = document.getElementById('pricingCost');
             
             sizeSelect.innerHTML = '<option value="">Loading...</option>';
             sizeSelect.disabled = true;
+            sizeInput.disabled = true;
+            aspectRatioSelect.disabled = true;
             costInput.disabled = true;
             document.getElementById('submitPricingBtn').disabled = true;
             
             try {
-                const response = await fetch('/api/pricing/sizes');
-                const data = await response.json();
+                // Load existing sizes
+                const sizesResponse = await fetch('/api/pricing/sizes');
+                const sizesData = await sizesResponse.json();
                 
-                if (data.success && data.sizes.length > 0) {
-                    sizeSelect.innerHTML = '<option value="">Select size...</option>';
-                    data.sizes.forEach(size => {
+                if (sizesData.success && sizesData.sizes.length > 0) {
+                    sizeSelect.innerHTML = '<option value="">Select existing...</option>';
+                    sizesData.sizes.forEach(size => {
                         const option = document.createElement('option');
                         option.value = size.size_id;
                         option.textContent = `${size.size_name} (${size.aspect_ratio})`;
                         sizeSelect.appendChild(option);
                     });
                     sizeSelect.disabled = false;
-                } else {
-                    sizeSelect.innerHTML = '<option value="">No sizes found</option>';
                 }
+                
+                // Load aspect ratios
+                const aspectResponse = await fetch('/api/pricing/aspect-ratios');
+                const aspectData = await aspectResponse.json();
+                
+                if (aspectData.success && aspectData.aspect_ratios.length > 0) {
+                    aspectRatioSelect.innerHTML = '<option value="">Select aspect ratio...</option>';
+                    aspectData.aspect_ratios.forEach(ar => {
+                        const option = document.createElement('option');
+                        option.value = ar.aspect_ratio_id;
+                        option.textContent = ar.display_name;
+                        aspectRatioSelect.appendChild(option);
+                    });
+                    aspectRatioSelect.disabled = false;
+                }
+                
+                // Enable size input
+                sizeInput.disabled = false;
+                
             } catch (error) {
                 showAlert('Error loading sizes: ' + error.message, 'error');
-                sizeSelect.innerHTML = '<option value="">Error loading sizes</option>';
             }
         }
         
@@ -1173,24 +1205,62 @@
         // Submit new pricing entry
         async function submitAddPricingEntry() {
             const subcategoryId = document.getElementById('pricingSubcategory').value;
-            const sizeId = document.getElementById('pricingSize').value;
+            const sizeInput = document.getElementById('pricingSizeInput').value.trim();
+            const sizeSelect = document.getElementById('pricingSizeSelect').value;
+            const aspectRatioId = document.getElementById('pricingAspectRatio').value;
             const costPrice = parseFloat(document.getElementById('pricingCost').value);
             
-            if (!subcategoryId || !sizeId || isNaN(costPrice) || costPrice <= 0) {
-                showAlert('Please fill in all fields correctly', 'error');
+            if (!subcategoryId) {
+                showAlert('Please select a product type', 'error');
+                return;
+            }
+            
+            // Check if using new size or existing
+            let sizeId = null;
+            let newSizeName = null;
+            
+            if (sizeInput) {
+                // Using new size - validate format (e.g., 26x42)
+                if (!/^\d+x\d+$/.test(sizeInput)) {
+                    showAlert('Size must be in format: WIDTHxHEIGHT (e.g., 26x42)', 'error');
+                    return;
+                }
+                if (!aspectRatioId) {
+                    showAlert('Please select an aspect ratio for the new size', 'error');
+                    return;
+                }
+                newSizeName = sizeInput;
+            } else if (sizeSelect) {
+                // Using existing size
+                sizeId = parseInt(sizeSelect);
+            } else {
+                showAlert('Please enter a new size or select an existing one', 'error');
+                return;
+            }
+            
+            if (isNaN(costPrice) || costPrice <= 0) {
+                showAlert('Please enter a valid cost price', 'error');
                 return;
             }
             
             try {
+                const requestBody = {
+                    subcategory_id: parseInt(subcategoryId),
+                    cost_price: costPrice,
+                    is_available: true
+                };
+                
+                if (sizeId) {
+                    requestBody.size_id = sizeId;
+                } else {
+                    requestBody.new_size_name = newSizeName;
+                    requestBody.aspect_ratio_id = parseInt(aspectRatioId);
+                }
+                
                 const response = await fetch('/admin/pricing/entries/add', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        subcategory_id: parseInt(subcategoryId),
-                        size_id: parseInt(sizeId),
-                        cost_price: costPrice,
-                        is_available: true
-                    })
+                    body: JSON.stringify(requestBody)
                 });
                 
                 const data = await response.json();
@@ -1224,9 +1294,23 @@
             if (sizeSelect) {
                 sizeSelect.addEventListener('change', function() {
                     const costInput = document.getElementById('pricingCost');
+                    const sizeInput = document.getElementById('pricingSizeInput');
                     if (this.value) {
+                        sizeInput.value = ''; // Clear manual input if selecting existing
                         costInput.disabled = false;
                         costInput.focus();
+                    }
+                });
+            }
+            
+            const sizeInput = document.getElementById('pricingSizeInput');
+            if (sizeInput) {
+                sizeInput.addEventListener('input', function() {
+                    const costInput = document.getElementById('pricingCost');
+                    const sizeSelect = document.getElementById('pricingSizeSelect');
+                    if (this.value) {
+                        sizeSelect.value = ''; // Clear selection if entering manually
+                        costInput.disabled = false;
                     }
                 });
             }

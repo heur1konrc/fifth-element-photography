@@ -616,7 +616,6 @@ def add_pricing_entry():
         data = request.json if request.is_json else request.form
         
         subcategory_id = int(data.get('subcategory_id'))
-        size_id = int(data.get('size_id'))
         cost_price = float(data.get('cost_price'))
         is_available = data.get('is_available', 'true').lower() == 'true'
         notes = data.get('notes', '').strip()
@@ -626,6 +625,50 @@ def add_pricing_entry():
         
         conn = get_db()
         cursor = conn.cursor()
+        
+        # Check if using existing size or creating new one
+        size_id = data.get('size_id')
+        new_size_name = data.get('new_size_name')
+        aspect_ratio_id = data.get('aspect_ratio_id')
+        
+        if size_id:
+            # Using existing size
+            size_id = int(size_id)
+        elif new_size_name and aspect_ratio_id:
+            # Create new size
+            aspect_ratio_id = int(aspect_ratio_id)
+            
+            # Parse size name (e.g., "26x42" -> width=26, height=42)
+            parts = new_size_name.lower().split('x')
+            if len(parts) != 2:
+                return jsonify({'success': False, 'error': 'Invalid size format. Use WIDTHxHEIGHT (e.g., 26x42)'}), 400
+            
+            try:
+                width = int(parts[0])
+                height = int(parts[1])
+            except ValueError:
+                return jsonify({'success': False, 'error': 'Width and height must be numbers'}), 400
+            
+            # Check if size already exists
+            cursor.execute('''
+                SELECT size_id FROM print_sizes 
+                WHERE size_name = ? OR (width = ? AND height = ?)
+            ''', (f'{width}x{height}', width, height))
+            
+            existing_size = cursor.fetchone()
+            if existing_size:
+                size_id = existing_size[0]
+            else:
+                # Insert new size
+                cursor.execute('''
+                    INSERT INTO print_sizes 
+                    (size_name, width, height, aspect_ratio_id, is_enabled)
+                    VALUES (?, ?, ?, ?, TRUE)
+                ''', (f'{width}x{height}', width, height, aspect_ratio_id))
+                
+                size_id = cursor.lastrowid
+        else:
+            return jsonify({'success': False, 'error': 'Must provide either size_id or new_size_name with aspect_ratio_id'}), 400
         
         # Check if this combination already exists
         cursor.execute('''
@@ -723,3 +766,30 @@ def get_sizes():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+
+
+@pricing_admin_bp.route('/api/pricing/aspect-ratios')
+# @admin_required  # Temporarily disabled for testing
+def get_aspect_ratios():
+    """Get all available aspect ratios for dropdown"""
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT 
+                aspect_ratio_id,
+                display_name,
+                ratio_decimal
+            FROM aspect_ratios
+            WHERE is_enabled = TRUE
+            ORDER BY ratio_decimal
+        ''')
+        
+        aspect_ratios = [dict(row) for row in cursor.fetchall()]
+        conn.close()
+        
+        return jsonify({'success': True, 'aspect_ratios': aspect_ratios})
+        
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
