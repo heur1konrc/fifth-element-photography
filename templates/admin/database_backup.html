@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Backup & Restore - Fifth Element Photography</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; }
+        .header h1 { font-size: 2em; margin-bottom: 10px; }
+        .nav-links { display: flex; gap: 10px; margin-bottom: 20px; }
+        .nav-link { padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 6px; }
+        .nav-link:hover { background: #5568d3; }
+        
+        .section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .section h2 { color: #333; margin-bottom: 15px; font-size: 1.5em; }
+        .section p { color: #666; margin-bottom: 15px; line-height: 1.6; }
+        
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 1em; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .alert-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        
+        .backup-list { margin-top: 20px; }
+        .backup-group { border: 2px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .backup-group h3 { color: #667eea; margin-bottom: 10px; font-size: 1.1em; }
+        .backup-item { padding: 10px; background: #f8f9fa; border-radius: 4px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .backup-info { flex: 1; }
+        .backup-name { font-weight: 600; color: #333; }
+        .backup-size { color: #666; font-size: 0.9em; }
+        .backup-actions { display: flex; gap: 10px; }
+        .backup-actions button { padding: 6px 12px; font-size: 0.9em; }
+        
+        .loading { display: none; text-align: center; padding: 20px; }
+        .loading.active { display: block; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 500px; width: 90%; }
+        .modal-content h3 { color: #dc3545; margin-bottom: 15px; }
+        .modal-content p { color: #666; margin-bottom: 20px; line-height: 1.6; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-links">
+            <a href="/admin" class="nav-link">← Back to Admin</a>
+            <a href="/admin/shopify-mapping" class="nav-link">Shopify Mapping</a>
+        </div>
+        
+        <div class="header">
+            <h1>💾 Database Backup & Restore</h1>
+            <p>Protect your data with one-click backups and easy restoration</p>
+        </div>
+        
+        <div id="alertContainer"></div>
+        
+        <!-- Create Backup Section -->
+        <div class="section">
+            <h2>Create New Backup</h2>
+            <p>Create a timestamped backup of all databases (print_ordering.db, pricing.db, image_descriptions.json). Always backup before making major changes!</p>
+            <button class="btn btn-primary" onclick="createBackup()">
+                📦 Create Backup Now
+            </button>
+        </div>
+        
+        <!-- Restore Backup Section -->
+        <div class="section">
+            <h2>Available Backups</h2>
+            <p>Select a backup to restore. A safety backup will be created automatically before restoring.</p>
+            
+            <div class="loading" id="loadingBackups">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #666;">Loading backups...</p>
+            </div>
+            
+            <div id="backupList" class="backup-list"></div>
+        </div>
+    </div>
+    
+    <!-- Restore Confirmation Modal -->
+    <div id="restoreModal" class="modal">
+        <div class="modal-content">
+            <h3>⚠️ Confirm Restore</h3>
+            <p>Are you sure you want to restore from this backup?</p>
+            <p><strong>Timestamp:</strong> <span id="restoreTimestamp"></span></p>
+            <p style="font-size: 0.9em; color: #856404; background: #fff3cd; padding: 10px; border-radius: 4px;">
+                A safety backup of your current databases will be created automatically before restoring.
+            </p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closeRestoreModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmRestore()">Restore</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let selectedTimestamp = null;
+        
+        // Load backups on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBackups();
+        });
+        
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+        
+        function createBackup() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Creating backup...';
+            
+            fetch('/api/database/backup/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(`✅ Backup created successfully! (${data.backups.length} databases backed up)`, 'success');
+                    loadBackups();
+                } else {
+                    showAlert(`❌ Error: ${data.error}`, 'error');
+                }
+            })
+            .catch(error => {
+                showAlert(`❌ Error creating backup: ${error.message}`, 'error');
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = '📦 Create Backup Now';
+            });
+        }
+        
+        function loadBackups() {
+            const loadingEl = document.getElementById('loadingBackups');
+            const listEl = document.getElementById('backupList');
+            
+            loadingEl.classList.add('active');
+            listEl.innerHTML = '';
+            
+            fetch('/api/database/backup/list')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.total === 0) {
+                        listEl.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No backups found. Create your first backup above!</p>';
+                    } else {
+                        displayBackups(data.backups);
+                    }
+                } else {
+                    showAlert(`❌ Error loading backups: ${data.error}`, 'error');
+                }
+            })
+            .catch(error => {
+                showAlert(`❌ Error loading backups: ${error.message}`, 'error');
+            })
+            .finally(() => {
+                loadingEl.classList.remove('active');
+            });
+        }
+        
+        function displayBackups(backupGroups) {
+            const listEl = document.getElementById('backupList');
+            listEl.innerHTML = '';
+            
+            // Sort timestamps in reverse order (newest first)
+            const timestamps = Object.keys(backupGroups).sort().reverse();
+            
+            timestamps.forEach(timestamp => {
+                const backups = backupGroups[timestamp];
+                
+                const groupEl = document.createElement('div');
+                groupEl.className = 'backup-group';
+                
+                const headerEl = document.createElement('h3');
+                headerEl.textContent = `📅 ${timestamp}`;
+                groupEl.appendChild(headerEl);
+                
+                backups.forEach(backup => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'backup-item';
+                    
+                    const infoEl = document.createElement('div');
+                    infoEl.className = 'backup-info';
+                    
+                    const nameEl = document.createElement('div');
+                    nameEl.className = 'backup-name';
+                    nameEl.textContent = backup.database;
+                    infoEl.appendChild(nameEl);
+                    
+                    const sizeEl = document.createElement('div');
+                    sizeEl.className = 'backup-size';
+                    sizeEl.textContent = formatBytes(backup.size);
+                    infoEl.appendChild(sizeEl);
+                    
+                    itemEl.appendChild(infoEl);
+                    groupEl.appendChild(itemEl);
+                });
+                
+                // Add restore button for the entire group
+                const actionsEl = document.createElement('div');
+                actionsEl.style.marginTop = '10px';
+                actionsEl.style.textAlign = 'right';
+                
+                const restoreBtn = document.createElement('button');
+                restoreBtn.className = 'btn btn-success';
+                restoreBtn.textContent = '🔄 Restore from this backup';
+                restoreBtn.onclick = () => openRestoreModal(timestamp);
+                actionsEl.appendChild(restoreBtn);
+                
+                groupEl.appendChild(actionsEl);
+                listEl.appendChild(groupEl);
+            });
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        function openRestoreModal(timestamp) {
+            selectedTimestamp = timestamp;
+            document.getElementById('restoreTimestamp').textContent = timestamp;
+            document.getElementById('restoreModal').classList.add('active');
+        }
+        
+        function closeRestoreModal() {
+            selectedTimestamp = null;
+            document.getElementById('restoreModal').classList.remove('active');
+        }
+        
+        function confirmRestore() {
+            if (!selectedTimestamp) return;
+            
+            const modal = document.getElementById('restoreModal');
+            const modalContent = modal.querySelector('.modal-content');
+            modalContent.innerHTML = '<div class="loading active"><div class="spinner"></div><p style="margin-top: 10px;">Restoring backup...</p></div>';
+            
+            fetch('/api/database/backup/restore', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ timestamp: selectedTimestamp })
+            })
+            .then(response => response.json())
+            .then(data => {
+                closeRestoreModal();
+                if (data.success) {
+                    showAlert(`✅ Successfully restored ${data.restored.length} databases from backup!`, 'success');
+                    loadBackups();
+                } else {
+                    showAlert(`❌ Error restoring backup: ${data.error}`, 'error');
+                }
+            })
+            .catch(error => {
+                closeRestoreModal();
+                showAlert(`❌ Error restoring backup: ${error.message}`, 'error');
+            });
+        }
+    </script>
+</body>
+</html>
