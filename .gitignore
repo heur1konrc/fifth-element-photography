@@ -207,3 +207,10 @@ marimo/_lsp/
 __marimo__/
 data/admin_users.json
 data/reset_tokens.json
+
+# Database files - NEVER commit these to prevent overwriting Railway data
+*.db
+*.db-journal
+*.db.backup.*
+data/*.db
+database/*.db
