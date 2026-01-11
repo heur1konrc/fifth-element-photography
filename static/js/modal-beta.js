@@ -260,27 +260,3 @@ document.getElementById('printNotificationForm').onsubmit = async function(e) {
         notificationMessage.style.color = '#fff';
     }
 };
-
-// Auto-open modal if ?image= parameter is present in URL
-document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const imageParam = urlParams.get('image');
-    
-    if (imageParam) {
-        // Find the image in the gallery
-        const galleryImages = document.querySelectorAll('.gallery-item');
-        
-        for (let item of galleryImages) {
-            const img = item.querySelector('img');
-            if (img) {
-                const imgSrc = img.getAttribute('src');
-                // Check if the image filename matches
-                if (imgSrc && imgSrc.includes(imageParam)) {
-                    // Trigger click on the gallery item to open modal
-                    item.click();
-                    break;
-                }
-            }
-        }
-    }
-});

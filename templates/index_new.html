@@ -24,6 +24,7 @@
     {% endif %}
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/modal-beta.css">
     <style>
         * {
             margin: 0;
@@ -350,6 +351,9 @@
         </div>
     </footer>
     
+    <!-- BETA MODAL -->
+    {% include 'modal_beta.html' %}
+    
     <script>
 
         
@@ -445,6 +449,40 @@
         // Initialize
         loadCarousel();
         
+        // Check for image parameter and open modal
+        document.addEventListener('DOMContentLoaded', async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const imageParam = urlParams.get('image');
+            
+            if (imageParam) {
+                console.log('Image parameter found:', imageParam);
+                // Wait for images to load
+                try {
+                    const response = await fetch('/api/images');
+                    const images = await response.json();
+                    
+                    // Find the matching image
+                    const image = images.find(img => img.filename === imageParam);
+                    
+                    if (image) {
+                        console.log('Opening modal for image:', image.filename);
+                        // Wait a bit for modal-beta.js to load
+                        setTimeout(() => {
+                            if (typeof openModalBeta === 'function') {
+                                openModalBeta(image);
+                            } else {
+                                console.error('openModalBeta function not found');
+                            }
+                        }, 500);
+                    } else {
+                        console.log('Image not found:', imageParam);
+                    }
+                } catch (error) {
+                    console.error('Error loading images:', error);
+                }
+            }
+        });
+        
         // Mobile dropdown functionality
         document.addEventListener('DOMContentLoaded', function() {
             const dropdowns = document.querySelectorAll('.dropdown');
@@ -479,5 +517,8 @@
             });
         });
     </script>
+    
+    <!-- Modal Beta JavaScript -->
+    <script src="/static/js/modal-beta.js"></script>
 </body>
 </html>
