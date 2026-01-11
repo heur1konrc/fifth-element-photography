@@ -135,9 +135,9 @@ document.getElementById('btnShare').onclick = function() {
     
     // Get the full image URL and create shareable page URL
     const imageUrl = window.location.origin + currentImageDataBeta.url;
-    // Extract actual filename from URL (e.g., /images/file.jpg -> file.jpg)
-    const actualFilename = currentImageDataBeta.url.split('/').pop();
-    const sharePageUrl = window.location.origin + '/photo/' + actualFilename;
+    // Use the filename property directly (has the hash)
+    const actualFilename = currentImageDataBeta.filename || currentImageDataBeta.url.split('/').pop();
+    const sharePageUrl = window.location.origin + '/photo/' + encodeURIComponent(actualFilename);
     const title = encodeURIComponent(currentImageDataBeta.title || 'Fifth Element Photography');
     const description = encodeURIComponent('Check out this image from Fifth Element Photography');
     
