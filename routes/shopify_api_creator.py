@@ -217,8 +217,8 @@ def create_shopify_product():
                 ]),
                 ('1.25" Framed Canvas', [
                     ('Black', 'black_floating_125'),
-                    ('White', 'white_floating_125'),
-                    ('Oak', 'oak_floating_125'),
+                    ('Natural Oak', 'oak_floating_125'),
+                    ('Walnut', 'walnut_floating_125'),
                 ]),
                 ('1.50" Framed Canvas', [
                     ('Black', 'black_floating_150'),
