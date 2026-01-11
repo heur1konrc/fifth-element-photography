@@ -137,7 +137,7 @@ document.getElementById('btnShare').onclick = function() {
     const imageUrl = window.location.origin + currentImageDataBeta.url;
     // Use the filename property directly (has the hash)
     const actualFilename = currentImageDataBeta.filename || currentImageDataBeta.url.split('/').pop();
-    const sharePageUrl = window.location.origin + '/photo/' + encodeURIComponent(actualFilename);
+    const sharePageUrl = window.location.origin + '/?image=' + encodeURIComponent(actualFilename);
     const title = encodeURIComponent(currentImageDataBeta.title || 'Fifth Element Photography');
     const description = encodeURIComponent('Check out this image from Fifth Element Photography');
     

@@ -7,6 +7,22 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Fifth Element Photography - Capturing the Quintessence</title>
+    
+    <!-- Open Graph / Facebook -->
+    {% if og_image_data %}
+    <meta property="fb:app_id" content="1234567890">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url.replace('http://', 'https://') }}">
+    <meta property="og:title" content="{{ og_image_data.title }} - Fifth Element Photography">
+    <meta property="og:description" content="{{ (og_image_data.description|striptags)[:200] if og_image_data.description else 'Professional photography by Fifth Element Photography' }}">
+    <meta property="og:image" content="{{ request.url_root.rstrip('/').replace('http://', 'https://') }}/data/gallery-images/{{ og_image_data.filename }}">
+    <meta property="og:image:secure_url" content="{{ request.url_root.rstrip('/').replace('http://', 'https://') }}/data/gallery-images/{{ og_image_data.filename }}">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="{{ og_image_data.width }}">
+    <meta property="og:image:height" content="{{ og_image_data.height }}">
+    <meta property="og:site_name" content="Fifth Element Photography">
+    {% endif %}
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {

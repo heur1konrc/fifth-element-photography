@@ -815,7 +815,19 @@ def index():
     from navigation_helpers import get_navigation_for_template
     galleries = get_all_galleries()
     nav_items = get_navigation_for_template()
-    return render_template('index_new.html', galleries=galleries, nav_items=nav_items)
+    
+    # Check if an image parameter is provided for Open Graph tags
+    image_param = request.args.get('image')
+    og_image_data = None
+    if image_param:
+        # Find the image in the scanned images
+        images = scan_images()
+        for img in images:
+            if img['filename'] == image_param:
+                og_image_data = img
+                break
+    
+    return render_template('index_new.html', galleries=galleries, nav_items=nav_items, og_image_data=og_image_data)
 
 @app.route('/portfolio')
 def portfolio():
