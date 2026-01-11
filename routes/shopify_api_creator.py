@@ -64,6 +64,17 @@ def load_image_titles():
         print(f"Error loading image titles: {e}")
     return {}
 
+def load_image_descriptions():
+    """Load image descriptions from JSON file"""
+    try:
+        descriptions_file = '/data/image_descriptions.json' if os.path.exists('/data') else os.path.join(os.path.dirname(__file__), '..', 'data', 'image_descriptions.json')
+        if os.path.exists(descriptions_file):
+            with open(descriptions_file, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading image descriptions: {e}")
+    return {}
+
 def slugify(text):
     """Convert text to URL-friendly slug"""
     import re
@@ -133,8 +144,9 @@ def create_shopify_product():
         conn = get_db()
         cursor = conn.cursor()
         
-        # Load image titles
+        # Load image titles and descriptions
         image_titles = load_image_titles()
+        image_descriptions = load_image_descriptions()
         
         # Get global markup
         cursor.execute("""
@@ -160,6 +172,10 @@ def create_shopify_product():
                 title = os.path.splitext(title)[0]
                 title = ' '.join(word.capitalize() for word in title.split())
             handle = slugify(title)
+            
+            # Load description for this image
+            description = image_descriptions.get(filename, '')
+            
             aspect_ratio = detect_aspect_ratio(filename)
             
             # Query pricing for unframed products
@@ -345,9 +361,10 @@ def create_shopify_product():
                 product_data = {
                     'product': {
                         'title': category_title,
+                        'body_html': description,  # Use image description
                         'handle': category_handle,
                         'vendor': 'Lumaprints',
-                        'product_type': 'Art Print',
+                        'product_type': 'Prints',  # Set category to Prints
                         'status': 'active',
                         'options': [
                             {'name': 'Printed Product', 'values': sorted([f'Printed Product - {pt}' for pt in product_types])},
