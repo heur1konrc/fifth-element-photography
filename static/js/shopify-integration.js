@@ -278,9 +278,10 @@ function displayProductModal(product, imageTitle) {
         const isFirstOption = optionIndex === 0;
         const badgeClass = isFirstOption ? 'option-badge-full' : 'option-badge-small';
         
+        const labelText = isFirstOption ? `${option.name}: <span style="font-size: 0.85em; color: #888; font-weight: normal;">(Hover to see description of products)</span>` : `${option.name}:`;
         productHTML += `
             <div class="option-group">
-                <label class="option-label">${option.name}:</label>
+                <label class="option-label">${labelText}</label>
                 <div class="option-badges">
         `;
         
