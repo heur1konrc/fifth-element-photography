@@ -148,6 +148,7 @@ document.getElementById('btnShare').onclick = function() {
     shareMenu.innerHTML = `
         <h3 style="color: #fff; margin-bottom: 15px; font-family: Poppins, sans-serif;">Share on Social Media</h3>
         <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button id="btnCopyUrl" style="background: #7c5cff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-family: Poppins, sans-serif;">📋 Copy URL</button>
             <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(sharePageUrl)}" target="_blank" style="background: #4267B2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-family: Poppins, sans-serif;">Share on Facebook</a>
             <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(sharePageUrl)}&text=${title}" target="_blank" style="background: #1DA1F2; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-family: Poppins, sans-serif;">Share on Twitter</a>
             <a href="https://pinterest.com/pin/create/button/?url=${encodeURIComponent(sharePageUrl)}&media=${encodeURIComponent(imageUrl)}&description=${title}" target="_blank" style="background: #E60023; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-family: Poppins, sans-serif;">Share on Pinterest</a>
@@ -155,6 +156,24 @@ document.getElementById('btnShare').onclick = function() {
         </div>
     `;
     document.body.appendChild(shareMenu);
+    
+    // Add click handler for Copy URL button
+    document.getElementById('btnCopyUrl').onclick = function() {
+        navigator.clipboard.writeText(sharePageUrl).then(() => {
+            // Show success feedback
+            const btn = this;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✓ Copied!';
+            btn.style.background = '#4caf50';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '#7c5cff';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy URL:', err);
+            alert('Failed to copy URL. Please try again.');
+        });
+    };
 };
 
 // ORDER PRINTS button - use same function as old modal
