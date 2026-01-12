@@ -74,8 +74,19 @@ function openModalBeta(imageData) {
     notificationForm.style.display = 'none';
     
     // Attach ORDER PRINTS button handler
-    orderBtn.onclick = function() {
+    console.log('[ORDER PRINTS] Attaching button handler, button element:', orderBtn);
+    
+    // Remove any existing listeners
+    const newOrderBtn = orderBtn.cloneNode(true);
+    orderBtn.parentNode.replaceChild(newOrderBtn, orderBtn);
+    
+    newOrderBtn.addEventListener('click', function(e) {
+        console.log('[ORDER PRINTS] Button clicked!');
+        e.preventDefault();
+        e.stopPropagation();
+        
         if (currentImageDataBeta && currentImageDataBeta.url) {
+            console.log('[ORDER PRINTS] Opening modal for:', currentImageDataBeta.url);
             // Use the existing Shopify integration
             if (typeof openShopifyProductModal === 'function') {
                 openShopifyProductModal(currentImageDataBeta.url, currentImageDataBeta.title || 'Untitled');
@@ -87,7 +98,9 @@ function openModalBeta(imageData) {
             console.error('No image data available for order');
             alert('Unable to open order wizard. Please try again.');
         }
-    };
+    });
+    
+    console.log('[ORDER PRINTS] Button handler attached successfully');
     
     // Show modal
     modalBeta.style.display = 'block';
