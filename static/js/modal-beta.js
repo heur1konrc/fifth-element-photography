@@ -176,14 +176,14 @@ document.getElementById('btnShare').onclick = function() {
     };
 };
 
-// ORDER PRINTS button - use same function as old modal
+// ORDER PRINTS button - navigate to dedicated order page
 document.getElementById('btnOrderPrints').onclick = function() {
-    // Call the existing openOrderWizard function from script.js
-    if (typeof openOrderWizard === 'function') {
-        openOrderWizard();
+    if (currentImageDataBeta && currentImageDataBeta.filename) {
+        // Navigate to order page with image parameter
+        window.location.href = `/order?image=${currentImageDataBeta.filename}`;
     } else {
-        console.error('openOrderWizard function not found');
-        alert('Order function not available. Please refresh the page.');
+        console.error('No image data available for order');
+        alert('Unable to load order page. Please try again.');
     }
 };
 

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Print - {{ image_title }}</title>
+    <link rel="stylesheet" href="/static/css/shopify-modal.css">
+    <link rel="stylesheet" href="/static/css/substrate-hover.css">
+    <style>
+        /* Full page styling to match modal appearance */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: rgba(0, 0, 0, 0.8);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .order-page-container {
+            background: white;
+            border-radius: 12px;
+            max-width: 1200px;
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .order-page-header {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .order-page-header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+        
+        .close-button {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        
+        .close-button:hover {
+            color: #333;
+        }
+        
+        .order-page-content {
+            padding: 30px;
+        }
+        
+        .shopify-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="order-page-container">
+        <div class="order-page-header">
+            <h2>{{ image_title }}</h2>
+            <button class="close-button" onclick="window.history.back()">&times;</button>
+        </div>
+        <div class="order-page-content">
+            <div id="shopify-product-component" class="shopify-loading">
+                <p>Loading product options...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Shopify Storefront API Integration -->
+    <script src="/static/js/shopify-config.js"></script>
+    <script src="/static/js/shopify-integration.js"></script>
+    
+    <script>
+        // Initialize order page
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUrl = "{{ image_url }}";
+            const imageTitle = "{{ image_title }}";
+            
+            console.log('[Order Page] Loading for image:', imageUrl);
+            
+            // Get product handles for this image
+            const productHandles = getAllProductHandlesFromUrl(imageUrl);
+            
+            if (!productHandles || productHandles.length === 0) {
+                document.getElementById('shopify-product-component').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <h3>Product Not Available</h3>
+                        <p>This image is not yet available for purchase. Please check back soon!</p>
+                        <button onclick="window.history.back()" style="margin-top: 20px; padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">Go Back</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Store for back button functionality
+            window.originalImageUrl = imageUrl;
+            window.originalImageTitle = imageTitle;
+            window.originalProductHandles = productHandles;
+            
+            // If multiple products, show category selector
+            if (productHandles.length > 1) {
+                showCategorySelector(imageUrl, imageTitle, productHandles);
+                return;
+            }
+            
+            // Single product - load directly
+            const productHandle = productHandles[0].handle;
+            
+            fetchProductByHandle(productHandle)
+                .then(product => {
+                    if (!product) {
+                        document.getElementById('shopify-product-component').innerHTML = `
+                            <div style="text-align: center; padding: 40px;">
+                                <h3>Product Not Found</h3>
+                                <p>Unable to load product details. Please try again later.</p>
+                                <button onclick="window.history.back()" style="margin-top: 20px; padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">Go Back</button>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    console.log('[Order Page] Product loaded:', product);
+                    displayProductInPage(product, imageTitle);
+                })
+                .catch(error => {
+                    console.error('[Order Page] Error loading product:', error);
+                    document.getElementById('shopify-product-component').innerHTML = `
+                        <div style="text-align: center; padding: 40px;">
+                            <h3>Error Loading Product</h3>
+                            <p>An error occurred while loading the product. Please try again.</p>
+                            <button onclick="window.history.back()" style="margin-top: 20px; padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">Go Back</button>
+                        </div>
+                    `;
+                });
+        });
+        
+        // Display product in page (similar to displayProductModal but for page context)
+        function displayProductInPage(product, imageTitle) {
+            const container = document.getElementById('shopify-product-component');
+            if (!container) return;
+            
+            const imageUrl = product.images.edges[0]?.node.url || '';
+            
+            let productHTML = `
+                <div class="product-details">
+                    <div class="product-image">
+                        <img src="${imageUrl}" alt="${product.title}" />
+                        <div id="substrate-description-panel" class="substrate-description-panel">
+                            <h4 id="substrate-title"></h4>
+                            <p id="substrate-description"></p>
+                            <ul id="substrate-specs"></ul>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3>${product.title}</h3>
+                        <div class="product-description">${product.descriptionHtml || ''}</div>
+                        <div class="product-price">
+                            <span class="price" id="variant-price">Select a size</span>
+                        </div>
+                        
+                        <button id="back-to-categories-btn" class="back-button" style="display: none;">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" style="margin-right: 8px;">
+                                <path d="M8 0L6.59 1.41 12.17 7H0v2h12.17l-5.58 5.59L8 16l8-8z" transform="rotate(180 8 8)"/>
+                            </svg>
+                            Back to Print Types
+                        </button>
+                        
+                        <div class="product-options">
+            `;
+            
+            // Add variant selectors
+            product.options.forEach((option, optionIndex) => {
+                const isFirstOption = optionIndex === 0;
+                const badgeClass = isFirstOption ? 'option-badge-full' : 'option-badge-small';
+                
+                productHTML += `
+                    <div class="option-group">
+                        <label class="option-label">${option.name}:</label>
+                        <div class="option-badges">
+                `;
+                
+                option.values.forEach(value => {
+                    productHTML += `
+                        <button 
+                            class="${badgeClass}" 
+                            data-option-index="${optionIndex}"
+                            data-option-value="${value}"
+                            onclick="selectOption(${optionIndex}, '${value}')"
+                        >
+                            ${value}
+                        </button>
+                    `;
+                });
+                
+                productHTML += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            productHTML += `
+                        </div>
+                        
+                        <div id="availability-message" class="availability-message"></div>
+                        
+                        <div class="product-actions">
+                            <button id="add-to-cart-btn" class="add-to-cart-button" disabled>Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = productHTML;
+            container.classList.remove('shopify-loading');
+            
+            // Store product data
+            window.currentProduct = product;
+            window.selectedOptions = {};
+            
+            // Initialize substrate hover listeners
+            initializeSubstrateHoverListeners();
+            
+            // Attach Add to Cart button
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', addToCart);
+            }
+            
+            // Show back button if multiple categories
+            const backBtn = document.getElementById('back-to-categories-btn');
+            if (backBtn && window.originalProductHandles && window.originalProductHandles.length > 1) {
+                backBtn.style.display = 'inline-flex';
+                backBtn.addEventListener('click', function() {
+                    showCategorySelector(window.originalImageUrl, window.originalImageTitle, window.originalProductHandles);
+                });
+            }
+        }
+        
+        // Override showCategorySelector to work in page context
+        function showCategorySelector(imageUrl, imageTitle, productHandles) {
+            const container = document.getElementById('shopify-product-component');
+            if (!container) return;
+            
+            let html = `
+                <div class="category-selector">
+                    <h3>Select Print Type</h3>
+                    <p>Choose the type of print you'd like to order:</p>
+                    <div class="category-buttons">
+            `;
+            
+            productHandles.forEach(item => {
+                html += `
+                    <button class="category-button" onclick="loadProductByHandle('${item.handle}', '${imageTitle}')">
+                        ${item.category}
+                    </button>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        // Load product by handle
+        function loadProductByHandle(handle, imageTitle) {
+            const container = document.getElementById('shopify-product-component');
+            container.innerHTML = '<div class="shopify-loading"><p>Loading product options...</p></div>';
+            
+            fetchProductByHandle(handle)
+                .then(product => {
+                    if (product) {
+                        displayProductInPage(product, imageTitle);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading product:', error);
+                    container.innerHTML = '<div style="text-align: center; padding: 40px;"><p>Error loading product. Please try again.</p></div>';
+                });
+        }
+    </script>
+</body>
+</html>
