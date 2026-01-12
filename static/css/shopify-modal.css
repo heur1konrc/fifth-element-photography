@@ -11,7 +11,7 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.9);
-    z-index: 10000;
+    z-index: 10002;
     justify-content: center;
     align-items: center;
     padding: 20px;
@@ -63,7 +63,7 @@
     justify-content: center;
     transition: color 0.3s ease;
     position: relative;
-    z-index: 10001;
+    z-index: 10003;
     pointer-events: auto;
 }
 
