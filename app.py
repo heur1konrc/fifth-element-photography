@@ -955,34 +955,6 @@ def portfolio():
                              og_title=og_title,
                              og_description=og_description)
 
-@app.route('/order')
-def order_page():
-    """Order page for print selection"""
-    image_param = request.args.get('image')
-    
-    if not image_param:
-        return redirect(url_for('index'))
-    
-    # Get image details
-    images = scan_images()
-    image_data = None
-    for img in images:
-        if img['filename'] == image_param:
-            image_data = img
-            break
-    
-    if not image_data:
-        return redirect(url_for('index'))
-    
-    # Construct image URL
-    image_url = f"/data/gallery-images/{image_param}"
-    image_title = image_data.get('title', image_param.replace('.jpg', '').replace('.jpeg', '').replace('_', ' ').title())
-    
-    return render_template('order_page.html',
-                         image_url=image_url,
-                         image_title=image_title,
-                         image_filename=image_param)
-
 @app.route('/mobile')
 def mobile_gallery():
 

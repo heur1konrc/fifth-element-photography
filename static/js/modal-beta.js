@@ -176,14 +176,19 @@ document.getElementById('btnShare').onclick = function() {
     };
 };
 
-// ORDER PRINTS button - navigate to dedicated order page
+// ORDER PRINTS button - open Shopify product modal
 document.getElementById('btnOrderPrints').onclick = function() {
-    if (currentImageDataBeta && currentImageDataBeta.filename) {
-        // Navigate to order page with image parameter
-        window.location.href = `/order?image=${currentImageDataBeta.filename}`;
+    if (currentImageDataBeta && currentImageDataBeta.url) {
+        // Use the existing Shopify integration
+        if (typeof openShopifyProductModal === 'function') {
+            openShopifyProductModal(currentImageDataBeta.url, currentImageDataBeta.title || 'Untitled');
+        } else {
+            console.error('openShopifyProductModal function not found');
+            alert('Order function not available. Please refresh the page.');
+        }
     } else {
         console.error('No image data available for order');
-        alert('Unable to load order page. Please try again.');
+        alert('Unable to open order wizard. Please try again.');
     }
 };
 
