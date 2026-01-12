@@ -553,8 +553,14 @@ console.log('Shopify Storefront API integration loaded');
 
 // Show category selector modal
 function showCategorySelector(imageUrl, imageTitle, productHandles) {
+    console.log('[CATEGORY SELECTOR] showCategorySelector called');
+    console.log('[CATEGORY SELECTOR] imageUrl:', imageUrl);
+    console.log('[CATEGORY SELECTOR] imageTitle:', imageTitle);
+    console.log('[CATEGORY SELECTOR] productHandles:', productHandles);
+    
     // Create modal if it doesn't exist
     let modal = document.getElementById('shopify-product-modal');
+    console.log('[CATEGORY SELECTOR] Existing modal:', modal);
     
     if (!modal) {
         // Create the modal structure
@@ -624,7 +630,10 @@ function showCategorySelector(imageUrl, imageTitle, productHandles) {
         </div>
     `;
     
+    console.log('[CATEGORY SELECTOR] Setting modal display to block');
     modal.style.display = 'block';
+    console.log('[CATEGORY SELECTOR] Modal should now be visible, modal element:', modal);
+    console.log('[CATEGORY SELECTOR] Modal computed style:', window.getComputedStyle(modal).display);
 }
 
 // Get icon for category
