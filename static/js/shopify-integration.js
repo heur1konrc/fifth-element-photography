@@ -131,27 +131,33 @@ async function createCartWithItem(variantId) {
 
 // Open product modal for a specific image
 function openShopifyProductModal(imageUrl, imageTitle) {
+    console.log('[SHOPIFY MODAL] openShopifyProductModal called with:', imageUrl, imageTitle);
+    
     // Store original image URL and title for back button
     window.originalImageUrl = imageUrl;
     window.originalImageTitle = imageTitle;
     
     // Get all product handles for this image (multiple categories)
     const productHandles = getAllProductHandlesFromUrl(imageUrl);
+    console.log('[SHOPIFY MODAL] productHandles:', productHandles);
     
     // Store product handles for back button
     window.originalProductHandles = productHandles;
     
     if (!productHandles || productHandles.length === 0) {
+        console.error('[SHOPIFY MODAL] No product handles found for:', imageUrl);
         alert('This image is not yet available for purchase. Please check back soon!');
-        console.error('No Shopify product mapped for:', imageUrl);
         return;
     }
 
     // If multiple products exist, show category selector
     if (productHandles.length > 1) {
+        console.log('[SHOPIFY MODAL] Multiple products, showing category selector');
         showCategorySelector(imageUrl, imageTitle, productHandles);
         return;
     }
+    
+    console.log('[SHOPIFY MODAL] Single product, loading directly');
 
     // Single product - open directly
     const productHandle = productHandles[0].handle;
