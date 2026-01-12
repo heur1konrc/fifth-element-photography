@@ -634,6 +634,13 @@ function showCategorySelector(imageUrl, imageTitle, productHandles) {
     modal.style.display = 'block';
     console.log('[CATEGORY SELECTOR] Modal should now be visible, modal element:', modal);
     console.log('[CATEGORY SELECTOR] Modal computed style:', window.getComputedStyle(modal).display);
+    console.log('[CATEGORY SELECTOR] Modal z-index:', window.getComputedStyle(modal).zIndex);
+    console.log('[CATEGORY SELECTOR] Modal position:', window.getComputedStyle(modal).position);
+    console.log('[CATEGORY SELECTOR] Modal parent:', modal.parentElement);
+    console.log('[CATEGORY SELECTOR] Modal offsetParent:', modal.offsetParent);
+    console.log('[CATEGORY SELECTOR] Modal getBoundingClientRect:', modal.getBoundingClientRect());
+    console.log('[CATEGORY SELECTOR] Modal visibility:', window.getComputedStyle(modal).visibility);
+    console.log('[CATEGORY SELECTOR] Modal opacity:', window.getComputedStyle(modal).opacity);
 }
 
 // Get icon for category
