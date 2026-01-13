@@ -321,6 +321,26 @@
         </div>
     </div>
     
+    <!-- Add Page Link Modal -->
+    <div id="add-page-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Add Page Link</div>
+            <div class="form-group">
+                <label class="form-label">Page Name</label>
+                <input type="text" id="page-name" class="form-input" placeholder="e.g., Contact, About, Shop">
+            </div>
+            <div class="form-group">
+                <label class="form-label">URL</label>
+                <input type="text" id="page-url" class="form-input" placeholder="e.g., /contact, https://example.com">
+            </div>
+            <input type="hidden" id="page-parent-id">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('add-page-modal')">CANCEL</button>
+                <button class="btn-save" onclick="savePage()">DONE</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Edit/Rename Modal -->
     <div id="edit-item-modal" class="modal">
         <div class="modal-content">
@@ -396,7 +416,8 @@
                         <span class="drag-handle">☰</span>
                         <span class="nav-item-name">${item.name}</span>
                         <div class="nav-item-actions">
-                            <button class="btn-icon" onclick="addGalleryToCategory(${item.id})" title="Add gallery">+</button>
+                            <button class="btn-icon" onclick="addGalleryToCategory(${item.id})" title="Add gallery">📷</button>
+                            <button class="btn-icon" onclick="addPageToCategory(${item.id})" title="Add page link">🔗</button>
                             <button class="btn-icon" onclick="editNavItem(${item.id}, '${item.name}')" title="Edit">✎</button>
                             <button class="btn-icon delete" onclick="deleteNavItem(${item.id})" title="Delete">×</button>
                         </div>
@@ -506,6 +527,55 @@
                 }
             } catch (error) {
                 alert('Error saving gallery: ' + error);
+            }
+        }
+        
+        // Add page link to category
+        function addPageToCategory(categoryId) {
+            document.getElementById('page-parent-id').value = categoryId;
+            document.getElementById('page-name').value = '';
+            document.getElementById('page-url').value = '';
+            document.getElementById('add-page-modal').classList.add('active');
+        }
+        
+        // Save page link
+        async function savePage() {
+            const name = document.getElementById('page-name').value.trim();
+            const url = document.getElementById('page-url').value.trim();
+            const parentId = document.getElementById('page-parent-id').value;
+            
+            if (!name) {
+                alert('Please enter a page name');
+                return;
+            }
+            
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/navigation/items', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        name: name,
+                        type: 'link',
+                        parent_id: parseInt(parentId),
+                        url: url,
+                        order_index: 0
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    closeModal('add-page-modal');
+                    loadNavigation();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error saving page: ' + error);
             }
         }
         
