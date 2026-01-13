@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, render_template
 import requests
 import time
 import os
@@ -8,6 +8,11 @@ shopify_bulk_update_bp = Blueprint('shopify_bulk_update', __name__, url_prefix='
 SHOPIFY_STORE = os.environ.get('SHOPIFY_STORE')
 SHOPIFY_API_SECRET = os.environ.get('SHOPIFY_API_SECRET')
 SHOPIFY_API_VERSION = '2024-01'
+
+@shopify_bulk_update_bp.route('/shopify/bulk-remove-quotes', methods=['GET'])
+def bulk_remove_quotes_page():
+    """Display admin UI for bulk quote removal"""
+    return render_template('admin/bulk_remove_quotes.html')
 
 @shopify_bulk_update_bp.route('/api/shopify/bulk-remove-quotes', methods=['POST'])
 def bulk_remove_quotes():

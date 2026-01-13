@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Remove Quotes - Fifth Element Photography</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        #status.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        #status.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        #status.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .product-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bulk Remove Quotes from Shopify Products</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> This will update ALL Shopify products to remove quote marks (") from their option values. This process may take several minutes depending on the number of products.
+        </div>
+        
+        <p>This tool will:</p>
+        <ul>
+            <li>Fetch all products from your Shopify store</li>
+            <li>Remove quote marks from option values (e.g., 0.75" → 0.75)</li>
+            <li>Update variant option values accordingly</li>
+            <li>Respect Shopify API rate limits</li>
+        </ul>
+        
+        <button id="startBtn" onclick="startBulkUpdate()">Start Bulk Update</button>
+        
+        <div id="status"></div>
+    </div>
+    
+    <script>
+        function startBulkUpdate() {
+            const btn = document.getElementById('startBtn');
+            const status = document.getElementById('status');
+            
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            
+            status.className = 'info';
+            status.style.display = 'block';
+            status.innerHTML = 'Starting bulk update... This may take a few minutes.';
+            
+            fetch('/admin/api/shopify/bulk-remove-quotes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.textContent = 'Start Bulk Update';
+                
+                if (data.success) {
+                    status.className = 'success';
+                    status.innerHTML = `
+                        <strong>✓ Success!</strong><br>
+                        Updated ${data.updated} products.<br>
+                        ${data.errors.length > 0 ? `<br><strong>Errors:</strong><br>${data.errors.join('<br>')}` : ''}
+                        ${data.products.length > 0 ? `<br><br><strong>Updated Products:</strong><div class="product-list">${data.products.join('<br>')}</div>` : ''}
+                    `;
+                } else {
+                    status.className = 'error';
+                    status.innerHTML = `<strong>✗ Error:</strong> ${data.error}`;
+                }
+            })
+            .catch(error => {
+                btn.disabled = false;
+                btn.textContent = 'Start Bulk Update';
+                status.className = 'error';
+                status.innerHTML = `<strong>✗ Error:</strong> ${error.message}`;
+            });
+        }
+    </script>
+</body>
+</html>
