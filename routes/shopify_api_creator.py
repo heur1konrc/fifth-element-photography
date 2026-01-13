@@ -342,11 +342,14 @@ def create_shopify_product():
                     size = row['size_name'].strip('"')
                     price = round(row['cost_price'] * markup_multiplier, 2)
                     
-                    product_types.add(shopify_prod_type)
+                    # Remove quotes from product type names
+                    shopify_prod_type_clean = shopify_prod_type.replace('"', '')
+                    
+                    product_types.add(shopify_prod_type_clean)
                     sizes.add(size)
                     
                     variants.append({
-                        'option1': f'Printed Product - {shopify_prod_type}',
+                        'option1': f'Printed Product - {shopify_prod_type_clean}',
                         'option2': f'Size - {size}',
                         'price': str(price),
                         'inventory_quantity': 10,
