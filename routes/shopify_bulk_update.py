@@ -5,8 +5,8 @@ import os
 
 shopify_bulk_update_bp = Blueprint('shopify_bulk_update', __name__, url_prefix='/admin')
 
-SHOPIFY_STORE = os.environ.get('SHOPIFY_STORE')
-SHOPIFY_API_SECRET = os.environ.get('SHOPIFY_API_SECRET')
+SHOPIFY_STORE = os.environ.get('SHOPIFY_STORE', 'fifth-element-photography.myshopify.com')
+SHOPIFY_API_SECRET = os.environ.get('SHOPIFY_API_SECRET', '')
 SHOPIFY_API_VERSION = '2024-01'
 
 @shopify_bulk_update_bp.route('/shopify/bulk-remove-quotes', methods=['GET'])
