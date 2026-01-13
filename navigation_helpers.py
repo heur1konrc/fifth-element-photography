@@ -20,7 +20,7 @@ def get_navigation_for_template():
             'children': []
         }
         
-        # Add children (galleries)
+        # Add children (galleries and links)
         for child in category.get('children', []):
             if child['type'] == 'gallery' and child.get('gallery_id'):
                 # Get gallery slug from gallery_db
@@ -31,8 +31,17 @@ def get_navigation_for_template():
                         'id': child['id'],
                         'name': child['name'],
                         'url': f"/gallery/{gallery['slug']}",
+                        'type': 'gallery',
                         'gallery_id': child['gallery_id']
                     })
+            elif child['type'] == 'link' and child.get('url'):
+                # Custom page link
+                category_data['children'].append({
+                    'id': child['id'],
+                    'name': child['name'],
+                    'url': child['url'],
+                    'type': 'link'
+                })
         
         formatted_nav.append(category_data)
     

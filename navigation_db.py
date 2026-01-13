@@ -94,7 +94,7 @@ def add_nav_item(name: str, item_type: str, parent_id: Optional[int] = None,
 
 def update_nav_item(item_id: int, name: Optional[str] = None, 
                     parent_id: Optional[int] = None, order_index: Optional[int] = None,
-                    visible: Optional[int] = None) -> bool:
+                    visible: Optional[int] = None, url: Optional[str] = None) -> bool:
     """Update a navigation item"""
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -114,6 +114,9 @@ def update_nav_item(item_id: int, name: Optional[str] = None,
     if visible is not None:
         updates.append('visible = ?')
         params.append(visible)
+    if url is not None:
+        updates.append('url = ?')
+        params.append(url)
     
     if updates:
         updates.append('updated_at = CURRENT_TIMESTAMP')

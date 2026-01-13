@@ -60,8 +60,9 @@ def update_item(item_id):
         parent_id = data.get('parent_id')
         order_index = data.get('order_index')
         visible = data.get('visible')
+        url = data.get('url')
         
-        update_nav_item(item_id, name, parent_id, order_index, visible)
+        update_nav_item(item_id, name, parent_id, order_index, visible, url)
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

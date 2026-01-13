@@ -344,12 +344,17 @@
     <!-- Edit/Rename Modal -->
     <div id="edit-item-modal" class="modal">
         <div class="modal-content">
-            <div class="modal-header">Rename Item</div>
+            <div class="modal-header">Edit Item</div>
             <div class="form-group">
-                <label class="form-label">New Name</label>
-                <input type="text" id="edit-item-name" class="form-input" placeholder="Enter new name">
+                <label class="form-label">Name</label>
+                <input type="text" id="edit-item-name" class="form-input" placeholder="Enter name">
+            </div>
+            <div class="form-group" id="edit-url-group" style="display: none;">
+                <label class="form-label">URL</label>
+                <input type="text" id="edit-item-url" class="form-input" placeholder="Enter URL">
             </div>
             <input type="hidden" id="edit-item-id">
+            <input type="hidden" id="edit-item-type">
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModal('edit-item-modal')">CANCEL</button>
                 <button class="btn-save" onclick="saveEditedItem()">DONE</button>
@@ -418,7 +423,7 @@
                         <div class="nav-item-actions">
                             <button class="btn-icon" onclick="addGalleryToCategory(${item.id})" title="Add gallery">📷</button>
                             <button class="btn-icon" onclick="addPageToCategory(${item.id})" title="Add page link">🔗</button>
-                            <button class="btn-icon" onclick="editNavItem(${item.id}, '${item.name}')" title="Edit">✎</button>
+                            <button class="btn-icon" onclick="editNavItem(${item.id}, '${item.name}', '${item.type}', '${item.url || ''}')" title="Edit">✎</button>
                             <button class="btn-icon delete" onclick="deleteNavItem(${item.id})" title="Delete">×</button>
                         </div>
                         <span class="arrow-icon">›</span>
@@ -430,7 +435,7 @@
                                     <span class="drag-handle">☰</span>
                                     <span class="nav-item-name">${child.name}</span>
                                     <div class="nav-item-actions" style="margin-left: auto;">
-                                        <button class="btn-icon" onclick="editNavItem(${child.id}, '${child.name}')" title="Edit">✎</button>
+                                        <button class="btn-icon" onclick="editNavItem(${child.id}, '${child.name}', '${child.type}', '${child.url || ''}')" title="Edit">✎</button>
                                         <button class="btn-icon delete" onclick="deleteNavItem(${child.id})" title="Delete">×</button>
                                     </div>
                                 </div>
@@ -580,9 +585,22 @@
         }
         
         // Edit nav item
-        function editNavItem(itemId, currentName) {
+        function editNavItem(itemId, currentName, itemType, currentUrl) {
             document.getElementById('edit-item-id').value = itemId;
             document.getElementById('edit-item-name').value = currentName;
+            document.getElementById('edit-item-type').value = itemType || '';
+            
+            // Show URL field only for link types
+            const urlGroup = document.getElementById('edit-url-group');
+            const urlInput = document.getElementById('edit-item-url');
+            if (itemType === 'link') {
+                urlGroup.style.display = 'block';
+                urlInput.value = currentUrl || '';
+            } else {
+                urlGroup.style.display = 'none';
+                urlInput.value = '';
+            }
+            
             document.getElementById('edit-item-modal').classList.add('active');
             // Focus the input field
             setTimeout(() => {
@@ -594,18 +612,30 @@
         // Save edited item
         async function saveEditedItem() {
             const itemId = document.getElementById('edit-item-id').value;
+            const itemType = document.getElementById('edit-item-type').value;
             const newName = document.getElementById('edit-item-name').value.trim();
+            const newUrl = document.getElementById('edit-item-url').value.trim();
             
             if (!newName) {
                 alert('Please enter a name');
                 return;
             }
             
+            if (itemType === 'link' && !newUrl) {
+                alert('Please enter a URL');
+                return;
+            }
+            
+            const updateData = { name: newName };
+            if (itemType === 'link') {
+                updateData.url = newUrl;
+            }
+            
             try {
                 const response = await fetch(`/api/navigation/items/${itemId}`, {
                     method: 'PUT',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ name: newName })
+                    body: JSON.stringify(updateData)
                 });
                 
                 const data = await response.json();
