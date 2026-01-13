@@ -50,6 +50,7 @@ from routes.setup_pricing import setup_pricing_bp
 from routes.shopify_admin import shopify_admin_bp
 from routes.shopify_csv_generator import shopify_csv_bp
 from routes.shopify_api_creator import shopify_api_creator_bp
+from routes.shopify_bulk_update import shopify_bulk_update_bp
 from routes.shopify_status_api import shopify_status_api_bp
 from routes.shopify_price_sync_api import shopify_price_sync_bp
 from routes.add_metal_migration import add_metal_bp
@@ -79,6 +80,7 @@ app.register_blueprint(setup_pricing_bp)
 app.register_blueprint(shopify_admin_bp)
 app.register_blueprint(shopify_csv_bp)
 app.register_blueprint(shopify_api_creator_bp)
+app.register_blueprint(shopify_bulk_update_bp)
 app.register_blueprint(shopify_status_api_bp)
 app.register_blueprint(shopify_price_sync_bp)
 app.register_blueprint(add_metal_bp)
