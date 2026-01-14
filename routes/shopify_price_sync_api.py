@@ -57,12 +57,16 @@ def sync_shopify_prices():
     Uses the EXACT same logic as shopify_api_creator.py
     """
     start_time = time.time()
+    print(f"[SYNC] Starting sync at {start_time}")
     
     try:
+        print("[SYNC] Getting database connection...")
         conn = get_db_connection()
         cursor = conn.cursor()
+        print("[SYNC] Database connected")
         
         # Get global markup multiplier
+        print("[SYNC] Fetching markup multiplier...")
         cursor.execute("""
             SELECT markup_value FROM markup_rules 
             WHERE rule_type = 'global' AND is_active = TRUE 
@@ -76,10 +80,13 @@ def sync_shopify_prices():
         all_products = []
         url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit=250'
         headers = {'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN}
+        print(f"[SYNC] Fetching products from Shopify: {url}")
         
         while url:
             try:
+                print(f"[SYNC] Making request to: {url[:80]}...")
                 response = requests.get(url, headers=headers, timeout=30)
+                print(f"[SYNC] Got response: {response.status_code}")
             except requests.exceptions.Timeout:
                 return jsonify({
                     'success': False,
@@ -196,9 +203,14 @@ def sync_shopify_prices():
                         'cost_price': row['cost_price'] + frame_adjustment
                     })
         
-        # Now update variants for all products
+        # Now update variants for all products (FILTER: product_type = "Metal" only)
         for product in all_products:
             product_title = product.get('title', '')
+            product_type = product.get('product_type', '')
+            
+            # Skip non-Metal products
+            if product_type != 'Metal':
+                continue
             
             product_updated = False
             for variant in product.get('variants', []):
