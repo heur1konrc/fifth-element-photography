@@ -50,13 +50,13 @@ def map_product_type_to_shopify(db_product_type):
     }
     return mapping.get(db_product_type, db_product_type)
 
-@shopify_price_sync_bp.route('/sync-prices', methods=['POST'])
+@shopify_price_sync_bp.route('/api/shopify/sync-prices', methods=['POST'])
 def sync_shopify_prices():
     """
     Sync prices in batches of 10 products.
     Accepts optional 'page' parameter to process specific batch.
     """
-    page = request.json.get('page', 1) if request.is_json else 1
+    page = int(request.args.get('page', 1))
     start_time = time.time()
     print(f"[SYNC] Starting sync at {start_time}")
     
