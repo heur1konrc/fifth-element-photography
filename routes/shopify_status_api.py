@@ -13,11 +13,11 @@ shopify_status_api_bp = Blueprint('shopify_status_api', __name__)
 # Database paths
 if os.path.exists('/data'):
     PRICING_DB_PATH = '/data/print_ordering.db'
-    GALLERY_DB_PATH = '/data/gallery_images.db'
+    GALLERY_DB_PATH = '/data/galleries.db'
     IMAGES_FOLDER = '/data'
 else:
     PRICING_DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'database', 'print_ordering.db')
-    GALLERY_DB_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'gallery_images.db')
+    GALLERY_DB_PATH = 'galleries.db'
     IMAGES_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'static', 'images')
 
 def ensure_shopify_products_table():
@@ -122,12 +122,12 @@ def get_images_shopify_status():
         try:
             gallery_conn = get_gallery_db()
             gallery_cursor = gallery_conn.cursor()
-            gallery_cursor.execute('SELECT filename FROM images ORDER BY filename')
+            gallery_cursor.execute('SELECT DISTINCT image_filename as filename FROM gallery_images ORDER BY filename')
             image_rows = gallery_cursor.fetchall()
             gallery_conn.close()
             image_files = [row['filename'] for row in image_rows]
         except Exception as e:
-            print(f"Error loading from gallery_images.db: {e}")
+            print(f"Error loading from galleries.db: {e}")
             # Fallback to filesystem scan
             if os.path.exists(IMAGES_FOLDER):
                 for filename in os.listdir(IMAGES_FOLDER):
