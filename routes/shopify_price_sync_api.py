@@ -208,8 +208,8 @@ def sync_shopify_prices():
             product_title = product.get('title', '')
             product_type = product.get('product_type', '')
             
-            # Skip non-Metal products
-            if product_type != 'Metal':
+            # Skip non-Metal products (case-insensitive)
+            if product_type.lower() != 'metal':
                 continue
             
             product_updated = False
