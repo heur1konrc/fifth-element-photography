@@ -86,6 +86,7 @@ def sync_shopify_prices():
         
         # Fetch pages until we reach the requested page
         current_page = 1
+        next_page_link = None
         while url and current_page <= page:
             try:
                 print(f"[SYNC] Making request to: {url[:80]}...")
@@ -111,14 +112,18 @@ def sync_shopify_prices():
                 }), 500
             
             data = response.json()
+            link_header = response.headers.get('Link', '')
             
-            # If this is the page we want, save products and stop
+            # If this is the page we want, save products and check for next page
             if current_page == page:
                 all_products.extend(data.get('products', []))
+                # Check if there's a next page link
+                if 'rel="next"' in link_header:
+                    next_links = [l.split(';')[0].strip('<> ') for l in link_header.split(',') if 'rel="next"' in l]
+                    next_page_link = next_links[0] if next_links else None
                 url = None
             else:
                 # Skip this page, move to next
-                link_header = response.headers.get('Link', '')
                 if 'rel="next"' in link_header:
                     next_link = [l.split(';')[0].strip('<> ') for l in link_header.split(',') if 'rel="next"' in l]
                     url = next_link[0] if next_link else None
@@ -272,11 +277,8 @@ def sync_shopify_prices():
         
         duration = round((time.time() - start_time) / 60, 2)
         
-        # Check if there are more pages by making a request for the next page
-        next_page_url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit={limit}&page={page + 1}'
-        check_response = requests.get(next_page_url, headers=headers, timeout=30)
-        next_page_products = check_response.json().get('products', [])
-        has_more = len(next_page_products) > 0
+        # Check if there are more pages based on Link header from current page
+        has_more = next_page_link is not None
         
         return jsonify({
             'success': True,
