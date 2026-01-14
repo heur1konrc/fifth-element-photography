@@ -111,7 +111,7 @@ def sync_shopify_prices():
             else:
                 url = None
             
-            time.sleep(0.5)  # Rate limiting
+            time.sleep(0.1)  # Rate limiting (Shopify allows 2 req/sec)
         
         products_updated = 0
         variants_updated = 0
@@ -196,14 +196,9 @@ def sync_shopify_prices():
                         'cost_price': row['cost_price'] + frame_adjustment
                     })
         
-        # Now update variants for all products (FILTER: Metal only for testing)
+        # Now update variants for all products
         for product in all_products:
             product_title = product.get('title', '')
-            
-            # Skip non-Metal products
-            product_type = product.get('product_type', '')
-            if 'Metal' not in product_type:
-                continue
             
             product_updated = False
             for variant in product.get('variants', []):
@@ -255,7 +250,7 @@ def sync_shopify_prices():
                 else:
                     errors.append(f"{product_title} - {option1} / {option2}: Failed to update (HTTP {update_response.status_code})")
                 
-                time.sleep(0.5)  # Rate limiting
+                time.sleep(0.1)  # Rate limiting (Shopify allows 2 req/sec)
             
             if product_updated:
                 products_updated += 1
