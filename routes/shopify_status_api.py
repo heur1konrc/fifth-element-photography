@@ -67,12 +67,19 @@ def sync_shopify_products():
             'X-Shopify-Access-Token': SHOPIFY_API_SECRET
         }
         
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers, timeout=30)
         
         if response.status_code != 200:
-            return jsonify({'success': False, 'error': f'Shopify API error: {response.status_code}'}), 500
+            error_detail = f'Status: {response.status_code}, Response: {response.text[:500]}'
+            print(f'Shopify API Error: {error_detail}')
+            return jsonify({'success': False, 'error': error_detail}), 500
         
-        products = response.json().get('products', [])
+        try:
+            products = response.json().get('products', [])
+        except Exception as json_error:
+            error_detail = f'JSON parse error: {str(json_error)}, Response: {response.text[:500]}'
+            print(f'Shopify Response Parse Error: {error_detail}')
+            return jsonify({'success': False, 'error': error_detail}), 500
         
         # Save to database
         conn = get_pricing_db()
