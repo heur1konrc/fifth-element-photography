@@ -203,13 +203,12 @@ def sync_shopify_prices():
                         'cost_price': row['cost_price'] + frame_adjustment
                     })
         
-        # Now update variants for all products (FILTER: product_type = "Metal" only)
+        # Now update variants for all products (FILTER: title ends with " - Metal" only)
         for product in all_products:
             product_title = product.get('title', '')
-            product_type = product.get('product_type', '')
             
-            # Skip non-Metal products (case-insensitive)
-            if product_type.lower() != 'metal':
+            # Skip non-Metal products (check title suffix)
+            if not product_title.endswith(' - Metal'):
                 continue
             
             product_updated = False
