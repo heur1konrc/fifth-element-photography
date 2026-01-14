@@ -272,11 +272,11 @@ def sync_shopify_prices():
         
         duration = round((time.time() - start_time) / 60, 2)
         
-        # Check if there are more pages
-        check_url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit={limit}'
-        check_response = requests.get(check_url, headers=headers, timeout=30)
-        total_products = len(check_response.json().get('products', []))
-        has_more = (page * limit) < total_products
+        # Check if there are more pages by making a request for the next page
+        next_page_url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit={limit}&page={page + 1}'
+        check_response = requests.get(next_page_url, headers=headers, timeout=30)
+        next_page_products = check_response.json().get('products', [])
+        has_more = len(next_page_products) > 0
         
         return jsonify({
             'success': True,
