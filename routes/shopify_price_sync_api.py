@@ -76,13 +76,14 @@ def sync_shopify_prices():
         global_markup = markup_row[0] if markup_row else 100.0
         markup_multiplier = 1 + (global_markup / 100)
         
-        # Fetch all Shopify products (paginated)
+        # Fetch Shopify products (BATCH: first 20 only)
         all_products = []
-        url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit=250'
+        url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit=20'
         headers = {'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN}
         print(f"[SYNC] Fetching products from Shopify: {url}")
         
-        while url:
+        # Only fetch first page (20 products)
+        if url:
             try:
                 print(f"[SYNC] Making request to: {url[:80]}...")
                 response = requests.get(url, headers=headers, timeout=30)
@@ -108,17 +109,7 @@ def sync_shopify_prices():
             
             data = response.json()
             all_products.extend(data.get('products', []))
-            
-            # Check for next page
-            link_header = response.headers.get('Link', '')
-            if 'rel="next"' in link_header:
-                # Extract next URL from Link header
-                next_link = [l.split(';')[0].strip('<> ') for l in link_header.split(',') if 'rel="next"' in l]
-                url = next_link[0] if next_link else None
-            else:
-                url = None
-            
-            time.sleep(0.1)  # Rate limiting (Shopify allows 2 req/sec)
+            url = None  # Stop after first batch
         
         products_updated = 0
         variants_updated = 0
@@ -203,13 +194,9 @@ def sync_shopify_prices():
                         'cost_price': row['cost_price'] + frame_adjustment
                     })
         
-        # Now update variants for all products (FILTER: title ends with " - Metal" only)
+        # Now update variants for all products (BATCH: 20 products)
         for product in all_products:
             product_title = product.get('title', '')
-            
-            # Skip non-Metal products (check title suffix)
-            if not product_title.endswith(' - Metal'):
-                continue
             
             product_updated = False
             for variant in product.get('variants', []):
