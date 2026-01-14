@@ -196,9 +196,14 @@ def sync_shopify_prices():
                         'cost_price': row['cost_price'] + frame_adjustment
                     })
         
-        # Now update variants for all products
+        # Now update variants for all products (FILTER: Metal only for testing)
         for product in all_products:
             product_title = product.get('title', '')
+            
+            # Skip non-Metal products
+            product_type = product.get('product_type', '')
+            if 'Metal' not in product_type:
+                continue
             
             product_updated = False
             for variant in product.get('variants', []):
