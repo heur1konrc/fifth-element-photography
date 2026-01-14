@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, request, jsonify
 import os
 import sqlite3
 import requests
@@ -50,7 +50,7 @@ def map_product_type_to_shopify(db_product_type):
     }
     return mapping.get(db_product_type, db_product_type)
 
-@shopify_price_sync_api_bp.route('/sync-prices', methods=['POST'])
+@shopify_price_sync_bp.route('/sync-prices', methods=['POST'])
 def sync_shopify_prices():
     """
     Sync prices in batches of 10 products.
