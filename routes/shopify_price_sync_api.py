@@ -50,12 +50,13 @@ def map_product_type_to_shopify(db_product_type):
     }
     return mapping.get(db_product_type, db_product_type)
 
-@shopify_price_sync_bp.route('/api/shopify/sync-prices', methods=['POST'])
+@shopify_price_sync_api_bp.route('/sync-prices', methods=['POST'])
 def sync_shopify_prices():
     """
-    Sync prices for all existing Shopify products based on current database pricing.
-    Uses the EXACT same logic as shopify_api_creator.py
+    Sync prices in batches of 10 products.
+    Accepts optional 'page' parameter to process specific batch.
     """
+    page = request.json.get('page', 1) if request.is_json else 1
     start_time = time.time()
     print(f"[SYNC] Starting sync at {start_time}")
     
@@ -76,14 +77,16 @@ def sync_shopify_prices():
         global_markup = markup_row[0] if markup_row else 100.0
         markup_multiplier = 1 + (global_markup / 100)
         
-        # Fetch Shopify products (BATCH: first 20 only)
+        # Fetch Shopify products (BATCH: 10 products per page)
         all_products = []
-        url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit=20'
+        limit = 10
+        url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit={limit}'
         headers = {'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN}
-        print(f"[SYNC] Fetching products from Shopify: {url}")
+        print(f"[SYNC] Fetching page {page} (limit={limit}) from Shopify: {url}")
         
-        # Only fetch first page (20 products)
-        if url:
+        # Fetch pages until we reach the requested page
+        current_page = 1
+        while url and current_page <= page:
             try:
                 print(f"[SYNC] Making request to: {url[:80]}...")
                 response = requests.get(url, headers=headers, timeout=30)
@@ -108,8 +111,20 @@ def sync_shopify_prices():
                 }), 500
             
             data = response.json()
-            all_products.extend(data.get('products', []))
-            url = None  # Stop after first batch
+            
+            # If this is the page we want, save products and stop
+            if current_page == page:
+                all_products.extend(data.get('products', []))
+                url = None
+            else:
+                # Skip this page, move to next
+                link_header = response.headers.get('Link', '')
+                if 'rel="next"' in link_header:
+                    next_link = [l.split(';')[0].strip('<> ') for l in link_header.split(',') if 'rel="next"' in l]
+                    url = next_link[0] if next_link else None
+                    current_page += 1
+                else:
+                    url = None
         
         products_updated = 0
         variants_updated = 0
@@ -257,11 +272,19 @@ def sync_shopify_prices():
         
         duration = round((time.time() - start_time) / 60, 2)
         
+        # Check if there are more pages
+        check_url = f'https://{SHOPIFY_STORE}/admin/api/{SHOPIFY_API_VERSION}/products.json?limit={limit}'
+        check_response = requests.get(check_url, headers=headers, timeout=30)
+        total_products = len(check_response.json().get('products', []))
+        has_more = (page * limit) < total_products
+        
         return jsonify({
             'success': True,
             'products_updated': products_updated,
             'variants_updated': variants_updated,
             'duration_minutes': duration,
+            'current_page': page,
+            'has_more': has_more,
             'errors': errors[:100]  # Limit to first 100 errors
         })
     

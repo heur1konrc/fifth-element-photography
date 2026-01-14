@@ -944,10 +944,23 @@
         }
 
         // Sync Prices to Shopify
-        async function syncPricesToShopify() {
-            if (!confirm('This will update ALL product prices in Shopify based on the current database pricing and global markup. This may take several minutes. Continue?')) {
-                return;
+        let currentPage = 1;
+        let totalProductsUpdated = 0;
+        let totalVariantsUpdated = 0;
+        let batchStartTime = null;
+
+        async function syncPricesToShopify(page = 1) {
+            // Only show confirmation on first batch
+            if (page === 1) {
+                if (!confirm('This will update product prices in Shopify in batches of 10 products. You can continue to the next batch after each one completes. Continue?')) {
+                    return;
+                }
+                // Reset counters on first batch
+                totalProductsUpdated = 0;
+                totalVariantsUpdated = 0;
             }
+
+            currentPage = page;
 
             // Show progress monitor
             const monitor = document.getElementById('progressMonitor');
@@ -957,23 +970,25 @@
             const progressResults = document.getElementById('progressResults');
             const progressResultsContent = document.getElementById('progressResultsContent');
             const progressSpinner = document.getElementById('progressSpinner');
+            const continueButton = document.getElementById('continueSyncButton');
             
             monitor.classList.add('active');
             progressResults.style.display = 'none';
             progressSpinner.style.display = 'block';
+            if (continueButton) continueButton.style.display = 'none';
             
-            const startTime = Date.now();
+            batchStartTime = Date.now();
             let timeInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const elapsed = Math.floor((Date.now() - batchStartTime) / 1000);
                 progressTime.textContent = `Time elapsed: ${elapsed}s`;
             }, 1000);
 
             try {
-                progressStatus.textContent = 'Connecting to Shopify...';
+                progressStatus.textContent = `Processing batch ${page} (products ${(page-1)*10 + 1}-${page*10})...`;
                 progressBar.style.width = '10%';
                 progressBar.textContent = '10%';
 
-                const response = await fetch('/api/shopify/sync-prices', {
+                const response = await fetch(`/api/shopify/sync-prices?page=${page}&limit=10`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'}
                 });
@@ -989,15 +1004,22 @@
                 progressBar.style.width = '100%';
                 progressBar.textContent = '100%';
                 
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                progressTime.textContent = `Completed in ${elapsed}s`;
+                const elapsed = Math.floor((Date.now() - batchStartTime) / 1000);
+                progressTime.textContent = `Batch completed in ${elapsed}s`;
                 
                 if (data.success) {
-                    progressStatus.textContent = '✅ Sync completed successfully!';
+                    // Update totals
+                    totalProductsUpdated += data.products_updated;
+                    totalVariantsUpdated += data.variants_updated;
+
+                    progressStatus.textContent = `✅ Batch ${page} completed!`;
                     
                     let resultsHTML = `
                         <div class="result-item result-success">
-                            ✅ Updated ${data.products_updated} products (${data.variants_updated} variants)
+                            ✅ Batch ${page}: Updated ${data.products_updated} products (${data.variants_updated} variants)
+                        </div>
+                        <div class="result-item result-success">
+                            📊 Total so far: ${totalProductsUpdated} products, ${totalVariantsUpdated} variants
                         </div>
                     `;
                     
@@ -1005,7 +1027,27 @@
                         console.log('Sync errors:', data.errors);
                         resultsHTML += `
                             <div class="result-item result-warning">
-                                ⚠️ ${data.errors.length} variants could not be matched (likely unavailable products)
+                                ⚠️ ${data.errors.length} variants could not be matched in this batch
+                            </div>
+                        `;
+                    }
+
+                    // Show Continue button if there are more products
+                    if (data.has_more) {
+                        resultsHTML += `
+                            <div style="margin-top: 1rem;">
+                                <button onclick="syncPricesToShopify(${page + 1})" 
+                                        style="background: #28a745; color: white; padding: 0.75rem 1.5rem; 
+                                               border: none; border-radius: 4px; cursor: pointer; font-size: 1rem;
+                                               font-weight: bold;">
+                                    ▶️ Continue to Next Batch (${page + 1})
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        resultsHTML += `
+                            <div class="result-item result-success" style="margin-top: 1rem; font-weight: bold;">
+                                🎉 All products synced! Total: ${totalProductsUpdated} products, ${totalVariantsUpdated} variants
                             </div>
                         `;
                     }
