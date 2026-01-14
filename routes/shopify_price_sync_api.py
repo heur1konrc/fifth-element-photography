@@ -78,11 +78,25 @@ def sync_shopify_prices():
         headers = {'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN}
         
         while url:
-            response = requests.get(url, headers=headers)
-            if response.status_code != 200:
+            try:
+                response = requests.get(url, headers=headers, timeout=30)
+            except requests.exceptions.Timeout:
                 return jsonify({
                     'success': False,
-                    'error': f'Failed to fetch products from Shopify: HTTP {response.status_code}'
+                    'error': 'Request to Shopify timed out after 30 seconds'
+                }), 500
+            except requests.exceptions.RequestException as req_err:
+                return jsonify({
+                    'success': False,
+                    'error': f'Request error: {str(req_err)}'
+                }), 500
+            
+            if response.status_code != 200:
+                error_detail = f'HTTP {response.status_code}: {response.text[:500]}'
+                print(f'Shopify API Error: {error_detail}')
+                return jsonify({
+                    'success': False,
+                    'error': error_detail
                 }), 500
             
             data = response.json()
@@ -228,7 +242,7 @@ def sync_shopify_prices():
                     }
                 }
                 
-                update_response = requests.put(update_url, headers=headers, json=update_data)
+                update_response = requests.put(update_url, headers=headers, json=update_data, timeout=30)
                 
                 if update_response.status_code == 200:
                     variants_updated += 1
