@@ -61,7 +61,6 @@
         }
         
         .logo {
-            /* max-width: 560px; */
             max-width: 450px;
             margin: 0 auto 20px;
         }
@@ -101,29 +100,15 @@
             color: #7B68EE;
         }
         
-        /* Dropdown Navigation */
+        /* Dropdown Menu Styles */
         nav li {
             position: relative;
-        }
-        
-        nav li.dropdown {
-            cursor: pointer;
-        }
-        
-        nav li.dropdown > a {
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
         
         nav li.dropdown > a::after {
             content: '▼';
             font-size: 10px;
-            transition: transform 0.3s;
-        }
-        
-        nav li.dropdown:hover > a::after {
-            transform: rotate(180deg);
+            margin-left: 5px;
         }
         
         .dropdown-menu {
@@ -136,21 +121,10 @@
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 4px;
             padding: 10px 0;
-            min-width: 180px;
-            margin-top: 0;
-            padding-top: 15px;
+            margin-top: 10px;
+            min-width: 200px;
             z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        }
-        
-        .dropdown-menu::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 15px;
-            background: transparent;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
         
         nav li.dropdown:hover .dropdown-menu {
@@ -158,79 +132,120 @@
         }
         
         .dropdown-menu li {
+            display: block;
             padding: 0;
         }
         
         .dropdown-menu a {
-            display: flex;
-            align-items: center;
-            height: 24px;
-            padding: 0 20px !important;
+            display: block;
+            padding: 10px 20px;
+            color: #fff;
+            text-decoration: none;
             font-size: 13px;
-            white-space: nowrap;
+            transition: background 0.2s;
         }
         
         .dropdown-menu a:hover {
-            background: rgba(123, 104, 238, 0.1);
-        }
-        
-        /* Nested dropdown for categories */
-        .dropdown-menu .category-item {
-            position: relative;
-        }
-        
-        .dropdown-menu .category-header {
-            display: flex;
-            align-items: center;
-            height: 22px;
-            padding: 0 20px !important;
-            font-size: 11px;
-            font-weight: bold;
+            background: rgba(123,104,238,0.2);
             color: #7B68EE;
-            cursor: default;
-            white-space: nowrap;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         
-        .dropdown-menu .category-submenu {
-            padding-left: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-        
-        .dropdown-menu .category-submenu a {
-            height: 24px;
-            padding: 0 20px 0 30px !important;
-            font-size: 12px;
-        }
-        
-        /* Carousel Container */
-        .carousel-container {
+        /* Hero Section */
+        .hero-section {
             position: relative;
             width: 100%;
+            height: 600px;
             overflow: hidden;
             margin: 30px 0;
         }
         
-        .carousel-track {
-            display: flex;
-            gap: 20px;
-            transition: transform 0.8s ease-in-out;
-        }
-        
-        .carousel-slide {
-            min-width: calc((100% - 40px) / 3);
-            aspect-ratio: 4/3;
-            background: #000;
-            overflow: hidden;
-        }
-        
-        .carousel-slide img {
+        .hero-image {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
+        }
+        
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hero-tagline {
+            max-width: 600px;
+            width: 80%;
+        }
+        
+        /* Masonry Grid */
+        .gallery-section {
+            margin: 50px 0;
+        }
+        
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .gallery-header h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .gallery-subtitle {
+            color: rgba(255,255,255,0.7);
+            font-size: 14px;
+        }
+        
+        .masonry-grid {
+            column-count: 4;
+            column-gap: 20px;
+        }
+        
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+            transition: transform 0.3s;
+        }
+        
+        .masonry-item:hover {
+            transform: scale(1.02);
+        }
+        
+        .masonry-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .masonry-item-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .masonry-item:hover .masonry-item-overlay {
+            opacity: 1;
+        }
+        
+        .masonry-item-title {
+            font-size: 14px;
+            font-weight: 500;
         }
         
         /* Footer */
@@ -259,12 +274,20 @@
             color: #7B68EE;
         }
         
-        /* Mobile dropdown toggle */
-        .dropdown-menu.active {
-            display: block;
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: rgba(255,255,255,0.5);
         }
         
         /* Responsive */
+        @media (max-width: 1200px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+        
         @media (max-width: 768px) {
             nav ul {
                 gap: 15px;
@@ -275,7 +298,6 @@
                 font-size: 12px;
             }
             
-            /* Mobile dropdown adjustments */
             .dropdown-menu {
                 position: fixed;
                 left: 50%;
@@ -289,12 +311,22 @@
                 font-size: 8px;
             }
             
-            .carousel-slide {
-                min-width: 100%;
+            .hero-section {
+                height: 400px;
+            }
+            
+            .masonry-grid {
+                column-count: 2;
             }
             
             .logo {
                 max-width: 300px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .masonry-grid {
+                column-count: 1;
             }
         }
     </style>
@@ -337,9 +369,23 @@
     </nav>
     
     <div class="container">
-        <div class="carousel-container">
-            <div class="carousel-track" id="carouselTrack">
-                <!-- Carousel slides will be inserted here -->
+        <!-- Hero Section -->
+        <div class="hero-section" id="heroSection">
+            <img id="heroImage" class="hero-image" src="" alt="Featured Photography">
+            <div class="hero-overlay">
+                <img src="/static/images/TaglineWhite.png" alt="Capturing the Quintessence" class="hero-tagline">
+            </div>
+        </div>
+        
+        <!-- Gallery Section -->
+        <div class="gallery-section">
+            <div class="gallery-header">
+                <h2>PORTFOLIO GALLERY</h2>
+                <p class="gallery-subtitle">Click any image to view details and order prints</p>
+            </div>
+            
+            <div class="masonry-grid" id="masonryGrid">
+                <div class="loading">Loading images...</div>
             </div>
         </div>
     </div>
@@ -362,174 +408,78 @@
     <!-- BETA MODAL -->
     {% include 'modal_beta.html' %}
     
-    <script>
-
-        
-        let carouselImages = [];
-        let currentIndex = 0;
-        let autoplayInterval;
-        let AUTOPLAY_SPEED = 5000; // 5 seconds default
-        
-        // Load images marked for carousel
-        async function loadCarousel() {
-            try {
-                // Load speed setting first
-                try {
-                    const speedRes = await fetch('/api/settings/carousel-speed');
-                    const speedData = await speedRes.json();
-                    if (speedData.speed) {
-                        AUTOPLAY_SPEED = speedData.speed;
-                    }
-                } catch (e) {
-                    console.error('Error loading carousel speed:', e);
-                }
-
-                const imgRes = await fetch('/api/images');
-                const images = await imgRes.json();
-                
-                // Filter images marked for carousel
-                const carouselMarked = images.filter(img => img.show_in_carousel);
-                
-                if (carouselMarked.length === 0) {
-                    console.log('No images marked for carousel');
-                    return;
-                }
-                
-                carouselImages = carouselMarked.map(img => img.filename);
-                
-                renderCarousel();
-                startAutoplay();
-            } catch (error) {
-                console.error('Error loading carousel:', error);
-            }
-        }
-        
-        function renderCarousel() {
-            const track = document.getElementById('carouselTrack');
-            
-            // Duplicate images for infinite loop effect
-            const allImages = [...carouselImages, ...carouselImages.slice(0, 3)];
-            
-            track.innerHTML = allImages.map(img => `
-                <div class="carousel-slide">
-                    <img src="/data/gallery-images/${img}" alt="Carousel Image">
-                </div>
-            `).join('');
-        }
-        
-        function slideCarousel() {
-            currentIndex++;
-            
-            if (currentIndex >= carouselImages.length) {
-                // Reset to beginning without animation
-                const track = document.getElementById('carouselTrack');
-                track.style.transition = 'none';
-                currentIndex = 0;
-                updateCarouselPosition();
-                
-                // Re-enable animation after reset
-                setTimeout(() => {
-                    track.style.transition = 'transform 0.8s ease-in-out';
-                    currentIndex = 1;
-                    updateCarouselPosition();
-                }, 50);
-            } else {
-                updateCarouselPosition();
-            }
-        }
-        
-        function updateCarouselPosition() {
-            const track = document.getElementById('carouselTrack');
-            const slideWidth = track.querySelector('.carousel-slide').offsetWidth;
-            const gap = 20;
-            const offset = -(currentIndex * (slideWidth + gap));
-            track.style.transform = `translateX(${offset}px)`;
-        }
-        
-        function startAutoplay() {
-            autoplayInterval = setInterval(slideCarousel, AUTOPLAY_SPEED);
-        }
-        
-        function stopAutoplay() {
-            clearInterval(autoplayInterval);
-        }
-        
-        // Initialize
-        loadCarousel();
-        
-        // Check for image parameter and open modal
-        document.addEventListener('DOMContentLoaded', async function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const imageParam = urlParams.get('image');
-            
-            if (imageParam) {
-                console.log('Image parameter found:', imageParam);
-                // Wait for images to load
-                try {
-                    const response = await fetch('/api/images');
-                    const images = await response.json();
-                    
-                    // Find the matching image
-                    const image = images.find(img => img.filename === imageParam);
-                    
-                    if (image) {
-                        console.log('Opening modal for image:', image.filename);
-                        // Wait a bit for modal-beta.js to load
-                        setTimeout(() => {
-                            if (typeof openModalBeta === 'function') {
-                                openModalBeta(image);
-                            } else {
-                                console.error('openModalBeta function not found');
-                            }
-                        }, 500);
-                    } else {
-                        console.log('Image not found:', imageParam);
-                    }
-                } catch (error) {
-                    console.error('Error loading images:', error);
-                }
-            }
-        });
-        
-        // Mobile dropdown functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const dropdowns = document.querySelectorAll('.dropdown');
-            
-            dropdowns.forEach(dropdown => {
-                const link = dropdown.querySelector('a');
-                const menu = dropdown.querySelector('.dropdown-menu');
-                
-                // Prevent default click behavior on mobile
-                link.addEventListener('click', function(e) {
-                    if (window.innerWidth <= 768) {
-                        e.preventDefault();
-                        
-                        // Close other dropdowns
-                        document.querySelectorAll('.dropdown-menu').forEach(m => {
-                            if (m !== menu) m.classList.remove('active');
-                        });
-                        
-                        // Toggle this dropdown
-                        menu.classList.toggle('active');
-                    }
-                });
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.dropdown')) {
-                    document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                        menu.classList.remove('active');
-                    });
-                }
-            });
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/shopify-config.js') }}?v=2.3.5"></script>
+    <script src="{{ url_for('static', filename='js/shopify-integration.js') }}?v=2.3.5"></script>
+    <script src="{{ url_for('static', filename='js/substrate-descriptions.js') }}?v=2.3.5"></script>
     
-    <!-- Modal Beta JavaScript -->
-    <script src="/static/js/shopify-config.js"></script>
-    <script src="/static/js/substrate-descriptions.js"></script>
-    <script src="/static/js/shopify-integration.js"></script>
-    <script src="/static/js/modal-beta.js"></script>
+    <script>
+        let allImages = [];
+        
+        // Load hero image
+        async function loadHeroImage() {
+            try {
+                const res = await fetch('/api/images');
+                const images = await res.json();
+                
+                // Find first image marked for carousel as hero, or use first image
+                const heroImg = images.find(img => img.show_in_carousel) || images[0];
+                
+                if (heroImg) {
+                    document.getElementById('heroImage').src = `/data/gallery-images/${heroImg.filename}`;
+                }
+            } catch (error) {
+                console.error('Error loading hero image:', error);
+            }
+        }
+        
+        // Load masonry gallery
+        async function loadMasonryGallery() {
+            try {
+                const res = await fetch('/api/images');
+                const images = await res.json();
+                allImages = images;
+                
+                // Take first 20 images for masonry grid
+                const displayImages = images.slice(0, 20);
+                
+                const grid = document.getElementById('masonryGrid');
+                grid.innerHTML = displayImages.map(img => `
+                    <div class="masonry-item" onclick="openModal('${img.filename}')">
+                        <img src="/data/gallery-images/${img.filename}" alt="${img.title || 'Gallery Image'}" loading="lazy">
+                        <div class="masonry-item-overlay">
+                            <div class="masonry-item-title">${img.title || 'Untitled'}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading gallery:', error);
+                document.getElementById('masonryGrid').innerHTML = '<div class="loading">Error loading images</div>';
+            }
+        }
+        
+        // Open modal function (connects to existing modal system)
+        function openModal(filename) {
+            const img = allImages.find(i => i.filename === filename);
+            if (img && window.openModalBeta) {
+                window.openModalBeta(img);
+            }
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHeroImage();
+            loadMasonryGallery();
+        });
+        
+        // Handle URL parameter for direct image modal open
+        const urlParams = new URLSearchParams(window.location.search);
+        const imageParam = urlParams.get('image');
+        if (imageParam) {
+            // Wait for images to load then open modal
+            setTimeout(() => {
+                openModal(imageParam);
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
