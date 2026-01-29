@@ -450,7 +450,7 @@
                 }
                 
                 grid.innerHTML = displayImages.map(img => `
-                    <div class="masonry-item" onclick="navigateToGallery('${img.filename}', ${JSON.stringify(img.categories || []).replace(/"/g, '&quot;')})">
+                    <div class="masonry-item" onclick="navigateToGallery('${img.filename}')">
                         <img src="/data/gallery-images/${img.filename}" alt="${img.title || 'Gallery Image'}" loading="lazy">
                         <div class="masonry-item-overlay">
                             <div class="masonry-item-title">${img.title || 'Untitled'}</div>
@@ -464,16 +464,24 @@
         }
         
         // Navigate to gallery page with the clicked image
-        function navigateToGallery(filename, categories) {
+        function navigateToGallery(filename) {
+            const img = allImages.find(i => i.filename === filename);
+            
+            if (!img) {
+                console.error('Image not found:', filename);
+                return;
+            }
+            
             // If image has categories, navigate to first category gallery
-            if (categories && categories.length > 0) {
-                const categorySlug = categories[0].toLowerCase().replace(/\s+/g, '-');
+            if (img.categories && img.categories.length > 0) {
+                const categorySlug = img.categories[0].toLowerCase().replace(/\s+/g, '-');
                 window.location.href = `/gallery/${categorySlug}?image=${filename}`;
             } else {
                 // Fallback: open modal if no category
-                const img = allImages.find(i => i.filename === filename);
-                if (img && window.openModalBeta) {
+                if (window.openModalBeta) {
                     window.openModalBeta(img);
+                } else {
+                    console.error('Modal function not available');
                 }
             }
         }
