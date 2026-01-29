@@ -439,12 +439,18 @@
                 const images = await res.json();
                 allImages = images;
                 
-                // Take first 20 images for masonry grid
-                const displayImages = images.slice(0, 20);
+                // Filter images marked for carousel/masonry display
+                const displayImages = images.filter(img => img.show_in_carousel);
                 
                 const grid = document.getElementById('masonryGrid');
+                
+                if (displayImages.length === 0) {
+                    grid.innerHTML = '<div class="loading">No images selected for display. Use admin panel to mark images for homepage.</div>';
+                    return;
+                }
+                
                 grid.innerHTML = displayImages.map(img => `
-                    <div class="masonry-item" onclick="openModal('${img.filename}')">
+                    <div class="masonry-item" onclick="navigateToGallery('${img.filename}', ${JSON.stringify(img.categories || []).replace(/"/g, '&quot;')})">
                         <img src="/data/gallery-images/${img.filename}" alt="${img.title || 'Gallery Image'}" loading="lazy">
                         <div class="masonry-item-overlay">
                             <div class="masonry-item-title">${img.title || 'Untitled'}</div>
@@ -457,11 +463,18 @@
             }
         }
         
-        // Open modal function (connects to existing modal system)
-        function openModal(filename) {
-            const img = allImages.find(i => i.filename === filename);
-            if (img && window.openModalBeta) {
-                window.openModalBeta(img);
+        // Navigate to gallery page with the clicked image
+        function navigateToGallery(filename, categories) {
+            // If image has categories, navigate to first category gallery
+            if (categories && categories.length > 0) {
+                const categorySlug = categories[0].toLowerCase().replace(/\s+/g, '-');
+                window.location.href = `/gallery/${categorySlug}?image=${filename}`;
+            } else {
+                // Fallback: open modal if no category
+                const img = allImages.find(i => i.filename === filename);
+                if (img && window.openModalBeta) {
+                    window.openModalBeta(img);
+                }
             }
         }
         
