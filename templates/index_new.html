@@ -473,9 +473,9 @@
             }
             
             // If image has categories, navigate to first category gallery
-            if (img.categories && img.categories.length > 0) {
-                const categorySlug = img.categories[0].toLowerCase().replace(/\s+/g, '-');
-                window.location.href = `/gallery/${categorySlug}?image=${filename}`;
+            if (img.galleries && img.galleries.length > 0) {
+                const gallerySlug = img.galleries[0].toLowerCase().replace(/\s+/g, '-');
+                window.location.href = `/gallery/${gallerySlug}?image=${filename}`;
             } else {
                 // Fallback: open modal if no category
                 if (window.openModalBeta) {
