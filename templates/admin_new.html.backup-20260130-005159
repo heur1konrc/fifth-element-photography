@@ -1318,85 +1318,28 @@
             document.body.removeChild(link);
         }
 
-        let heroImageData = {};
-        
         function setAsHero(filename, title) {
-            // Store image data for modal
-            heroImageData = {filename, title};
-            
             // Show positioning modal
-            document.getElementById('heroPositionModal').style.display = 'flex';
-        }
-        
-        function closeHeroModal() {
-            document.getElementById('heroPositionModal').style.display = 'none';
-            heroImageData = {};
-        }
-        
-        function setHeroWithPosition(position) {
-            if (!heroImageData.filename) return;
-            
+            const position = prompt('Enter hero image position (left, right, top, center, bottom):', 'center');
+            if (!position) return;
+
             fetch('/set_hero_image', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    filename: heroImageData.filename,
-                    title: heroImageData.title,
-                    position: position
-                })
+                body: JSON.stringify({filename, title, position})
             })
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    alert(`Hero image set to "${heroImageData.title}" with ${position} positioning`);
-                    closeHeroModal();
+                    alert(`Hero image set to "${title}" with ${position} positioning`);
                     location.reload();
                 } else {
                     alert('Error: ' + data.error);
-                    closeHeroModal();
                 }
             })
-            .catch(err => {
-                alert('Error setting hero image: ' + err);
-                closeHeroModal();
-            });
+            .catch(err => alert('Error setting hero image: ' + err));
         }
     </script>
-
-    <!-- Hero Image Position Modal -->
-    <div id="heroPositionModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center;">
-        <div style="background: #2a2a2a; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%;">
-            <h2 style="color: #fff; margin: 0 0 20px 0; font-size: 24px;">Choose Hero Image Position</h2>
-            <p style="color: #aaa; margin: 0 0 30px 0;">Select where the image should be positioned in the hero section:</p>
-            
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px;">
-                <button onclick="setHeroWithPosition('left')" style="padding: 20px; background: #4a90e2; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.background='#357abd'" onmouseout="this.style.background='#4a90e2'">
-                    <i class="fas fa-align-left" style="display: block; font-size: 24px; margin-bottom: 8px;"></i>
-                    Left
-                </button>
-                <button onclick="setHeroWithPosition('center')" style="padding: 20px; background: #4a90e2; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.background='#357abd'" onmouseout="this.style.background='#4a90e2'">
-                    <i class="fas fa-align-center" style="display: block; font-size: 24px; margin-bottom: 8px;"></i>
-                    Center
-                </button>
-                <button onclick="setHeroWithPosition('right')" style="padding: 20px; background: #4a90e2; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.background='#357abd'" onmouseout="this.style.background='#4a90e2'">
-                    <i class="fas fa-align-right" style="display: block; font-size: 24px; margin-bottom: 8px;"></i>
-                    Right
-                </button>
-                <button onclick="setHeroWithPosition('top')" style="padding: 20px; background: #4a90e2; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s; grid-column: 1;" onmouseover="this.style.background='#357abd'" onmouseout="this.style.background='#4a90e2'">
-                    <i class="fas fa-arrow-up" style="display: block; font-size: 24px; margin-bottom: 8px;"></i>
-                    Top
-                </button>
-                <button onclick="setHeroWithPosition('bottom')" style="padding: 20px; background: #4a90e2; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s; grid-column: 3;" onmouseover="this.style.background='#357abd'" onmouseout="this.style.background='#4a90e2'">
-                    <i class="fas fa-arrow-down" style="display: block; font-size: 24px; margin-bottom: 8px;"></i>
-                    Bottom
-                </button>
-            </div>
-            
-            <button onclick="closeHeroModal()" style="width: 100%; padding: 15px; background: #666; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: all 0.3s;" onmouseover="this.style.background='#555'" onmouseout="this.style.background='#666'">
-                Cancel
-            </button>
-        </div>
-    </div>
 
     <!-- Version identifier -->
     <div style="position: fixed; bottom: 0; right: 0; background: rgba(0,0,0,0.7); color: white; padding: 4px 12px; font-size: 11px; font-family: monospace; z-index: 9999; border-top-left-radius: 4px;">
