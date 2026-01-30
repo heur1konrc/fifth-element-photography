@@ -3089,7 +3089,7 @@ def set_hero_image():
             'position': position
         }
         
-        hero_file_path = os.path.join('data', 'hero_image.json')
+        hero_file_path = os.path.join('/data', 'hero_image.json')
         with open(hero_file_path, 'w') as f:
             json.dump(hero_data, f, indent=2)
         
@@ -3107,7 +3107,7 @@ def clear_hero_image():
             'title': None
         }
         
-        hero_file_path = os.path.join('data', 'hero_image.json')
+        hero_file_path = os.path.join('/data', 'hero_image.json')
         with open(hero_file_path, 'w') as f:
             json.dump(hero_data, f, indent=2)
         
@@ -3120,7 +3120,7 @@ def clear_hero_image():
 def get_hero_image():
     """API endpoint to get current hero image selection"""
     try:
-        hero_file_path = os.path.join('data', 'hero_image.json')
+        hero_file_path = os.path.join('/data', 'hero_image.json')
         if os.path.exists(hero_file_path):
             with open(hero_file_path, 'r') as f:
                 hero_data = json.load(f)
