@@ -375,6 +375,9 @@
                         <i class="fas fa-images status-icon {% if image.show_in_carousel %}active{% endif %}" 
                            onclick="toggleCarousel('{{ image.filename }}')" 
                            title="{% if image.show_in_carousel %}Remove from Carousel{% else %}Add to Carousel{% endif %}"></i>
+                        <i class="fas fa-home status-icon {% if image.is_hero %}active{% endif %}" 
+                           onclick="setAsHero('{{ image.filename }}', '{{ image.title }}')" 
+                           title="{% if image.is_hero %}Current Hero Image{% else %}Set as Hero Image{% endif %}"></i>
                                         <input type="checkbox" class="image-select" data-filename="{{ image.filename }}" onchange="updateSelectionCount()">
                                     </div>
                                 </div>
@@ -1313,6 +1316,28 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        function setAsHero(filename, title) {
+            // Show positioning modal
+            const position = prompt('Enter hero image position (left, right, top, center, bottom):', 'center');
+            if (!position) return;
+
+            fetch('/set_hero_image', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({filename, title, position})
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Hero image set to "${title}" with ${position} positioning`);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(err => alert('Error setting hero image: ' + err));
         }
     </script>
 

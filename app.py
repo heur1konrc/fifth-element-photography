@@ -3081,10 +3081,12 @@ def set_hero_image():
         if not filename:
             return jsonify({'success': False, 'error': 'No filename provided'})
         
-        # Save hero image selection
+        # Save hero image selection with positioning
+        position = data.get('position', 'center')  # left, right, top, center, bottom
         hero_data = {
             'filename': filename,
-            'title': title
+            'title': title,
+            'position': position
         }
         
         hero_file_path = os.path.join('/data', 'hero_image.json')

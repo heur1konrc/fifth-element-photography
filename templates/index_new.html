@@ -163,6 +163,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center; /* Default, will be overridden by JS */
         }
         
         .hero-overlay {
@@ -418,14 +419,25 @@
         // Load hero image
         async function loadHeroImage() {
             try {
-                const res = await fetch('/api/images');
-                const images = await res.json();
+                // Load hero image selection from backend
+                const heroRes = await fetch('/api/hero_image');
+                const heroData = await heroRes.json();
                 
-                // Find first image marked for carousel as hero, or use first image
-                const heroImg = images.find(img => img.show_in_carousel) || images[0];
-                
-                if (heroImg) {
-                    document.getElementById('heroImage').src = `/data/gallery-images/${heroImg.filename}`;
+                if (heroData && heroData.filename) {
+                    const heroImgEl = document.getElementById('heroImage');
+                    heroImgEl.src = `/data/gallery-images/${heroData.filename}`;
+                    
+                    // Apply positioning
+                    const position = heroData.position || 'center';
+                    heroImgEl.style.objectPosition = position;
+                } else {
+                    // Fallback: use first carousel image
+                    const res = await fetch('/api/images');
+                    const images = await res.json();
+                    const heroImg = images.find(img => img.show_in_carousel) || images[0];
+                    if (heroImg) {
+                        document.getElementById('heroImage').src = `/data/gallery-images/${heroImg.filename}`;
+                    }
                 }
             } catch (error) {
                 console.error('Error loading hero image:', error);
